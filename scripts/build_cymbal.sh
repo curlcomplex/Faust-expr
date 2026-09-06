@@ -4,14 +4,13 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 mkdir -p build/cymbal evidence/cymbal
 export OPENBLAS_NUM_THREADS=1
-# Keep the public compiler available for offline diagnosis of generated code.
-# Explicit file allowlist: no environment variables, credentials or private data.
+# Explicit public compiler files only; no environment or credentials.
 if [[ "${GITHUB_ACTIONS:-}" == true ]]; then
-  mkdir -p build/faust-sdk/include build/faust-sdk/share build/faust-sdk/lib
+  mkdir -p build/faust-sdk/include build/faust-sdk/share build/faust-sdk/lib build/faust-sdk/licenses
   cp /usr/bin/faust build/faust-sdk/
   cp -r /usr/include/faust build/faust-sdk/include/
   cp -r /usr/share/faust build/faust-sdk/share/
-  cp -r /usr/share/doc/faust build/faust-sdk/
+  cp -r /usr/share/doc/faust build/faust-sdk/licenses/
   ldd /usr/bin/faust > evidence/cymbal/faust-ldd.txt
   ldd /usr/bin/faust | awk '/=> \/[^ ]+/ {print $3}' | while IFS= read -r lib; do cp "$lib" build/faust-sdk/lib/; done
   tar -czf evidence/cymbal/faust-sdk.tar.gz -C build faust-sdk
