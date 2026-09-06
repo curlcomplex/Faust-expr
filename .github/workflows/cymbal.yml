@@ -1,0 +1,41 @@
+name: Spatial cymbal model and audio
+on:
+  push:
+    branches: [3-spatial-cymbal-v1]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: cymbal-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  cymbal:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install public distribution tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy python3-matplotlib
+      - name: Test analyser and shell construction
+        run: OPENBLAS_NUM_THREADS=1 /usr/bin/python3 -m unittest discover -s tests -v
+      - name: Compile and test the actual cymbal
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/cymbal
+          PATH=/usr/bin:/bin:$PATH bash scripts/build_cymbal.sh 2>&1 | tee evidence/cymbal/build.log
+      - name: Save source and audio evidence, including failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: cymbal-evidence-${{ github.sha }}
+          path: |
+            evidence/cymbal/
+            build/cymbal/cymbal-standalone.dsp
+            build/cymbal/model.json
+          if-no-files-found: warn
+          retention-days: 3
