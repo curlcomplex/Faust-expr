@@ -13,7 +13,7 @@ import numpy as np
 from numpy.polynomial import Polynomial, Legendre
 from scipy.linalg import eigh
 
-NMODES = 128
+NMODES = 64
 SUPPORT = 0.035
 RADIUS = 0.22
 THICKNESS = 0.0012

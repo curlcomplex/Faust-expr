@@ -1,126 +1,111 @@
 # Spatial Cymbal — first audible model
 
-This is the first research instrument for the user's brief, not a finished or
-calibrated replica of a manufactured cymbal. All sound comes from the compiled
-Faust model; there are no recorded cymbal samples, noise layers or reverb.
+This is a research instrument for the user's brief, not a calibrated replica
+of a manufactured cymbal. All sound comes from compiled Faust; no recorded
+cymbal samples, noise layers or reverb are used.
 
-## Play it
+## Build and play
 
-`bash scripts/build_cymbal.sh` builds the model and runs its render suite.
-Dependencies are Faust, g++, Python, NumPy and SciPy. The original two-tone
-smoke test and its `scripts/build.sh` remain unchanged.
+`bash scripts/build_cymbal.sh` builds the model and renders its comparison suite.
+Dependencies: Faust, g++, Python, NumPy and SciPy. The original two-tone smoke
+test (`scripts/build.sh`) remains available. CI includes both test suites.
 
-The CI artifact contains `spatial-cymbal.dsp`, a self-contained generated source
-that can be opened in the Faust IDE or compiled by a Faust host. The maintained
-source is `dsp/cymbal.dsp` plus `scripts/generate_cymbal.py`; do not edit the
-expanded generated kernel by hand.
+The cymbal artifact contains `spatial-cymbal.dsp`, a self-contained generated
+source for Faust hosts. Maintained source: `dsp/cymbal.dsp` and
+`scripts/generate_cymbal.py`; do not edit the expanded kernel by hand.
 
-Press **gate** to strike; release before another hit. Gate release does not
-stop the existing tail. **clear** empties the resonator state; **choke** increases
-mechanical damping. Begin at a low monitoring level. Audition WAVs are not
-individually normalised.
+Press **gate** to strike; release before the next hit. Gate release does not
+stop a tail. **clear** empties resonator state; **choke** increases damping.
+Start with a low monitoring level. Audition WAVs are not individually normalised.
 
 ## Controls
 
 - **diameter_m:** 1 cm to 40 m, logarithmic. **thickness_mm** is independent;
-  **proportional_thickness** instead scales thickness with diameter. The size
-  may change during a decay. Geometry extremes are intentionally imaginary.
-- **taper:** reduction from centre thickness to rim; **bell_diameter_ratio**,
-  **bell_height_ratio**, **bow_height_ratio** control the shape independently.
-  Bell height and bow height are relative to main radius; bell diameter ratio
-  is relative to main diameter. Default: 44 cm diameter, 1.2 mm central thickness,
-  0.48 mm nominal rim thickness, 12.3 cm bell diameter, 2.64 cm bell height.
-- **strike_radius:** 0–1 from mounting point to edge; **strike_angle_deg** gives
-  the full surface position. Radius below 0.035 is the clamped support, so a
-  strike at zero is silent, not an artificial bell sample. Try 0.16/0.55/0.92.
+  **proportional_thickness** scales thickness with diameter. Resize while ringing.
+- **taper:** reduction from centre thickness to rim. **bell_diameter_ratio**,
+  **bell_height_ratio**, **bow_height_ratio** control shape independently.
+  Heights are relative to main radius; bell diameter ratio to main diameter.
+  Default: 44 cm diameter, 1.2 mm central thickness, 0.48 mm nominal rim thickness,
+  12.3 cm bell diameter, 2.64 cm bell height.
+- **strike_radius:** 0–1, support to rim; **strike_angle_deg** covers the surface.
+  Radius below 0.035 is clamped and silent. Try 0.16/0.55/0.92 for bell/bow/edge.
 - **velocity**, **beater** (wood/nylon/felt/rubber/steel), **beater_mass_g**,
   **tip_radius_mm**, **beater_hardness** control excitation.
-- **material:** continuous bronze→steel→glass→wood morph. **stiffness_scale**,
-  **density_scale**, **loss_scale** allow impossible materials. Wood also has
-  **grain_anisotropy** and **grain_angle_deg**.
-- **hammering** continuously increases a fixed deterministic imperfection
-  pattern. **hammer_pattern** selects a pattern; use the amount, not the seed,
-  for smooth automation. **nonlinearity** controls internal modal exchange.
-- **gain_db** is a linear output gain, not a compressor or distortion stage.
+- **material:** bronze→steel→glass→wood morph. **stiffness_scale**,
+  **density_scale**, **loss_scale** permit imaginary combinations. Wood has
+  **grain_anisotropy** and **grain_angle_deg** controls.
+- **hammering** increases a fixed deterministic imperfection pattern;
+  **hammer_pattern** selects it. Automate amount rather than pattern number.
+- **nonlinearity** controls internal energy exchange; **gain_db** is linear
+  output gain, not a compressor or distortion stage.
 
-## What is physically derived
+## Model and its limits
 
-The reference calculation uses a Rayleigh–Ritz approximation to bending energy
-of a circular annular Kirchhoff–Love plate. Trial functions enforce displacement
-and slope zero at a small central support; the outer boundary is free through
-the variational formulation. Radial thickness varies linearly. The curvature
-energy includes radial, hoop and twist terms. Eigenvectors are mass-normalised.
-Both angular quadratures of non-axisymmetric modes are retained.
+The reference calculation uses Rayleigh–Ritz bending energy for a tapered
+annular Kirchhoff–Love plate. Trial functions enforce displacement and slope
+zero at a small central support; the outer boundary is variationally free.
+Radial thickness varies linearly. Radial, hoop and twist curvature terms enter
+the energy. Eigenvectors are mass-normalised and angular quadratures retained.
 
-The engine retains 128 modes selected across the audible band, rather than all
-modes below a cutoff. Strike coordinates sample those spatial shapes. A finite
-tip footprint attenuates wavelengths short compared with its contact area.
-The effective impact mass follows the modal mobility at that position, and an
-approximate restitution collision law includes pre-impact surface velocity.
-A Hertz-inspired contact-duration estimate shapes the impulse in time. Material
-stiffness/density and thickness/radius affect resonance scales, not merely EQ.
+The engine retains **64 broadband modes**, not every mode below a cutoff.
+The initial 128-mode compiler graph exceeded Faust's default 120-second limit;
+64 is the first-build complexity budget, not a convergence claim. Strike
+coordinates sample mode shapes; the finite tip footprint attenuates short
+wavelengths. Effective impact mass follows modal mobility. A restitution
+collision law uses pre-impact surface velocity; a Hertz-inspired duration
+estimate shapes the resulting impulse. Stiffness, density, thickness and radius
+change resonance scales, not just equalisation.
 
-## Explicit approximations and missing physics
+Important approximations:
 
-1. **Bell/shape:** a positive local curvature foundation approximates shell
-   stiffening; its in-plane relaxation factor is an uncalibrated modelling
-   parameter. This is not an exact shallow-shell solve. Live geometry uses a
-   positive Rayleigh-quotient frequency morph and radial coordinate warp of a
-   fixed reference basis; it does not solve new eigenvectors at each setting.
-2. **Crash nonlinearity:** two connected Cayley-rotation sweeps exchange energy
-   among modal momenta, depending on displacement. Each rotation preserves
-   quadratic state energy; damping reduces it. This provides amplitude-dependent
-   nonlinear motion without feedback blow-up. It is a passive reduced-order
-   surrogate, NOT the von Karman nonlinear coupling tensor or a validated
-   simulation of wave turbulence. No claim that a stronger hit sounds like a
-   real crash follows merely from a changed spectrum.
-3. **Beater:** the incoming collision uses body velocity, but contact force is
-   then a prescribed finite pulse. Continuous separation/re-contact and a
-   dynamically deforming stick are not solved. Brushes, bows and scraping are
-   not implemented. Beater and material properties are representative design
-   assumptions, not measured specimens or guaranteed physical calibration.
-4. **Hammering:** deterministic mode splitting and spatial asymmetry represent
-   imperfection; dents, work hardening and residual manufacturing stress are
-   not computed. Glass is unbreakable; wood uses a directional stiffness proxy,
-   not an orthotropic shell. Material interpolation is a creative construction.
-5. **Radiation:** two fixed weighted velocity pickups provide stereo. This is
-   not a microphone, room, full acoustic-radiation or radiation-impedance solve.
-6. **Changing object:** oscillator states are energy coordinates. Retuning
-   preserves the represented quadratic vibration energy before damping, rather
-   than pretending the expanding object has physically conserved momentum.
-   This is an explicit musical morph convention. Moving strike position alone
-   never crossfades or recolours an already-ringing tail.
-7. **Bandwidth:** modes approaching Nyquist fade and damp rather than fold back
-   into the audio band. Very tiny/huge objects can place most modes above/below
-   hearing. Fixed mode count is NOT mesh convergence or timbral completeness.
-   Nonlinear aliasing is reduced in previews by 96 kHz rendering followed by
-   proper low-pass downsampling to 48 kHz. The DSP itself does not automatically
-   oversample; live CPU, aliasing and iPad performance remain to be evaluated.
+1. **Bell/shape:** positive local curvature foundation with an uncalibrated
+   relaxation factor, not a complete shallow-shell solve. Geometry morphs use
+   positive stiffness-frequency interpolation and a radial coordinate warp of
+   a fixed reference basis, not freshly solved eigenvectors.
+2. **Nonlinearity:** two connected Cayley-rotation sweeps exchange modal momentum
+   energy depending on displacement. Each rotation preserves quadratic state
+   energy and damping reduces it. This passive surrogate is NOT the von Karman
+   coupling tensor or validated wave turbulence. Numerical stability does not
+   prove a realistic crash sound.
+3. **Beater:** the initial collision includes body velocity but the following
+   pulse is prescribed. Continuous deformation, separation and re-contact are
+   not solved. No brushes, scraping or bowing. Properties are representative
+   design assumptions, not measured specimens.
+4. **Hammering/material:** deterministic mode splitting and asymmetry; no dents,
+   residual stress or work hardening. Glass is unbreakable. Wood uses a
+   directional-stiffness proxy, not a full orthotropic shell. Material morphing
+   is a creative construction, not a claim about alloy manufacture.
+5. **Radiation:** two weighted velocity pickups give stereo; no microphone,
+   room, full radiation or radiation-impedance solve.
+6. **Retuning:** energy-coordinate states preserve represented quadratic energy
+   before damping, an explicit musical convention for a changing object.
+   Moving the strike point alone never crossfades the existing sound.
+7. **Bandwidth:** approaching-Nyquist modes fade and damp; extreme sizes can be
+   ultrasonic/subsonic. Fixed mode count does not establish timbral completeness.
+   Auditions render at 96 kHz and use low-pass downsampling to 48 kHz to reduce
+   nonlinear aliasing. The DSP does not internally oversample; real-time CPU,
+   aliasing convergence and iPad performance require separate evaluation.
 
-## Evidence and acceptance
+## Evidence
 
-`evidence/cymbal/results.json` records the exact tested commit, parameters,
-triggers, runtime and unnormalised levels. The suite checks silence, support
-position, repeatability, parameter validation, sample-rate and block-size
-behaviour, nearby strike continuity, tail independence from beater movement,
-clear/retriggering, contact softness, nonlinear ablation and extreme settings.
-Those are numerical and behavioural checks, not a human listening assessment.
+`evidence/cymbal/results.json` records the tested commit, parameters, events,
+levels and runtime. Tests cover silence, support, repeatability, invalid controls,
+sample rates, block-size independence, nearby strike continuity, unchanged tails
+when the beater moves, clear/retrigger, contact softness, nonlinear ablation and
+extreme controls. These are behavioural/numerical checks, not listening judgement.
 
-The developer and listener should first judge bell/bow/edge stick and felt
-examples. Next compare size and material examples and the ringing resize.
-Any change in fidelity requirements should be tested against real recordings
-and/or a fuller nonlinear reference, not satisfied by renaming knobs.
+First audition bell/bow/edge using wood and felt, then size/material and live
+resizing. Fidelity must be assessed against recordings or a fuller reference,
+not inferred from control labels. No private host source is included; CURLOP
+runtime/GUI verification remains separate. Do not merge without approval.
 
 ## Research basis
 
 - Nguyen & Touze (2019), *Nonlinear vibrations of thin plates with variable
   thickness: Application to sound synthesis of cymbals*, JASA 145, 977–988.
-  DOI: https://doi.org/10.1121/1.5091013
-- Authors' sound examples and discussion of taper and curvature:
-  https://perso.ensta.fr/~touze/tapercymbals.html
-- Faust syntax / recursive composition / tables:
-  https://faustdoc.grame.fr/manual/syntax/
+  https://doi.org/10.1121/1.5091013
+- Author examples: https://perso.ensta.fr/~touze/tapercymbals.html
+- Faust syntax: https://faustdoc.grame.fr/manual/syntax/
 
-These motivate the model and the limitations; this code is not a reproduction
-of the paper's full method. No private host source is included. Host integration
-and real GUI screenshots require separate testing. Do not merge without approval.
+These motivate the approach and caveats; this code does not reproduce the
+paper's full nonlinear method.

@@ -39,13 +39,14 @@ struct UI {
         const auto name=assignment.substr(0,pos);
         size_t used=0; const auto tail=assignment.substr(pos+1);
         const double value=std::stod(tail,&used);
+        const float stored=static_cast<float>(value);
         const auto it=controls.find(name);
         if(it==controls.end() || !it->second.writable) throw std::runtime_error("Unknown/wrong control: "+name);
-        if(used!=tail.size() || !std::isfinite(value) || value<it->second.lo || value>it->second.hi)
+        if(used!=tail.size() || !std::isfinite(value) || !std::isfinite(stored) || stored<it->second.lo || stored>it->second.hi)
             throw std::runtime_error("Invalid control value: "+assignment);
         if((name=="beater" || name=="hammer_pattern" || name=="proportional_thickness") && std::floor(value)!=value)
             throw std::runtime_error("Integer control required: "+assignment);
-        *it->second.zone=static_cast<float>(value);
+        *it->second.zone=stored;
     }
 };
 #include "cymbal.hpp"
