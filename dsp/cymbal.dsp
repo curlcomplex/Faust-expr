@@ -59,8 +59,9 @@ tipfactor = 1+(beater==1)*(-0.2)+(beater==2)*2+(beater==3)*0.8+(beater==4)*(-0.5
 contactk = max(0.001,hardness)*(10000000*(beater==0)+6000000*(beater==1)+20000*(beater==2)+150000*(beater==3)+40000000*(beater==4)+3000*(beater==5));
 zeta = 0.1+0.08*(beater==1)+0.45*(beater==2)+0.2*(beater==3)-0.05*(beater==4)+0.55*(beater==5);
 contactd = 2*zeta*sqrt(contactk*max(0.002,mb));
+// Explicit float is essential: Faust integers are signed 32-bit.
 // Positive low-rank stretching potential: U = kappa*slope^4/4.
-kappa = bloom*100000000000*er*(thickness*0.001)*pow(size*0.5,2)*0.025;
+kappa = bloom*1.0e11*er*(thickness*0.001)*pow(size*0.5,2)*0.025;
 
 import("cymbal-network.lib");
 process = (step ~ si.bus(STATES)) : pickup : (fi.dcblocker,fi.dcblocker);
