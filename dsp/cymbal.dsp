@@ -29,7 +29,7 @@ pattern=hslider("hammer_pattern",3,0,15,1);
 
 // Morph: 0 bronze, 1 steel, 2 glass, 3 wood. Values are representative design
 // assumptions, not measurements of an alloy, glass formulation or wood specimen.
-material=clip(0,3,hslider("material[style:menu{'Bronze':0;'Steel':1;'Glass':2;'Wood':3}]",0,0,3,0.001):smooth);
+material=clip(0,3,hslider("material",0,0,3,0.001):smooth);
 stiffness=clip(0.05,4,hslider("stiffness_scale[scale:log]",1,0.05,4,0.001):smooth);
 density=clip(0.1,4,hslider("density_scale[scale:log]",1,0.1,4,0.001):smooth);
 loss=clip(0.1,12,hslider("loss_scale[scale:log]",1,0.1,12,0.001):smooth);
@@ -74,7 +74,7 @@ modeHz(i)=sqrt(max(0.0000000001,materialRatio*(
     *exp(0.055*hammer*sin(12.9898*(i+1)+19.31*pattern))
     *sqrt(1-grain*0.8*(0.5+0.5*cos(2*(azimuth(i)*0.37+quadrature(i)*ma.PI/2-grainAngle*ma.PI/180))));
 band(i)=clip(0,1,(0.44*ma.SR-modeHz(i))/(0.08*ma.SR));
-modeDecay(i)=(1-clear)*exp(-(loss*(0.16+ma.PI*eta*modeHz(i)+0.07*sqrt(modeHz(i)/1000))
+modeDecay(i)=(1-clear)*exp(0-(loss*(0.16+ma.PI*eta*modeHz(i)+0.07*sqrt(modeHz(i)/1000))
                               +choke*180+600*(1-band(i)))/ma.SR);
 // Piecewise continuous radial warp keeps the reference bell boundary aligned.
 warped=select2(position>bell,position*0.28/bell,0.28+(position-bell)*0.72/(1-bell));
@@ -96,9 +96,9 @@ length=max(3,ba.sAndH(hit,contactSamples));
 impulse(vs)=ba.sAndH(hit,(1+restitution)*reducedMass*clip(0,12,impactSpeed-vs));
 force(vs)=seen*(elapsed<length)*(1-cos(2*ma.PI*elapsed/length))/length
                *impulse(vs)/sqrt(modalMass);
-pickup(i,ch)=0.45/sqrt(N)*radial(i,0.73+0.09*ch)
+pickup(i,ch)=3.0/sqrt(N)*radial(i,0.73+0.09*ch)
              *cos(azimuth(i)*(0.31+0.69*ch)+quadrature(i)*ma.PI/2)
              *band(i)*sqrt(modeHz(i)/(modeHz(i)+100));
-tick(vs)=model(force(vs));
+tick(vs)=force(vs) : model;
 observe(vs,l,r,energy)=attach(l,energy : hbargraph("energy",0,1000)),r;
 process=(tick ~ _) : observe : par(ch,2,fi.dcblocker*gain);
