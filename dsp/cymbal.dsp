@@ -53,8 +53,8 @@ beater=clip(0,4,nentry("beater[style:menu{'Wood':0;'Nylon':1;'Felt':2;'Rubber':3
 beaterMass=0.001*clip(1,200,hslider("beater_mass_g[unit:g][scale:log]",25,1,200,0.1));
 tip=0.001*clip(0.2,25,hslider("tip_radius_mm[unit:mm][scale:log]",3.5,0.2,25,0.1));
 hardness=clip(0.1,4,hslider("beater_hardness[scale:log]",1,0.1,4,0.001));
-tipE=hardness*ba.take(int(beater)+1,(10e9,2e9,1e6,5e7,200e9));
-restitution=ba.take(int(beater)+1,(0.55,0.65,0.12,0.8,0.7));
+tipE=hardness*((10e9,2e9,1e6,5e7,200e9):ba.selectn(5,int(beater)));
+restitution=((0.55,0.65,0.12,0.8,0.7):ba.selectn(5,int(beater)));
 impactSpeed=6*velocity;
 
 nonlinearity=clip(0,1,hslider("nonlinearity",0.65,0,1,0.001):smooth);
