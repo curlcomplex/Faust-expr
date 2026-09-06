@@ -1,14 +1,15 @@
 """Small Rayleigh--Ritz shallow-shell model. SI units; no fitted audio samples.
 
-Clamped 3 mm mounting hole, free rim, tapered thickness. In-plane coordinates
-are statically condensed before solving transverse eigenmodes. The realtime
-model interpolates nine bell geometries in this deliberately limited basis.
+Clamped 3 mm mounting-hole radius, free rim, tapered thickness. In-plane
+coordinates are statically condensed before solving transverse eigenmodes.
+The realtime model interpolates nine bell geometries in a limited basis.
 """
 from __future__ import annotations
 import numpy as np
 from numpy.polynomial import Polynomial, Legendre
 from scipy.linalg import eigh
 from scipy.optimize import linear_sum_assignment
+from math import comb
 
 RADIUS = 0.25
 THICKNESS = 0.0012
@@ -24,18 +25,23 @@ ANGULAR_ORDERS = 14
 BASIS_SIZE = 16
 SAMPLES = 41
 
-def basis(m: int, size: int, power: int, r: np.ndarray):
-    x = Polynomial([-(1 + HOLE)/(1-HOLE), 2/(1-HOLE)])
-    envelope = Polynomial([-HOLE, 1])**power * Polynomial([0, 1])**max(0, m-power)
-    polys = [envelope * Legendre.basis(j).convert(kind=Polynomial)(x) for j in range(size)]
-    values = np.array([p(r) for p in polys]).T
-    # Weighted QR avoids unstable monomial conditioning at higher angular order.
-    _, transform = np.linalg.qr(values)
-    inverse = np.linalg.inv(transform)
-    return polys, inverse
+def raw_basis(descriptor, r, derivative=0):
+    envelope, legs = descriptor
+    r=np.asarray(r)
+    scale=2/(1-HOLE); x=(2*r-1-HOLE)/(1-HOLE)
+    # Direct Legendre recurrences avoid high-degree monomial cancellation.
+    return np.array([sum(comb(derivative,k)*envelope.deriv(k)(r)
+        *p.deriv(derivative-k)(x)*scale**(derivative-k)
+        for k in range(derivative+1)) for p in legs]).T
 
-def evaluate(polys, transform, r, derivative=0):
-    return np.array([p.deriv(derivative)(r) for p in polys]).T @ transform
+def basis(m: int, size: int, power: int, r: np.ndarray):
+    envelope=Polynomial([-HOLE,1])**power * Polynomial([0,1])**max(0,m-power)
+    descriptor=(envelope,[Legendre.basis(j) for j in range(size)])
+    _, transform=np.linalg.qr(raw_basis(descriptor,r))
+    return descriptor,np.linalg.inv(transform)
+
+def evaluate(descriptor, transform, r, derivative=0):
+    return raw_basis(descriptor,r,derivative) @ transform
 
 def shell_modes(m: int, bell_radius: float, bell_height: float):
     x, wt = np.polynomial.legendre.leggauss(112)
@@ -58,7 +64,6 @@ def shell_modes(m: int, bell_radius: float, bell_height: float):
     kb += POISSON*(gram(krr,ktt,area*D)+gram(ktt,krr,area*D))
     kb += 2*(1-POISSON)*gram(krt,krt,area*D)
     zeros = np.zeros_like(w)
-    # [radial strain, circumferential strain, engineering shear strain].
     ew = [slope[:,None]*wr,zeros,-m*slope[:,None]*w/radius]
     eu = [ur,u/radius,-m*u/radius]
     ev = [zeros,m*u/radius,ur-u/radius]
@@ -80,7 +85,6 @@ def shell_modes(m: int, bell_radius: float, bell_height: float):
     sample_r=np.linspace(HOLE,1,SAMPLES)
     shapes=evaluate(wp,wq,sample_r)@q
     slope_nl=(evaluate(wp,wq,np.array([0.63]),1)@q)[0]/RADIUS
-    # Canonical sign at maximum displacement; geometric neighbours are aligned below.
     for j in range(RADIAL_MODES):
         sign=np.sign(shapes[np.argmax(abs(shapes[:,j])),j]) or 1
         shapes[:,j]*=sign; slope_nl[j]*=sign; q[:,j]*=sign
@@ -91,8 +95,6 @@ def make_grid():
     for height in BELL_HEIGHTS:
         for radius in BELL_RADII:
             result.append([shell_modes(m,radius,height) for m in range(ANGULAR_ORDERS)])
-    # Match radial families against central geometry. Shapes are for interpolation,
-    # not recomputed eigenmodes at every intermediate control value.
     for m in range(ANGULAR_ORDERS):
         ref=result[4][m]
         for g in range(9):

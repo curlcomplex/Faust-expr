@@ -28,13 +28,13 @@ def generate(out: pathlib.Path):
     for k,(m,n,p) in enumerate(modes):
         u=m*RADIAL_MODES+n
         lines.extend([
-            f'w{k}=omega({u},{k}); d{k}=den({u},{k});',
+            f'w{k}=omega({u},{k}); denom{k}=den({u},{k});',
             f'a{k}=shape({u},pos)*angular({m},{p},angle)*ms*foot({u})*band({u},{k});',
             f'g{k}=blend({u},2)*angular({m},{p},0.371)*ms/sr*band({u},{k})/(1+pow(basefreq({u})/5000,2));',
-            f'vf{k}=((1-sigma({u},{k})*dt-pow(w{k}*dt*0.5,2))*v{k}-w{k}*dt*x{k})/d{k};',
+            f'vf{k}=((1-sigma({u},{k})*dt-pow(w{k}*dt*0.5,2))*v{k}-w{k}*dt*x{k})/denom{k};',
             f'xf{k}=x{k}+w{k}*dt*0.5*(v{k}+vf{k});',
-            f'vn{k}=vf{k}+dt*(a{k}*fc-g{k}*fn)/d{k};',
-            f'xn{k}=xf{k}+w{k}*h*(a{k}*fc-g{k}*fn)/d{k};'])
+            f'vn{k}=vf{k}+dt*(a{k}*fc-g{k}*fn)/denom{k};',
+            f'xn{k}=xf{k}+w{k}*h*(a{k}*fc-g{k}*fn)/denom{k};'])
     summ=lambda term:'+'.join(term(k) for k in range(N))
     lines.extend([
         'active=max(aold,trig);',
@@ -42,9 +42,9 @@ def generate(out: pathlib.Path):
         'contactfree='+summ(lambda k:f'a{k}*xf{k}/w{k}')+';',
         's0='+summ(lambda k:f'g{k}*x{k}/w{k}')+';',
         'sf='+summ(lambda k:f'g{k}*xf{k}/w{k}')+';',
-        'ac=1/max(0.002,mb)+'+summ(lambda k:f'a{k}*a{k}/d{k}')+';',
-        'ag='+summ(lambda k:f'g{k}*g{k}/d{k}')+';',
-        'cross='+summ(lambda k:f'a{k}*g{k}/d{k}')+';',
+        'ac=1/max(0.002,mb)+'+summ(lambda k:f'a{k}*a{k}/denom{k}')+';',
+        'ag='+summ(lambda k:f'g{k}*g{k}/denom{k}')+';',
+        'cross='+summ(lambda k:f'a{k}*g{k}/denom{k}')+';',
         'bx=select2(trig,bxold,contactold);',
         'bv=select2(trig,bvold,3*velocity);',
         'd0=bx-contactold; df=bx+dt*bv-contactfree;',
