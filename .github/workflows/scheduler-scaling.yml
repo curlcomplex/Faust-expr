@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: scheduler-scaling-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   scaling-macos:
     runs-on: macos-15
@@ -16,6 +20,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           ref: research/libfaust-scheduler
+          persist-credentials: false
       - name: Install tested toolchain
         run: |
           brew install faust llvm@22
@@ -58,41 +63,56 @@ jobs:
           "$CXX" -std=c++17 -O3 -I"$INC" scripts/scheduler_scaling_bench.cpp -L"$LIB" -Wl,-rpath,"$LIB" -lfaust -lpthread -lz -o build/scaling/bench
           cp build/scaling/scheduler.cpp evidence-scaling/
           cp build/scaling/scheduler.ll evidence-scaling/
-      - name: Prepare cached factories
+      - name: Prepare cached light factories
         run: |
           set -euo pipefail
           for V in 32 64 128 256; do
-            build/scaling/prep scalar "$V" "build/scaling/scalar-$V.bc" - | tee "evidence-scaling/prep-scalar-$V.txt"
-            build/scaling/prep vec "$V" "build/scaling/vec-$V.bc" - | tee "evidence-scaling/prep-vec-$V.txt"
-            build/scaling/prep sch "$V" "build/scaling/sch-$V.bc" build/scaling/scheduler.ll | tee "evidence-scaling/prep-sch-$V.txt"
+            build/scaling/prep scalar "$V" "build/scaling/scalar-$V.bc" - light | tee "evidence-scaling/prep-scalar-$V.txt"
+            build/scaling/prep vec "$V" "build/scaling/vec-$V.bc" - light | tee "evidence-scaling/prep-vec-$V.txt"
+            build/scaling/prep sch "$V" "build/scaling/sch-$V.bc" build/scaling/scheduler.ll light | tee "evidence-scaling/prep-sch-$V.txt"
           done
-      - name: Run scaling matrix
+      - name: Run light scaling matrix
         run: |
           set -euo pipefail
           : > evidence-scaling/results.tsv
-          printf 'mode\tvoices\tframes\tparticipants\tmedian_ns_per_frame\tbest_ns_per_frame\tworst_ns_per_frame\trealtime_factor\n' >> evidence-scaling/results.tsv
+          printf 'family\tmode\tvoices\tframes\tparticipants\tmedian_ns_per_frame\tbest_ns_per_frame\tworst_ns_per_frame\trealtime_factor\n' >> evidence-scaling/results.tsv
           for V in 32 64 128 256; do
             for F in 64 128 256 512; do
-              # Keep enough frames per trial for stable throughput while bounding CI runtime.
-              B=$(( 524288 / F ))
-              if [ "$B" -lt 1000 ]; then B=1000; fi
+              B=$(( 524288 / F )); if [ "$B" -lt 1000 ]; then B=1000; fi
               for MODE in scalar vec; do
                 OUT="$(build/scaling/bench build/scaling/$MODE-$V.bc 1 "$F" "$B")"
                 echo "$OUT" > "evidence-scaling/${MODE}-v${V}-f${F}.txt"
-                MED="$(echo "$OUT" | awk -F= '/median_ns_per_frame/{print $2}')"
-                BEST="$(echo "$OUT" | awk -F= '/best_ns_per_frame/{print $2}')"
-                WORST="$(echo "$OUT" | awk -F= '/worst_ns_per_frame/{print $2}')"
-                RT="$(echo "$OUT" | awk -F= '/median_realtime_factor/{print $2}')"
-                printf '%s\t%s\t%s\t1\t%s\t%s\t%s\t%s\n' "$MODE" "$V" "$F" "$MED" "$BEST" "$WORST" "$RT" >> evidence-scaling/results.tsv
+                MED="$(echo "$OUT" | awk -F= '/median_ns_per_frame/{print $2}')"; BEST="$(echo "$OUT" | awk -F= '/best_ns_per_frame/{print $2}')"; WORST="$(echo "$OUT" | awk -F= '/worst_ns_per_frame/{print $2}')"; RT="$(echo "$OUT" | awk -F= '/median_realtime_factor/{print $2}')"
+                printf 'light\t%s\t%s\t%s\t1\t%s\t%s\t%s\t%s\n' "$MODE" "$V" "$F" "$MED" "$BEST" "$WORST" "$RT" >> evidence-scaling/results.tsv
               done
               for P in 1 2 3; do
                 OUT="$(build/scaling/bench build/scaling/sch-$V.bc "$P" "$F" "$B")"
                 echo "$OUT" > "evidence-scaling/sch-v${V}-f${F}-p${P}.txt"
-                MED="$(echo "$OUT" | awk -F= '/median_ns_per_frame/{print $2}')"
-                BEST="$(echo "$OUT" | awk -F= '/best_ns_per_frame/{print $2}')"
-                WORST="$(echo "$OUT" | awk -F= '/worst_ns_per_frame/{print $2}')"
-                RT="$(echo "$OUT" | awk -F= '/median_realtime_factor/{print $2}')"
-                printf 'sch\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$V" "$F" "$P" "$MED" "$BEST" "$WORST" "$RT" >> evidence-scaling/results.tsv
+                MED="$(echo "$OUT" | awk -F= '/median_ns_per_frame/{print $2}')"; BEST="$(echo "$OUT" | awk -F= '/best_ns_per_frame/{print $2}')"; WORST="$(echo "$OUT" | awk -F= '/worst_ns_per_frame/{print $2}')"; RT="$(echo "$OUT" | awk -F= '/median_realtime_factor/{print $2}')"
+                printf 'light\tsch\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$V" "$F" "$P" "$MED" "$BEST" "$WORST" "$RT" >> evidence-scaling/results.tsv
+              done
+            done
+          done
+      - name: Prepare and run heavy-task matrix
+        run: |
+          set -euo pipefail
+          for V in 16 32 64; do
+            build/scaling/prep scalar "$V" "build/scaling/heavy-scalar-$V.bc" - heavy | tee "evidence-scaling/prep-heavy-scalar-$V.txt"
+            build/scaling/prep vec "$V" "build/scaling/heavy-vec-$V.bc" - heavy | tee "evidence-scaling/prep-heavy-vec-$V.txt"
+            build/scaling/prep sch "$V" "build/scaling/heavy-sch-$V.bc" build/scaling/scheduler.ll heavy | tee "evidence-scaling/prep-heavy-sch-$V.txt"
+            for F in 128 512; do
+              B=$(( 262144 / F )); if [ "$B" -lt 512 ]; then B=512; fi
+              for MODE in scalar vec; do
+                OUT="$(build/scaling/bench build/scaling/heavy-$MODE-$V.bc 1 "$F" "$B")"
+                echo "$OUT" > "evidence-scaling/heavy-${MODE}-v${V}-f${F}.txt"
+                MED="$(echo "$OUT" | awk -F= '/median_ns_per_frame/{print $2}')"; BEST="$(echo "$OUT" | awk -F= '/best_ns_per_frame/{print $2}')"; WORST="$(echo "$OUT" | awk -F= '/worst_ns_per_frame/{print $2}')"; RT="$(echo "$OUT" | awk -F= '/median_realtime_factor/{print $2}')"
+                printf 'heavy\t%s\t%s\t%s\t1\t%s\t%s\t%s\t%s\n' "$MODE" "$V" "$F" "$MED" "$BEST" "$WORST" "$RT" >> evidence-scaling/results.tsv
+              done
+              for P in 1 2 3; do
+                OUT="$(build/scaling/bench build/scaling/heavy-sch-$V.bc "$P" "$F" "$B")"
+                echo "$OUT" > "evidence-scaling/heavy-sch-v${V}-f${F}-p${P}.txt"
+                MED="$(echo "$OUT" | awk -F= '/median_ns_per_frame/{print $2}')"; BEST="$(echo "$OUT" | awk -F= '/best_ns_per_frame/{print $2}')"; WORST="$(echo "$OUT" | awk -F= '/worst_ns_per_frame/{print $2}')"; RT="$(echo "$OUT" | awk -F= '/median_realtime_factor/{print $2}')"
+                printf 'heavy\tsch\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$V" "$F" "$P" "$MED" "$BEST" "$WORST" "$RT" >> evidence-scaling/results.tsv
               done
             done
           done
@@ -100,29 +120,25 @@ jobs:
       - name: Summarize scaling
         run: |
           python3 - <<'PY'
-          import csv, json, statistics
+          import csv, json
           from pathlib import Path
           rows=list(csv.DictReader(open('evidence-scaling/results.tsv'), delimiter='\t'))
           for r in rows:
               for k in ('voices','frames','participants'): r[k]=int(r[k])
               for k in ('median_ns_per_frame','best_ns_per_frame','worst_ns_per_frame','realtime_factor'): r[k]=float(r[k])
           report=[]
-          for v in (32,64,128,256):
-              for f in (64,128,256,512):
-                  group=[r for r in rows if r['voices']==v and r['frames']==f]
+          for family in ('light','heavy'):
+              keys=sorted({(r['voices'],r['frames']) for r in rows if r['family']==family})
+              for v,f in keys:
+                  group=[r for r in rows if r['family']==family and r['voices']==v and r['frames']==f]
                   by={(r['mode'],r['participants']):r for r in group}
-                  scalar=by[('scalar',1)]['median_ns_per_frame']
-                  vec=by[('vec',1)]['median_ns_per_frame']
-                  s1=by[('sch',1)]['median_ns_per_frame']
-                  s2=by[('sch',2)]['median_ns_per_frame']
-                  s3=by[('sch',3)]['median_ns_per_frame']
-                  report.append(dict(voices=v,frames=f,scalar=scalar,vec=vec,sch1=s1,sch2=s2,sch3=s3,
-                      vec_vs_scalar=scalar/vec,sch2_vs_sch1=s1/s2,sch3_vs_sch1=s1/s3,
-                      sch2_vs_scalar=scalar/s2,sch3_vs_scalar=scalar/s3))
+                  scalar=by[('scalar',1)]['median_ns_per_frame']; vec=by[('vec',1)]['median_ns_per_frame']; s1=by[('sch',1)]['median_ns_per_frame']; s2=by[('sch',2)]['median_ns_per_frame']; s3=by[('sch',3)]['median_ns_per_frame']
+                  report.append(dict(family=family,voices=v,frames=f,scalar=scalar,vec=vec,sch1=s1,sch2=s2,sch3=s3,
+                      vec_vs_scalar=scalar/vec,sch2_vs_sch1=s1/s2,sch3_vs_sch1=s1/s3,sch2_vs_scalar=scalar/s2,sch3_vs_scalar=scalar/s3))
           Path('evidence-scaling/summary.json').write_text(json.dumps(report,indent=2))
-          print('voices frames  vec/scalar  sch2/sch1  sch3/sch1  sch2/scalar  sch3/scalar')
+          print('family voices frames vec/scalar sch2/sch1 sch3/sch1 sch2/scalar sch3/scalar')
           for r in report:
-              print(f"{r['voices']:>6} {r['frames']:>6} {r['vec_vs_scalar']:>10.3f} {r['sch2_vs_sch1']:>10.3f} {r['sch3_vs_sch1']:>10.3f} {r['sch2_vs_scalar']:>11.3f} {r['sch3_vs_scalar']:>11.3f}")
+              print(f"{r['family']:>5} {r['voices']:>6} {r['frames']:>6} {r['vec_vs_scalar']:>10.3f} {r['sch2_vs_sch1']:>10.3f} {r['sch3_vs_sch1']:>10.3f} {r['sch2_vs_scalar']:>11.3f} {r['sch3_vs_scalar']:>11.3f}")
           PY
       - uses: actions/upload-artifact@v4
         with:
