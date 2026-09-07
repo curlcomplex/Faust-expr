@@ -46,6 +46,8 @@ std::vector<std::string> argsFor(const std::string& mode)
 
 int main(int argc, char** argv)
 {
+    std::cout << std::unitbuf;
+    std::cerr << std::unitbuf;
     if (argc != 2) {
         std::cerr << "usage: jit_scheduler_probe scalar|vec32|vec64|sch\n";
         return 2;
@@ -55,13 +57,19 @@ int main(int argc, char** argv)
     std::vector<const char*> faustArgs;
     for (const auto& arg : storage) faustArgs.push_back(arg.c_str());
 
+    const char* targetEnv = std::getenv("FAUST_JIT_TARGET");
+    const std::string target = targetEnv && *targetEnv
+        ? targetEnv : "x86_64-pc-linux-gnu:generic";
+    std::cout << "mode=" << mode << "\n";
+    std::cout << "target=" << target << "\n";
+
     std::string error;
     const auto buildStart = std::chrono::steady_clock::now();
     std::unique_ptr<llvm_dsp_factory, FactoryDeleter> factory(
         createDSPFactoryFromString("SchedulerProbe", kSource,
                                    static_cast<int>(faustArgs.size()),
                                    faustArgs.empty() ? nullptr : faustArgs.data(),
-                                   "", error, -1));
+                                   target, error, -1));
     const auto buildEnd = std::chrono::steady_clock::now();
     if (!factory) {
         std::cerr << "factory_error=" << error << "\n";
@@ -69,18 +77,19 @@ int main(int argc, char** argv)
     }
 
     const std::string ir = writeDSPFactoryToIR(factory.get());
-    std::cout << "mode=" << mode << "\n";
     std::cout << "compile_options=" << factory->getCompileOptions() << "\n";
     std::cout << "ir_bytes=" << ir.size() << "\n";
     std::cout << "ir_has_createScheduler=" << (ir.find("createScheduler") != std::string::npos) << "\n";
     std::cout << "ir_has_computeThreadExternal=" << (ir.find("computeThreadExternal") != std::string::npos) << "\n";
     std::cout << "build_us=" << std::chrono::duration_cast<std::chrono::microseconds>(buildEnd - buildStart).count() << "\n";
+    std::cout << "stage=create_instance\n";
 
     std::unique_ptr<dsp, DSPDeleter> instance(factory->createDSPInstance());
     if (!instance) {
         std::cerr << "instance_error=null\n";
         return 4;
     }
+    std::cout << "stage=init\n";
     instance->init(48000);
 
     constexpr int frames = 256;
@@ -89,7 +98,9 @@ int main(int argc, char** argv)
     std::vector<FAUSTFLOAT> left(frames), right(frames);
     FAUSTFLOAT* outputs[2] = {left.data(), right.data()};
 
+    std::cout << "stage=warmup\n";
     for (int i = 0; i < warmup; ++i) instance->compute(frames, nullptr, outputs);
+    std::cout << "stage=benchmark\n";
     const auto start = std::chrono::steady_clock::now();
     for (int i = 0; i < iterations; ++i) instance->compute(frames, nullptr, outputs);
     const auto end = std::chrono::steady_clock::now();
