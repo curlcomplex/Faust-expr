@@ -1,0 +1,72 @@
+name: Scheduler bitcode compatibility
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scheduler-bitcode-macos:
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - name: Check out research branch
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install Faust
+        shell: bash
+        run: |
+          set -euo pipefail
+          brew install faust
+      - name: Build scheduler support module and bitcode probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build evidence-scheduler-bitcode
+          uname -a | tee evidence-scheduler-bitcode/environment.txt
+          sysctl -n machdep.cpu.brand_string 2>/dev/null | tee -a evidence-scheduler-bitcode/environment.txt || true
+          faust -v 2>&1 | head -5 | tee -a evidence-scheduler-bitcode/environment.txt
+          FAUST_INCLUDE="$(faust --includedir)"
+          FAUST_LIBDIR="$(faust --libdir)"
+          SCHEDULER_CPP="$(find "$(brew --prefix faust)" /opt/homebrew/share/faust /usr/local/share/faust -name scheduler.cpp -print -quit 2>/dev/null || true)"
+          printf 'include=%s\nlibdir=%s\nscheduler_cpp=%s\n' "$FAUST_INCLUDE" "$FAUST_LIBDIR" "$SCHEDULER_CPP" | tee -a evidence-scheduler-bitcode/environment.txt
+          test -n "$SCHEDULER_CPP"
+
+          cp "$SCHEDULER_CPP" build/faust-scheduler-link.cpp
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('build/faust-scheduler-link.cpp')
+          s = p.read_text()
+          old = '#define EXPORT inline __attribute__ ((visibility("default"))) __attribute__((always_inline))'
+          new = '#define EXPORT __attribute__ ((visibility("default")))'
+          if old not in s:
+              raise SystemExit('scheduler EXPORT macro did not match expected Faust source')
+          p.write_text(s.replace(old, new))
+          PY
+
+          clang++ -std=c++17 -O2 -S -emit-llvm -I"$FAUST_INCLUDE" build/faust-scheduler-link.cpp -o build/faust-scheduler.ll
+          grep -E '(define|declare) .*@(createScheduler|deleteScheduler|startAll|stopAll|signalAll|syncAll|computeThreadExternal)' build/faust-scheduler.ll | tee evidence-scheduler-bitcode/scheduler-symbols.txt || true
+
+          cat > build/faust_target.cpp <<'CPP'
+          #include <faust/dsp/llvm-dsp.h>
+          #include <iostream>
+          int main() { std::cout << getDSPMachineTarget(); }
+          CPP
+          clang++ -std=c++17 -O2 -I"$FAUST_INCLUDE" build/faust_target.cpp -L"$FAUST_LIBDIR" -lfaust -lpthread -lz -o build/faust_target
+          TARGET="$(build/faust_target)"
+          echo "jit_target=$TARGET" | tee -a evidence-scheduler-bitcode/environment.txt
+
+          clang++ -std=c++17 -O2 -I"$FAUST_INCLUDE" scripts/scheduler_bitcode_probe.cpp -L"$FAUST_LIBDIR" -lfaust -lpthread -lz -o build/scheduler_bitcode_probe
+          FAUST_SCHEDULER_MODULE="$PWD/build/faust-scheduler.ll" FAUST_JIT_TARGET="$TARGET" build/scheduler_bitcode_probe 2>&1 | tee evidence-scheduler-bitcode/result.txt
+      - name: Save evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: scheduler-bitcode-${{ github.sha }}-${{ github.run_attempt }}
+          path: evidence-scheduler-bitcode/
+          if-no-files-found: warn
+          retention-days: 3
