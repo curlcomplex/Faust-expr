@@ -84,9 +84,11 @@ int main()
     }
 
     std::cout << "original_options=" << original->getCompileOptions() << "\n";
-    const double before = renderChecksum(original.get());
-    std::cout << "checksum_before=" << before << "\n";
 
+    // Serialize before creating any DSP instance. This distinguishes an
+    // intrinsically non-serializable -L-linked LLVM module from corruption or
+    // lifecycle trouble caused by starting/stopping scheduler worker threads.
+    std::cout << "serialization_phase=before_instance\n";
     const std::string bitcode = writeDSPFactoryToBitcode(original.get());
     if (bitcode.empty()) {
         std::cerr << "bitcode_write_error=empty\n";
@@ -94,11 +96,9 @@ int main()
     }
     std::cout << "bitcode_bytes=" << bitcode.size() << "\n";
 
-    // This is the compatibility gate: destroy the scheduler-enabled source
-    // factory, then reconstruct from only its serialized factory bitcode.
-    // readDSPFactoryFromBitcode has no -L argument, so a successful reload
-    // proves that the scheduler linkage needed by this factory survived the
-    // persisted build artifact rather than depending on the source compile call.
+    const double before = renderChecksum(original.get());
+    std::cout << "checksum_before=" << before << "\n";
+
     original.reset();
 
     error.clear();
