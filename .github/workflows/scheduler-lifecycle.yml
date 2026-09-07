@@ -1,0 +1,45 @@
+name: Scheduler lifecycle diagnosis
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/scheduler-lifecycle.yml'
+      - 'scripts/lifecycle_diag.cpp'
+      - 'scripts/run_lifecycle_diagnostics.py'
+      - 'scripts/patch_scheduler_arm64.py'
+      - 'scripts/scheduler_bitcode_probe.cpp'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scheduler-lifecycle-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lifecycle-macos:
+    runs-on: macos-15
+    timeout-minutes: 12
+    steps:
+      - name: Check out the research branch
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install the same Faust distribution as the previous probe
+        shell: bash
+        run: brew install faust
+      - name: Run paired cleanup, native C++, JIT and fresh-process bitcode controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile scripts/run_lifecycle_diagnostics.py
+          python3 scripts/run_lifecycle_diagnostics.py
+      - name: Preserve all results, commands, runtime copies, audio and backtraces
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: scheduler-lifecycle-${{ github.sha }}-${{ github.run_attempt }}
+          path: evidence-lifecycle/
+          if-no-files-found: error
+          retention-days: 30
