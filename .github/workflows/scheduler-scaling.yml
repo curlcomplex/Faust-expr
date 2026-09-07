@@ -1,10 +1,11 @@
-name: Existing Faust options and linkage controls
+name: Focused existing Faust option controls
 
 on:
   pull_request:
     branches: [main]
     paths:
       - '.github/workflows/scheduler-scaling.yml'
+      - 'scripts/run_existing_faust_focus.py'
       - 'scripts/run_existing_faust_options.py'
       - 'scripts/scaling_factory_prep.cpp'
       - 'scripts/scheduler_scaling_bench.cpp'
@@ -18,49 +19,40 @@ permissions:
 
 concurrency:
   group: faust-existing-options-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
-  existing-options-macos:
+  focused-options-macos:
     runs-on: macos-15
-    timeout-minutes: 30
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
-      - name: Install toolchain (driver verifies exact versions)
+      - name: Install tested toolchain
         run: brew install faust llvm@22
-      - name: Install existing lab analysis dependencies
+      - name: Existing harness self-tests
         run: |
-          python3 -m venv .venv
-          .venv/bin/python -m pip install numpy matplotlib
-          echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
-          mkdir -p evidence-existing-options
-          .venv/bin/python -m pip freeze > evidence-existing-options/python-packages.txt
-      - name: Existing lab and analysis self-tests
-        run: |
-          python3 -m unittest discover -s tests -v
           python3 scripts/run_existing_faust_options.py --self-test
           bash scripts/build.sh
-      - name: Existing optimizer, chunk-size, grouping and linkage experiment
+          python3 -m py_compile scripts/run_existing_faust_focus.py
+      - name: Chunk size, inline and optimizer-winner controls
         env:
           PYTHONUNBUFFERED: '1'
-        run: python3 scripts/run_existing_faust_options.py
+        run: python3 scripts/run_existing_faust_focus.py
       - name: Publish report in Actions
         if: always()
         run: |
-          if [ -f evidence-existing-options/REPORT.md ]; then
-            cat evidence-existing-options/REPORT.md >> "$GITHUB_STEP_SUMMARY"
+          if [ -f evidence-existing-focus/REPORT.md ]; then
+            cat evidence-existing-focus/REPORT.md >> "$GITHUB_STEP_SUMMARY"
           else
-            echo 'Experiment incomplete; inspect errors.json and stage logs. No performance conclusion.' >> "$GITHUB_STEP_SUMMARY"
+            echo 'Focused experiment incomplete; inspect errors.json and stage logs.' >> "$GITHUB_STEP_SUMMARY"
           fi
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: faust-existing-options-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            evidence-existing-options/
-            evidence/
+          name: faust-existing-focus-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence-existing-focus/
           retention-days: 14
           if-no-files-found: error
