@@ -26,80 +26,70 @@ jobs:
           brew install faust llvm@22
           faust -v
           sysctl hw.physicalcpu hw.logicalcpu machdep.cpu.brand_string
-      - name: Build runtime and benchmark tools
+      - name: Build benchmark tools
         run: |
           set -euo pipefail
           mkdir -p build/scaling evidence-scaling
-          cp "$(brew --prefix faust)/share/faust/scheduler.cpp" build/scaling/scheduler.cpp
-          python3 scripts/patch_scheduler_arm64.py build/scaling/scheduler.cpp
-          python3 - <<'PY'
-          from pathlib import Path
-          import sys
-          sys.path.insert(0, 'scripts')
-          import run_scheduler_liveness as l
-          import scheduler_liveness_queue_controls as q
-          p=Path('build/scaling/scheduler.cpp')
-          s=l.instrument_runtime(p.read_text(), barrier=False, trace=False)
-          s=q.queue_control(s, 'atomic')
-          p.write_text(s)
-          PY
           LLVM="$(brew --prefix llvm@22)"; INC="$(faust --includedir)"; LIB="$(faust --libdir)"; CXX="$LLVM/bin/clang++"
-          cat > build/scaling/target.cpp <<'CPP'
-          #include <faust/dsp/llvm-dsp.h>
-          #include <iostream>
-          int main(){std::cout<<getDSPMachineTarget();}
-          CPP
-          "$CXX" -std=c++17 -O3 -I"$INC" build/scaling/target.cpp -L"$LIB" -Wl,-rpath,"$LIB" -lfaust -lpthread -lz -o build/scaling/target
-          TARGET="$(build/scaling/target)"; TRIPLE="${TARGET%%:*}"
-          echo "jit_target=$TARGET" | tee evidence-scaling/environment.txt
-          "$CXX" -std=c++17 -O3 -target "$TRIPLE" -I"$INC" -S -emit-llvm build/scaling/scheduler.cpp -o build/scaling/scheduler.ll
-          "$CXX" -std=c++17 -O3 -I"$INC" scripts/scaling_factory_prep.cpp -L"$LIB" -Wl,-rpath,"$LIB" -lfaust -lpthread -lz -o build/scaling/prep
-          "$CXX" -std=c++17 -O3 -I"$INC" scripts/scheduler_scaling_bench.cpp -L"$LIB" -Wl,-rpath,"$LIB" -lfaust -lpthread -lz -o build/scaling/bench
-          "$CXX" -std=c++20 -O3 -I"$INC" scripts/coarse_scalar_bench.cpp -L"$LIB" -Wl,-rpath,"$LIB" -lfaust -lpthread -lz -o build/scaling/coarse
-      - name: Prepare region and full-graph factories
+          "$CXX" -std=c++17 -O3 -I"$INC" scripts/scaling_factory_prep.cpp -L"$LIB" -Wl,-rpath,"$LIB" -lfaust -lpthread -lz -o build/scaling/prep-full
+          "$CXX" -std=c++17 -O3 -I"$INC" scripts/coarse_region_prep.cpp -L"$LIB" -Wl,-rpath,"$LIB" -lfaust -lpthread -lz -o build/scaling/prep-region
+          "$CXX" -std=c++17 -O3 -I"$INC" scripts/scheduler_scaling_bench.cpp -L"$LIB" -Wl,-rpath,"$LIB" -lfaust -lpthread -lz -o build/scaling/bench-fused
+          "$CXX" -std=c++17 -O3 -I"$INC" scripts/coarse_region_bench.cpp -L"$LIB" -Wl,-rpath,"$LIB" -lfaust -lpthread -lz -o build/scaling/bench-coarse
+      - name: Prepare full and coarse cached factories
         run: |
           set -euo pipefail
-          for R in 16 32; do
-            T=$((R * 3))
-            build/scaling/prep scalar "$R" "build/scaling/region-$R.bc" - heavy | tee "evidence-scaling/prep-region-$R.txt"
-            build/scaling/prep scalar "$T" "build/scaling/fused-$T.bc" - heavy | tee "evidence-scaling/prep-fused-$T.txt"
-            build/scaling/prep sch "$T" "build/scaling/sch-$T.bc" build/scaling/scheduler.ll heavy | tee "evidence-scaling/prep-sch-$T.txt"
+          for T in 48 96; do
+            build/scaling/prep-full scalar "$T" "build/scaling/fused-$T.bc" - heavy | tee "evidence-scaling/prep-fused-$T.txt"
           done
-      - name: Run coarse-region comparison
+          # 48 voices: 2x24 and 3x16, preserving full-graph voice indices.
+          build/scaling/prep-region 0 24 build/scaling/r48-2-a.bc
+          build/scaling/prep-region 24 24 build/scaling/r48-2-b.bc
+          build/scaling/prep-region 0 16 build/scaling/r48-3-a.bc
+          build/scaling/prep-region 16 16 build/scaling/r48-3-b.bc
+          build/scaling/prep-region 32 16 build/scaling/r48-3-c.bc
+          # 96 voices: 2x48 and 3x32.
+          build/scaling/prep-region 0 48 build/scaling/r96-2-a.bc
+          build/scaling/prep-region 48 48 build/scaling/r96-2-b.bc
+          build/scaling/prep-region 0 32 build/scaling/r96-3-a.bc
+          build/scaling/prep-region 32 32 build/scaling/r96-3-b.bc
+          build/scaling/prep-region 64 32 build/scaling/r96-3-c.bc
+      - name: Run strict coarse-region comparison
         run: |
           set -euo pipefail
-          printf 'region_voices\ttotal_voices\tframes\tmode\tmedian_ns_per_frame\tbest_ns_per_frame\tworst_ns_per_frame\n' > evidence-scaling/results.tsv
-          for R in 16 32; do
-            T=$((R * 3))
+          printf 'voices\tframes\tmode\tmedian_ns_per_frame\tbest_ns_per_frame\tworst_ns_per_frame\n' > evidence-scaling/results.tsv
+          for T in 48 96; do
             for F in 128 512; do
               B=$(( 196608 / F )); if [ "$B" -lt 384 ]; then B=384; fi
-              for MODE in fused coarse sch; do
-                if [ "$MODE" = fused ]; then OUT="$(build/scaling/bench build/scaling/fused-$T.bc 1 "$F" "$B")"; fi
-                if [ "$MODE" = sch ]; then OUT="$(build/scaling/bench build/scaling/sch-$T.bc 3 "$F" "$B")"; fi
-                if [ "$MODE" = coarse ]; then OUT="$(build/scaling/coarse build/scaling/region-$R.bc "$F" "$B")"; fi
-                MED="$(echo "$OUT" | awk -F= '/median_ns_per_frame/{print $2}')"; BEST="$(echo "$OUT" | awk -F= '/best_ns_per_frame/{print $2}')"; WORST="$(echo "$OUT" | awk -F= '/worst_ns_per_frame/{print $2}')"
-                printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$R" "$T" "$F" "$MODE" "$MED" "$BEST" "$WORST" >> evidence-scaling/results.tsv
-              done
+              OUT="$(build/scaling/bench-fused build/scaling/fused-$T.bc 1 "$F" "$B")"
+              MED="$(echo "$OUT"|awk -F= '/median_ns_per_frame/{print $2}')"; BEST="$(echo "$OUT"|awk -F= '/best_ns_per_frame/{print $2}')"; WORST="$(echo "$OUT"|awk -F= '/worst_ns_per_frame/{print $2}')"
+              printf '%s\t%s\tfused\t%s\t%s\t%s\n' "$T" "$F" "$MED" "$BEST" "$WORST" >> evidence-scaling/results.tsv
+              OUT="$(build/scaling/bench-coarse "$F" "$B" 2 build/scaling/r${T}-2-a.bc build/scaling/r${T}-2-b.bc)"
+              MED="$(echo "$OUT"|awk -F= '/median_ns_per_frame/{print $2}')"; BEST="$(echo "$OUT"|awk -F= '/best_ns_per_frame/{print $2}')"; WORST="$(echo "$OUT"|awk -F= '/worst_ns_per_frame/{print $2}')"
+              printf '%s\t%s\tcoarse2\t%s\t%s\t%s\n' "$T" "$F" "$MED" "$BEST" "$WORST" >> evidence-scaling/results.tsv
+              OUT="$(build/scaling/bench-coarse "$F" "$B" 3 build/scaling/r${T}-3-a.bc build/scaling/r${T}-3-b.bc build/scaling/r${T}-3-c.bc)"
+              MED="$(echo "$OUT"|awk -F= '/median_ns_per_frame/{print $2}')"; BEST="$(echo "$OUT"|awk -F= '/best_ns_per_frame/{print $2}')"; WORST="$(echo "$OUT"|awk -F= '/worst_ns_per_frame/{print $2}')"
+              printf '%s\t%s\tcoarse3\t%s\t%s\t%s\n' "$T" "$F" "$MED" "$BEST" "$WORST" >> evidence-scaling/results.tsv
             done
           done
           cat evidence-scaling/results.tsv
-      - name: Summarize coarse regions
+      - name: Summarize
         run: |
           python3 - <<'PY'
-          import csv, json
+          import csv,json
           rows=list(csv.DictReader(open('evidence-scaling/results.tsv'),delimiter='\t'))
           for r in rows:
-              r['region_voices']=int(r['region_voices']); r['total_voices']=int(r['total_voices']); r['frames']=int(r['frames']); r['median_ns_per_frame']=float(r['median_ns_per_frame'])
+              r['voices']=int(r['voices']); r['frames']=int(r['frames']); r['median_ns_per_frame']=float(r['median_ns_per_frame'])
           report=[]
-          for R,T,F in sorted({(r['region_voices'],r['total_voices'],r['frames']) for r in rows}):
-              g={r['mode']:r['median_ns_per_frame'] for r in rows if r['region_voices']==R and r['frames']==F}
-              report.append({'region':R,'total':T,'frames':F,**g,'coarse_vs_fused':g['fused']/g['coarse'],'coarse_vs_sch':g['sch']/g['coarse']})
-          print('region total frames coarse/fused coarse-vs-sch')
-          for r in report: print(f"{r['region']:>6} {r['total']:>5} {r['frames']:>6} {r['coarse_vs_fused']:>12.3f} {r['coarse_vs_sch']:>13.3f}")
+          for T,F in sorted({(r['voices'],r['frames']) for r in rows}):
+              g={r['mode']:r['median_ns_per_frame'] for r in rows if r['voices']==T and r['frames']==F}
+              row={'voices':T,'frames':F,**g,'coarse2_vs_fused':g['fused']/g['coarse2'],'coarse3_vs_fused':g['fused']/g['coarse3']}
+              report.append(row)
+          print('voices frames coarse2/fused coarse3/fused')
+          for r in report: print(f"{r['voices']:>6} {r['frames']:>6} {r['coarse2_vs_fused']:>14.3f} {r['coarse3_vs_fused']:>14.3f}")
           open('evidence-scaling/summary.json','w').write(json.dumps(report,indent=2))
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: coarse-scalar-${{ github.sha }}
+          name: strict-coarse-${{ github.sha }}
           path: evidence-scaling/
           retention-days: 14
