@@ -1,0 +1,131 @@
+name: Scheduler cached-JIT scaling
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scaling-macos:
+    runs-on: macos-15
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: research/libfaust-scheduler
+      - name: Install tested toolchain
+        run: |
+          brew install faust llvm@22
+          faust -v
+          "$(brew --prefix llvm@22)/bin/clang++" --version
+          sysctl hw.physicalcpu hw.logicalcpu machdep.cpu.brand_string
+      - name: Build scheduler runtime and benchmark tools
+        run: |
+          set -euo pipefail
+          mkdir -p build/scaling evidence-scaling
+          cp "$(brew --prefix faust)/share/faust/scheduler.cpp" build/scaling/scheduler.cpp
+          python3 scripts/patch_scheduler_arm64.py build/scaling/scheduler.cpp
+          python3 - <<'PY'
+          from pathlib import Path
+          import sys
+          sys.path.insert(0, 'scripts')
+          import run_scheduler_liveness as l
+          import scheduler_liveness_queue_controls as q
+          p=Path('build/scaling/scheduler.cpp')
+          s=l.instrument_runtime(p.read_text(), barrier=False, trace=False)
+          s=q.queue_control(s, 'atomic')
+          p.write_text(s)
+          PY
+          LLVM="$(brew --prefix llvm@22)"
+          INC="$(faust --includedir)"
+          LIB="$(faust --libdir)"
+          CXX="$LLVM/bin/clang++"
+          cat > build/scaling/target.cpp <<'CPP'
+          #include <faust/dsp/llvm-dsp.h>
+          #include <iostream>
+          int main(){std::cout<<getDSPMachineTarget();}
+          CPP
+          "$CXX" -std=c++17 -O3 -I"$INC" build/scaling/target.cpp -L"$LIB" -Wl,-rpath,"$LIB" -lfaust -lpthread -lz -o build/scaling/target
+          TARGET="$(build/scaling/target)"
+          TRIPLE="${TARGET%%:*}"
+          echo "jit_target=$TARGET" | tee evidence-scaling/environment.txt
+          echo "triple=$TRIPLE" | tee -a evidence-scaling/environment.txt
+          "$CXX" -std=c++17 -O3 -target "$TRIPLE" -I"$INC" -S -emit-llvm build/scaling/scheduler.cpp -o build/scaling/scheduler.ll
+          "$CXX" -std=c++17 -O3 -I"$INC" scripts/scaling_factory_prep.cpp -L"$LIB" -Wl,-rpath,"$LIB" -lfaust -lpthread -lz -o build/scaling/prep
+          "$CXX" -std=c++17 -O3 -I"$INC" scripts/scheduler_scaling_bench.cpp -L"$LIB" -Wl,-rpath,"$LIB" -lfaust -lpthread -lz -o build/scaling/bench
+          cp build/scaling/scheduler.cpp evidence-scaling/
+          cp build/scaling/scheduler.ll evidence-scaling/
+      - name: Prepare cached factories
+        run: |
+          set -euo pipefail
+          for V in 32 64 128 256; do
+            build/scaling/prep scalar "$V" "build/scaling/scalar-$V.bc" - | tee "evidence-scaling/prep-scalar-$V.txt"
+            build/scaling/prep vec "$V" "build/scaling/vec-$V.bc" - | tee "evidence-scaling/prep-vec-$V.txt"
+            build/scaling/prep sch "$V" "build/scaling/sch-$V.bc" build/scaling/scheduler.ll | tee "evidence-scaling/prep-sch-$V.txt"
+          done
+      - name: Run scaling matrix
+        run: |
+          set -euo pipefail
+          : > evidence-scaling/results.tsv
+          printf 'mode\tvoices\tframes\tparticipants\tmedian_ns_per_frame\tbest_ns_per_frame\tworst_ns_per_frame\trealtime_factor\n' >> evidence-scaling/results.tsv
+          for V in 32 64 128 256; do
+            for F in 64 128 256 512; do
+              # Keep enough frames per trial for stable throughput while bounding CI runtime.
+              B=$(( 524288 / F ))
+              if [ "$B" -lt 1000 ]; then B=1000; fi
+              for MODE in scalar vec; do
+                OUT="$(build/scaling/bench build/scaling/$MODE-$V.bc 1 "$F" "$B")"
+                echo "$OUT" > "evidence-scaling/${MODE}-v${V}-f${F}.txt"
+                MED="$(echo "$OUT" | awk -F= '/median_ns_per_frame/{print $2}')"
+                BEST="$(echo "$OUT" | awk -F= '/best_ns_per_frame/{print $2}')"
+                WORST="$(echo "$OUT" | awk -F= '/worst_ns_per_frame/{print $2}')"
+                RT="$(echo "$OUT" | awk -F= '/median_realtime_factor/{print $2}')"
+                printf '%s\t%s\t%s\t1\t%s\t%s\t%s\t%s\n' "$MODE" "$V" "$F" "$MED" "$BEST" "$WORST" "$RT" >> evidence-scaling/results.tsv
+              done
+              for P in 1 2 3; do
+                OUT="$(build/scaling/bench build/scaling/sch-$V.bc "$P" "$F" "$B")"
+                echo "$OUT" > "evidence-scaling/sch-v${V}-f${F}-p${P}.txt"
+                MED="$(echo "$OUT" | awk -F= '/median_ns_per_frame/{print $2}')"
+                BEST="$(echo "$OUT" | awk -F= '/best_ns_per_frame/{print $2}')"
+                WORST="$(echo "$OUT" | awk -F= '/worst_ns_per_frame/{print $2}')"
+                RT="$(echo "$OUT" | awk -F= '/median_realtime_factor/{print $2}')"
+                printf 'sch\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$V" "$F" "$P" "$MED" "$BEST" "$WORST" "$RT" >> evidence-scaling/results.tsv
+              done
+            done
+          done
+          column -t -s $'\t' evidence-scaling/results.tsv || cat evidence-scaling/results.tsv
+      - name: Summarize scaling
+        run: |
+          python3 - <<'PY'
+          import csv, json, statistics
+          from pathlib import Path
+          rows=list(csv.DictReader(open('evidence-scaling/results.tsv'), delimiter='\t'))
+          for r in rows:
+              for k in ('voices','frames','participants'): r[k]=int(r[k])
+              for k in ('median_ns_per_frame','best_ns_per_frame','worst_ns_per_frame','realtime_factor'): r[k]=float(r[k])
+          report=[]
+          for v in (32,64,128,256):
+              for f in (64,128,256,512):
+                  group=[r for r in rows if r['voices']==v and r['frames']==f]
+                  by={(r['mode'],r['participants']):r for r in group}
+                  scalar=by[('scalar',1)]['median_ns_per_frame']
+                  vec=by[('vec',1)]['median_ns_per_frame']
+                  s1=by[('sch',1)]['median_ns_per_frame']
+                  s2=by[('sch',2)]['median_ns_per_frame']
+                  s3=by[('sch',3)]['median_ns_per_frame']
+                  report.append(dict(voices=v,frames=f,scalar=scalar,vec=vec,sch1=s1,sch2=s2,sch3=s3,
+                      vec_vs_scalar=scalar/vec,sch2_vs_sch1=s1/s2,sch3_vs_sch1=s1/s3,
+                      sch2_vs_scalar=scalar/s2,sch3_vs_scalar=scalar/s3))
+          Path('evidence-scaling/summary.json').write_text(json.dumps(report,indent=2))
+          print('voices frames  vec/scalar  sch2/sch1  sch3/sch1  sch2/scalar  sch3/scalar')
+          for r in report:
+              print(f"{r['voices']:>6} {r['frames']:>6} {r['vec_vs_scalar']:>10.3f} {r['sch2_vs_sch1']:>10.3f} {r['sch3_vs_sch1']:>10.3f} {r['sch2_vs_scalar']:>11.3f} {r['sch3_vs_scalar']:>11.3f}")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scheduler-scaling-${{ github.sha }}
+          path: evidence-scaling/
+          retention-days: 14
