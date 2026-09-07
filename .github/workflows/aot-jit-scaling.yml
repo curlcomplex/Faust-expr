@@ -1,0 +1,120 @@
+name: Native C++ vs cached JIT scaling
+
+on:
+  push:
+    branches: [research/aot-jit-scaling]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare-macos:
+    runs-on: macos-15
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Install tested toolchain
+        run: brew install faust llvm@22
+      - name: Build common adapted scheduler runtime and JIT tools
+        run: |
+          set -euo pipefail
+          mkdir -p build/compare evidence-compare
+          cp "$(brew --prefix faust)/share/faust/scheduler.cpp" build/compare/scheduler.cpp
+          python3 scripts/patch_scheduler_arm64.py build/compare/scheduler.cpp
+          python3 - <<'PY'
+          from pathlib import Path
+          import sys
+          sys.path.insert(0,'scripts')
+          import run_scheduler_liveness as l
+          import scheduler_liveness_queue_controls as q
+          p=Path('build/compare/scheduler.cpp')
+          p.write_text(q.queue_control(l.instrument_runtime(p.read_text(),False,False),'atomic'))
+          PY
+          LLVM="$(brew --prefix llvm@22)"; INC="$(faust --includedir)"; LIB="$(faust --libdir)"; CXX="$LLVM/bin/clang++"
+          cat > build/compare/target.cpp <<'CPP'
+          #include <faust/dsp/llvm-dsp.h>
+          #include <iostream>
+          int main(){std::cout<<getDSPMachineTarget();}
+          CPP
+          "$CXX" -std=c++17 -O3 -I"$INC" build/compare/target.cpp -L"$LIB" -Wl,-rpath,"$LIB" -lfaust -lpthread -lz -o build/compare/target
+          TARGET="$(build/compare/target)"; TRIPLE="${TARGET%%:*}"
+          sysctl hw.physicalcpu hw.logicalcpu machdep.cpu.brand_string | tee evidence-compare/environment.txt
+          echo "target=$TARGET" >> evidence-compare/environment.txt
+          "$CXX" -std=c++17 -O3 -target "$TRIPLE" -I"$INC" -S -emit-llvm build/compare/scheduler.cpp -o build/compare/scheduler.ll
+          "$CXX" -std=c++17 -O3 -I"$INC" scripts/scaling_factory_prep.cpp -L"$LIB" -Wl,-rpath,"$LIB" -lfaust -lpthread -lz -o build/compare/prep
+          "$CXX" -std=c++17 -O3 -I"$INC" scripts/scheduler_scaling_bench.cpp -L"$LIB" -Wl,-rpath,"$LIB" -lfaust -lpthread -lz -o build/compare/jitbench
+      - name: Generate and adapt native DSPs
+        run: |
+          set -euo pipefail
+          LLVM="$(brew --prefix llvm@22)"; INC="$(faust --includedir)"; CXX="$LLVM/bin/clang++"
+          for V in 64 256; do
+            cat > "build/compare/v$V.dsp" <<EOF
+          import("stdfaust.lib");
+          voice(i)=os.osc(70+i*3.17):fi.lowpass(2,1200+i*41):*(0.01);
+          bank=par(i,$V,voice(i)):>_;
+          process=bank,bank;
+          EOF
+            faust -lang cpp -cn BenchDSP "build/compare/v$V.dsp" -o "build/compare/scalar-$V-upstream.h"
+            faust -lang cpp -cn BenchDSP -sch "build/compare/v$V.dsp" -o "build/compare/sch-$V-upstream.h"
+            python3 - "$V" <<'PY'
+          from pathlib import Path
+          import sys,hashlib
+          v=sys.argv[1]
+          upstream_sched=Path('build/compare/scheduler.cpp')
+          installed=Path(__import__('subprocess').check_output(['brew','--prefix','faust'],text=True).strip())/'share/faust/scheduler.cpp'
+          old=installed.read_text(); new=upstream_sched.read_text()
+          inp=Path(f'build/compare/sch-{v}-upstream.h'); s=inp.read_text()
+          if s.count(old)!=1: raise SystemExit(f'expected exact installed scheduler once, got {s.count(old)}')
+          s=s.replace(old,new,1)
+          marker='virtual ~BenchDSP() = default;'
+          if s.count(marker)!=1: raise SystemExit(f'expected redundant default destructor once, got {s.count(marker)}')
+          s=s.replace(marker,'// diagnostic: redundant scheduler default destructor removed',1)
+          Path(f'build/compare/sch-{v}.h').write_text(s)
+          Path(f'evidence-compare/native-{v}-hashes.txt').write_text('upstream='+hashlib.sha256(inp.read_bytes()).hexdigest()+'\nadapted='+hashlib.sha256(s.encode()).hexdigest()+'\n')
+          PY
+            cp "build/compare/scalar-$V-upstream.h" "build/compare/scalar-$V.h"
+            mkdir -p "build/compare/native-scalar-$V" "build/compare/native-sch-$V"
+            cp "build/compare/scalar-$V.h" "build/compare/native-scalar-$V/generated_dsp.h"
+            cp "build/compare/sch-$V.h" "build/compare/native-sch-$V/generated_dsp.h"
+            "$CXX" -std=c++17 -O3 -I"$INC" -I"build/compare/native-scalar-$V" scripts/native_scaling_bench.cpp -lpthread -o "build/compare/native-scalar-$V/bench"
+            "$CXX" -std=c++17 -O3 -I"$INC" -I"build/compare/native-sch-$V" scripts/native_scaling_bench.cpp -lpthread -o "build/compare/native-sch-$V/bench"
+          done
+      - name: Prepare cached JIT factories and benchmark both backends
+        run: |
+          set -euo pipefail
+          printf 'backend\tmode\tvoices\tframes\tparticipants\tmedian_ns_per_frame\n' > evidence-compare/results.tsv
+          for V in 64 256; do
+            build/compare/prep scalar "$V" "build/compare/jit-scalar-$V.bc" - >/dev/null
+            build/compare/prep sch "$V" "build/compare/jit-sch-$V.bc" build/compare/scheduler.ll >/dev/null
+            for F in 128 512; do
+              B=256
+              O="$(build/compare/jitbench build/compare/jit-scalar-$V.bc 1 "$F" "$B")"; M="$(echo "$O"|awk -F= '/median_ns_per_frame/{print $2}')"; printf 'jit\tscalar\t%s\t%s\t1\t%s\n' "$V" "$F" "$M" >> evidence-compare/results.tsv
+              O="$(build/compare/native-scalar-$V/bench 1 "$F" "$B")"; M="$(echo "$O"|awk -F= '/median_ns_per_frame/{print $2}')"; printf 'native\tscalar\t%s\t%s\t1\t%s\n' "$V" "$F" "$M" >> evidence-compare/results.tsv
+              for P in 1 2 3; do
+                O="$(build/compare/jitbench build/compare/jit-sch-$V.bc "$P" "$F" "$B")"; M="$(echo "$O"|awk -F= '/median_ns_per_frame/{print $2}')"; printf 'jit\tsch\t%s\t%s\t%s\t%s\n' "$V" "$F" "$P" "$M" >> evidence-compare/results.tsv
+                O="$(build/compare/native-sch-$V/bench "$P" "$F" "$B")"; M="$(echo "$O"|awk -F= '/median_ns_per_frame/{print $2}')"; printf 'native\tsch\t%s\t%s\t%s\t%s\n' "$V" "$F" "$P" "$M" >> evidence-compare/results.tsv
+              done
+            done
+          done
+          cat evidence-compare/results.tsv
+          python3 - <<'PY'
+          import csv,json
+          r=list(csv.DictReader(open('evidence-compare/results.tsv'),delimiter='\t'))
+          for x in r:x['voices']=int(x['voices']);x['frames']=int(x['frames']);x['participants']=int(x['participants']);x['median_ns_per_frame']=float(x['median_ns_per_frame'])
+          out=[]
+          for v in (64,256):
+            for f in (128,512):
+              g=[x for x in r if x['voices']==v and x['frames']==f]
+              for backend in ('jit','native'):
+                z=[x for x in g if x['backend']==backend]; scalar=next(x['median_ns_per_frame'] for x in z if x['mode']=='scalar'); q={x['participants']:x['median_ns_per_frame'] for x in z if x['mode']=='sch'}
+                row={'backend':backend,'voices':v,'frames':f,'scalar':scalar,'sch1':q[1],'sch2':q[2],'sch3':q[3],'sch2_vs_sch1':q[1]/q[2],'sch3_vs_sch1':q[1]/q[3],'sch2_vs_scalar':scalar/q[2],'sch3_vs_scalar':scalar/q[3]};out.append(row);print(json.dumps(row))
+              j=next(x for x in out if x['backend']=='jit' and x['voices']==v and x['frames']==f); n=next(x for x in out if x['backend']=='native' and x['voices']==v and x['frames']==f)
+              print(json.dumps({'voices':v,'frames':f,'native_over_jit_scalar':j['scalar']/n['scalar'],'native_over_jit_sch2':j['sch2']/n['sch2']}))
+          open('evidence-compare/summary.json','w').write(json.dumps(out,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aot-jit-scaling-${{ github.sha }}
+          path: evidence-compare/
+          retention-days: 14
