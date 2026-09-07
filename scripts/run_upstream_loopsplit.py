@@ -9,7 +9,7 @@ output. This is compiler/codegen research only: no custom scheduler is introduce
 from __future__ import annotations
 
 from pathlib import Path
-import json, os, re, shutil, subprocess, sys, time
+import json, os, re, shutil, subprocess, time
 
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = ROOT / "build" / "upstream-loopsplit"
@@ -23,8 +23,6 @@ bank=par(i,32,voice(i)):>_;
 process=bank,bank;
 '''
 
-# Existing upstream mechanisms only. Keep this bounded: the purpose is to decide
-# whether upstream fusion is promising, not to search its whole option space.
 VARIANTS = [
     ("ocpp", []),
     ("ls-df", ["-ls", "-ls-sched", "df"]),
@@ -60,8 +58,6 @@ def run(cmd, name, cwd=None, env=None, timeout=600, required=True):
 
 
 def extract_number(text):
-    # fcbenchtool output has changed formatting over time; use the final standalone
-    # finite decimal on a line, while preserving raw logs as evidence.
     vals = []
     for line in text.splitlines():
         m = re.fullmatch(r"\s*([0-9]+(?:\.[0-9]+)?)\s*", line)
@@ -71,6 +67,7 @@ def extract_number(text):
 
 
 def main():
+    shutil.rmtree(EVID, ignore_errors=True)
     BUILD.mkdir(parents=True, exist_ok=True)
     EVID.mkdir(parents=True, exist_ok=True)
     source = BUILD / "heavy.dsp"
@@ -85,8 +82,6 @@ def main():
              "https://github.com/grame-cncm/faust.git", FAUST_REPO], "clone-faust", timeout=300)
     run(["git", "fetch", "--depth", "1", "origin", FAUST_COMMIT], "fetch-faust", cwd=FAUST_REPO, timeout=300)
     run(["git", "checkout", "--detach", "FETCH_HEAD"], "checkout-faust", cwd=FAUST_REPO)
-    # compiler target has no LLVM dependency and is enough for ocpp. Submodules are
-    # initialized by the upstream make target; cap parallelism on the 3-vCPU runner.
     env = os.environ.copy(); env["MAKEFLAGS"] = "-j3"
     run(["make", "compiler"], "build-faust-compiler", cwd=FAUST_REPO, env=env, timeout=900)
     faust = FAUST_REPO / "build" / "bin" / "faust"
@@ -100,24 +95,25 @@ def main():
 
     if not BENCH_REPO.exists():
         run(["git", "clone", "--depth", "1", "https://github.com/grame-cncm/faustcompilerbenchtool.git", BENCH_REPO], "clone-benchtool", timeout=300)
-
-    fcbench = BENCH_REPO / "fcbenchtool"
-    fcplot = BENCH_REPO / "fcplottool"
+    # The wrappers expect their architecture fragments in /usr/local/share/fctool.
+    # Install exactly as upstream documents; GitHub's macOS runner permits sudo.
+    run(["sudo", "./install.sh"], "install-benchtool", cwd=BENCH_REPO, timeout=120)
+    fcbench = Path("/usr/local/bin/fcbenchtool")
+    fcplot = Path("/usr/local/bin/fcplottool")
     if not fcbench.exists() or not fcplot.exists():
-        raise RuntimeError("upstream benchmark wrappers not found")
+        raise RuntimeError("installed upstream benchmark wrappers not found")
 
     results = []
     cxx_env = os.environ.copy()
-    # Use the same compiler for every generated form. The upstream wrapper adds
-    # -O3 -ffast-math -march=native; CXX only selects the compiler binary.
     cxx_env["CXX"] = "clang++"
     cxx_env["FAUST_LIB_PATH"] = str(FAUST_REPO / "libraries")
 
     generated = {}
     for label, options in VARIANTS:
         cpp = BUILD / f"{label}.cpp"
+        if cpp.exists(): cpp.unlink()
         cmd = [faust, "-lang", "ocpp", *options, "-I", str(FAUST_REPO / "libraries"), source, "-o", cpp]
-        out = run(cmd, f"generate-{label}", timeout=180, required=False)
+        run(cmd, f"generate-{label}", timeout=180, required=False)
         if not cpp.exists():
             results.append({"label": label, "options": options, "generated": False})
             continue
@@ -126,18 +122,18 @@ def main():
         row = {"label": label, "options": options, "generated": True,
                "generated_bytes": cpp.stat().st_size,
                "for_loops": len(re.findall(r"\bfor\s*\(", cpp.read_text(errors="replace")))}
-        # Run three independent benchmark binaries. fcbenchtool emits a binary at
-        # the source stem; rename between trials so compilation is not timed.
         times = []
         for trial in range(3):
             trial_src = BUILD / f"{label}-t{trial}.cpp"
-            shutil.copy2(cpp, trial_src)
-            run([fcbench, trial_src], f"bench-build-{label}-t{trial}", cwd=BENCH_REPO, env=cxx_env, timeout=180)
             binary = trial_src.with_suffix("")
+            if binary.exists(): binary.unlink()
+            shutil.copy2(cpp, trial_src)
+            run([fcbench, trial_src], f"bench-build-{label}-t{trial}", cwd=BUILD, env=cxx_env, timeout=180)
+            if not binary.exists():
+                raise RuntimeError(f"fcbenchtool reported success without producing {binary}")
             text = run([binary, "300"], f"bench-run-{label}-t{trial}", cwd=BUILD, env=cxx_env, timeout=180)
             value = extract_number(text)
             if value is None:
-                # Preserve uncertainty instead of manufacturing a parse.
                 row.setdefault("unparsed_trials", []).append(trial)
             else:
                 times.append(value)
@@ -145,15 +141,16 @@ def main():
         row["best"] = min(times) if times else None
         results.append(row)
 
-    # Deterministic output comparison through upstream fcplottool. This is a
-    # screening oracle, not full Curlop stateful correctness qualification.
     reference = None
     correctness = []
     for label, cpp in generated.items():
         plot_src = BUILD / f"plot-{label}.cpp"
-        shutil.copy2(cpp, plot_src)
-        run([fcplot, plot_src], f"plot-build-{label}", cwd=BENCH_REPO, env=cxx_env, timeout=180)
         binary = plot_src.with_suffix("")
+        if binary.exists(): binary.unlink()
+        shutil.copy2(cpp, plot_src)
+        run([fcplot, plot_src], f"plot-build-{label}", cwd=BUILD, env=cxx_env, timeout=180)
+        if not binary.exists():
+            raise RuntimeError(f"fcplottool reported success without producing {binary}")
         text = run([binary], f"plot-run-{label}", cwd=BUILD, env=cxx_env, timeout=60)
         path = EVID / f"{label}.ir"
         path.write_text(text)
