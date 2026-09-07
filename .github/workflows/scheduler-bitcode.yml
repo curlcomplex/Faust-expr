@@ -75,11 +75,8 @@ jobs:
               raise SystemExit('scheduler atomic helper insertion point not found')
           s = s.replace(marker, arm_atomics, 1)
 
-          # Upstream macOS teardown terminates the Mach thread without joining
-          # the pthread, then immediately destroys DSPThread/semaphore storage.
-          # Use the same cancel+join lifecycle as Faust's Linux implementation.
           old_cancel = '''static void CancelThread(pthread_t fThread)\n{\n    mach_port_t machThread = pthread_mach_thread_np(fThread);\n    thread_terminate(machThread);\n}'''
-          new_cancel = '''static void CancelThread(pthread_t fThread)\n{\n    pthread_cancel(fThread);\n    pthread_join(fThread, NULL);\n}'''
+          new_cancel = '''static void CancelThread(pthread_t fThread)\n{\n    mach_port_t machThread = pthread_mach_thread_np(fThread);\n    thread_terminate(machThread);\n    pthread_join(fThread, NULL);\n}'''
           if old_cancel not in s:
               raise SystemExit('scheduler macOS CancelThread body did not match expected Faust source')
           s = s.replace(old_cancel, new_cancel)
@@ -94,8 +91,8 @@ jobs:
           "$CLANGXX" -std=c++17 -O2 -I"$FAUST_INCLUDE" scripts/scheduler_bitcode_probe.cpp -L"$FAUST_LIBDIR" -lfaust -lpthread -lz -o build/scheduler_bitcode_probe
 
           BC="$PWD/build/scheduler-cache.bc.txt"
-          FAUST_SCHEDULER_MODULE="$PWD/build/faust-scheduler.ll" FAUST_JIT_TARGET="$TARGET" build/scheduler_bitcode_probe write "$BC" 2>&1 | tee evidence-scheduler-bitcode/write.txt
-          env -u FAUST_SCHEDULER_MODULE FAUST_JIT_TARGET="$TARGET" build/scheduler_bitcode_probe read "$BC" 2>&1 | tee evidence-scheduler-bitcode/read.txt
+          OMP_NUM_THREADS=2 FAUST_SCHEDULER_MODULE="$PWD/build/faust-scheduler.ll" FAUST_JIT_TARGET="$TARGET" build/scheduler_bitcode_probe write "$BC" 2>&1 | tee evidence-scheduler-bitcode/write.txt
+          env -u FAUST_SCHEDULER_MODULE OMP_NUM_THREADS=2 FAUST_JIT_TARGET="$TARGET" build/scheduler_bitcode_probe read "$BC" 2>&1 | tee evidence-scheduler-bitcode/read.txt
 
           python3 - <<'PY' | tee evidence-scheduler-bitcode/verification.txt
           from pathlib import Path
