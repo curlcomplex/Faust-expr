@@ -25,7 +25,7 @@ jobs:
       - name: Install distribution compiler and analysis tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends faust libfaust-static g++ python3-numpy python3-matplotlib
+          sudo apt-get install -y --no-install-recommends faust libfaust-static g++ clang-17 python3-numpy python3-matplotlib
       - name: Check analyser failure detection
         run: /usr/bin/python3 -m unittest discover -s tests -v
       - name: Compile actual Faust, render, and validate
@@ -39,10 +39,20 @@ jobs:
         shell: bash
         run: |
           set -uo pipefail
-          mkdir -p evidence
+          mkdir -p evidence build
           FAUST_INCLUDE="$(faust --includedir)"
           FAUST_LIB="$(ldconfig -p | awk '/libfaust\.so\.2/{print $NF; exit}')"
-          printf 'include=%s\nlib=%s\n' "$FAUST_INCLUDE" "$FAUST_LIB" | tee evidence/jit-environment.txt
+          SCHEDULER_CPP="$(find /usr/share/faust /usr/include -name scheduler.cpp -print -quit 2>/dev/null)"
+          printf 'include=%s\nlib=%s\nscheduler_cpp=%s\n' "$FAUST_INCLUDE" "$FAUST_LIB" "$SCHEDULER_CPP" | tee evidence/jit-environment.txt
+          clang++-17 --version | head -1 | tee -a evidence/jit-environment.txt
+          if [ -z "$SCHEDULER_CPP" ]; then
+            echo 'Installed Faust package did not contain scheduler.cpp' | tee evidence/scheduler-module-build.txt
+            exit 10
+          fi
+          clang++-17 -std=c++17 -O2 -S -emit-llvm -I"$FAUST_INCLUDE" "$SCHEDULER_CPP" -o build/faust-scheduler.ll 2>&1 | tee evidence/scheduler-module-build.txt
+          module_status=${PIPESTATUS[0]}
+          if [ "$module_status" -ne 0 ]; then exit "$module_status"; fi
+          grep -E 'define .*@(createScheduler|computeThreadExternal)|declare .*@(createScheduler|computeThreadExternal)' build/faust-scheduler.ll | tee evidence/scheduler-module-symbols.txt || true
           g++ -std=c++17 -O2 -I"$FAUST_INCLUDE" scripts/jit_scheduler_probe.cpp "$FAUST_LIB" -lpthread -ldl -lz -o build/jit_scheduler_probe 2>&1 | tee evidence/jit-build.log
           build_status=${PIPESTATUS[0]}
           if [ "$build_status" -ne 0 ]; then
@@ -52,14 +62,14 @@ jobs:
           : > evidence/jit-summary.txt
           overall=0
           set +e
-          for mode in scalar vec32 vec64 sch; do
+          for mode in scalar vec32 vec64 sch sch-linked; do
             echo "=== $mode ===" | tee -a evidence/jit-summary.txt
-            timeout 30s build/jit_scheduler_probe "$mode" >"evidence/jit-${mode}.txt" 2>&1
+            FAUST_SCHEDULER_MODULE="$PWD/build/faust-scheduler.ll" timeout 30s build/jit_scheduler_probe "$mode" >"evidence/jit-${mode}.txt" 2>&1
             status=$?
             cat "evidence/jit-${mode}.txt" | tee -a evidence/jit-summary.txt
             echo "exit_status=$status" | tee -a evidence/jit-summary.txt
-            # Scalar and vector modes are required to work; scheduler failure is
-            # evidence for this research branch, not a reason to hide artifacts.
+            # Scalar/vector are controls. Unlinked scheduler failure is expected evidence;
+            # the linked scheduler is the actual integration hypothesis under test.
             if [ "$mode" != sch ] && [ "$status" -ne 0 ]; then overall=$status; fi
           done
           set -e
