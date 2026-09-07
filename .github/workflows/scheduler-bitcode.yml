@@ -32,21 +32,40 @@ jobs:
           faust -v 2>&1 | head -5 | tee -a evidence-scheduler-bitcode/environment.txt
           FAUST_INCLUDE="$(faust --includedir)"
           FAUST_LIBDIR="$(faust --libdir)"
-          brew list faust | tee evidence-scheduler-bitcode/faust-files.txt
-          SCHEDULER_CPP="$(brew list faust | grep '/scheduler\.cpp$' | head -1 || true)"
+          SCHEDULER_CPP="$(brew --prefix faust)/share/faust/scheduler.cpp"
           printf 'include=%s\nlibdir=%s\nscheduler_cpp=%s\n' "$FAUST_INCLUDE" "$FAUST_LIBDIR" "$SCHEDULER_CPP" | tee -a evidence-scheduler-bitcode/environment.txt
-          test -n "$SCHEDULER_CPP"
+          test -f "$SCHEDULER_CPP"
 
           cp "$SCHEDULER_CPP" build/faust-scheduler-link.cpp
           python3 - <<'PY'
           from pathlib import Path
           p = Path('build/faust-scheduler-link.cpp')
           s = p.read_text()
-          old = '#define EXPORT inline __attribute__ ((visibility("default"))) __attribute__((always_inline))'
-          new = '#define EXPORT __attribute__ ((visibility("default")))'
-          if old not in s:
+
+          # scheduler.cpp is written for textual inclusion in generated C++.
+          # For a standalone -L module, force the C ABI entry points to be emitted.
+          old_export = '#define EXPORT inline __attribute__ ((visibility("default"))) __attribute__((always_inline))'
+          new_export = '#define EXPORT __attribute__ ((visibility("default")))'
+          if old_export not in s:
               raise SystemExit('scheduler EXPORT macro did not match expected Faust source')
-          p.write_text(s.replace(old, new))
+          s = s.replace(old_export, new_export)
+
+          # Upstream scheduler.cpp currently uses x86 RDTSC unconditionally and
+          # only defines CAS1/atomic_xadd for x86. Adapt those low-level helpers
+          # for Apple Silicon without changing Faust's task graph/scheduler logic.
+          old_rdtsc = '''static INLINE UInt64 DSP_rdtsc(void)\n{\n\tunion {\n\t\tUInt32 i32[2];\n\t\tUInt64 i64;\n\t} count;\n\t\n\t__asm__ __volatile__("rdtsc" : "=a" (count.i32[0]), "=d" (count.i32[1]));\n    return count.i64;\n}'''
+          new_rdtsc = '''static INLINE UInt64 DSP_rdtsc(void)\n{\n#if defined(__aarch64__) || defined(__arm64__)\n    UInt64 count = 0;\n    __asm__ __volatile__("mrs %0, cntvct_el0" : "=r" (count));\n    return count;\n#else\n    union {\n        UInt32 i32[2];\n        UInt64 i64;\n    } count;\n    __asm__ __volatile__("rdtsc" : "=a" (count.i32[0]), "=d" (count.i32[1]));\n    return count.i64;\n#endif\n}'''
+          if old_rdtsc not in s:
+              raise SystemExit('scheduler DSP_rdtsc body did not match expected Faust source')
+          s = s.replace(old_rdtsc, new_rdtsc)
+
+          marker = '''#endif\n\n/*\nstatic INLINE int INC_ATOMIC'''
+          arm_atomics = '''#endif\n\n#if defined(__aarch64__) || defined(__arm64__)\nstatic INLINE void NOP(void) {}\nstatic INLINE char CAS1(volatile void* addr, volatile int value, int newvalue)\n{\n    return __sync_bool_compare_and_swap((int*)addr, value, newvalue);\n}\nstatic INLINE int atomic_xadd(volatile int* atomic, int val)\n{\n    return __sync_add_and_fetch(atomic, val);\n}\n#endif\n\n/*\nstatic INLINE int INC_ATOMIC'''
+          if marker not in s:
+              raise SystemExit('scheduler atomic helper insertion point not found')
+          s = s.replace(marker, arm_atomics, 1)
+
+          p.write_text(s)
           PY
 
           clang++ -std=c++17 -O2 -S -emit-llvm -I"$FAUST_INCLUDE" build/faust-scheduler-link.cpp -o build/faust-scheduler.ll
