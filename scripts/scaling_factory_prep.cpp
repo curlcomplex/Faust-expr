@@ -13,22 +13,19 @@ static bool writeFile(const std::string& p, const std::string& s) {
 
 int main(int argc, char** argv) {
     if (argc != 5 && argc != 6) {
-        std::cerr << "usage: scaling_factory_prep scalar|vec|sch <voices> <output.bc> <scheduler.ll-or-dash> [light|heavy]\n";
+        std::cerr << "usage: scaling_factory_prep scalar|vec|sch|schg <voices> <output.bc> <scheduler.ll-or-dash> [light|heavy]\n";
         return 2;
     }
     const std::string mode = argv[1], output = argv[3], scheduler = argv[4];
     const std::string family = argc == 6 ? argv[5] : "light";
     const int voices = std::atoi(argv[2]);
-    if ((mode != "scalar" && mode != "vec" && mode != "sch") ||
+    if ((mode != "scalar" && mode != "vec" && mode != "sch" && mode != "schg") ||
         (family != "light" && family != "heavy") || voices < 8 || voices > 1024) return 2;
     std::ostringstream src;
     src << "import(\"stdfaust.lib\");\n";
     if (family == "light") {
         src << "voice(i)=os.osc(70+i*3.17):fi.lowpass(2,1200+i*41):*(0.01);\n";
     } else {
-        // Same wide-independent topology, but make each branch substantially
-        // more expensive so scheduling overhead has a fair chance to amortize.
-        // Distinct cutoffs discourage collapse of the serial filter stages.
         src << "voice(i)=os.osc(70+i*3.17)"
             << ":fi.lowpass(4,900+i*7)"
             << ":fi.highpass(2,70+i*2)"
@@ -43,9 +40,12 @@ int main(int argc, char** argv) {
     src << "bank=par(i," << voices << ",voice(i)):>_;\nprocess=bank,bank;\n";
     std::vector<std::string> optStorage;
     if (mode == "vec") optStorage = {"-vec", "-vs", "32"};
-    if (mode == "sch") {
+    if (mode == "sch" || mode == "schg") {
         if (scheduler == "-") return 2;
-        optStorage = {"-sch", "-L", scheduler};
+        optStorage = {"-sch"};
+        if (mode == "schg") optStorage.push_back("-g");
+        optStorage.push_back("-L");
+        optStorage.push_back(scheduler);
     }
     std::vector<const char*> opts;
     for (const auto& s : optStorage) opts.push_back(s.c_str());
