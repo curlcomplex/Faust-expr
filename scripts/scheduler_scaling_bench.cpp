@@ -10,7 +10,6 @@
 #include <iomanip>
 #include <iostream>
 #include <memory>
-#include <numeric>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -45,7 +44,6 @@ int main(int argc, char** argv) {
     // Warm scheduler, JIT code, and caches before measuring.
     for (int i=0; i<1000; ++i) instance->compute(frames, nullptr, outs);
 
-    constexpr int trials =  nine; // replaced below by preprocessor-free literal
     std::vector<double> nsPerFrame;
     nsPerFrame.reserve(9);
     double checksum = 0.0;
