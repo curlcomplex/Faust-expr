@@ -1,10 +1,6 @@
 name: Scheduler queue publication controls
 
 on:
-  pull_request:
-    paths:
-      - 'scripts/scheduler_liveness_queue_controls.py'
-      - '.github/workflows/scheduler-queue-liveness.yml'
   workflow_dispatch:
 
 permissions:
