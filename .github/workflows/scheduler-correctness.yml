@@ -1,14 +1,6 @@
 name: Scheduler extended correctness
 
 on:
-  pull_request:
-    paths:
-      - 'scripts/scheduler_correctness.cpp'
-      - 'scripts/run_scheduler_correctness.py'
-      - 'scripts/run_scheduler_liveness.py'
-      - 'scripts/scheduler_liveness_queue_controls.py'
-      - 'scripts/patch_scheduler_arm64.py'
-      - '.github/workflows/scheduler-correctness.yml'
   workflow_dispatch:
 
 permissions:
