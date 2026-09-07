@@ -124,7 +124,11 @@ jobs:
           TARGET="$(build/faust_target)"
           echo "jit_target=$TARGET" | tee -a evidence-macos/environment.txt
           clang++ -std=c++17 -O2 -I"$FAUST_INCLUDE" scripts/module_fusion_probe.cpp -L"$FAUST_LIBDIR" -lfaust -lpthread -lz -o build/module_fusion_probe 2>&1 | tee evidence-macos/module-fusion-build.txt
-          FAUST_JIT_TARGET="$TARGET" build/module_fusion_probe 2>&1 | tee evidence-macos/module-fusion-results.txt
+          : > evidence-macos/module-fusion-results.txt
+          for repeat in 1 2 3; do
+            echo "=== repeat $repeat ===" | tee -a evidence-macos/module-fusion-results.txt
+            FAUST_JIT_TARGET="$TARGET" build/module_fusion_probe 2>&1 | tee -a evidence-macos/module-fusion-results.txt
+          done
       - name: Save macOS benchmark evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
