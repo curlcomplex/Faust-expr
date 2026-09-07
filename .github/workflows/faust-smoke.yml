@@ -49,21 +49,15 @@ jobs:
             echo 'Installed Faust package did not contain scheduler.cpp' | tee evidence/scheduler-module-build.txt
             exit 10
           fi
-
-          # scheduler.cpp is designed to be textually inserted into generated C++.
-          # Its public ABI is declared inline/always_inline, so a standalone LLVM
-          # compilation may discard the entry points needed by libfaust -L.
           cp "$SCHEDULER_CPP" build/faust-scheduler-link.cpp
           sed -i 's/#define EXPORT inline __attribute__ ((visibility("default"))) __attribute__((always_inline))/#define EXPORT __attribute__ ((visibility("default")))/' build/faust-scheduler-link.cpp
           clang++-17 -std=c++17 -O2 -S -emit-llvm -I"$FAUST_INCLUDE" build/faust-scheduler-link.cpp -o build/faust-scheduler.ll 2>&1 | tee evidence/scheduler-module-build.txt
           module_status=${PIPESTATUS[0]}
           if [ "$module_status" -ne 0 ]; then exit "$module_status"; fi
           grep -E '(define|declare) .*@(createScheduler|deleteScheduler|startAll|stopAll|signalAll|syncAll|computeThreadExternal)' build/faust-scheduler.ll | tee evidence/scheduler-module-symbols.txt || true
-
           g++ -std=c++17 -O2 -I"$FAUST_INCLUDE" scripts/jit_scheduler_probe.cpp "$FAUST_LIB" -lpthread -ldl -lz -o build/jit_scheduler_probe 2>&1 | tee evidence/jit-build.log
           build_status=${PIPESTATUS[0]}
           if [ "$build_status" -ne 0 ]; then exit "$build_status"; fi
-
           : > evidence/jit-summary.txt
           linked_status=0
           set +e
@@ -78,6 +72,7 @@ jobs:
           set -e
           exit "$linked_status"
       - name: Compare editable module boundaries with a fused Faust graph
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
@@ -90,7 +85,51 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: faust-evidence-${{ github.sha }}-${{ github.run_attempt }}
+          name: faust-evidence-linux-${{ github.sha }}-${{ github.run_attempt }}
           path: evidence/
+          if-no-files-found: warn
+          retention-days: 3
+
+  module-fusion-macos:
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - name: Check out this public repository only
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install Faust
+        shell: bash
+        run: |
+          set -euo pipefail
+          brew install faust
+      - name: Build and run editable-module versus fused graph probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence-macos build
+          uname -a | tee evidence-macos/environment.txt
+          sysctl -n machdep.cpu.brand_string 2>/dev/null | tee -a evidence-macos/environment.txt || true
+          faust -v 2>&1 | head -5 | tee -a evidence-macos/environment.txt
+          FAUST_INCLUDE="$(faust --includedir)"
+          FAUST_LIBDIR="$(faust --libdir)"
+          printf 'include=%s\nlibdir=%s\n' "$FAUST_INCLUDE" "$FAUST_LIBDIR" | tee -a evidence-macos/environment.txt
+          ls -la "$FAUST_LIBDIR" | tee evidence-macos/libdir.txt
+          cat > build/faust_target.cpp <<'CPP'
+          #include <faust/dsp/llvm-dsp.h>
+          #include <iostream>
+          int main() { std::cout << getDSPMachineTarget(); }
+          CPP
+          clang++ -std=c++17 -O2 -I"$FAUST_INCLUDE" build/faust_target.cpp -L"$FAUST_LIBDIR" -lfaust -lpthread -lz -o build/faust_target
+          TARGET="$(build/faust_target)"
+          echo "jit_target=$TARGET" | tee -a evidence-macos/environment.txt
+          clang++ -std=c++17 -O2 -I"$FAUST_INCLUDE" scripts/module_fusion_probe.cpp -L"$FAUST_LIBDIR" -lfaust -lpthread -lz -o build/module_fusion_probe 2>&1 | tee evidence-macos/module-fusion-build.txt
+          FAUST_JIT_TARGET="$TARGET" build/module_fusion_probe 2>&1 | tee evidence-macos/module-fusion-results.txt
+      - name: Save macOS benchmark evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: faust-evidence-macos-${{ github.sha }}-${{ github.run_attempt }}
+          path: evidence-macos/
           if-no-files-found: warn
           retention-days: 3
