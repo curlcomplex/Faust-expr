@@ -12,7 +12,6 @@ import json
 import math
 import os
 import re
-import shlex
 import shutil
 import signal
 import subprocess
@@ -28,6 +27,7 @@ REPEATS = 2
 results = []
 comparisons = []
 commands = []
+roundtrips = []
 
 
 def sha(path):
@@ -95,12 +95,17 @@ def run_child(name, cmd, child_env, debug=True, timeout=15):
     if not completed:
         print('\n'.join(text.splitlines()[-28:]), flush=True)
     if debug and not completed and not timed_out:
-        # LLDB is a separate diagnostic replay, never the source of PASS status.
+        # Replays use DIFFERENT output files, so they cannot overwrite evidence
+        # produced by the original child or silently change a reader's input.
         lldb = shutil.which('lldb')
         if lldb:
+            replay = cmd.copy()
+            replay[-1] += '.lldb'
+            if replay[2] == 'source' and replay[-2] != '-': replay[-2] += '.lldb'
             dcmd = [lldb, '--batch', '--no-lldbinit',
                     '-o', 'settings set target.disable-aslr false', '-o', 'run',
-                    '-k', 'thread backtrace all', '-k', 'image list', '--'] + cmd
+                    '-k', 'thread backtrace all', '-k', 'image list', '--'] + replay
+            commands.append({'name': name + '-lldb', 'argv': dcmd})
             dp = EVIDENCE / (name + '-lldb.txt')
             with dp.open('w') as df:
                 d = subprocess.Popen(dcmd, env=child_env, cwd=ROOT, stdout=df,
@@ -146,7 +151,6 @@ def main():
     flags = [str(clang), '-std=c++17', '-O2', '-g', '-fno-omit-frame-pointer', '-I' + inc]
     libs = ['-L' + lib, '-Wl,-rpath,' + lib, '-lfaust', '-lpthread', '-lz']
     version = checked(['faust', '-v'], 'faust-version')
-    # Keep this run comparable with the failing experiment; don't silently drift.
     if 'FAUST Version 2.85.9' not in version:
         raise RuntimeError('expected the previously tested Faust 2.85.9; record/version migration first')
     clang_version = checked([clang, '--version'], 'clang-version')
@@ -194,27 +198,41 @@ def main():
         if cleanup != 'explicit': return
         reader = stem + '-read'
         read_audio = EVIDENCE / (reader + '.f32')
-        # Run independently even when producer cleanup fails: record both facts,
-        # but never declare end-to-end PASS unless BOTH cleanly exited.
-        reloaded = run_child(reader, [host, shape, 'read', 'explicit', source, bc, read_audio], env,
-                             debug=(rep == 0))
+        # The original scheduler IR is physically absent during reload, not
+        # merely omitted from the environment. Restore it for the next case.
+        hidden = scheduler.with_suffix('.unavailable') if scheduler else None
+        if scheduler: scheduler.rename(hidden)
+        try:
+            reloaded = run_child(reader, [host, shape, 'read', 'explicit', source, bc, read_audio], env,
+                                 debug=(rep == 0))
+        finally:
+            if scheduler: hidden.rename(scheduler)
         match = compare(audio, read_audio, stem + '-bitcode-audio', 1e-7)
-        print('roundtrip_gate=' + json.dumps({'variant': variant, 'rep': rep,
-              'pass': write['clean_exit'] and reloaded['clean_exit'] and match['pass']}), flush=True)
+        gate = {'variant': variant, 'rep': rep, 'scheduler_ir_absent_during_reload': bool(scheduler),
+                'pass': write['clean_exit'] and reloaded['clean_exit'] and match['pass']}
+        roundtrips.append(gate)
+        print('roundtrip_gate=' + json.dumps(gate), flush=True)
         if baseline_audio and variant != 'scalar':
             compare(baseline_audio, audio, stem + '-vs-scalar', 5e-5)
 
     for rep in range(REPEATS): jit_case('scalar', 'scalar', rep)
     jit_case('scalar', 'scalar', 0, 'retain')
 
+    # Faust's bare-class output does not embed scheduler.cpp. An architecture
+    # wrapper triggers that embedding. -A selects the very same runtime file
+    # compiled to IR above; the marker below guards against selecting upstream.
+    arch = BUILD / 'diag_arch.cpp'
+    arch.write_text('<<includeIntrinsic>>\n<<includeclass>>\n')
+
     def aot_case(variant, shape, directory, repeat):
         output = directory / 'diag_dsp.h'
-        args = ['faust', '-lang', 'cpp', '-cn', 'ProbeDSP']
+        args = ['faust', '-lang', 'cpp', '-cn', 'ProbeDSP', '-a', arch]
         if shape == 'sch': args += ['-sch', '-A', directory]
         checked(args + [source, '-o', output], f'generate-cpp-{variant}')
+        # Preserve generated code even when the runtime selection guard fails.
+        shutil.copy2(output, EVIDENCE / f'generated-{variant}.h')
         if shape == 'sch' and f'CURLOP_DIAG_RUNTIME_{variant}' not in output.read_text():
             raise RuntimeError('Faust C++ did not embed the selected scheduler copy')
-        shutil.copy2(output, EVIDENCE / f'generated-{variant}.h')
         exe = directory / 'aot_diag'
         checked(flags + ['-DDIAG_AOT', '-I' + str(directory), ROOT / 'scripts/lifecycle_diag.cpp',
                          '-lpthread', '-o', exe], f'build-cpp-{variant}')
@@ -249,8 +267,6 @@ def main():
                 if s.count('volatile bool fRunning;') != 1:
                     raise RuntimeError('unexpected graceful flag')
                 # Only this variable differs from the previous graceful patch.
-                # std::atomic's default sequentially consistent loads/stores are
-                # intentional here. Volatile is not a C++ synchronization primitive.
                 s = '#include <atomic>\n' + s.replace('volatile bool fRunning;', 'std::atomic<bool> fRunning;')
             runtime.write_text(f'// CURLOP_DIAG_RUNTIME_{variant}\n' + s)
             shutil.copy2(runtime, EVIDENCE / f'scheduler-{variant}.cpp')
@@ -274,7 +290,7 @@ except Exception as exc:
     results.append({'name': 'harness', 'clean_exit': False, 'error': repr(exc)})
     print('harness_error=' + repr(exc), flush=True)
 finally:
-    summary = {'results': results, 'audio_comparisons': comparisons,
+    summary = {'results': results, 'audio_comparisons': comparisons, 'roundtrip_gates': roundtrips,
                'warning': 'Compatibility diagnostics only. No realtime or multicore speedup acceptance.'}
     (EVIDENCE / 'summary.json').write_text(json.dumps(summary, indent=2))
     (EVIDENCE / 'commands.json').write_text(json.dumps(commands, indent=2))
@@ -284,6 +300,7 @@ finally:
     for r in results:
         report.append(f"| {r['name']} | {r['clean_exit']} | {r.get('last_stage', r.get('error', ''))} |")
     report += ['', 'A retained-factory negative control is not an acceptance check.',
+               'Strict scalar roundtrip tolerance is retained even if it fails; see exact errors.',
                'Full sample comparisons and backtraces are in the evidence artifact.']
     if os.environ.get('GITHUB_STEP_SUMMARY'):
         with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f: f.write('\n'.join(report) + '\n')
