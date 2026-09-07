@@ -1,0 +1,65 @@
+# TEMPLATE ONLY. Install in a separate private, owner-only control repository.
+# Do not register a personal Mac as a runner on the public Faust-expr repository.
+name: Physical Mac Faust correctness
+
+on:
+  workflow_dispatch:
+    inputs:
+      research_sha:
+        description: 'Reviewed 40-character commit from curlcomplex/Faust-expr'
+        required: true
+        type: string
+      participants:
+        description: 'Participant counts, including the caller'
+        required: true
+        default: '1,2,3'
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: physical-mac-faust-tests
+  cancel-in-progress: false
+
+jobs:
+  correctness:
+    if: github.event_name == 'workflow_dispatch' && github.event.repository.private == true && github.actor == 'curlcomplex'
+    runs-on: [self-hosted, macOS, ARM64, curlop-bench]
+    timeout-minutes: 30
+    steps:
+      - name: Validate owner-supplied inputs before checkout
+        env:
+          RESEARCH_SHA: ${{ inputs.research_sha }}
+          PARTICIPANTS: ${{ inputs.participants }}
+        run: |
+          python3 - <<'PY'
+          import os, re
+          assert re.fullmatch(r'[0-9a-fA-F]{40}', os.environ['RESEARCH_SHA']), 'Full commit SHA required'
+          assert re.fullmatch(r'[0-9]+(,[0-9]+)*', os.environ['PARTICIPANTS']), 'Comma-separated counts required'
+          assert all(1 <= int(n) <= 64 for n in os.environ['PARTICIPANTS'].split(','))
+          PY
+      - name: Check out only the reviewed research commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          repository: curlcomplex/Faust-expr
+          ref: ${{ inputs.research_sha }}
+          path: research-checkout
+          persist-credentials: false
+      - name: Run correctness with preinstalled matching diagnostic toolchain
+        working-directory: research-checkout
+        env:
+          CORRECTNESS_THREADS: ${{ inputs.participants }}
+        run: |
+          # No brew install/upgrade, sudo, source eval, or local compiler replacement.
+          command -v python3
+          command -v faust
+          python3 scripts/run_scheduler_correctness.py
+      - name: Save diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: physical-mac-correctness-${{ github.run_id }}-${{ github.run_attempt }}
+          path: research-checkout/evidence-correctness/
+          if-no-files-found: warn
+          retention-days: 7
