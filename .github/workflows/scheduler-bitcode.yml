@@ -33,8 +33,23 @@ jobs:
           FAUST_INCLUDE="$(faust --includedir)"
           FAUST_LIBDIR="$(faust --libdir)"
           SCHEDULER_CPP="$(brew --prefix faust)/share/faust/scheduler.cpp"
-          printf 'include=%s\nlibdir=%s\nscheduler_cpp=%s\n' "$FAUST_INCLUDE" "$FAUST_LIBDIR" "$SCHEDULER_CPP" | tee -a evidence-scheduler-bitcode/environment.txt
+          LLVM_PREFIX="$(brew --prefix llvm@22)"
+          CLANGXX="$LLVM_PREFIX/bin/clang++"
+          printf 'include=%s\nlibdir=%s\nscheduler_cpp=%s\nclang=%s\n' "$FAUST_INCLUDE" "$FAUST_LIBDIR" "$SCHEDULER_CPP" "$CLANGXX" | tee -a evidence-scheduler-bitcode/environment.txt
           test -f "$SCHEDULER_CPP"
+          test -x "$CLANGXX"
+          "$CLANGXX" --version | head -1 | tee -a evidence-scheduler-bitcode/environment.txt
+
+          cat > build/faust_target.cpp <<'CPP'
+          #include <faust/dsp/llvm-dsp.h>
+          #include <iostream>
+          int main() { std::cout << getDSPMachineTarget(); }
+          CPP
+          "$CLANGXX" -std=c++17 -O2 -I"$FAUST_INCLUDE" build/faust_target.cpp -L"$FAUST_LIBDIR" -lfaust -lpthread -lz -o build/faust_target
+          TARGET="$(build/faust_target)"
+          TRIPLE="${TARGET%%:*}"
+          echo "jit_target=$TARGET" | tee -a evidence-scheduler-bitcode/environment.txt
+          echo "jit_triple=$TRIPLE" | tee -a evidence-scheduler-bitcode/environment.txt
 
           cp "$SCHEDULER_CPP" build/faust-scheduler-link.cpp
           python3 - <<'PY'
@@ -42,17 +57,12 @@ jobs:
           p = Path('build/faust-scheduler-link.cpp')
           s = p.read_text()
 
-          # scheduler.cpp is written for textual inclusion in generated C++.
-          # For a standalone -L module, force the C ABI entry points to be emitted.
           old_export = '#define EXPORT inline __attribute__ ((visibility("default"))) __attribute__((always_inline))'
           new_export = '#define EXPORT __attribute__ ((visibility("default")))'
           if old_export not in s:
               raise SystemExit('scheduler EXPORT macro did not match expected Faust source')
           s = s.replace(old_export, new_export)
 
-          # Upstream scheduler.cpp currently uses x86 RDTSC unconditionally and
-          # only defines CAS1/atomic_xadd for x86. Adapt those low-level helpers
-          # for Apple Silicon without changing Faust's task graph/scheduler logic.
           old_rdtsc = '''static INLINE UInt64 DSP_rdtsc(void)\n{\n\tunion {\n\t\tUInt32 i32[2];\n\t\tUInt64 i64;\n\t} count;\n\t\n\t__asm__ __volatile__("rdtsc" : "=a" (count.i32[0]), "=d" (count.i32[1]));\n    return count.i64;\n}'''
           new_rdtsc = '''static INLINE UInt64 DSP_rdtsc(void)\n{\n#if defined(__aarch64__) || defined(__arm64__)\n    UInt64 count = 0;\n    __asm__ __volatile__("mrs %0, cntvct_el0" : "=r" (count));\n    return count;\n#else\n    union {\n        UInt32 i32[2];\n        UInt64 i64;\n    } count;\n    __asm__ __volatile__("rdtsc" : "=a" (count.i32[0]), "=d" (count.i32[1]));\n    return count.i64;\n#endif\n}'''
           if old_rdtsc not in s:
@@ -64,23 +74,15 @@ jobs:
           if marker not in s:
               raise SystemExit('scheduler atomic helper insertion point not found')
           s = s.replace(marker, arm_atomics, 1)
-
           p.write_text(s)
           PY
 
-          clang++ -std=c++17 -O2 -S -emit-llvm -I"$FAUST_INCLUDE" build/faust-scheduler-link.cpp -o build/faust-scheduler.ll
+          # Match the same LLVM major and exact target triple that libfaust reports.
+          "$CLANGXX" -target "$TRIPLE" -std=c++17 -O2 -S -emit-llvm -I"$FAUST_INCLUDE" build/faust-scheduler-link.cpp -o build/faust-scheduler.ll
+          grep '^target triple' build/faust-scheduler.ll | tee evidence-scheduler-bitcode/scheduler-target.txt
           grep -E '(define|declare) .*@(createScheduler|deleteScheduler|startAll|stopAll|signalAll|syncAll|computeThreadExternal)' build/faust-scheduler.ll | tee evidence-scheduler-bitcode/scheduler-symbols.txt || true
 
-          cat > build/faust_target.cpp <<'CPP'
-          #include <faust/dsp/llvm-dsp.h>
-          #include <iostream>
-          int main() { std::cout << getDSPMachineTarget(); }
-          CPP
-          clang++ -std=c++17 -O2 -I"$FAUST_INCLUDE" build/faust_target.cpp -L"$FAUST_LIBDIR" -lfaust -lpthread -lz -o build/faust_target
-          TARGET="$(build/faust_target)"
-          echo "jit_target=$TARGET" | tee -a evidence-scheduler-bitcode/environment.txt
-
-          clang++ -std=c++17 -O2 -I"$FAUST_INCLUDE" scripts/scheduler_bitcode_probe.cpp -L"$FAUST_LIBDIR" -lfaust -lpthread -lz -o build/scheduler_bitcode_probe
+          "$CLANGXX" -std=c++17 -O2 -I"$FAUST_INCLUDE" scripts/scheduler_bitcode_probe.cpp -L"$FAUST_LIBDIR" -lfaust -lpthread -lz -o build/scheduler_bitcode_probe
           FAUST_SCHEDULER_MODULE="$PWD/build/faust-scheduler.ll" FAUST_JIT_TARGET="$TARGET" build/scheduler_bitcode_probe 2>&1 | tee evidence-scheduler-bitcode/result.txt
       - name: Save evidence
         if: always()
