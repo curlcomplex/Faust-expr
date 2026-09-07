@@ -49,8 +49,8 @@ jobs:
           set -euo pipefail
           export PATH=/usr/bin:/bin:$PATH
           {
-            (cd build/reference/A/source && python3 scripts/generate_cymbal.py --out build && faust -t 120 -double -I build -lang cpp -cn CymbalDSP dsp/cymbal.dsp -o ../cymbal.hpp)
-            (cd build/reference/B/source && python3 scripts/generate_cymbal.py --out build/cymbal && faust -t 180 -double -lang cpp -cn CymbalDSP build/cymbal/cymbal-standalone.dsp -o ../cymbal.hpp)
+            (cd build/reference/A/source && python3 scripts/generate_cymbal.py --out build && faust -time -t 120 -double -I build -lang cpp -cn CymbalDSP dsp/cymbal.dsp -o ../cymbal.hpp)
+            (cd build/reference/B/source && python3 scripts/generate_cymbal.py --out build/cymbal && faust -time -t 300 -double -lang cpp -cn CymbalDSP build/cymbal/cymbal-standalone.dsp -o ../cymbal.hpp)
             g++ -std=c++17 -O2 -Ibuild/reference/A scripts/reference_render.cpp -o build/reference/A/render_compare
             g++ -std=c++17 -O2 -Ibuild/reference/B scripts/reference_render.cpp -o build/reference/B/render_compare
             faust --version > build/reference/out/faust-version.txt 2>&1
