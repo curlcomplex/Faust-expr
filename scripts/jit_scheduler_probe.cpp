@@ -38,6 +38,14 @@ std::vector<std::string> argsFor(const std::string& mode)
     if (mode == "vec32") return {"-vec", "-vs", "32"};
     if (mode == "vec64") return {"-vec", "-vs", "64"};
     if (mode == "sch") return {"-sch"};
+    if (mode == "sch-linked") {
+        const char* module = std::getenv("FAUST_SCHEDULER_MODULE");
+        if (!module || !*module) {
+            std::cerr << "FAUST_SCHEDULER_MODULE is required for sch-linked\n";
+            std::exit(2);
+        }
+        return {"-sch", "-L", module};
+    }
     std::cerr << "unknown mode: " << mode << "\n";
     std::exit(2);
 }
@@ -49,7 +57,7 @@ int main(int argc, char** argv)
     std::cout << std::unitbuf;
     std::cerr << std::unitbuf;
     if (argc != 2) {
-        std::cerr << "usage: jit_scheduler_probe scalar|vec32|vec64|sch\n";
+        std::cerr << "usage: jit_scheduler_probe scalar|vec32|vec64|sch|sch-linked\n";
         return 2;
     }
     const std::string mode = argv[1];
