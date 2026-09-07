@@ -1,0 +1,67 @@
+name: Cross-model cymbal reference validation
+on:
+  push:
+    branches: [cymbal-reference-shortlist]
+    paths: ['scripts/reference_*', 'references/calibration*', 'references/CALIBRATION.md', 'reference_tests/**', '.github/workflows/reference-validation.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: cymbal-reference-validation-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  compare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Pinned public CYM-A source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          repository: curlcomplex/Faust-expr
+          ref: 43f39b60b7b239f8e460d1d8ee7b6f027a0532fb
+          path: build/reference/A/source
+          persist-credentials: false
+      - name: Pinned public CYM-B source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          repository: curlcomplex/Faust-expr
+          ref: 821736879bdea6c1c58ce9f0d932e0ebe5196840
+          path: build/reference/B/source
+          persist-credentials: false
+      - name: Install compiler and numerical tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy python3-soundfile
+      - name: Test metrics and fetch verified public references
+        run: |
+          mkdir -p build/reference/out
+          /usr/bin/python3 -m unittest discover -s reference_tests -v
+          /usr/bin/python3 scripts/fetch_cymbal_references.py
+          mv evidence/cymbal-references build/reference/refs
+      - name: Compile both actual Faust models and compare
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PATH=/usr/bin:/bin:$PATH
+          {
+            (cd build/reference/A/source && python3 scripts/generate_cymbal.py --out build && faust -t 120 -double -I build -lang cpp -cn CymbalDSP dsp/cymbal.dsp -o ../cymbal.hpp)
+            (cd build/reference/B/source && python3 scripts/generate_cymbal.py --out build/cymbal && faust -t 180 -double -lang cpp -cn CymbalDSP build/cymbal/cymbal-standalone.dsp -o ../cymbal.hpp)
+            g++ -std=c++17 -O2 -Ibuild/reference/A scripts/reference_render.cpp -o build/reference/A/render_compare
+            g++ -std=c++17 -O2 -Ibuild/reference/B scripts/reference_render.cpp -o build/reference/B/render_compare
+            faust --version > build/reference/out/faust-version.txt 2>&1
+            g++ --version > build/reference/out/cpp-version.txt
+            python3 scripts/reference_compare.py --preset references/calibration-ref1.json
+          } 2>&1 | tee build/reference/out/build.log
+      - name: Preserve actual audio, results and failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: reference-validation-${{ github.sha }}
+          path: build/reference/out/
+          retention-days: 3
+          if-no-files-found: warn
