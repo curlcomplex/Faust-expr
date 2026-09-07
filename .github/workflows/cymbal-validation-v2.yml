@@ -1,0 +1,37 @@
+name: Percussion evaluator v2 and independent reference hits
+on:
+  push:
+    branches: [cymbal-reference-shortlist]
+    paths: ['research/validation-v2/**', '.github/workflows/cymbal-validation-v2.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install numerical tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends python3-numpy python3-scipy
+      - name: Run adversarial evaluator tests
+        run: |
+          mkdir -p evidence/validation-v2
+          git rev-parse HEAD > evidence/validation-v2/commit.txt
+          /usr/bin/python3 -m unittest discover -s research/validation-v2 -v 2>&1 | tee evidence/validation-v2/tests.log
+      - name: Fetch five hash-pinned independent CC0 hits
+        run: /usr/bin/python3 research/validation-v2/fetch_holdouts.py
+      - name: Save evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: validation-v2-${{ github.sha }}
+          path: evidence/validation-v2/
+          retention-days: 3
+          if-no-files-found: warn

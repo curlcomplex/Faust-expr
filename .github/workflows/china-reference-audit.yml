@@ -1,0 +1,52 @@
+name: China reference audit collection
+on:
+  push:
+    branches: [cymbal-reference-shortlist]
+    paths: ['.github/workflows/china-reference-audit.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  collect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - name: Collect four original public reference recordings with provenance
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, pathlib, urllib.request
+          root = pathlib.Path('evidence/china-references')
+          root.mkdir(parents=True)
+          commit = '8b6faa8847b4c02f4b5dd42c1836c28ffbe89d33'
+          base = 'https://raw.githubusercontent.com/studiorack/salamander-drumkit/' + commit + '/'
+          records = [
+            ('Samples/china1_OH_FF_1.flac','230979d40ac67bb59875352f03f4aa00da608335',1137645),
+            ('Samples/china1_OH_FF_2.flac','d4071ed666f4ebbe87538ab22a6f96112b4b4da1',1176423),
+            ('Samples/china2_OH_FF_1.flac','b9da9d22e29e064105b411dad04b6e3d86e1f58f',1105628),
+            ('Samples/china2_OH_FF_2.flac','fc22c3afe201afdcd8f56ff7312aed12d92dc144',1117498),
+            ('LICENSE','1d1e1d6e88579dd32086b23e95723a0f4864c22a',22239),
+            ('README.md','5801e0ce9557d41ee781cca4434ebbd3857e92e0',1822),
+          ]
+          results=[]
+          for path, expected, length in records:
+              url=base+path
+              with urllib.request.urlopen(url,timeout=30) as response:
+                  if not response.url.startswith('https://raw.githubusercontent.com/'):
+                      raise RuntimeError('Unexpected source host')
+                  data=response.read(length+1)
+              actual=hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+              if len(data)!=length or actual!=expected:
+                  raise RuntimeError('Upstream checksum mismatch: '+path)
+              target=root/pathlib.Path(path).name
+              target.write_bytes(data)
+              results.append(dict(file=target.name,source_url=url,bytes=len(data),git_blob_sha1=actual,sha256=hashlib.sha256(data).hexdigest()))
+          manifest=dict(source_commit=commit,author='Alexander Holm',instruments={'china1':'Masterworks 20 inch Custom China','china2':'Paiste 18 inch Innovations China'},files=results,scope='Reference collection only. No DSP change, fitting, compilation or realism claim. Originals unchanged.',rights_note='Mirror includes CC BY-SA 3.0. Creator also declares public domain on his own page as of 4 March 2022; preserve both provenance and attribution.',author_page='https://rytmenpinne.wordpress.com/sounds-and-such/salamander-drumkit/',recording_warning='Creator describes a garage recording and post-export sample normalization; these are not force- or level-calibrated measurements.')
+          (root/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+          print(json.dumps(manifest,indent=2))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: china-reference-audit-${{ github.sha }}
+          path: evidence/china-references/
+          retention-days: 3
+          if-no-files-found: error
