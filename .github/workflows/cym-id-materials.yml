@@ -1,0 +1,32 @@
+name: CYM-ID material kernel fixture
+on:
+  push:
+    branches: [cym-id-materials-01]
+    paths: ['experiments/cym-id-materials/**', '.github/workflows/cym-id-materials.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: cym-id-materials-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  fixture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install public distribution tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++
+      - name: Compile material kernel and run synthetic fixture
+        working-directory: experiments/cym-id-materials
+        run: |
+          faust -double -cn MaterialProbe -I . smoke.dsp -o probe.hpp
+          g++ -std=c++17 -O2 smoke.cpp -o smoke
+          ./smoke
+          python3 generate_wrapper.py materials-engine.lib material-bank.dsp
+          faust -double -cn ModalBank material-bank.dsp -o modal_bank.hpp
+          echo 'Compilation and synthetic fixtures only; not a full fitted cymbal render.'
