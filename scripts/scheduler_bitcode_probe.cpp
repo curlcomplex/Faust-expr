@@ -4,8 +4,10 @@
 #include <cmath>
 #include <csignal>
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <unistd.h>
 #include <vector>
@@ -20,11 +22,6 @@ voice(i) = os.osc(70 + i * 3.17)
 bank = par(i, 64, voice(i)) :> _;
 process = bank, bank;
 )FAUST";
-
-struct FactoryDeleter {
-    void operator()(llvm_dsp_factory* p) const noexcept { if (p) deleteDSPFactory(p); }
-};
-using FactoryPtr = std::unique_ptr<llvm_dsp_factory, FactoryDeleter>;
 
 struct DSPDeleter {
     void operator()(dsp* p) const noexcept { delete p; }
@@ -65,73 +62,111 @@ double renderChecksum(llvm_dsp_factory* factory, const char* stage)
     return checksum;
 }
 
+bool writeText(const std::string& path, const std::string& text)
+{
+    std::ofstream out(path, std::ios::binary | std::ios::trunc);
+    out << text;
+    return bool(out);
+}
+
+std::string readText(const std::string& path)
+{
+    std::ifstream in(path, std::ios::binary);
+    std::ostringstream out;
+    out << in.rdbuf();
+    return out.str();
+}
+
 } // namespace
 
-int main()
+int main(int argc, char** argv)
 {
     std::cout << std::unitbuf;
     std::cerr << std::unitbuf;
     std::signal(SIGALRM, timedOut);
     alarm(30);
 
-    const char* schedulerModule = std::getenv("FAUST_SCHEDULER_MODULE");
-    if (!schedulerModule || !*schedulerModule) {
-        std::cerr << "FAUST_SCHEDULER_MODULE is required\n";
+    if (argc != 3 || (std::string(argv[1]) != "write" && std::string(argv[1]) != "read")) {
+        std::cerr << "usage: scheduler_bitcode_probe write|read <bitcode-file>\n";
         return 2;
     }
 
+    const std::string mode = argv[1];
+    const std::string path = argv[2];
     const std::string jitTarget = target();
+    std::cout << "mode=" << mode << "\n";
     std::cout << "target=" << jitTarget << "\n";
-    std::cout << "scheduler_module=" << schedulerModule << "\n";
-
-    std::vector<std::string> storage { "-sch", "-L", schedulerModule };
-    std::vector<const char*> args;
-    for (const auto& s : storage) args.push_back(s.c_str());
 
     std::string error;
-    std::cout << "stage=create_source_factory\n";
-    FactoryPtr original(createDSPFactoryFromString(
-        "SchedulerBitcodeProbe", kSource,
-        static_cast<int>(args.size()), args.data(),
-        jitTarget, error, -1));
-    if (!original) {
-        std::cerr << "compile_error=" << error << "\n";
-        return 3;
+
+    if (mode == "write") {
+        const char* schedulerModule = std::getenv("FAUST_SCHEDULER_MODULE");
+        if (!schedulerModule || !*schedulerModule) {
+            std::cerr << "FAUST_SCHEDULER_MODULE is required in write mode\n";
+            return 3;
+        }
+        std::cout << "scheduler_module=" << schedulerModule << "\n";
+
+        std::vector<std::string> storage { "-sch", "-L", schedulerModule };
+        std::vector<const char*> args;
+        for (const auto& s : storage) args.push_back(s.c_str());
+
+        std::cout << "stage=create_source_factory\n";
+        llvm_dsp_factory* factory = createDSPFactoryFromString(
+            "SchedulerBitcodeProbe", kSource,
+            static_cast<int>(args.size()), args.data(),
+            jitTarget, error, -1);
+        if (!factory) {
+            std::cerr << "compile_error=" << error << "\n";
+            return 4;
+        }
+        std::cout << "original_options=" << factory->getCompileOptions() << "\n";
+
+        std::cout << "stage=write_bitcode_before_instance\n";
+        const std::string bitcode = writeDSPFactoryToBitcode(factory);
+        std::cout << "stage=write_bitcode_returned\n";
+        if (bitcode.empty() || !writeText(path, bitcode)) {
+            std::cerr << "bitcode_write_error\n";
+            return 6;
+        }
+        std::cout << "bitcode_bytes=" << bitcode.size() << "\n";
+
+        const double checksum = renderChecksum(factory, "source");
+        std::cout << "checksum=" << checksum << "\n";
+        if (!std::isfinite(checksum)) return 7;
+
+        // Intentionally do not call deleteDSPFactory here. Curlop's process-wide
+        // FaustRuntime cache also keeps hot factories alive for process lifetime,
+        // and current libfaust/scheduler teardown crashes after scheduler use.
+        // The OS reclaims the factory when this producer process exits.
+        alarm(0);
+        std::cout << "scheduler_bitcode_write=PASS\n";
+        return 0;
     }
 
-    std::cout << "original_options=" << original->getCompileOptions() << "\n";
-    std::cout << "stage=write_bitcode_before_instance\n";
-    const std::string bitcode = writeDSPFactoryToBitcode(original.get());
-    std::cout << "stage=write_bitcode_returned\n";
+    // Fresh-process cache reload. There is deliberately no -L argument and no
+    // requirement for FAUST_SCHEDULER_MODULE in this process.
+    const std::string bitcode = readText(path);
     if (bitcode.empty()) {
-        std::cerr << "bitcode_write_error=empty\n";
-        return 4;
+        std::cerr << "bitcode_read_file_error\n";
+        return 8;
     }
     std::cout << "bitcode_bytes=" << bitcode.size() << "\n";
-
-    const double before = renderChecksum(original.get(), "original");
-    std::cout << "checksum_before=" << before << "\n";
-
-    std::cout << "stage=destroy_source_factory\n";
-    original.reset();
-
-    error.clear();
     std::cout << "stage=read_bitcode_factory\n";
-    FactoryPtr reloaded(readDSPFactoryFromBitcode(bitcode, jitTarget, error, -1));
-    if (!reloaded) {
+    llvm_dsp_factory* factory = readDSPFactoryFromBitcode(bitcode, jitTarget, error, -1);
+    if (!factory) {
         std::cerr << "bitcode_reload_error=" << error << "\n";
-        return 6;
+        return 9;
     }
     std::cout << "stage=read_bitcode_returned\n";
-    std::cout << "reloaded_options=" << reloaded->getCompileOptions() << "\n";
+    std::cout << "reloaded_options=" << factory->getCompileOptions() << "\n";
 
-    const double after = renderChecksum(reloaded.get(), "reloaded");
-    std::cout << "checksum_after=" << after << "\n";
-    const double delta = std::abs(before - after);
-    std::cout << "checksum_delta=" << delta << "\n";
-    if (!std::isfinite(after) || delta > 1.0e-5) return 7;
+    const double checksum = renderChecksum(factory, "reloaded");
+    std::cout << "checksum=" << checksum << "\n";
+    if (!std::isfinite(checksum)) return 10;
 
+    // Same process-lifetime cache policy as write mode.
     alarm(0);
-    std::cout << "scheduler_bitcode_roundtrip=PASS\n";
+    std::cout << "scheduler_bitcode_reload=PASS\n";
     return 0;
 }
