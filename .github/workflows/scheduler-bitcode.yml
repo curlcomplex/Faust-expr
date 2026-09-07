@@ -56,19 +56,16 @@ jobs:
           from pathlib import Path
           p = Path('build/faust-scheduler-link.cpp')
           s = p.read_text()
-
           old_export = '#define EXPORT inline __attribute__ ((visibility("default"))) __attribute__((always_inline))'
           new_export = '#define EXPORT __attribute__ ((visibility("default")))'
           if old_export not in s:
               raise SystemExit('scheduler EXPORT macro did not match expected Faust source')
           s = s.replace(old_export, new_export)
-
           old_rdtsc = '''static INLINE UInt64 DSP_rdtsc(void)\n{\n\tunion {\n\t\tUInt32 i32[2];\n\t\tUInt64 i64;\n\t} count;\n\t\n\t__asm__ __volatile__("rdtsc" : "=a" (count.i32[0]), "=d" (count.i32[1]));\n    return count.i64;\n}'''
           new_rdtsc = '''static INLINE UInt64 DSP_rdtsc(void)\n{\n#if defined(__aarch64__) || defined(__arm64__)\n    UInt64 count = 0;\n    __asm__ __volatile__("mrs %0, cntvct_el0" : "=r" (count));\n    return count;\n#else\n    union {\n        UInt32 i32[2];\n        UInt64 i64;\n    } count;\n    __asm__ __volatile__("rdtsc" : "=a" (count.i32[0]), "=d" (count.i32[1]));\n    return count.i64;\n#endif\n}'''
           if old_rdtsc not in s:
               raise SystemExit('scheduler DSP_rdtsc body did not match expected Faust source')
           s = s.replace(old_rdtsc, new_rdtsc)
-
           marker = '''#endif\n\n/*\nstatic INLINE int INC_ATOMIC'''
           arm_atomics = '''#endif\n\n#if defined(__aarch64__) || defined(__arm64__)\nstatic INLINE void NOP(void) {}\nstatic INLINE char CAS1(volatile void* addr, volatile int value, int newvalue)\n{\n    return __sync_bool_compare_and_swap((int*)addr, value, newvalue);\n}\nstatic INLINE int atomic_xadd(volatile int* atomic, int val)\n{\n    return __sync_add_and_fetch(atomic, val);\n}\n#endif\n\n/*\nstatic INLINE int INC_ATOMIC'''
           if marker not in s:
@@ -77,13 +74,35 @@ jobs:
           p.write_text(s)
           PY
 
-          # Match the same LLVM major and exact target triple that libfaust reports.
           "$CLANGXX" -target "$TRIPLE" -std=c++17 -O2 -S -emit-llvm -I"$FAUST_INCLUDE" build/faust-scheduler-link.cpp -o build/faust-scheduler.ll
           grep '^target triple' build/faust-scheduler.ll | tee evidence-scheduler-bitcode/scheduler-target.txt
           grep -E '(define|declare) .*@(createScheduler|deleteScheduler|startAll|stopAll|signalAll|syncAll|computeThreadExternal)' build/faust-scheduler.ll | tee evidence-scheduler-bitcode/scheduler-symbols.txt || true
 
           "$CLANGXX" -std=c++17 -O2 -I"$FAUST_INCLUDE" scripts/scheduler_bitcode_probe.cpp -L"$FAUST_LIBDIR" -lfaust -lpthread -lz -o build/scheduler_bitcode_probe
-          FAUST_SCHEDULER_MODULE="$PWD/build/faust-scheduler.ll" FAUST_JIT_TARGET="$TARGET" build/scheduler_bitcode_probe 2>&1 | tee evidence-scheduler-bitcode/result.txt
+
+          BC="$PWD/build/scheduler-cache.bc.txt"
+          FAUST_SCHEDULER_MODULE="$PWD/build/faust-scheduler.ll" FAUST_JIT_TARGET="$TARGET" build/scheduler_bitcode_probe write "$BC" 2>&1 | tee evidence-scheduler-bitcode/write.txt
+          env -u FAUST_SCHEDULER_MODULE FAUST_JIT_TARGET="$TARGET" build/scheduler_bitcode_probe read "$BC" 2>&1 | tee evidence-scheduler-bitcode/read.txt
+
+          python3 - <<'PY' | tee evidence-scheduler-bitcode/verification.txt
+          from pathlib import Path
+          import math, re
+          def checksum(path):
+              text = Path(path).read_text()
+              m = re.search(r'^checksum=([-+0-9.eE]+)$', text, re.M)
+              if not m:
+                  raise SystemExit(f'missing checksum in {path}')
+              return float(m.group(1))
+          a = checksum('evidence-scheduler-bitcode/write.txt')
+          b = checksum('evidence-scheduler-bitcode/read.txt')
+          d = abs(a-b)
+          print(f'write_checksum={a}')
+          print(f'read_checksum={b}')
+          print(f'checksum_delta={d}')
+          if not math.isfinite(d) or d > 1e-5:
+              raise SystemExit('scheduler bitcode reload output mismatch')
+          print('scheduler_bitcode_fresh_process_gate=PASS')
+          PY
       - name: Save evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
