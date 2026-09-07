@@ -31,6 +31,13 @@ jobs:
           persist-credentials: false
       - name: Install toolchain (driver verifies exact versions)
         run: brew install faust llvm@22
+      - name: Install existing lab analysis dependencies
+        run: |
+          python3 -m venv .venv
+          .venv/bin/python -m pip install numpy matplotlib
+          echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
+          mkdir -p evidence-existing-options
+          .venv/bin/python -m pip freeze > evidence-existing-options/python-packages.txt
       - name: Existing lab and analysis self-tests
         run: |
           python3 -m unittest discover -s tests -v
