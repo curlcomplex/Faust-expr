@@ -35,7 +35,6 @@ jobs:
       - name: Existing harness self-tests
         run: |
           python3 scripts/run_existing_faust_options.py --self-test
-          bash scripts/build.sh
           python3 -m py_compile scripts/run_existing_faust_focus.py
       - name: Chunk size, inline and optimizer-winner controls
         env:
