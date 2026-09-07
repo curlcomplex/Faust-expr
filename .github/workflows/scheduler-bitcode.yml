@@ -32,7 +32,8 @@ jobs:
           faust -v 2>&1 | head -5 | tee -a evidence-scheduler-bitcode/environment.txt
           FAUST_INCLUDE="$(faust --includedir)"
           FAUST_LIBDIR="$(faust --libdir)"
-          SCHEDULER_CPP="$(find "$(brew --prefix faust)" /opt/homebrew/share/faust /usr/local/share/faust -name scheduler.cpp -print -quit 2>/dev/null || true)"
+          brew list faust | tee evidence-scheduler-bitcode/faust-files.txt
+          SCHEDULER_CPP="$(brew list faust | grep '/scheduler\.cpp$' | head -1 || true)"
           printf 'include=%s\nlibdir=%s\nscheduler_cpp=%s\n' "$FAUST_INCLUDE" "$FAUST_LIBDIR" "$SCHEDULER_CPP" | tee -a evidence-scheduler-bitcode/environment.txt
           test -n "$SCHEDULER_CPP"
 
