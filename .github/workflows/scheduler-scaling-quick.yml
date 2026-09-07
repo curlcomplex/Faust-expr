@@ -1,8 +1,6 @@
 name: Scheduler cached-JIT scaling quick
 
 on:
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
