@@ -1,4 +1,4 @@
-name: CYM-ID material kernel fixture
+name: CYM-ID material and interaction kernel fixtures
 on:
   push:
     branches: [cym-id-materials-01]
@@ -21,7 +21,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends faust g++
-      - name: Compile material kernel and run synthetic fixture
+      - name: Compile preserved material kernel and run synthetic fixture
         working-directory: experiments/cym-id-materials
         run: |
           faust -double -cn MaterialProbe -I . smoke.dsp -o probe.hpp
@@ -29,4 +29,26 @@ jobs:
           ./smoke
           python3 generate_wrapper.py materials-engine.lib material-bank.dsp
           faust -double -cn ModalBank material-bank.dsp -o modal_bank.hpp
+      - name: Compile thickness and held-contact extension and test numerical fixtures
+        working-directory: experiments/cym-id-materials
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p fixture-evidence
+          python3 generate_interactions.py materials-engine.lib refinement-controls.lib interactions-engine.lib | tee fixture-evidence/kernel.txt
+          echo 'c1e2cbf0e92c49d3b6c489ae8e44c352d913817513fd0a71b558a65047a2d4a8  interactions-engine.lib' | sha256sum -c -
+          faust -double -cn InteractionProbe -I . interaction-smoke.dsp -o interaction-probe.hpp
+          g++ -std=c++17 -O2 interaction-smoke.cpp -o interaction-smoke
+          ./interaction-smoke | tee fixture-evidence/results.txt
+          python3 generate_wrapper.py interactions-engine.lib interaction-bank.dsp
+          faust -double -cn ModalBank interaction-bank.dsp -o interaction-bank.hpp
+          sha256sum interactions-engine.lib interaction-bank.dsp > fixture-evidence/source-hashes.txt
           echo 'Compilation and synthetic fixtures only; not a full fitted cymbal render.'
+      - name: Preserve fixture evidence only
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: cym-id-interaction-fixture-${{ github.sha }}
+          path: experiments/cym-id-materials/fixture-evidence/
+          retention-days: 3
+          if-no-files-found: warn
