@@ -1,0 +1,81 @@
+name: Scheduler option tuning
+
+on:
+  push:
+    branches: [research/scheduler-scaling-tune]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tune-macos:
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Install toolchain
+        run: brew install faust llvm@22
+      - name: Build runtime and tools
+        run: |
+          set -euo pipefail
+          mkdir -p build/tune evidence-tune
+          cp "$(brew --prefix faust)/share/faust/scheduler.cpp" build/tune/scheduler.cpp
+          python3 scripts/patch_scheduler_arm64.py build/tune/scheduler.cpp
+          python3 - <<'PY'
+          from pathlib import Path
+          import sys
+          sys.path.insert(0,'scripts')
+          import run_scheduler_liveness as l
+          import scheduler_liveness_queue_controls as q
+          p=Path('build/tune/scheduler.cpp')
+          p.write_text(q.queue_control(l.instrument_runtime(p.read_text(),False,False),'atomic'))
+          PY
+          LLVM="$(brew --prefix llvm@22)"; INC="$(faust --includedir)"; LIB="$(faust --libdir)"; CXX="$LLVM/bin/clang++"
+          cat > build/tune/target.cpp <<'CPP'
+          #include <faust/dsp/llvm-dsp.h>
+          #include <iostream>
+          int main(){std::cout<<getDSPMachineTarget();}
+          CPP
+          "$CXX" -std=c++17 -O3 -I"$INC" build/tune/target.cpp -L"$LIB" -Wl,-rpath,"$LIB" -lfaust -lpthread -lz -o build/tune/target
+          TARGET="$(build/tune/target)"; TRIPLE="${TARGET%%:*}"
+          sysctl hw.physicalcpu hw.logicalcpu machdep.cpu.brand_string | tee evidence-tune/environment.txt
+          echo "target=$TARGET" >> evidence-tune/environment.txt
+          "$CXX" -std=c++17 -O3 -target "$TRIPLE" -I"$INC" -S -emit-llvm build/tune/scheduler.cpp -o build/tune/scheduler.ll
+          "$CXX" -std=c++17 -O3 -I"$INC" scripts/scaling_factory_prep_tune.cpp -L"$LIB" -Wl,-rpath,"$LIB" -lfaust -lpthread -lz -o build/tune/prep
+          "$CXX" -std=c++17 -O3 -I"$INC" scripts/scheduler_scaling_bench.cpp -L"$LIB" -Wl,-rpath,"$LIB" -lfaust -lpthread -lz -o build/tune/bench
+      - name: Benchmark scheduler option variants
+        run: |
+          set -euo pipefail
+          printf 'mode\tvoices\tframes\tparticipants\tmedian_ns_per_frame\n' > evidence-tune/results.tsv
+          for V in 64 256; do
+            build/tune/prep scalar "$V" build/tune/scalar-$V.bc build/tune/scheduler.ll >/dev/null
+            for M in sch schg schdfs schgdfs; do build/tune/prep "$M" "$V" "build/tune/$M-$V.bc" build/tune/scheduler.ll > "evidence-tune/prep-$M-$V.txt"; done
+            for F in 128 512; do
+              O="$(build/tune/bench build/tune/scalar-$V.bc 1 "$F" 256)"; N="$(echo "$O"|awk -F= '/median_ns_per_frame/{print $2}')"; printf 'scalar\t%s\t%s\t1\t%s\n' "$V" "$F" "$N" >> evidence-tune/results.tsv
+              for M in sch schg schdfs schgdfs; do
+                for P in 1 2 3; do
+                  O="$(build/tune/bench build/tune/$M-$V.bc "$P" "$F" 256)"; N="$(echo "$O"|awk -F= '/median_ns_per_frame/{print $2}')"; printf '%s\t%s\t%s\t%s\t%s\n' "$M" "$V" "$F" "$P" "$N" >> evidence-tune/results.tsv
+                done
+              done
+            done
+          done
+          cat evidence-tune/results.tsv
+          python3 - <<'PY'
+          import csv,json
+          r=list(csv.DictReader(open('evidence-tune/results.tsv'),delimiter='\t'))
+          for x in r:x['voices']=int(x['voices']);x['frames']=int(x['frames']);x['participants']=int(x['participants']);x['median_ns_per_frame']=float(x['median_ns_per_frame'])
+          out=[]
+          for v in (64,256):
+            for f in (128,512):
+              g=[x for x in r if x['voices']==v and x['frames']==f]; scalar=next(x['median_ns_per_frame'] for x in g if x['mode']=='scalar')
+              for m in ('sch','schg','schdfs','schgdfs'):
+                q={x['participants']:x['median_ns_per_frame'] for x in g if x['mode']==m}
+                z={'voices':v,'frames':f,'mode':m,'p1':q[1],'p2':q[2],'p3':q[3],'p2_vs_p1':q[1]/q[2],'p3_vs_p1':q[1]/q[3],'p2_vs_scalar':scalar/q[2],'p3_vs_scalar':scalar/q[3]};out.append(z);print(json.dumps(z))
+          open('evidence-tune/summary.json','w').write(json.dumps(out,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scheduler-tune-${{ github.sha }}
+          path: evidence-tune/
+          retention-days: 14
