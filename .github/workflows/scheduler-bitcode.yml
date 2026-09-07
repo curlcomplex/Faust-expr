@@ -52,37 +52,7 @@ jobs:
           echo "jit_triple=$TRIPLE" | tee -a evidence-scheduler-bitcode/environment.txt
 
           cp "$SCHEDULER_CPP" build/faust-scheduler-link.cpp
-          python3 - <<'PY'
-          from pathlib import Path
-          p = Path('build/faust-scheduler-link.cpp')
-          s = p.read_text()
-
-          old_export = '#define EXPORT inline __attribute__ ((visibility("default"))) __attribute__((always_inline))'
-          new_export = '#define EXPORT __attribute__ ((visibility("default")))'
-          if old_export not in s:
-              raise SystemExit('scheduler EXPORT macro did not match expected Faust source')
-          s = s.replace(old_export, new_export)
-
-          old_rdtsc = '''static INLINE UInt64 DSP_rdtsc(void)\n{\n\tunion {\n\t\tUInt32 i32[2];\n\t\tUInt64 i64;\n\t} count;\n\t\n\t__asm__ __volatile__("rdtsc" : "=a" (count.i32[0]), "=d" (count.i32[1]));\n    return count.i64;\n}'''
-          new_rdtsc = '''static INLINE UInt64 DSP_rdtsc(void)\n{\n#if defined(__aarch64__) || defined(__arm64__)\n    UInt64 count = 0;\n    __asm__ __volatile__("mrs %0, cntvct_el0" : "=r" (count));\n    return count;\n#else\n    union {\n        UInt32 i32[2];\n        UInt64 i64;\n    } count;\n    __asm__ __volatile__("rdtsc" : "=a" (count.i32[0]), "=d" (count.i32[1]));\n    return count.i64;\n#endif\n}'''
-          if old_rdtsc not in s:
-              raise SystemExit('scheduler DSP_rdtsc body did not match expected Faust source')
-          s = s.replace(old_rdtsc, new_rdtsc)
-
-          marker = '''#endif\n\n/*\nstatic INLINE int INC_ATOMIC'''
-          arm_atomics = '''#endif\n\n#if defined(__aarch64__) || defined(__arm64__)\nstatic INLINE void NOP(void) {}\nstatic INLINE char CAS1(volatile void* addr, volatile int value, int newvalue)\n{\n    return __sync_bool_compare_and_swap((int*)addr, value, newvalue);\n}\nstatic INLINE int atomic_xadd(volatile int* atomic, int val)\n{\n    return __sync_add_and_fetch(atomic, val);\n}\n#endif\n\n/*\nstatic INLINE int INC_ATOMIC'''
-          if marker not in s:
-              raise SystemExit('scheduler atomic helper insertion point not found')
-          s = s.replace(marker, arm_atomics, 1)
-
-          old_cancel = '''static void CancelThread(pthread_t fThread)\n{\n    mach_port_t machThread = pthread_mach_thread_np(fThread);\n    thread_terminate(machThread);\n}'''
-          new_cancel = '''static void CancelThread(pthread_t fThread)\n{\n    mach_port_t machThread = pthread_mach_thread_np(fThread);\n    thread_terminate(machThread);\n    pthread_join(fThread, NULL);\n}'''
-          if old_cancel not in s:
-              raise SystemExit('scheduler macOS CancelThread body did not match expected Faust source')
-          s = s.replace(old_cancel, new_cancel)
-
-          p.write_text(s)
-          PY
+          python3 scripts/patch_scheduler_arm64.py build/faust-scheduler-link.cpp
 
           "$CLANGXX" -target "$TRIPLE" -std=c++17 -O2 -S -emit-llvm -I"$FAUST_INCLUDE" build/faust-scheduler-link.cpp -o build/faust-scheduler.ll
           grep '^target triple' build/faust-scheduler.ll | tee evidence-scheduler-bitcode/scheduler-target.txt
