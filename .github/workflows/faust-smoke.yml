@@ -14,12 +14,11 @@ concurrency:
 
 jobs:
   smoke:
-    # Standard hosted runner; no paid larger runner.
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - name: Check out this public repository only
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
       - name: Install distribution compiler and analysis tools
@@ -83,7 +82,7 @@ jobs:
           FAUST_JIT_TARGET="x86_64-pc-linux-gnu:generic" timeout 120s build/module_fusion_probe 2>&1 | tee evidence/module-fusion-results.txt
       - name: Save commit-specific audio and test evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: faust-evidence-linux-${{ github.sha }}-${{ github.run_attempt }}
           path: evidence/
@@ -95,7 +94,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Check out this public repository only
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
       - name: Install Faust
@@ -103,7 +102,7 @@ jobs:
         run: |
           set -euo pipefail
           brew install faust
-      - name: Build and run editable-module versus fused graph probe
+      - name: Build and run Apple Silicon Faust probes
         shell: bash
         run: |
           set -euo pipefail
@@ -114,7 +113,6 @@ jobs:
           FAUST_INCLUDE="$(faust --includedir)"
           FAUST_LIBDIR="$(faust --libdir)"
           printf 'include=%s\nlibdir=%s\n' "$FAUST_INCLUDE" "$FAUST_LIBDIR" | tee -a evidence-macos/environment.txt
-          ls -la "$FAUST_LIBDIR" | tee evidence-macos/libdir.txt
           cat > build/faust_target.cpp <<'CPP'
           #include <faust/dsp/llvm-dsp.h>
           #include <iostream>
@@ -123,15 +121,23 @@ jobs:
           clang++ -std=c++17 -O2 -I"$FAUST_INCLUDE" build/faust_target.cpp -L"$FAUST_LIBDIR" -lfaust -lpthread -lz -o build/faust_target
           TARGET="$(build/faust_target)"
           echo "jit_target=$TARGET" | tee -a evidence-macos/environment.txt
+
           clang++ -std=c++17 -O2 -I"$FAUST_INCLUDE" scripts/module_fusion_probe.cpp -L"$FAUST_LIBDIR" -lfaust -lpthread -lz -o build/module_fusion_probe 2>&1 | tee evidence-macos/module-fusion-build.txt
           : > evidence-macos/module-fusion-results.txt
           for repeat in 1 2 3; do
             echo "=== repeat $repeat ===" | tee -a evidence-macos/module-fusion-results.txt
             FAUST_JIT_TARGET="$TARGET" build/module_fusion_probe 2>&1 | tee -a evidence-macos/module-fusion-results.txt
           done
+
+          clang++ -std=c++17 -O2 -I"$FAUST_INCLUDE" scripts/two_level_cache_probe.cpp -L"$FAUST_LIBDIR" -lfaust -lpthread -lz -o build/two_level_cache_probe 2>&1 | tee evidence-macos/two-level-cache-build.txt
+          : > evidence-macos/two-level-cache-results.txt
+          for repeat in 1 2 3; do
+            echo "=== repeat $repeat ===" | tee -a evidence-macos/two-level-cache-results.txt
+            FAUST_JIT_TARGET="$TARGET" build/two_level_cache_probe 2>&1 | tee -a evidence-macos/two-level-cache-results.txt
+          done
       - name: Save macOS benchmark evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: faust-evidence-macos-${{ github.sha }}-${{ github.run_attempt }}
           path: evidence-macos/
