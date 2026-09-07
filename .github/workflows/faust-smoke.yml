@@ -78,6 +78,15 @@ jobs:
           # Hosted x86 CPU feature exposure has proven variable between runners;
           # this research step gates only the linked-scheduler hypothesis.
           exit "$linked_status"
+      - name: Compare editable module boundaries with a fused Faust graph
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence build
+          FAUST_INCLUDE="$(faust --includedir)"
+          FAUST_LIB="$(ldconfig -p | awk '/libfaust\.so\.2/{print $NF; exit}')"
+          g++ -std=c++17 -O2 -I"$FAUST_INCLUDE" scripts/module_fusion_probe.cpp "$FAUST_LIB" -lpthread -ldl -lz -o build/module_fusion_probe 2>&1 | tee evidence/module-fusion-build.txt
+          FAUST_JIT_TARGET="x86_64-pc-linux-gnu:generic" timeout 120s build/module_fusion_probe 2>&1 | tee evidence/module-fusion-results.txt
       - name: Save commit-specific audio and test evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
