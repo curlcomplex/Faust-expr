@@ -44,7 +44,7 @@ def replace_one(text, old, new):
 def add_block_completion_barrier(text):
     """Diagnostic hypothesis, NOT a production-approved worker runtime.
 
-The previous run hung in compute(), before its cleanup-policy branch.
+A prior run hung in compute(), before its cleanup-policy branch.
 Upstream has disabled worker completion accounting and SyncAll's wait.
 Restore an explicit atomic acknowledgement before the callback can reset
 shared task state for the next block. Task partitioning stays unchanged.
@@ -121,7 +121,6 @@ def run_child(name, cmd, child_env, debug=True, timeout=15):
     if not completed:
         print('\n'.join(text.splitlines()[-28:]), flush=True)
     if debug and not completed and not timed_out:
-        # Replays use separate output files: never overwrite original evidence.
         lldb = shutil.which('lldb')
         if lldb:
             replay = cmd.copy()
@@ -250,19 +249,25 @@ def main():
         checked(args + [source, '-o', output], f'generate-cpp-{variant}')
         shutil.copy2(output, EVIDENCE / f'generated-{variant}-unadapted.h')
         if shape == 'sch':
-            # In the tested distribution, -A did not override scheduler.cpp.
-            # The generated file contains an EXACT copy of the installed file.
-            # Replace only that copy with the SAME runtime compiled into JIT IR.
-            # This avoids silently comparing different scheduler implementations.
             raw = output.read_text()
             stock = original.read_text()
             runtime = (directory / 'scheduler.cpp').read_text()
             modified = replace_one(raw, stock, runtime)
             if modified.replace(runtime, stock, 1) != raw:
-                raise RuntimeError('native adaptation modified more than scheduler runtime')
+                raise RuntimeError('runtime adaptation changed unexpected generated code')
+            # Faust 2.85.9 C++ -sch emits BOTH a defaulted destructor and a
+            # destructor that calls destroy(). The archived unadapted output
+            # and prior build logs preserve this compiler error. Retain the
+            # real scheduler-destroying destructor and remove ONLY the duplicate
+            # defaulted declaration for this diagnostic comparison.
+            if modified.count('virtual ~ProbeDSP() {') != 1 or 'deleteScheduler(fScheduler);' not in modified:
+                raise RuntimeError('expected real scheduler destructor missing')
+            modified = replace_one(modified, 'virtual ~ProbeDSP() = default;',
+                                    '// Diagnostic: redundant default destructor removed; see evidence.')
             output.write_text(modified)
             (EVIDENCE / f'native-runtime-{variant}.json').write_text(json.dumps({
-                'method': 'exact single embedded scheduler replacement, generated DSP unchanged',
+                'method': 'exact embedded runtime replacement plus removal of redundant default destructor',
+                'dsp_compute_modified': False,
                 'unadapted_sha256': sha(EVIDENCE / f'generated-{variant}-unadapted.h'),
                 'adapted_sha256': sha(output), 'runtime_sha256': sha(directory / 'scheduler.cpp')}, indent=2))
         shutil.copy2(output, EVIDENCE / f'generated-{variant}.h')
@@ -313,10 +318,15 @@ def main():
             count = 1 if variant == 'arm_portable' else REPEATS
             for rep in range(count): jit_case(variant, 'sch', rep, scheduler=ll)
             if variant == 'graceful_atomic': jit_case(variant, 'sch', 0, 'retain', ll)
-            exe = aot_case(variant, 'sch', directory, count)
+            exe = None
+            try:
+                exe = aot_case(variant, 'sch', directory, count)
+            except Exception as e:
+                results.append({'name': 'build-cpp-' + variant, 'clean_exit': False, 'error': str(e)})
+                print('native_build_error=' + str(e), flush=True)
             if variant.startswith('graceful_atomic'):
-                # Additional repeats try to expose the intermittent compute hang.
-                # Alternate JIT/native, with the original IR absent throughout.
+                # Additional repeats expose intermittent hangs. JIT checks still
+                # execute even if native generation/build independently fails.
                 hidden = ll.with_suffix('.unavailable'); ll.rename(hidden)
                 try:
                     bc = EVIDENCE / f'jit-{variant}-explicit-0.bc.txt'
@@ -327,11 +337,12 @@ def main():
                         run_child(stem, [host, 'sch', 'read', 'explicit', source, bc, audio], env,
                                   debug=(rep == 0))
                         compare(reference, audio, stem + '-audio', 1e-7)
-                        stem = f'cpp-{variant}-repeat-{rep}'
-                        audio = EVIDENCE / (stem + '.f32')
-                        run_child(stem, [exe, 'sch', 'source', 'explicit', source, '-', audio], env,
-                                  debug=(rep == 0))
-                        compare(baseline_audio, audio, stem + '-audio', 5e-5)
+                        if exe:
+                            stem = f'cpp-{variant}-repeat-{rep}'
+                            audio = EVIDENCE / (stem + '.f32')
+                            run_child(stem, [exe, 'sch', 'source', 'explicit', source, '-', audio], env,
+                                      debug=(rep == 0))
+                            compare(baseline_audio, audio, stem + '-audio', 5e-5)
                 finally:
                     hidden.rename(ll)
         except Exception as e:
@@ -358,9 +369,9 @@ finally:
                'A compute hang before the cleanup branch is NOT explained by factory retention.',
                'Strict scalar roundtrip tolerance is retained even if it fails; see exact errors.',
                'The block-completion barrier is a separate experimental variant, not a production fix.',
+               'Native -sch requires a documented redundant-destructor codegen workaround.',
                'Full sample comparisons and backtraces are in the evidence artifact.']
     if os.environ.get('GITHUB_STEP_SUMMARY'):
         with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f: f.write('\n'.join(report) + '\n')
-# Keep the diagnostic workflow red when any control actually fails.
 raise SystemExit(0 if results and all(r['clean_exit'] for r in results) and
                  all(c['pass'] for c in comparisons) else 1)
