@@ -1,0 +1,37 @@
+name: Reproducible Faust compiler tools
+on:
+  push:
+    branches: [1-spatial-cymbal]
+    paths: [.github/workflows/compiler-tools.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compiler:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Collect distribution compiler and its runtime dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust
+          mkdir -p compiler/bin compiler/lib compiler/share/faust compiler/licenses
+          cp /usr/bin/faust compiler/bin/
+          ldd /usr/bin/faust | tee compiler/dependencies.txt
+          ldd /usr/bin/faust | awk '/=> \// {print $3}' | while read -r lib; do
+            case "$(basename "$lib")" in libc.so*|libm.so*|libpthread.so*|libdl.so*|librt.so*) continue;; esac
+            cp -L "$lib" compiler/lib/
+          done
+          find /usr/share/faust -maxdepth 1 -name '*.lib' -exec cp '{}' compiler/share/faust/ \;
+          cp /usr/share/doc/faust/copyright compiler/licenses/faust-copyright
+          apt-cache show faust > compiler/package-metadata.txt
+          printf 'Source packages: https://archive.ubuntu.com/ubuntu/pool/universe/f/faust/\n' > compiler/SOURCES.txt
+          tar -czf compiler-tools.tar.gz compiler
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: faust-compiler-tools
+          path: compiler-tools.tar.gz
+          retention-days: 1
+          if-no-files-found: error

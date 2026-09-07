@@ -1,0 +1,26 @@
+{
+  "engine": "CYM-A",
+  "engine_commit": "43f39b60b7b239f8e460d1d8ee7b6f027a0532fb",
+  "body_and_stick": {
+    "diameter_m": 0.435807,
+    "thickness_mm": 1.273931,
+    "taper": 0.575327,
+    "bell_height_ratio": 0.074159,
+    "bow_height_ratio": 0.033778,
+    "bell_diameter_ratio": 0.280376,
+    "hammering": 0.112066,
+    "loss_scale": 0.268465,
+    "nonlinearity": 0.894026,
+    "tip_radius_mm": 5.031135,
+    "beater_mass_g": 22.068123
+  },
+  "velocities": {
+    "suspended_soft": 0.118721,
+    "suspended_hard": 0.593086,
+    "suspended_bell": 0.45,
+    "suspended_general": 1.0
+  },
+  "optimizer_training": ["suspended_soft", "suspended_hard"],
+  "excluded_from_optimizer": ["suspended_bell", "suspended_general"],
+  "warning": "Unknown source geometry, gain and strike force. These are candidate synthesis settings, not identified specimen dimensions."
+}

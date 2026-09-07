@@ -1,38 +1,34 @@
 # Faust-expr
 
-A standalone public laboratory for Faust instruments, starting with research into a physically modelled, playable cymbal.
+Standalone public Faust experiments, beginning with **Spatial Cymbal v0.1**.
+This is a working research prototype, not a validated simulation of every detail
+of cymbal manufacture and contact. Read [the model and limitations](docs/CYMBAL.md).
 
-**Current scope: build infrastructure only. `dsp/probe.dsp` is a compiler smoke test, not a cymbal model.** Check the actual Actions run and its artifacts for build evidence; source presence alone does not prove a successful build.
+## Cymbal
 
-## Intended research
+One spatially struck, still-ringing body with continuous diameter, thickness,
+taper, bell shape, hammering approximation, beater properties and material morph.
+The core uses 128 modes from a tapered-plate reference with approximate shell
+stiffening and passive nonlinear modal coupling. No recorded cymbal samples.
 
-One connected vibrating object with a continuous size control; spatial strikes from bell through bow to edge; contact-based beaters; controllable thickness, bell geometry and hammering approximations; conventional and unconventional materials. Distinguish physical modelling from deliberate impossible-object behaviour. Do not label unvalidated approximations as real-world accuracy.
-
-## Build and evidence
-
-The GitHub workflow uses a standard Ubuntu runner with a ten-minute timeout. On pushes, pull requests and manual requests, it installs Faust, compiles the actual DSP into C++, renders one second of controlled audio, and validates pitch, amplitude, initial silence, release tail and finite sample values.
-
-The commit-labelled workflow artifact contains `probe.wav`, `waveform.png`, `results.json`, compiler versions, raw float audio, and the build log. Outputs expire after three days. The waveform is an analysis image, not an application screenshot. Failed validation fails the job; it is not hidden by normalisation.
-
-To run locally, install Faust with its C++ headers, g++, Python 3, NumPy and Matplotlib, then run:
-
-```sh
-python3 -m unittest discover -s tests -v
-bash scripts/build.sh
+```bash
+# Ubuntu dependencies
+sudo apt-get install faust g++ python3-numpy python3-scipy python3-matplotlib
+bash scripts/build_cymbal.sh
 ```
 
-The Python tests use explicitly synthetic fixtures to validate the analyser. They do not stand in for a Faust compile or physical-model validation.
+Outputs under `evidence/cymbal/` include `audition.wav`, individual 48 kHz stereo
+WAVs, `audition-timeline.json`, `results.json`, `precision.json`, compiler/version
+provenance and the self-contained **spatial-cymbal.dsp**.
 
-## Separation and security
+Open that generated DSP in a Faust host. Press/release gate to strike; leave the
+same instance alive between hits. Try strike_radius 0.16, 0.55 and 0.92; material
+0/1/2/3 means bronze/steel/glass/wood. The maintained source is `dsp/cymbal.dsp`
+plus `scripts/generate_cymbal.py`. Begin with low monitoring volume.
 
-This repository contains only standalone laboratory files. It does not fetch, build, or publish any private host repository, its history, dependencies, settings, recordings or credentials. CI needs no API key and calls no AI model. Its GitHub token is read-only; it runs no deployment, release or automatic merge. Do not add a private checkout or private credentials to this public workflow.
+CI runs the actual compiler and native renderer on a standard Linux runner and
+publishes commit-specific artifacts. No Codex or other model calls are involved.
+The original two-tone compiler check remains available via `bash scripts/build.sh`.
 
-No open-source licence has been selected; choosing one is a separate project decision.
-
-## References
-
-- Faust: https://github.com/grame-cncm/faust
-- Compiler options: https://faustdoc.grame.fr/manual/options/
-- GitHub Actions billing: https://docs.github.com/en/billing/concepts/product-billing/github-actions
-
-Standard hosted execution for public repositories is free under GitHub's published policy. This does not promise unlimited storage or paid larger runners.
+This repository does not contain or fetch private CURLOP code. CURLOP integration,
+real interface evidence and device performance require separate tests.

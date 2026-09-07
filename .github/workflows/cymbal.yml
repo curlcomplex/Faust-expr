@@ -1,0 +1,42 @@
+name: Spatial cymbal renders and regression tests
+on:
+  push:
+    branches: [main, 1-spatial-cymbal]
+    paths:
+      - dsp/**
+      - scripts/*cymbal*
+      - tests/test_cymbal_model.py
+      - .github/workflows/cymbal.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: cymbal-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  cymbal:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install compiler and numerical tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy python3-matplotlib
+      - name: Test analysis and reference model
+        run: /usr/bin/python3 -m unittest discover -s tests -v
+      - name: Compile cymbal and produce actual audio evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/cymbal
+          PATH=/usr/bin:/bin:$PATH bash scripts/build_cymbal.sh 2>&1 | tee evidence/cymbal/build.log
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: cymbal-${{ github.sha }}-${{ github.run_attempt }}
+          path: evidence/cymbal/
+          retention-days: 3
+          if-no-files-found: warn
