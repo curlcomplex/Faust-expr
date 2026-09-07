@@ -51,6 +51,7 @@ jobs:
           fi
           : > evidence/jit-summary.txt
           overall=0
+          set +e
           for mode in scalar vec32 vec64 sch; do
             echo "=== $mode ===" | tee -a evidence/jit-summary.txt
             timeout 30s build/jit_scheduler_probe "$mode" >"evidence/jit-${mode}.txt" 2>&1
@@ -61,6 +62,7 @@ jobs:
             # evidence for this research branch, not a reason to hide artifacts.
             if [ "$mode" != sch ] && [ "$status" -ne 0 ]; then overall=$status; fi
           done
+          set -e
           exit "$overall"
       - name: Save commit-specific audio and test evidence
         if: always()
