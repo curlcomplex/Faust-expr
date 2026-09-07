@@ -1,11 +1,6 @@
 name: Scheduler processing liveness
 
 on:
-  pull_request:
-    paths:
-      - 'scripts/run_scheduler_liveness.py'
-      - 'scripts/*liveness*'
-      - '.github/workflows/scheduler-liveness.yml'
   workflow_dispatch:
 
 permissions:
