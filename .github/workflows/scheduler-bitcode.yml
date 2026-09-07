@@ -1,8 +1,6 @@
 name: Scheduler bitcode compatibility
 
 on:
-  push:
-  pull_request:
   workflow_dispatch:
 
 permissions:
