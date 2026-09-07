@@ -1,13 +1,6 @@
 name: Scheduler lifecycle diagnosis
 
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/scheduler-lifecycle.yml'
-      - 'scripts/lifecycle_diag.cpp'
-      - 'scripts/run_lifecycle_diagnostics.py'
-      - 'scripts/patch_scheduler_arm64.py'
-      - 'scripts/scheduler_bitcode_probe.cpp'
   workflow_dispatch:
 
 permissions:
