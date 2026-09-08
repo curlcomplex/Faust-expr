@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  checkpoint:
+  producer-linux:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -25,7 +25,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
-      - name: Retrieve exact public compiler and prepare source evidence
+      - name: Preserve exact public sources and install reference toolchain
         shell: bash
         run: |
           set -euo pipefail
@@ -36,64 +36,85 @@ jobs:
           test "$(git -C build/plan-llvm/faust rev-parse HEAD)" = 3d4baa164c0dd31b7d147617ed84a626495148dd
           git rev-parse HEAD > evidence-plan-llvm/lab-commit.txt
           git -C build/plan-llvm/faust rev-parse HEAD > evidence-plan-llvm/faust-commit.txt
-          git -C build/plan-llvm/faust archive HEAD compiler architecture build Makefile > evidence-plan-llvm/pinned-compiler-sources.tar
+          git -C build/plan-llvm/faust archive HEAD compiler architecture build Makefile COPYING.txt > evidence-plan-llvm/pinned-compiler-sources.tar
           git archive HEAD > evidence-plan-llvm/lab-sources.tar
           sha256sum evidence-plan-llvm/*.tar > evidence-plan-llvm/source-archives.sha256
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: plan-llvm-sources-${{ github.run_id }}-${{ github.run_attempt }}
-          path: evidence-plan-llvm/
-          retention-days: 14
-      - name: Install public Linux reference toolchain
-        shell: bash
-        run: |
-          set -euo pipefail
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends faust g++ cmake
-          faust --version > evidence-plan-llvm/system-faust.txt
-          g++ --version > evidence-plan-llvm/cxx.txt
-          uname -a > evidence-plan-llvm/os.txt
+          sudo apt-get install -y --no-install-recommends faust g++ cmake python3-numpy python3-matplotlib
           dpkg-query -W faust libfaust2 > evidence-plan-llvm/packages.txt
-      - name: Build pinned compiler (or patched exporter when present)
+      - name: Unit tests and original Faust audio smoke test
         shell: bash
         run: |
           set -euo pipefail
-          if [ -f scripts/plan_llvm_export_patch.py ]; then
-            python3 scripts/plan_llvm_export_patch.py build/plan-llvm/faust
-          fi
+          /usr/bin/python3 -m unittest discover -s tests -v 2>&1 | tee evidence-plan-llvm/unit-tests.txt
+          PATH="/usr/bin:$PATH" bash scripts/build.sh 2>&1 | tee evidence-plan-llvm/original-smoke.txt
+      - name: Build pinned compiler with opt-in structured exporter
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/plan_llvm_export_patch.py build/plan-llvm/faust | tee evidence-plan-llvm/export-patch.txt
+          git -C build/plan-llvm/faust diff > evidence-plan-llvm/compiler.patch
+          cp scripts/plan_llvm_export.hh evidence-plan-llvm/
           (cd build/plan-llvm/faust && timeout 720 make compiler -j4) 2>&1 | tee evidence-plan-llvm/compiler-build.txt
-          build/plan-llvm/faust/build/bin/faust --version > evidence-plan-llvm/pinned-faust.txt
-      - name: Preserve executable compiler and public reference library
+      - name: Export actual plans and execute stateful LLVM checkpoint
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p evidence-plan-llvm/toolchain/bin evidence-plan-llvm/toolchain/lib evidence-plan-llvm/toolchain/include
-          cp build/plan-llvm/faust/build/bin/faust evidence-plan-llvm/toolchain/bin/faust-pinned
-          cp /usr/bin/faust evidence-plan-llvm/toolchain/bin/faust-system
-          cp -a /usr/include/faust evidence-plan-llvm/toolchain/include/
-          cp -L /usr/lib/x86_64-linux-gnu/libfaust.so* evidence-plan-llvm/toolchain/lib/
-          ldd /usr/lib/x86_64-linux-gnu/libfaust.so > evidence-plan-llvm/libfaust-ldd.txt
-          awk '/=> \/.* / {print $3}' evidence-plan-llvm/libfaust-ldd.txt | while read -r dep; do
-            case "$dep" in
-              */libc.so.*|*/libm.so.*|*/libpthread.so.*|*/libdl.so.*|*/librt.so.*) ;;
-              *) cp -L "$dep" evidence-plan-llvm/toolchain/lib/ ;;
-            esac
-          done
-          tar -czf evidence-plan-llvm/toolchain.tar.gz -C evidence-plan-llvm toolchain
-          rm -rf evidence-plan-llvm/toolchain
-          sha256sum evidence-plan-llvm/toolchain.tar.gz > evidence-plan-llvm/toolchain.sha256
-      - name: Execute checkpoint when implementation is present
+          python3 scripts/plan_llvm_checkpoint.py \
+            --faust build/plan-llvm/faust/build/bin/faust \
+            --system-faust /usr/bin/faust --output evidence-plan-llvm/results \
+            2>&1 | tee evidence-plan-llvm/checkpoint.txt
+      - name: Publish report
+        if: always()
         shell: bash
         run: |
-          set -euo pipefail
-          if [ -f scripts/plan_llvm_checkpoint.py ]; then
-            python3 scripts/plan_llvm_checkpoint.py --faust build/plan-llvm/faust/build/bin/faust --output evidence-plan-llvm/results
-          else
-            echo 'toolchain_only=true; no compiler-plan execution or correctness acceptance claimed' | tee evidence-plan-llvm/NOT-YET-EXECUTED.txt
-          fi
+          if [ -f evidence-plan-llvm/results/REPORT.md ]; then cat evidence-plan-llvm/results/REPORT.md >> "$GITHUB_STEP_SUMMARY"; fi
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: plan-llvm-checkpoint-${{ github.run_id }}-${{ github.run_attempt }}
+          name: plan-llvm-linux-${{ github.run_id }}-${{ github.run_attempt }}
           path: evidence-plan-llvm/
+          retention-days: 14
+
+  consumer-macos:
+    needs: producer-linux
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: plan-llvm-linux-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build/producer-evidence
+      - name: Install Apple Silicon reference runtime
+        run: brew install faust
+      - name: Replay checksummed producer plans through macOS LLVM
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence-plan-llvm-macos
+          git rev-parse HEAD > evidence-plan-llvm-macos/lab-commit.txt
+          sysctl hw.physicalcpu hw.logicalcpu machdep.cpu.brand_string > evidence-plan-llvm-macos/cpu.txt
+          FAUST_INCLUDE="$(faust --includedir)"
+          FAUST_LIBDIR="$(faust --libdir)"
+          CLANGXX="$(brew --prefix llvm@22)/bin/clang++"
+          test -x "$CLANGXX"
+          python3 -m unittest discover -s tests -p 'test_plan_llvm_*' -v 2>&1 | tee evidence-plan-llvm-macos/unit-tests.txt
+          python3 scripts/plan_llvm_checkpoint.py \
+            --replay-plans build/producer-evidence/results --system-faust "$(command -v faust)" \
+            --include "$FAUST_INCLUDE" --libdir "$FAUST_LIBDIR" --cxx "$CLANGXX" \
+            --output evidence-plan-llvm-macos/results 2>&1 | tee evidence-plan-llvm-macos/checkpoint.txt
+      - name: Publish report
+        if: always()
+        shell: bash
+        run: |
+          if [ -f evidence-plan-llvm-macos/results/REPORT.md ]; then cat evidence-plan-llvm-macos/results/REPORT.md >> "$GITHUB_STEP_SUMMARY"; fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: plan-llvm-macos-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence-plan-llvm-macos/
           retention-days: 14
