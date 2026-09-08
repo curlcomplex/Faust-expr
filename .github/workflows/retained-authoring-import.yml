@@ -1,0 +1,61 @@
+name: Publish authorized retained-authoring source snapshot
+on:
+  push:
+    branches: [research/retained-authoring]
+    paths:
+      - '.github/workflows/retained-authoring-import.yml'
+      - 'scripts/import_retained_snapshot.py'
+  workflow_dispatch:
+# This is the one-time source-publication operation explicitly authorized by
+# the owner, not benchmark CI. Benchmark execution uses a separate read-only job.
+permissions:
+  contents: write
+concurrency:
+  group: retained-authoring-source-publication
+  cancel-in-progress: false
+jobs:
+  publish-source:
+    if: github.repository == 'curlcomplex/Faust-expr' && github.actor == 'curlcomplex' && github.ref == 'refs/heads/research/retained-authoring'
+    runs-on: macos-15
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Create ephemeral source-transport key
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p "$RUNNER_TEMP/retained-key-${GITHUB_RUN_ID}" public-key
+          openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out "$RUNNER_TEMP/retained-key-${GITHUB_RUN_ID}/private.pem" 2>/dev/null
+          openssl pkey -in "$RUNNER_TEMP/retained-key-${GITHUB_RUN_ID}/private.pem" -pubout -out public-key/public.pem
+          shasum -a 256 public-key/public.pem > public-key/key.sha256
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retained-import-public-key-${{ github.run_id }}
+          path: public-key/
+          retention-days: 1
+      - name: Import and publish only authorized dependency closure
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The encrypted envelope is committed after the ephemeral public key
+          # exists. Incorporate that single fast-forward before publishing source.
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('scripts/import_retained_snapshot.py')
+          s=p.read_text()
+          needle="    subprocess.run(['git','add','--','vendor/curlop-latency'],check=True)"
+          insertion="    subprocess.run(['git','fetch','origin',BRANCH],check=True,stdout=subprocess.DEVNULL)\n    changed=subprocess.check_output(['git','diff','--name-only','HEAD..FETCH_HEAD'],text=True).splitlines()\n    if any(x!='.github/retained-import.encrypted.json' for x in changed):raise RuntimeError('unexpected concurrent branch changes')\n    subprocess.run(['git','merge','--ff-only','FETCH_HEAD'],check=True,stdout=subprocess.DEVNULL)\n"
+          assert s.count(needle)==1
+          p.write_text(s.replace(needle,insertion+needle))
+          PY
+          python3 scripts/import_retained_snapshot.py --key "$RUNNER_TEMP/retained-key-${GITHUB_RUN_ID}/private.pem" --public-key public-key/public.pem
+      - name: Destroy transport key
+        if: always()
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/retained-key-${GITHUB_RUN_ID}/private.pem"
