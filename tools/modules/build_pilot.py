@@ -1,4 +1,4 @@
-"""Compile unchanged baseline and candidate 02 using actual Faust; no fitting."""
+"""Compile unchanged baseline/candidate 02 and verify the isolated gate body."""
 from __future__ import annotations
 import argparse
 import hashlib
@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 
 ROOT=Path(__file__).resolve().parents[2]
 def sha(p): return hashlib.sha256(Path(p).read_bytes()).hexdigest()
@@ -15,7 +16,7 @@ def main():
     p.add_argument('--out',type=Path,default=ROOT/'build/kick-pm-02')
     args=p.parse_args(); out=args.out.resolve(); out.mkdir(parents=True,exist_ok=True)
     faust=os.environ.get('FAUST','faust'); cxx=os.environ.get('CXX','c++')
-    report={'source_commit':None,'builds':{},'passed':False,'scope':'actual Faust generation/native compile, not reference fit'}
+    report={'source_commit':None,'builds':{},'passed':False,'scope':'actual Faust generation/native compile and isolated gate-body checks, not reference fit'}
     def run(cmd):
         r=subprocess.run(cmd,cwd=ROOT,capture_output=True,text=True,timeout=120)
         with (out/'build.log').open('a') as f: f.write(json.dumps(cmd)+'\n'+r.stdout+r.stderr+'\n')
@@ -39,6 +40,7 @@ def main():
                 'expanded_sha256':sha(d/'expanded.dsp'),'generated_sha256':sha(d/'generated.hpp'),
                 'native_sha256':sha(d/'render'),'library_sha256':sha(d/'kernel.so'),
                 'controls_sha256':sha(d/'controls.tsv'),'faust_flags':flags,'native_flags':native}
+        run([sys.executable,str(ROOT/'tools/modules/body_gate_probe.py'),'--out',str(out/'gate-body')])
         report['passed']=True
     except Exception as e:
         report['failure']=str(e)
