@@ -1,0 +1,15 @@
+{
+  "experiment": "kick-reference-02",
+  "fitting_targets": ["BDM-01", "BDM-05", "BDM-09", "BDM-14"],
+  "reserved_not_inspected": ["BDM-20", "BDM-26"],
+  "scope": "Patch-level pilot with lossy unknown-settings previews. No hardware macro or velocity mapping identified. Not perceptual validation.",
+  "baseline_sha": "e5e4c3d6911a60fb80793a6b8955d80a645c6248",
+  "reference_zip_sha256": "ec411bed8b2bd473ab043f0e9e27e03cc7dba97c16135ce795e7c084b90b3a14",
+  "rules": [
+    "Targets selected by pre-existing numerical sequence, not audio similarity",
+    "Optimize actual Faust-generated kernels, not substitute Python synthesis",
+    "Compare fitted existing architecture versus revised architecture, not an unfit default",
+    "Any gain applied for fitting/listening is recorded separately; raw audio remains unmodified",
+    "Reserve the final two references until a later experiment; no held-out generalization claim now"
+  ]
+}

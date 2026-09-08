@@ -41,6 +41,12 @@ jobs:
           set -euo pipefail
           mkdir -p build/kick-pm-01 evidence
           PATH=/usr/bin:/bin:$PATH /usr/bin/python3 tools/modules/lab.py --out build/kick-pm-01 2>&1 | tee evidence/module-run.log
+      - name: Compile reference-led body candidates without external recordings
+        if: hashFiles('tools/modules/build_pilot.py') != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          PATH=/usr/bin:/bin:$PATH /usr/bin/python3 tools/modules/build_pilot.py --out build/kick-pm-02
       - name: Save commit-specific audio and test evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -49,5 +55,6 @@ jobs:
           path: |
             evidence/
             build/kick-pm-01/
+            build/kick-pm-02/
           if-no-files-found: warn
           retention-days: 3
