@@ -1,0 +1,22 @@
+{
+  "experiment": "kick-pm-01",
+  "kind": "architecture-ablation-not-hardware-fit",
+  "candidate_a": {"feedback_mode": 0},
+  "candidate_b": {"feedback_mode": 1},
+  "anchors": {
+    "rounded": {"frequency_hz": 46, "sweep": 0.18, "punch": 0, "decay_s": 0.8, "square": 0.02, "triangle": 0.08, "mod_envelope": 0.9, "drive": 0},
+    "punchy": {"frequency_hz": 58, "sweep": 0.45, "punch": 1, "decay_s": 0.32, "square": 0.18, "triangle": 0.3, "mod_envelope": 0.85, "drive": 0.08},
+    "harmonic": {"frequency_hz": 52, "sweep": 0.3, "punch": 1, "decay_s": 0.65, "square": 0.6, "triangle": 0.55, "mod_envelope": 0.5, "drive": 0.15},
+    "aggressive": {"frequency_hz": 42, "sweep": 0.75, "punch": 1, "decay_s": 0.5, "square": 0.75, "triangle": 0.95, "mod_envelope": 0.65, "drive": 0.65}
+  },
+  "numerical_oracles": {
+    "same_scalar_build_segment_max_error": 0.000001,
+    "scalar_vector_max_error": 0.0002,
+    "velocity_scaling_max_error": 0.000002,
+    "clean_pitch_absolute_error_hz": 0.75,
+    "peak_ceiling_without_limiter": 0.7
+  },
+  "reference_fit_training": [],
+  "reference_fit_holdouts": [],
+  "note": "No reference data or optimization used. These are diagnostic patches, not matched hardware presets or held-out validation. Numeric tolerances test implementation, not perceptual fidelity."
+}

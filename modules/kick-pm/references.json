@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "primary_target": {"manufacturer": "Elektron", "product": "Syntakt", "machine": "BD Modern", "firmware": null},
+  "comparator": {"manufacturer": "Elektron", "product": "Model:Cycles", "machine": "Kick", "firmware": null},
+  "reviewed_on": "2026-09-08",
+  "calibration_ready": false,
+  "captures": [],
+  "leads": [
+    {"id": "cycles-designer", "url": "https://www.elektronauts.com/t/model-cycles-q-a-with-ess/122712/122", "kind": "primary-designer-account", "supports": "Cycles uses PM; kick includes triangular shaping into feedback; exact mappings not disclosed", "does_not_establish": "BD Modern exact routing, curves or captured output"},
+    {"id": "bd-modern-lab", "url": "https://www.elektronauts.com/t/syntakt-science-lab-18-bd-modern/245847", "kind": "creator-performance-recordings", "calibration_eligible": false, "reason": "Inspected contributions are multi-track/processed; some explicitly use max FX drive or pseudo compression. No isolated firmware-and-settings-controlled WAV capture obtained.", "redistribution": "not assumed; no recordings downloaded or republished"}
+  ],
+  "capture_requirements": ["original file SHA256 and format", "recording creator and storage/redistribution permission", "exact firmware", "machine and full parameter settings", "pitch/velocity/gate/retrigger timing", "filter/amp/FX and output routing", "fixed recording gain", "repeated hits for variation"],
+  "prospective_split": {
+    "training": "four chosen anchors plus individual control endpoints and midpoints with controlled pitch/velocity",
+    "holdout": "reserved intermediate settings, unseen square/triangle/envelope combinations and one dynamic phrase",
+    "status": "protocol only; no dataset split exists until controlled captures are registered"
+  }
+}
