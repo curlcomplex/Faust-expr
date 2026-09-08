@@ -46,6 +46,6 @@ triOp = (+(triPhase) : triShape)
 phaseOffset = 0.18*square*modEnv*squareOp + 0.30*triangle*modEnv*triOp;
 body = sin(carrierPhase + 2.0*ma.PI*phaseOffset);
 // Exactly dry at drive=0. Shaping precedes the amplitude envelope deliberately.
-shaped = (1.0-drive)*body + drive*tanh(body*(1.0+5.0*drive))/tanh(1.0+5.0*drive);
+shaped = (1.0-drive)*body + drive*ma.tanh(body*(1.0+5.0*drive))/ma.tanh(1.0+5.0*drive);
 tick = punch*0.06*sin(2.0*ma.PI*phase(7.0*frequency))*exp(-t/0.003);
 process = 0.65*v*amp*(shaped+tick);
