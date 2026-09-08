@@ -1,0 +1,31 @@
+name: Scheduler processing liveness
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  liveness-macos:
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - name: Check out isolated research branch
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install previously tested Faust distribution
+        run: brew install faust
+      - name: Instrument existing probe and capture original hung processes
+        run: |
+          python3 -m py_compile scripts/run_scheduler_liveness.py
+          python3 scripts/run_scheduler_liveness.py
+      - name: Preserve code, bitcode, progress traces and live stacks
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: scheduler-liveness-${{ github.sha }}-${{ github.run_attempt }}
+          path: evidence-liveness/
+          if-no-files-found: error
+          retention-days: 30

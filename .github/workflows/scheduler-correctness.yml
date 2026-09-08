@@ -1,0 +1,42 @@
+name: Scheduler extended correctness
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scheduler-correctness-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  correctness:
+    name: correctness (${{ matrix.variant }})
+    runs-on: macos-15
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [atomic, atomic_barrier]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install previously tested hosted toolchain
+        run: brew install faust
+      - name: Run fresh-cache correctness controls
+        env:
+          CORRECTNESS_VARIANT: ${{ matrix.variant }}
+          CORRECTNESS_THREADS: '1,2,3'
+        run: |
+          python3 -m py_compile scripts/run_scheduler_correctness.py
+          python3 scripts/run_scheduler_correctness.py
+      - name: Preserve failures, comparisons, toolchain and runtime copies
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: scheduler-correctness-${{ matrix.variant }}-${{ github.sha }}-${{ github.run_attempt }}
+          path: evidence-correctness/
+          if-no-files-found: error
+          retention-days: 14

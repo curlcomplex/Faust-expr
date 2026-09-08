@@ -1,0 +1,91 @@
+name: Scheduler bitcode compatibility
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scheduler-bitcode-macos:
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - name: Check out research branch
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install Faust
+        shell: bash
+        run: |
+          set -euo pipefail
+          brew install faust
+      - name: Build scheduler support module and bitcode probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build evidence-scheduler-bitcode
+          uname -a | tee evidence-scheduler-bitcode/environment.txt
+          sysctl -n machdep.cpu.brand_string 2>/dev/null | tee -a evidence-scheduler-bitcode/environment.txt || true
+          faust -v 2>&1 | head -5 | tee -a evidence-scheduler-bitcode/environment.txt
+          FAUST_INCLUDE="$(faust --includedir)"
+          FAUST_LIBDIR="$(faust --libdir)"
+          SCHEDULER_CPP="$(brew --prefix faust)/share/faust/scheduler.cpp"
+          LLVM_PREFIX="$(brew --prefix llvm@22)"
+          CLANGXX="$LLVM_PREFIX/bin/clang++"
+          printf 'include=%s\nlibdir=%s\nscheduler_cpp=%s\nclang=%s\n' "$FAUST_INCLUDE" "$FAUST_LIBDIR" "$SCHEDULER_CPP" "$CLANGXX" | tee -a evidence-scheduler-bitcode/environment.txt
+          test -f "$SCHEDULER_CPP"
+          test -x "$CLANGXX"
+          "$CLANGXX" --version | head -1 | tee -a evidence-scheduler-bitcode/environment.txt
+
+          cat > build/faust_target.cpp <<'CPP'
+          #include <faust/dsp/llvm-dsp.h>
+          #include <iostream>
+          int main() { std::cout << getDSPMachineTarget(); }
+          CPP
+          "$CLANGXX" -std=c++17 -O2 -I"$FAUST_INCLUDE" build/faust_target.cpp -L"$FAUST_LIBDIR" -lfaust -lpthread -lz -o build/faust_target
+          TARGET="$(build/faust_target)"
+          TRIPLE="${TARGET%%:*}"
+          echo "jit_target=$TARGET" | tee -a evidence-scheduler-bitcode/environment.txt
+          echo "jit_triple=$TRIPLE" | tee -a evidence-scheduler-bitcode/environment.txt
+
+          cp "$SCHEDULER_CPP" build/faust-scheduler-link.cpp
+          python3 scripts/patch_scheduler_arm64.py build/faust-scheduler-link.cpp
+
+          "$CLANGXX" -target "$TRIPLE" -std=c++17 -O2 -S -emit-llvm -I"$FAUST_INCLUDE" build/faust-scheduler-link.cpp -o build/faust-scheduler.ll
+          grep '^target triple' build/faust-scheduler.ll | tee evidence-scheduler-bitcode/scheduler-target.txt
+          grep -E '(define|declare) .*@(createScheduler|deleteScheduler|startAll|stopAll|signalAll|syncAll|computeThreadExternal)' build/faust-scheduler.ll | tee evidence-scheduler-bitcode/scheduler-symbols.txt || true
+
+          "$CLANGXX" -std=c++17 -O2 -I"$FAUST_INCLUDE" scripts/scheduler_bitcode_probe.cpp -L"$FAUST_LIBDIR" -lfaust -lpthread -lz -o build/scheduler_bitcode_probe
+
+          BC="$PWD/build/scheduler-cache.bc.txt"
+          OMP_NUM_THREADS=2 FAUST_SCHEDULER_MODULE="$PWD/build/faust-scheduler.ll" FAUST_JIT_TARGET="$TARGET" build/scheduler_bitcode_probe write "$BC" 2>&1 | tee evidence-scheduler-bitcode/write.txt
+          env -u FAUST_SCHEDULER_MODULE OMP_NUM_THREADS=2 FAUST_JIT_TARGET="$TARGET" build/scheduler_bitcode_probe read "$BC" 2>&1 | tee evidence-scheduler-bitcode/read.txt
+
+          python3 - <<'PY' | tee evidence-scheduler-bitcode/verification.txt
+          from pathlib import Path
+          import math, re
+          def checksum(path):
+              text = Path(path).read_text()
+              m = re.search(r'^checksum=([-+0-9.eE]+)$', text, re.M)
+              if not m:
+                  raise SystemExit(f'missing checksum in {path}')
+              return float(m.group(1))
+          a = checksum('evidence-scheduler-bitcode/write.txt')
+          b = checksum('evidence-scheduler-bitcode/read.txt')
+          d = abs(a-b)
+          print(f'write_checksum={a}')
+          print(f'read_checksum={b}')
+          print(f'checksum_delta={d}')
+          if not math.isfinite(d) or d > 1e-5:
+              raise SystemExit('scheduler bitcode reload output mismatch')
+          print('scheduler_bitcode_fresh_process_gate=PASS')
+          PY
+      - name: Save evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: scheduler-bitcode-${{ github.sha }}-${{ github.run_attempt }}
+          path: evidence-scheduler-bitcode/
+          if-no-files-found: warn
+          retention-days: 3

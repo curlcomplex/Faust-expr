@@ -1,0 +1,80 @@
+name: Existing Faust focused confirmation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/scheduler-scaling.yml'
+      - 'scripts/resume_existing_faust_options.py'
+      - 'scripts/run_existing_faust_options.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: faust-existing-focus-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  focus-macos:
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Install matched toolchain
+        run: brew install faust llvm@22
+      - name: Recover exact existing sweep artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            https://api.github.com/repos/curlcomplex/Faust-expr/actions/artifacts/10034378547/zip \
+            -o prior-artifact.zip
+          python3 - <<'PY'
+          import hashlib, zipfile
+          from pathlib import Path
+          data=Path('prior-artifact.zip').read_bytes()
+          assert hashlib.sha256(data).hexdigest() == '0045e3edf40b1e25be9c43e42955434f0b956027c134a252d5fff73351c12fd6'
+          target=Path('prior-artifact').resolve()
+          with zipfile.ZipFile('prior-artifact.zip') as z:
+              for n in z.namelist():
+                  assert (target/n).resolve().is_relative_to(target)
+              z.extractall(target)
+          PY
+      - name: Existing lab tests
+        run: |
+          python3 -m venv .venv
+          .venv/bin/python -m pip install numpy matplotlib
+          echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
+          .venv/bin/python -m unittest discover -s tests -v
+          .venv/bin/python scripts/run_existing_faust_options.py --self-test
+          PATH="$GITHUB_WORKSPACE/.venv/bin:$PATH" bash scripts/build.sh
+      - name: Confirm timing and capture statistical profiles
+        env:
+          PYTHONUNBUFFERED: '1'
+        run: python3 scripts/resume_existing_faust_options.py
+      - name: Publish report
+        if: always()
+        run: |
+          if [ -f evidence-focus/REPORT.md ]; then
+            cat evidence-focus/REPORT.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Incomplete diagnostic. Inspect errors and stage logs; no complete-result claim.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: faust-existing-focus-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            evidence-focus/
+            evidence/
+          retention-days: 14
+          if-no-files-found: error
