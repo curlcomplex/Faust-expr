@@ -1,0 +1,44 @@
+name: Cymbal preserved native core on Apple Silicon
+on:
+  push:
+    branches: [cym-id-materials-01]
+    paths:
+      - 'experiments/cym-id-materials/native-host/checkpoint21-native*'
+      - '.github/workflows/cymbal-macos-native.yml'
+permissions:
+  contents: read
+concurrency:
+  group: cymbal-native-arm64-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  mac-arm64:
+    runs-on: macos-15
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Record target platform
+        run: |
+          set -euo pipefail
+          mkdir -p build/mac-native-audit
+          uname -a | tee build/mac-native-audit/platform.txt
+          sw_vers | tee -a build/mac-native-audit/platform.txt
+          sysctl hw.model hw.memsize hw.ncpu machdep.cpu.brand_string | tee -a build/mac-native-audit/platform.txt
+          xcrun clang++ --version | tee build/mac-native-audit/compiler.txt
+          test "$(uname -m)" = arm64
+      - name: Verify and compile unchanged native engine and host; synthetic correctness tests
+        run: python3 experiments/cym-id-materials/native-host/checkpoint21-native-ci.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cymbal-native-arm64-${{ github.sha }}
+          path: |
+            build/mac-native-audit/*.json
+            build/mac-native-audit/*.txt
+            build/mac-native-audit/*.csv
+          if-no-files-found: error
+          retention-days: 7
