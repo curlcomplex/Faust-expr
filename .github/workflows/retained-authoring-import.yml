@@ -6,7 +6,6 @@ on:
       - '.github/workflows/retained-authoring-import.yml'
       - 'scripts/import_retained_snapshot.py'
   workflow_dispatch:
-# One-time owner-authorized source publication, separate from read-only test CI.
 permissions:
   contents: write
 concurrency:
@@ -30,13 +29,12 @@ jobs:
           mkdir -p "$RUNNER_TEMP/retained-key-${GITHUB_RUN_ID}" public-key
           openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out "$RUNNER_TEMP/retained-key-${GITHUB_RUN_ID}/private.pem" 2>/dev/null
           openssl pkey -in "$RUNNER_TEMP/retained-key-${GITHUB_RUN_ID}/private.pem" -pubout -out public-key/public.pem
-          shasum -a 256 public-key/public.pem > public-key/key.sha256
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: retained-import-public-key-${{ github.run_id }}
           path: public-key/
           retention-days: 1
-      - name: Import and publish only authorized dependency closure
+      - name: Publish only authorized source closure
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -44,16 +42,16 @@ jobs:
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
-          p=Path('scripts/import_retained_snapshot.py')
-          s=p.read_text()
-          # Ignore unrelated large generated members, not required dependencies.
-          # If a skipped member is actually required, dependency resolution fails.
+          p=Path('scripts/import_retained_snapshot.py');s=p.read_text()
           s=s.replace("if member.size>2000000:raise RuntimeError('oversized source file')", "if member.size>2000000:continue")
           s=s.replace('fetch(envelope_url,200000)', "fetch(envelope_url+'?poll='+str(time.time_ns()),200000)")
+          s=s.replace("    except Exception:\n        raise RuntimeError('source download failed; URL deliberately omitted') from None", "    except urllib.error.HTTPError as e:\n        raise RuntimeError('source HTTP '+str(e.code)+'; URL omitted') from None\n    except Exception as e:\n        raise RuntimeError('source transport '+type(e).__name__+'; URL omitted') from None")
+          needle="    archive=fetch(payload['archive']['url'])"
+          prefetch="    from concurrent.futures import ThreadPoolExecutor\n    with ThreadPoolExecutor(max_workers=8) as pool:\n        values=list(pool.map(lambda item:fetch(item['url'],2000000),payload['files']))\n    prefetched={item['path']:value for item,value in zip(payload['files'],values)}\n    print('Fetched',len(values),'pinned source files',flush=True)\n"
+          s=s.replace(needle,prefetch+needle).replace("data=fetch(item['url'],2000000)","data=prefetched[item['path']]")
           needle="    subprocess.run(['git','add','--','vendor/curlop-latency'],check=True)"
           insertion="    subprocess.run(['git','fetch','origin',BRANCH],check=True,stdout=subprocess.DEVNULL)\n    changed=subprocess.check_output(['git','diff','--name-only','HEAD..FETCH_HEAD'],text=True).splitlines()\n    if any(x!='.github/retained-import.encrypted.json' for x in changed):raise RuntimeError('unexpected concurrent branch changes')\n    subprocess.run(['git','merge','--ff-only','FETCH_HEAD'],check=True,stdout=subprocess.DEVNULL)\n"
-          assert s.count(needle)==1
-          p.write_text(s.replace(needle,insertion+needle))
+          assert s.count(needle)==1;p.write_text(s.replace(needle,insertion+needle))
           PY
           python3 scripts/import_retained_snapshot.py --key "$RUNNER_TEMP/retained-key-${GITHUB_RUN_ID}/private.pem" --public-key public-key/public.pem
       - name: Destroy transport key
