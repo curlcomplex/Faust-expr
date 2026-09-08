@@ -1,0 +1,38 @@
+name: Upstream Faust super-node plan probe
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/run_supernode_plan_probe.py'
+      - '.github/workflows/upstream-supernode-plan.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: upstream-supernode-plan-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  supernode-plan-macos:
+    runs-on: macos-15
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Generate upstream pre/post-fusion super-node plans
+        run: python3 scripts/run_supernode_plan_probe.py
+      - name: Publish report
+        if: always()
+        run: |
+          if [ -f evidence-supernode-plan/REPORT.md ]; then cat evidence-supernode-plan/REPORT.md >> "$GITHUB_STEP_SUMMARY"; fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: upstream-supernode-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence-supernode-plan/
+          retention-days: 14
