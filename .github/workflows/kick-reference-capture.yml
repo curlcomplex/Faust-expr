@@ -1,0 +1,44 @@
+name: Licensed kick reference acquisition
+
+on:
+  push:
+    branches: [14-kick-pm-first-comparison]
+    paths:
+      - 'tools/modules/fetch_bdmodern_references.py'
+      - '.github/workflows/kick-reference-capture.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kick-reference-acquisition-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  references:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install decoder on disposable hosted runner
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ffmpeg
+      - name: Acquire only the six explicitly licensed public previews
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/kick-reference-02
+          git rev-parse HEAD > build/kick-reference-02/commit.txt
+          /usr/bin/python3 tools/modules/fetch_bdmodern_references.py --out build/kick-reference-02 2>&1 | tee build/kick-reference-02/acquisition.log
+      - name: Preserve reference provenance and audio
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: kick-references-${{ github.sha }}
+          path: build/kick-reference-02/
+          if-no-files-found: error
+          retention-days: 7
