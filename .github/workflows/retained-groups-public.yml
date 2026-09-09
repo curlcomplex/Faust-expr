@@ -1,0 +1,64 @@
+name: Retained fused groups - public macOS
+on:
+  push:
+    branches: [research/retained-fused-groups]
+    paths:
+      - 'experiments/retained-groups/**'
+      - '.github/workflows/retained-groups-public.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: retained-fused-groups-public
+  cancel-in-progress: false
+jobs:
+  benchmark:
+    if: github.repository == 'curlcomplex/Faust-expr' && github.actor == 'curlcomplex' && github.ref == 'refs/heads/research/retained-fused-groups'
+    runs-on: macos-15
+    timeout-minutes: 50
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      GIT_LFS_SKIP_SMUDGE: 1
+      CURLOP_FAUST_BACKEND: jit
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Toolchain and existing public laboratory checks
+        run: |
+          set -euo pipefail
+          brew install faust
+          python3 -m venv .venv-groups
+          .venv-groups/bin/pip install numpy matplotlib
+          echo "$GITHUB_WORKSPACE/.venv-groups/bin" >> "$GITHUB_PATH"
+          mkdir -p evidence/groups-environment
+          { git rev-parse HEAD; uname -sm; sw_vers; sysctl hw.physicalcpu hw.logicalcpu machdep.cpu.brand_string; faust -v; clang++ --version; cmake --version; } > evidence/groups-environment/environment.txt 2>&1
+          .venv-groups/bin/python -m unittest discover -s tests -v > evidence/groups-environment/laboratory-tests.txt 2>&1
+          PATH="$GITHUB_WORKSPACE/.venv-groups/bin:$PATH" bash scripts/build.sh > evidence/groups-environment/laboratory-build.txt 2>&1
+          git archive HEAD experiments/retained-groups vendor/curlop-latency experiments/retained-host | gzip > evidence/groups-environment/executed-source.tar.gz
+      - name: Original 46 cases and ordinary LLVM retained-group cases
+        run: python3 experiments/retained-groups/run.py --phase jit --output evidence/groups-jit
+      - name: Retain first-stage evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retained-groups-jit-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            evidence/groups-jit/
+            evidence/groups-environment/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Earlier upstream fusion pass inside the same retained groups
+        run: python3 experiments/retained-groups/run.py --phase aot --output evidence/groups-aot
+      - name: Retain integrated optimization evidence and failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retained-groups-optimized-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            evidence/groups-aot/
+            evidence/groups-environment/
+            experiments/retained-groups/native-kernels/sources/
+          if-no-files-found: warn
+          retention-days: 14
