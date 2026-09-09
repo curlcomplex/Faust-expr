@@ -37,17 +37,20 @@ second = sin(2.0*ma.PI*phase(freq*2.0));
 sub = sin(2.0*ma.PI*phase(max(10.0,freq*.5)));
 harmonic = fund + body*(.20*second + .12*sub);
 
-// The first full endpoint sweep exposed instability at the original 14.4 kHz
-// dynamic two-pole cutoff. Keep the nonlinear stage explicitly bounded and the
-// filter below 10 kHz at every sample rate in the declared test set. Zero drive
-// is exactly the unshaped signal; this is not a hidden peak normalizer.
 driveAmount = drive*drive;
 shapeDrive(x) = (1.0-driveAmount)*x
     + driveAmount*ma.tanh(x*(1.0+12.0*driveAmount))
         / ma.tanh(1.0+12.0*driveAmount);
-colored = shapeDrive(harmonic);
-cutoff = 700.0 + tone*9300.0;
-bodySignal = colored*amp : fi.lowpass(2,cutoff);
+colored = shapeDrive(harmonic) * amp;
+
+// Tone is a crossfade between two fixed filter states, not a moving filter
+// coefficient. The first endpoint stress run proved that snapping a dynamic
+// two-pole cutoff on the same sample as a retrigger can expose a huge state
+// transient. Fixed one-pole branches keep step locks and live tone jumps
+// bounded without smoothing away note-on parameter locks.
+darkBody = colored : fi.lowpass(1,1200.0);
+brightBody = colored : fi.lowpass(1,9000.0);
+bodySignal = darkBody*(1.0-tone) + brightBody*tone;
 
 // Short excitation/click path kept independent from the body so optimization
 // cannot hide transient errors inside the resonator envelope.
