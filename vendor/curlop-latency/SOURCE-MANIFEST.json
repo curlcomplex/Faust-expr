@@ -577,6 +577,31 @@
       "sha256": "3a63f00be963428e5632e77eaa5782a43fbd08d8d30e68e5e6c67c818d0085f2",
       "git_blob_sha1": "0cb79397a55cdd66e10cc010f9f0c827920691a0",
       "bytes": 3567
+    },
+    "scripts/bench/patching_latency/README.md": {
+      "sha256": "e7ac0a154bbae01ecfe6a2e47252a4f40963fface7f89d7b8299d7ab1ab6ce93",
+      "git_blob_sha1": "4c2ecdba462d23622712f421a74f4115753f78c3",
+      "bytes": 3529
+    },
+    "scripts/bench/patching_latency/analyze.py": {
+      "sha256": "df84bd6ec139d8ccab357a3863d77168c7604ea40b2024e5ca64dd8ad358b5bc",
+      "git_blob_sha1": "b26d7f90fcf4fe104794e85f5d5f4b3a03829447",
+      "bytes": 9014
+    },
+    "scripts/bench/patching_latency/main.cpp": {
+      "sha256": "64100c6b063a6f85a4679d4602b3cd2a0ed746d8ba318d02657425e25dc923c5",
+      "git_blob_sha1": "8026275e8b71ece5113ca929313635991bf7dc84",
+      "bytes": 18891
+    },
+    "scripts/bench/patching_latency/run.py": {
+      "sha256": "69978df1748b79b192894bdd33667b921d44c4f1dc5f08592029a548536537e0",
+      "git_blob_sha1": "a8691bab5269d86b8b92777da6d9492178281ed3",
+      "bytes": 4729
+    },
+    "scripts/bench/patching_latency/test_analyze.py": {
+      "sha256": "b14d6462f20e2c3c09ddd5e7107359d6f7a9ac0907cba3f7c973942780e40c46",
+      "git_blob_sha1": "f3bc51fb5a5905d968a76c585c3b34bf5ad6f900",
+      "bytes": 2066
     }
   }
 }
