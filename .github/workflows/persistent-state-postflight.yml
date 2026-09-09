@@ -1,0 +1,51 @@
+name: Persistent state postflight diagnostics
+on:
+  push:
+    branches: [research/persistent-state-transition]
+    paths: ['experiments/persistent-state-postflight/**', '.github/workflows/persistent-state-postflight.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Read the exact completed native evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run download 34413214170 --repo curlcomplex/Faust-expr --name persistent-state-next-full-34413214170-1 --dir raw
+          mkdir -p review
+          python3 - <<'PY' | tee review/diagnostic.log
+          import pathlib,json
+          root=pathlib.Path('raw')
+          for name in ['identity.json','original-regression.log']:
+              p=root/name
+              if p.exists():print('FILE',name,'\n',p.read_text())
+          p=root/'original-regression/retained-cases.json'
+          if p.exists():
+              cases=json.loads(p.read_text());print('CASE_COUNTS',len(cases),'failures',sum(c['returncode']!=0 for c in cases))
+              for c in cases:
+                  if c['returncode']:
+                      print('FAILED_CASE',json.dumps(c))
+                      log=root/'original-regression'/(c['name']+'.log')
+                      if log.exists():print(log.read_text())
+          for name in ['original-regression/retained-summary.json','gate/gate-summary.json','transition/transition-summary.json']:
+              p=root/name
+              if p.exists():print('SUMMARY',name,'\n',p.read_text())
+          PY
+          cp raw/identity.json review/
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: persistent-state-postflight-${{ github.run_id }}
+          path: review/
+          if-no-files-found: error
+          retention-days: 14
