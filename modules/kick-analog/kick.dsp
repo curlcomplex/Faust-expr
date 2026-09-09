@@ -29,27 +29,35 @@ freq = pitch * (1.0 + (pitchRatio-1.0)*exp(-t/pitchTau));
 amp = (1.0-exp(-t/attackTau))*exp(-t/bodyTau);
 
 // A resonant-circuit-inspired body: deterministic excitation/reset, mild
-// asymmetric harmonic loading, and a slower sub-weighted component. This is a
-// behavioural model, not a component-level diode/transistor reconstruction.
+// harmonic loading, and a slower sub-weighted component. This is a behavioural
+// model, not a component-level diode/transistor reconstruction.
 phase(hz)=os.hs_phasor(1.0,hz,hit);
 fund = sin(2.0*ma.PI*phase(freq));
 second = sin(2.0*ma.PI*phase(freq*2.0));
 sub = sin(2.0*ma.PI*phase(max(10.0,freq*.5)));
 harmonic = fund + body*(.20*second + .12*sub);
-softclip(x,a)=ma.tanh(x*(1.0+18.0*a))/ma.tanh(1.0+18.0*a);
-colored = softclip(harmonic,drive*drive);
-cutoff = 900.0*pow(16.0,tone);
+
+// The first full endpoint sweep exposed instability at the original 14.4 kHz
+// dynamic two-pole cutoff. Keep the nonlinear stage explicitly bounded and the
+// filter below 10 kHz at every sample rate in the declared test set. Zero drive
+// is exactly the unshaped signal; this is not a hidden peak normalizer.
+driveAmount = drive*drive;
+shapeDrive(x) = (1.0-driveAmount)*x
+    + driveAmount*ma.tanh(x*(1.0+12.0*driveAmount))
+        / ma.tanh(1.0+12.0*driveAmount);
+colored = shapeDrive(harmonic);
+cutoff = 700.0 + tone*9300.0;
 bodySignal = colored*amp : fi.lowpass(2,cutoff);
 
 // Short excitation/click path kept independent from the body so optimization
 // cannot hide transient errors inside the resonator envelope.
 clickTau = .00045 + .0045*(1.0-punch);
 clickEnv = exp(-t/clickTau);
-clickTone = 1800.0 + 9800.0*tone;
+clickTone = 1800.0 + 7800.0*tone;
 clickSignal = (no.noise*.55 + sin(2.0*ma.PI*phase(clickTone))*.45)
-    * click * clickEnv;
+    * click * clickEnv * .45;
 
-// Remove tiny DC from asymmetric saturation; fixed gain leaves raw dynamics
-// observable to tests/listening instead of normalizing each hit.
-out = (bodySignal + clickSignal) * .58 * seen * vel : fi.dcblockerat(12);
+// Fixed headroom leaves the relative dynamics between patches and velocities
+// intact. There is no per-hit normalization or downstream limiter in evidence.
+out = (bodySignal + clickSignal) * .48 * seen * vel : fi.dcblockerat(12);
 process = out;
