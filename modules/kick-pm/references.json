@@ -2,17 +2,32 @@
   "schema": 1,
   "primary_target": {"manufacturer": "Elektron", "product": "Syntakt", "machine": "BD Modern", "firmware": null},
   "comparator": {"manufacturer": "Elektron", "product": "Model:Cycles", "machine": "Kick", "firmware": null},
-  "reviewed_on": "2026-09-08",
+  "reviewed_on": "2026-09-09",
   "calibration_ready": false,
   "captures": [],
+  "captures_meaning": "Controlled firmware-and-settings-known hardware captures only; preliminary previews are recorded separately below.",
+  "preliminary_reference_collection": {
+    "source": "https://particlesintowaves.bandcamp.com/album/syntakt-designer-drums",
+    "creator": "Winston Edwards / Particles Into Waves",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "format": "Public lossy MP3 previews decoded to float32 WAV; not lossless original downloads",
+    "ids": ["BDM-01", "BDM-05", "BDM-09", "BDM-14", "BDM-20", "BDM-26"],
+    "acquisition_commit": "2745ff51a8c312f29fe5ed7c474e526cf843e9c6",
+    "artifact_id": 10066482232,
+    "archive_sha256": "ec411bed8b2bd473ab043f0e9e27e03cc7dba97c16135ce795e7c084b90b3a14",
+    "eligible_for": "Same-preview patch-level pitch/envelope/timbre investigation",
+    "unknown": ["firmware", "knob settings", "velocity", "recording gain", "per-hit onboard drive", "note length"],
+    "validation_status": "All six were previously inspected descriptively. None is a blind held-out reference. No hardware macro mapping is identified."
+  },
   "leads": [
     {"id": "cycles-designer", "url": "https://www.elektronauts.com/t/model-cycles-q-a-with-ess/122712/122", "kind": "primary-designer-account", "supports": "Cycles uses PM; kick includes triangular shaping into feedback; exact mappings not disclosed", "does_not_establish": "BD Modern exact routing, curves or captured output"},
-    {"id": "bd-modern-lab", "url": "https://www.elektronauts.com/t/syntakt-science-lab-18-bd-modern/245847", "kind": "creator-performance-recordings", "calibration_eligible": false, "reason": "Inspected contributions are multi-track/processed; some explicitly use max FX drive or pseudo compression. No isolated firmware-and-settings-controlled WAV capture obtained.", "redistribution": "not assumed; no recordings downloaded or republished"}
+    {"id": "bd-modern-lab", "url": "https://www.elektronauts.com/t/syntakt-science-lab-18-bd-modern/245847", "kind": "creator-performance-recordings", "calibration_eligible": false, "reason": "Inspected contributions are multi-track/processed; some explicitly use max FX drive or pseudo compression. No isolated firmware-and-settings-controlled WAV capture obtained.", "redistribution": "not assumed; no Science Lab recordings downloaded or republished"}
   ],
   "capture_requirements": ["original file SHA256 and format", "recording creator and storage/redistribution permission", "exact firmware", "machine and full parameter settings", "pitch/velocity/gate/retrigger timing", "filter/amp/FX and output routing", "fixed recording gain", "repeated hits for variation"],
   "prospective_split": {
     "training": "four chosen anchors plus individual control endpoints and midpoints with controlled pitch/velocity",
     "holdout": "reserved intermediate settings, unseen square/triangle/envelope combinations and one dynamic phrase",
-    "status": "protocol only; no dataset split exists until controlled captures are registered"
+    "status": "protocol only; no controlled dataset split exists until suitable captures are registered"
   }
 }
