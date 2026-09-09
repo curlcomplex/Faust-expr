@@ -60,7 +60,16 @@ void trace(const experiment::Config& c,int frames,const fs::path& out){
         for(auto& m:ms)m.index=permute(m.index);for(auto& e:es){e.srcIndex=permute(e.srcIndex);e.tgtIndex=permute(e.tgtIndex);}
         require(g.replace(std::move(ms),std::move(es),{}),"nonmonotone index fixture");
     }
-    const int monitor=fixture.marker+4;addNode(g,module(monitor,"monitor","process=_,_;",true));addWire(g,monitor,fixture.output);
+    // Analytic stimulus calibration, not recording normalization: cancel the
+    // current centre-pan attenuation on ordinary wires so deep-chain edits
+    // cannot pass a 1e-5 check merely because the whole signal vanished.
+    constexpr float wireScale=1.4142135623730951f;
+    {
+        auto es=g.edges();for(auto& e:es)if(e.feedbackBoundary==curlop::FeedbackBoundary::None)e.gain*=wireScale;
+        require(g.replace(g.modules(),std::move(es),{}),"calibrated trace wire setup");
+    }
+    auto traceWire=[&](GraphState& graph,int src,int dst){auto e=edge(src,dst,wireScale);require(graph.addEdge(e),"trace wire rejected");};
+    const int monitor=fixture.marker+4;addNode(g,module(monitor,"monitor","process=_,_;",true));traceWire(g,monitor,fixture.output);
     adaptive::Engine engine(c.width,frames,(out/"candidate-cache").string());auto initial=engine.apply(g);
     require(!engine.layout.units.empty(),"automatic seed made no compiled groups");
     FlatReference reference(frames,out);reference.apply(g);coldOracle(g,pins,c.width,frames,out,"initial");
@@ -69,38 +78,39 @@ void trace(const experiment::Config& c,int frames,const fs::path& out){
     const int inserted=fixture.marker+7;const auto originalModule=entry(g,b);const auto originalSource=entry(g,last).code;
     std::ofstream rows(out/"edits.tsv");rows<<"event\tname\tmutation_us\tplan_us\tprepare_us\tedit_compute_us\tcreated\treused\tacquired\tsource_hits\tsource_misses\treset_members\tgroups\tsample_mode\n"<<std::setprecision(16);
     std::ofstream blocks(out/"blocks.tsv");blocks<<"block\tevent\n";int block=0;
-    juce::AudioBuffer<float>xbuf(2,frames),rbuf(2,frames);std::vector<float>x,y;
+    juce::AudioBuffer<float>xbuf(2,frames),rbuf(2,frames);std::vector<float>x,y;double referenceEventPeak=0;
     auto capture=[&](int event,bool candidateAlready=false){if(!candidateAlready)engine.render(xbuf);reference.render(rbuf);auto cur=interleave(xbuf),ref=interleave(rbuf);
+        for(float v:ref)referenceEventPeak=std::max(referenceEventPeak,std::abs(double(v)));
         append(x,cur);append(y,ref);compare(cur,ref,"live trace "+std::to_string(event));blocks<<block++<<'\t'<<event<<'\n';};
     for(int offset=0;offset<4096;offset+=frames)capture(-1);
     std::set<int> exposedTarget=parallel?std::set<int>(target.members.begin(),target.members.end()):std::set<int>{a};
     std::vector<std::string> names={"external-connect","external-disconnect","expose-hidden-input","connect-exposed-input","disconnect-exposed-input",
       "expose-hidden-output","connect-exposed-output","disconnect-exposed-output","internal-endpoint-rewire","undo-endpoint-rewire",
       "insert-node","remove-inserted-node","member-source-change","undo-member-source","delete-member","restore-member","explicit-compact","repeat-after-compact"};
-    for(int k=0;k<int(names.size());++k){const auto begin=now();bool compact=false;
+    for(int k=0;k<int(names.size());++k){referenceEventPeak=0;const auto begin=now();bool compact=false;
         switch(k){
-          case 0:for(int id:exposedTarget)addWire(g,fixture.marker,id);break;
+          case 0:for(int id:exposedTarget)traceWire(g,fixture.marker,id);break;
           case 1:for(int id:exposedTarget)removeWire(g,fixture.marker,id);break;
           case 2:pins.inputs.insert(b);break;
-          case 3:addWire(g,fixture.marker,b);break;
+          case 3:traceWire(g,fixture.marker,b);break;
           case 4:removeWire(g,fixture.marker,b);break;
           case 5:pins.outputs.insert(b);break;
-          case 6:addWire(g,b,monitor);break;
+          case 6:traceWire(g,b,monitor);break;
           case 7:removeWire(g,b,monitor);break;
-          case 8:if(parallel){removeWire(g,0,last);addWire(g,fixture.marker,last);}else{
-              int from=target.members[target.members.size()-2];removeWire(g,from,last);addWire(g,a,last);}break;
-          case 9:if(parallel){removeWire(g,fixture.marker,last);addWire(g,0,last);}else{
-              int from=target.members[target.members.size()-2];removeWire(g,a,last);addWire(g,from,last);}break;
+          case 8:if(parallel){removeWire(g,0,last);traceWire(g,fixture.marker,last);}else{
+              int from=target.members[target.members.size()-2];removeWire(g,from,last);traceWire(g,a,last);}break;
+          case 9:if(parallel){removeWire(g,fixture.marker,last);traceWire(g,0,last);}else{
+              int from=target.members[target.members.size()-2];removeWire(g,a,last);traceWire(g,from,last);}break;
           case 10:{auto m=module(inserted,"inserted","process=*(0.6),*(0.6);",true);addNode(g,m);
-              int src=parallel?0:target.members[target.members.size()-2];removeWire(g,src,last);addWire(g,src,inserted);addWire(g,inserted,last);break;}
-          case 11:{int src=parallel?0:target.members[target.members.size()-2];removeNode(g,inserted);addWire(g,src,last);break;}
+              int src=parallel?0:target.members[target.members.size()-2];removeWire(g,src,last);traceWire(g,src,inserted);traceWire(g,inserted,last);break;}
+          case 11:{int src=parallel?0:target.members[target.members.size()-2];removeNode(g,inserted);traceWire(g,src,last);break;}
           case 12:{auto& m=mutableEntry(g,last);auto at=m.code.find("process");require(at!=std::string::npos,"source-edit anchor");
               m.code.replace(at,7,"priorprocess");m.code+="\nprocess=priorprocess : *(0.75),*(0.75);\n";break;}
           case 13:mutableEntry(g,last).code=originalSource;break;
-          case 14:pins.inputs.erase(b);pins.outputs.erase(b);removeNode(g,b);if(!parallel)addWire(g,a,target.members[2]);break;
+          case 14:pins.inputs.erase(b);pins.outputs.erase(b);removeNode(g,b);if(!parallel)traceWire(g,a,target.members[2]);break;
           case 15:if(!parallel)removeWire(g,a,target.members[2]);addNode(g,originalModule);
-              if(parallel){addWire(g,0,b);auto route=edge(b,fixture.output,1.f/c.size);require(g.addEdge(route),"restore parallel output");}
-              else{addWire(g,a,b);addWire(g,b,target.members[2]);}break;
+              if(parallel){traceWire(g,0,b);auto route=edge(b,fixture.output,wireScale/c.size);require(g.addEdge(route),"restore parallel output");}
+              else{traceWire(g,a,b);traceWire(g,b,target.members[2]);}break;
           case 16:pins={};compact=true;break;
           case 17:break;
         }
@@ -110,6 +120,7 @@ void trace(const experiment::Config& c,int frames,const fs::path& out){
         if(k==2)require(impact.created>0,"hidden input did not split its compiled group");
         if(k==17)require(impact.misses==0,"unchanged groups reassembled source");
         reference.apply(g,&impact);capture(k,true);for(int n=0;n<3;++n)capture(k);
+        require(referenceEventPeak>1e-4,"reference signal vanished during edit "+names[k]);
         eventRow(rows,k,names[k],impact,afterMutation-begin,rendered-begin,engine);
         graphRecord(g,engine,out/("graph-"+std::to_string(k)+".json"));
     }

@@ -9,8 +9,10 @@ on:
 permissions:
   contents: read
 concurrency:
+  # This dedicated group contains only this experiment's hosted-VM runs.
+  # Superseded revisions need not consume a second complete native build.
   group: evolving-retained-groups-public
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   benchmark:
     if: github.repository == 'curlcomplex/Faust-expr' && github.actor == 'curlcomplex' && github.ref == 'refs/heads/research/evolving-retained-groups'
@@ -43,6 +45,7 @@ jobs:
             clang++ --version
             python3 --version
           } > evidence/evolving/environment.txt 2>&1
+          echo 'Trace stimulus uses analytic wire gains; each event reference peak must exceed 1e-4. Raw recordings are not normalized.' > evidence/evolving/signal-qualified.txt
           git archive HEAD vendor/curlop-latency experiments/retained-host experiments/retained-groups experiments/adaptive-groups experiments/evolving-groups | gzip > evidence/evolving/executed-source.tar.gz
           python3 -m unittest discover -s tests -v > evidence/evolving/laboratory-tests.log 2>&1
           bash scripts/build.sh > evidence/evolving/laboratory-build.log 2>&1
