@@ -2,7 +2,7 @@ name: Analog sharp full batch
 on:
   push:
     branches: [35-analog-kick-full-batch]
-    paths: ['modules/kick-analog/sharp-02/**', 'tools/modules/sharp_*', '.github/workflows/analog-complete-batch.yml']
+    paths: ['modules/kick-analog/sharp-02/**', 'tools/modules/sharp_*', 'tests/test_sharp_contract.py', '.github/workflows/analog-complete-batch.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -21,8 +21,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy
-      - name: Build, render, compare, stress and benchmark
-        run: /usr/bin/python3 tools/modules/sharp_batch.py --out build/analog-complete
+      - name: Check independent arithmetic and manifest fixtures
+        run: /usr/bin/python3 -m unittest discover -s tests -p test_sharp_contract.py -v
+      - name: Build, render, compare, stress and benchmark all candidates
+        run: /usr/bin/python3 tools/modules/sharp_qualification.py --out build/analog-complete
       - name: Keep bounded experiment evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
