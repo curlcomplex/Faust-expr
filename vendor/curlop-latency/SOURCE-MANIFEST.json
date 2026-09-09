@@ -1,0 +1,582 @@
+{
+  "source_repository": "curlcomplex/CURLOP",
+  "product_source_commit": "fc47759cf1bfd4126ea4484c91441c2190ba6237",
+  "benchmark_source_commit": "055c7a156e88e97d1db207769565fb6c7fcdff00",
+  "authorization": "Owner explicitly permitted public publication of benchmark dependencies in chat, 2026-09-09.",
+  "native_translation_units": [
+    "clip-launcher/state/ClipStateContainer.cpp",
+    "control/surfaces/script/music/MusicData.cpp",
+    "control/surfaces/script/music/PitchUtils.cpp",
+    "control/surfaces/script/ScriptLanguage.cpp",
+    "control/surfaces/script/ScriptParser.cpp",
+    "control/surfaces/script/ScriptParserV2.cpp",
+    "control/surfaces/script/ScriptCompiler.cpp",
+    "graph/state/GraphState.cpp",
+    "graph/transport/FaustGraphRenderer.cpp",
+    "graph/transport/FaustGraphRendererAttachment.cpp",
+    "graph/transport/SignalDescriptor.cpp",
+    "graph/transport/PreparedSignalBlock.cpp",
+    "graph/transport/PreparedSignalSchedule.cpp",
+    "graph/transport/RealtimeWorkerTeam.cpp",
+    "modules/backend/FaustRuntime.cpp",
+    "modules/backend/FaustNode.cpp",
+    "io/CurlopEventLog.cpp"
+  ],
+  "files": {
+    "native/clip-launcher/state/ClipStateContainer.cpp": {
+      "sha256": "a2fe84f49c8ca4b3acc5837ed1c0c17842f7e4f8b55272b051191dd333ef0024",
+      "git_blob_sha1": "87a4608cbf58fefb3c87475985f4d88c9268eff5",
+      "bytes": 122157
+    },
+    "native/clip-launcher/state/ClipStateContainer.h": {
+      "sha256": "d64368d7cc5e07c487a16be49f4f80128640b14733815a3b0366c7f4c1be931a",
+      "git_blob_sha1": "9038799ecaa186dbc0ce12a9c3b0e3ba35df60d8",
+      "bytes": 17756
+    },
+    "native/control/surfaces/script/ScriptCompiler.cpp": {
+      "sha256": "3ec4a39669084c5cb49ca6592632eee4f1607f3ab04077d737f09b3fd8ed4f9f",
+      "git_blob_sha1": "4c14004c2ddf9f0db19df7b4b4cc1c39e73f97f9",
+      "bytes": 262665
+    },
+    "native/control/surfaces/script/ScriptCompiler.h": {
+      "sha256": "4e63d43e0d50df116e3bb6e65f0e993ccc323423f19181c78cf8b832243fed03",
+      "git_blob_sha1": "1846bd5d16f216568a7230bad23f4c12db9ff67e",
+      "bytes": 11382
+    },
+    "native/control/surfaces/script/ScriptLanguage.cpp": {
+      "sha256": "b03ee72d531b7e4f8434fc7a4f8a5a1f98d4356244666269d76458536fe88520",
+      "git_blob_sha1": "7fd43dc4700216779732727ae6f8aa01af74db9a",
+      "bytes": 21010
+    },
+    "native/control/surfaces/script/ScriptLanguage.h": {
+      "sha256": "b4c3ae9cc0c4f665241800680f11b70d3c2c1bf3cec1e635214e74694b306d5e",
+      "git_blob_sha1": "4a996b9f520e1575fe19d2bfdd0893ec4079773d",
+      "bytes": 6702
+    },
+    "native/control/surfaces/script/ScriptOutputSockets.h": {
+      "sha256": "40beb27049c5fe77560ad993b868e85919952eb801bca7b235d2ad5c8f1c382e",
+      "git_blob_sha1": "46865204402f615bfb607c293030666b16e1ce1a",
+      "bytes": 6767
+    },
+    "native/control/surfaces/script/ScriptOutputSocketsV2.h": {
+      "sha256": "0bdff8a2743695bbd4472412081d0248c23e94e190aed7848dac15dda9aee552",
+      "git_blob_sha1": "fe8419cb8ab8e12c73263779c6c213ce9745a9cd",
+      "bytes": 26171
+    },
+    "native/control/surfaces/script/ScriptParser.cpp": {
+      "sha256": "43869fbf0a0a347d4d600f800a35a11f806b011459cf82a5927755d7f2d859eb",
+      "git_blob_sha1": "44980355af165563f1ca098f6950b4cacba7d15c",
+      "bytes": 116910
+    },
+    "native/control/surfaces/script/ScriptParser.h": {
+      "sha256": "65a74985e2e22a42979949629a774d5754637551968562f15134a99b9e28e2d8",
+      "git_blob_sha1": "d79a33c3699d66a940338fb9ad5103106fbd1dd3",
+      "bytes": 10781
+    },
+    "native/control/surfaces/script/ScriptParserV2.cpp": {
+      "sha256": "afa1662978975eacd9c5ea00f86abac3d5103d41ada9cc80aaebbe1bb5ea8f78",
+      "git_blob_sha1": "371bc1138107976c2fab9466c1091f91fe140db5",
+      "bytes": 250524
+    },
+    "native/control/surfaces/script/ScriptParserV2.h": {
+      "sha256": "9311bb5d9afab0ca0f25e95c6671a2622dc10aed01e42b4f9fb6f9d7752ce0dd",
+      "git_blob_sha1": "ccf9f7f2befab9f5028fa9c3b72cc4a72e09e40b",
+      "bytes": 4523
+    },
+    "native/control/surfaces/script/music/MusicData.cpp": {
+      "sha256": "77db7890eeaea6b0977355befd054d307a52c2640661fbe6fd8d20d606b9b7a6",
+      "git_blob_sha1": "56720dcb3c13c85f8b675b7d235cf3e1e1037244",
+      "bytes": 9062
+    },
+    "native/control/surfaces/script/music/MusicData.h": {
+      "sha256": "27c9fb978813badecbccc9ba1dffcbfc39cef37fabdc995cebad4b2fa4bbc656",
+      "git_blob_sha1": "842f9563d6bcbd3c3d749d4263cd6f6d9d582f2a",
+      "bytes": 2964
+    },
+    "native/control/surfaces/script/music/PitchUtils.cpp": {
+      "sha256": "1cda4c5b620adff71928184940ea5f3a14d797d21efaf730e35208cdf31d9678",
+      "git_blob_sha1": "b54083b3423da7e5c62ef9e48aa8d2be1c7699f3",
+      "bytes": 5462
+    },
+    "native/control/surfaces/script/music/PitchUtils.h": {
+      "sha256": "cf33cd420452078a96b7c84a69840a95bba0002023677086b72977a79cbe819c",
+      "git_blob_sha1": "74b1db8d2f17d1dda20584636e23758ad1685018",
+      "bytes": 2788
+    },
+    "native/control/vm/core/AudioInputRuntime.h": {
+      "sha256": "a9d8e282b489d4b95f468f2af551054948e07fa0b9203078d49d29549800a5e4",
+      "git_blob_sha1": "e60890754f7f27d54bca67a7819b835d7d3b9f7c",
+      "bytes": 2208
+    },
+    "native/control/vm/core/HostMidiInputRuntime.h": {
+      "sha256": "8cb3bbe15c09ff6a7f341a00fbb9f6f35bf1afe5189d33a94532ccc2340b26d9",
+      "git_blob_sha1": "ff69df420c207f3dd7c32745355775ef68ba9def",
+      "bytes": 14175
+    },
+    "native/control/vm/core/HostMidiVoicePlan.h": {
+      "sha256": "84401c661a5956b253bcc644655a403739c1f4d702ddf3b7928b22d99c36df8e",
+      "git_blob_sha1": "d7e5efffceb0595ba89cf9f456cf12e0690943d0",
+      "bytes": 12110
+    },
+    "native/control/vm/core/MidiOutputRuntime.h": {
+      "sha256": "f133b9043985485587894fc6b7c27e2221e80b7f7516f8b498f16a0ca1459a05",
+      "git_blob_sha1": "5f4d95c5a4b685e2082f78e68fd769f4fdb9572f",
+      "bytes": 9195
+    },
+    "native/control/vm/core/VMConstNode.h": {
+      "sha256": "3c2cc26e40055504404fe71e7a8df7e6210c31dde209ce4c7395b9669fff97c4",
+      "git_blob_sha1": "89676ce47e5cd9bd7cd9dac74ac02e763cf79ecc",
+      "bytes": 10963
+    },
+    "native/control/vm/core/VMEventBridge.h": {
+      "sha256": "fdc49efbce2092007cb870d18c4cdb07bab2aad055d3c11cc7c83aeea8212e5b",
+      "git_blob_sha1": "bf2104e4377e618352c1add6503b8d598b36916e",
+      "bytes": 8450
+    },
+    "native/control/vm/core/VMRunnerHost.h": {
+      "sha256": "cccaa837e08a26406abbe74019eab89ff5b0db13dd4a1b369482a258cf8cca4a",
+      "git_blob_sha1": "977d459f40ae935564fcb3df0fe938d688fe1c53",
+      "bytes": 16249
+    },
+    "native/control/vm/machine/Delivery.h": {
+      "sha256": "0fee8e0896b78cf63811784f6b4a25132dcb661d536e32a51f3adde0c5131ef9",
+      "git_blob_sha1": "a9f68ceed1f56c99ac18f23815b03518f8ca1e89",
+      "bytes": 67275
+    },
+    "native/control/vm/machine/Machine.h": {
+      "sha256": "cc522a26c221e7e665f176361071e01dbf56cacfc800706506048ccf1c728993",
+      "git_blob_sha1": "99e17b5870200e9d81d24e94f918a0ddf8a924a6",
+      "bytes": 108811
+    },
+    "native/control/vm/machine/OpIds.h": {
+      "sha256": "8a8ee950f7ea2c77e254f6152cf0adba37a44685f4c1759c767099932e783fe2",
+      "git_blob_sha1": "eff3f51b70fcdc3855068a51a983a9c54167742f",
+      "bytes": 17509
+    },
+    "native/control/vm/machine/OpTable.h": {
+      "sha256": "611a7ba0b90aa8565184f750b5e60c0c0518bbb10b889c5726f97079e5d63b17",
+      "git_blob_sha1": "a564786be195e54b187b75ae687cc2ebc2f0a0ed",
+      "bytes": 4504
+    },
+    "native/control/vm/machine/OpsCore.h": {
+      "sha256": "bbdb137f3cef2d8df9b601d07104c099f0c60c09f7e9c696c123407c21d9ed9f",
+      "git_blob_sha1": "4d6cec446b2793ff9b480abb1b4686f066979652",
+      "bytes": 167607
+    },
+    "native/control/vm/machine/Program.h": {
+      "sha256": "3151990e17bb1bdde42f390f45b4dc6129b84ba342ad6d90661eacaf30a5d419",
+      "git_blob_sha1": "bd34639b7c06892f07037df0b2ad8960971ce40e",
+      "bytes": 44442
+    },
+    "native/control/vm/machine/Signal.h": {
+      "sha256": "b9f8db7aac6eda2bd54245201bd175f1019567a9c03787acc609fe52b6ff40b8",
+      "git_blob_sha1": "56f00c379227527ce5efe3b6b1ccb854d70d63aa",
+      "bytes": 3176
+    },
+    "native/control/vm/machine/StepClockPlan.h": {
+      "sha256": "0cf8d65bbba0f06f0168fa47f5abc18c8326c944cf4a9eafb9783148e90ce517",
+      "git_blob_sha1": "d44908651371a8a284171b20290578d6752b2bfa",
+      "bytes": 624
+    },
+    "native/control/vm/machine/StepClockRuntime.h": {
+      "sha256": "91873b816e8170d4bb3a7a44464d7fafd3aeb7ebe14796b4fae7a2e6ecd72ee2",
+      "git_blob_sha1": "4df78ae7580b79d2c2c0192ae8e53da5ed752b0d",
+      "bytes": 12070
+    },
+    "native/control/vm/machine/TransportClockRuntime.h": {
+      "sha256": "805d493d5c73378f470415ef9e2c306417abac064ff18d7a59c20481d1dfacc3",
+      "git_blob_sha1": "9491edf4aef087174e808acb3813c364cda18746",
+      "bytes": 8386
+    },
+    "native/control/vm/params/AudioParamState.h": {
+      "sha256": "b9b7f290e7bb62f45243fc1df7e49650bbfe1df5cdfa45d458ef5840c5f10d75",
+      "git_blob_sha1": "2fe25ec9800e77a109dee0521e07c0d2628d4cba",
+      "bytes": 10458
+    },
+    "native/control/vm/params/ParamBufferCmd.h": {
+      "sha256": "1b391410ff8a99316b78bd0e6136f8d0a8a746aa94a759343109d9c68a627820",
+      "git_blob_sha1": "ffcbe75e47dcce7a3e413ebf9db93ee05fe4fbbb",
+      "bytes": 2037
+    },
+    "native/control/vm/params/ParamFIFO.h": {
+      "sha256": "e2afdf5bf4b33fcc752439362bf2ee7f4fe031a9e94fff682d39abc158e988cf",
+      "git_blob_sha1": "d3dc150bb6c49b99955a0122f583d539c2eca91d",
+      "bytes": 1187
+    },
+    "native/control/vm/params/ParamStore.h": {
+      "sha256": "3b25d524406d25c5e959ab2a2c9da3083288ccb845afd184eedde8d98e00e071",
+      "git_blob_sha1": "ea2f71705e240a33888dbcf7173389d4b68b67a3",
+      "bytes": 13396
+    },
+    "native/control/vm/params/ParamTypes.h": {
+      "sha256": "94c7dee5c1732eed4a81cebf68aeaa71034cf013230a225c3476f9aa08c1a4fe",
+      "git_blob_sha1": "fd35df60943af5d4817f88ae6409ce35f04989b1",
+      "bytes": 2393
+    },
+    "native/graph/engine/buffer/BufferReadCursor.h": {
+      "sha256": "debd2161bd9baedf872d89c46da0ace6f9b3e0487b43276332a604cfbaf78ab8",
+      "git_blob_sha1": "bbfd5f7c6c8b7a854585855c0aa599ed094cf6e7",
+      "bytes": 14390
+    },
+    "native/graph/engine/buffer/BufferStorage.h": {
+      "sha256": "1386b82171cb0fd86c77930899e79393dcd4259df9388d69442f8dac651cf08c",
+      "git_blob_sha1": "15dc5fac01e1c6f406e0840792e1514115b6bcf7",
+      "bytes": 59396
+    },
+    "native/graph/engine/modulebuilder/shared.h": {
+      "sha256": "c00b647dd73418561ebcac34b6634cf27e210a9b3fc75ca19e0c9d1a3afbf598",
+      "git_blob_sha1": "6403f0b8e652ced741bc2617553d377417c02cf2",
+      "bytes": 15878
+    },
+    "native/graph/engine/nodes/AudioInputEndpointProcessor.h": {
+      "sha256": "3bb6eba0daf1ced8b68d17419747a7f9c3beadad018e22f07242f7a89cbfa7bd",
+      "git_blob_sha1": "23d3f84ca1e86340f2c02b559f0b3d47b6ad787a",
+      "bytes": 2410
+    },
+    "native/graph/engine/nodes/BufferPlayerProcessor.h": {
+      "sha256": "a91d3f5b96192e62a934b28af7da8ffdc35984ada3b388aac9891c3c63759a30",
+      "git_blob_sha1": "a6933e76f20bdddc1757ba3b9e68447db28b1291",
+      "bytes": 20239
+    },
+    "native/graph/engine/nodes/ControlCoreProcessor.h": {
+      "sha256": "226d718be1bf28f90eb24cfe95cbaeb5d93b7c7aecdde6e9debd94850445005c",
+      "git_blob_sha1": "4535919b62094eadf6eaa34149f4b0d2bc2b3711",
+      "bytes": 2783
+    },
+    "native/graph/engine/nodes/ControlMeterProcessor.h": {
+      "sha256": "ffdc7845c5f58f2de78cbcc80dacaf3c59a189c484e9e08eafa9fdc69c1a31ec",
+      "git_blob_sha1": "2475bf3e387bf8634497b5027b06c67fd2024144",
+      "bytes": 6488
+    },
+    "native/graph/engine/nodes/HostAutomationInputProcessor.h": {
+      "sha256": "5259de3b75bea46cb3cb7747091d80a9981cb4d3b7f63e735ab91e81d37b6ce3",
+      "git_blob_sha1": "a0fc0d2c9618823886845b64f9ef4f3c7b02509e",
+      "bytes": 4951
+    },
+    "native/graph/engine/nodes/HostMidiInputProcessor.h": {
+      "sha256": "b52041a2131cbb08042630a626cb79add7af06e674df313d7d3d2311a76cc1ec",
+      "git_blob_sha1": "919d3140e8c5368837d7de8c5ebc9e64ca2727e7",
+      "bytes": 4031
+    },
+    "native/graph/engine/nodes/MeterProcessor.h": {
+      "sha256": "3912128293febec80cd2a5658f821ee560569460daae0c95020754fae2d185a1",
+      "git_blob_sha1": "d922e2cd2d5f0b889b533b81994818102ce08aee",
+      "bytes": 6155
+    },
+    "native/graph/engine/nodes/MidiOutputProcessor.h": {
+      "sha256": "6ac1ec0c7aee1ccad7c0c55c52c6a8dcfe079941dba1b150e5eac17515943171",
+      "git_blob_sha1": "1da0b09c889b37271383e4cce7d76dc81c8b82aa",
+      "bytes": 4234
+    },
+    "native/graph/engine/nodes/PreparedHostInputBlock.h": {
+      "sha256": "94fb1f0d9ebfd2c5a05bcc3c035bb242a2b965735b24309e6ee44a49fd2fe655",
+      "git_blob_sha1": "ab978d1cc02a75d54dd5e0d3bdf3b7b7329b1de3",
+      "bytes": 2389
+    },
+    "native/graph/engine/nodes/ScriptNodeProcessor.h": {
+      "sha256": "c58206975c16064cff3774e7634e965ff7f9320bd4b6b3d9899d18997f18844f",
+      "git_blob_sha1": "c39caeee349d20938190a2752360804c7e796b52",
+      "bytes": 38977
+    },
+    "native/graph/engine/nodes/StepSequencerProcessor.h": {
+      "sha256": "b6f2957c8ec3cc1ea7fc479478e9643fd7f1e68fdf044530fbe900a2b4c97259",
+      "git_blob_sha1": "f4c3b3745427aae529b8ed1843629965e97560d5",
+      "bytes": 10192
+    },
+    "native/graph/engine/nodes/TransportClockProcessor.h": {
+      "sha256": "0e89a29a2e584fcfb92611a8b82942a5b87ac402c82968058bde1a255f3c9212",
+      "git_blob_sha1": "d2fb4099f287637cfc43a97852e2e8bf92fae585",
+      "bytes": 6108
+    },
+    "native/graph/engine/nodes/VisualInputProcessor.h": {
+      "sha256": "15e32654ad6ea0fd407007e469c377bfa98d9995ab135990a344f0313efd495b",
+      "git_blob_sha1": "0c2ac51b5cf5b562aaf8159a4e644cbb83082627",
+      "bytes": 3508
+    },
+    "native/graph/engine/registry/ModuleRegistryGen.h": {
+      "sha256": "b0be8177738e4c57269ad22349ae6a12704e7c4d21979409b5aacca0d6fd3042",
+      "git_blob_sha1": "0f36010cd4de6b977e0ce79467e59cca6de7c2a9",
+      "bytes": 28745
+    },
+    "native/graph/state/ApgGraphSync.h": {
+      "sha256": "b3f610a9b82a22354fb4a73f4d976064f525e2970e249980df36793870a2c845",
+      "git_blob_sha1": "1af7af8b58e317d54a935eb945a140cfa86fbb1f",
+      "bytes": 7494
+    },
+    "native/graph/state/GraphPublicationTypes.h": {
+      "sha256": "88ba6805d81583063c268e6e4c4127d40eadd7e2f065211acee37cb94ef27970",
+      "git_blob_sha1": "3cb298c116c899ddfdda90565fdf5da3b5db7161",
+      "bytes": 4361
+    },
+    "native/graph/state/GraphState.cpp": {
+      "sha256": "e22dfe3fc8068189bac8d03a2524fb2439581218633ff63dc66a5650cedd0c53",
+      "git_blob_sha1": "caabb68c56c1ff2c493b87378f7b7161cf7248cf",
+      "bytes": 64420
+    },
+    "native/graph/state/GraphState.h": {
+      "sha256": "48c198b5d83721e4b3d5d964602166e97cf1f1a7535172b16da84777f768ac03",
+      "git_blob_sha1": "34fb7d7db9501a6887d9368f34f4f4acace2f143",
+      "bytes": 28029
+    },
+    "native/graph/state/GraphStateApplier.h": {
+      "sha256": "1ce6b3fee27fc381ca9cccf62fdfffceb5d96bd7a6e7ff73e1ae1d5574c070b4",
+      "git_blob_sha1": "4e9e2b29d78dc66fbd3dc6678f41cd14d5db8978",
+      "bytes": 4774
+    },
+    "native/graph/state/GraphStateLimits.h": {
+      "sha256": "7432a91410b321cf14e877865a74df2f5eab4a0f69dcd18a90b6d555573c861d",
+      "git_blob_sha1": "9c6758874c68ba34c84011cb00a374bd67582048",
+      "bytes": 5423
+    },
+    "native/graph/transport/CompiledRenderPlan.h": {
+      "sha256": "f838decc0fceb9f6caee8539cb25691aa9219ffea08f04450f751cae36dbf8cf",
+      "git_blob_sha1": "6be23441f9be73abad2077f6f5d6e33a2398fdda",
+      "bytes": 22757
+    },
+    "native/graph/transport/ControlRangeHandoff.h": {
+      "sha256": "54e16bc638862a65c695d3a6db40c4a799faaab47215a12d7a47a393f58d75f1",
+      "git_blob_sha1": "2a490fa9e76d714392c60fd27254924c22b1ddf3",
+      "bytes": 3134
+    },
+    "native/graph/transport/FaustGraphRenderer.cpp": {
+      "sha256": "9ba46b031a13bb74f8fe3816131dc4e1e9b0356e8fd35f4fbeee63edce8fad52",
+      "git_blob_sha1": "1a4358a6fecb4750bb160289bef24b49168fcc06",
+      "bytes": 208709
+    },
+    "native/graph/transport/FaustGraphRenderer.h": {
+      "sha256": "1d729e1ff217eeae8db6ebb209812880c1dd919e52df58ed1477fc7a57755f5d",
+      "git_blob_sha1": "56cf4454cec981bd52ff53e068f80832c9a931d9",
+      "bytes": 1519
+    },
+    "native/graph/transport/FaustGraphRendererAttachment.cpp": {
+      "sha256": "e6a646818088d9bd32082197fee22db49a77d1f29af652af4a3aa7c7909cf563",
+      "git_blob_sha1": "7db141e325814cd4d5cf58e0eb8b3ebd9eb45e14",
+      "bytes": 873
+    },
+    "native/graph/transport/FeedbackBoundaryState.h": {
+      "sha256": "a4eb8fe5019af70789049822d112bd4db557df327787a5e40b327b0e815e9234",
+      "git_blob_sha1": "003fabdb90414ff023a985da8837f9d3c4e5a790",
+      "bytes": 2110
+    },
+    "native/graph/transport/FeedbackSccPlan.h": {
+      "sha256": "2292312e1db61a3295b09eb21e1536a2523ade7773064272b02a81af15c8b1fb",
+      "git_blob_sha1": "63e343399a32097b19cd191d4875e421ff5a1daf",
+      "bytes": 5961
+    },
+    "native/graph/transport/FeedbackSccProcessor.h": {
+      "sha256": "9a2806245f2f9d0bc93f05f3c4605b5c6c752b1381648d5d36d376c49e738e0f",
+      "git_blob_sha1": "f78458b9420d55c32f70a607d2589d472ed272a1",
+      "bytes": 12308
+    },
+    "native/graph/transport/PreparedAudioRenderer.h": {
+      "sha256": "62593bfae0444bd96d33ab9d86e4550060325766a42d226e9bd468b0952c6d4b",
+      "git_blob_sha1": "a3ce078b22bc6cb83efae4d93a678ed18dbdf402",
+      "bytes": 7833
+    },
+    "native/graph/transport/PreparedExecutionPlan.h": {
+      "sha256": "89d3f989a6ccd80b4d21905998d3f4d2e674f05f2bcdba501a11faee0d7c7c29",
+      "git_blob_sha1": "9f79598d15b3561747fe7f93a7035f37d0c424b0",
+      "bytes": 9095
+    },
+    "native/graph/transport/PreparedSignalBlock.cpp": {
+      "sha256": "8fc7a3aae1e261979480785ce233675395c3dd64842fad7f301cedb3a474bbcb",
+      "git_blob_sha1": "9c67b56fbea78cbd0ee6897f6ec5439017f9c8ce",
+      "bytes": 12423
+    },
+    "native/graph/transport/PreparedSignalBlock.h": {
+      "sha256": "d0f880dcfd03537713a5b899276149f7318bc563b36d94ca451f4a24a7800153",
+      "git_blob_sha1": "bca08eaa5326a65d1ab2404d1b67d5c4887898f2",
+      "bytes": 5568
+    },
+    "native/graph/transport/PreparedSignalSchedule.cpp": {
+      "sha256": "df329e0a0ba9d8555ee7aa18ecdbbdeb6ef8afc57804502f175c1545da5acb00",
+      "git_blob_sha1": "ef3a895f0b926d0567032fd45ce53d54586f482e",
+      "bytes": 25814
+    },
+    "native/graph/transport/PreparedSignalSchedule.h": {
+      "sha256": "acd2ee48ae9ccd3dfd56ebb546d869650d6be7083d5e74e1fdab5115bc92448f",
+      "git_blob_sha1": "d0fa79aace1e6984db02ed6a235565d9225f5fba",
+      "bytes": 5919
+    },
+    "native/graph/transport/RealtimeWorkerTeam.cpp": {
+      "sha256": "692da1683163c9b9814f5779e6f8f8474277c04add88947ac0c2e150cb05db73",
+      "git_blob_sha1": "bd899fe369b0625cfb39b4f32e760fc36e016472",
+      "bytes": 9061
+    },
+    "native/graph/transport/RealtimeWorkerTeam.h": {
+      "sha256": "28f8b3da03f443781ff97487d08eba99033fc4032db1b5d030d916c29a3040b5",
+      "git_blob_sha1": "b000bb9369959a3dcf340bbbb79ee9c607d223c1",
+      "bytes": 3446
+    },
+    "native/graph/transport/SignalDescriptor.cpp": {
+      "sha256": "86549a0633605943bb4d8656582bd5a8390b0ce71e54a00c4e1ead221e452f91",
+      "git_blob_sha1": "abd0d67fc6c3e583383ff514306278554a0fb043",
+      "bytes": 31592
+    },
+    "native/graph/transport/SignalDescriptor.h": {
+      "sha256": "f413157bc9357ae4f3892a32d577d4bfd2103eb283a09c9ddfd955ddd302e514",
+      "git_blob_sha1": "5b8436656f5a315a2c868eb47cb0ca9c5bc6d615",
+      "bytes": 6228
+    },
+    "native/graph/transport/VisualInputRuntime.h": {
+      "sha256": "33babbcb6567462502744f14941a69755bc3dac5719ca6cf6d6639c77f1f7253",
+      "git_blob_sha1": "f5095aabeda5023b3b199d6720b7583eb8667110",
+      "bytes": 7135
+    },
+    "native/io/AudioRecorder.h": {
+      "sha256": "ccb39ac7496274e1099fcec1c3289f3e48165007d67d7c9606af3ab835d5dcb9",
+      "git_blob_sha1": "ebec05e53ed10145f30c643dc5ca10d74e1df07e",
+      "bytes": 29686
+    },
+    "native/io/CurlopEventLog.cpp": {
+      "sha256": "bad37273dc8fabaefa4e154ac95a49ed3af4ceeeee1b7a5059d05fbfc227bf94",
+      "git_blob_sha1": "2ff2db170b660a5671107976ceefbc9b1414f846",
+      "bytes": 6997
+    },
+    "native/io/CurlopEventLog.h": {
+      "sha256": "e08cd84d7dd3c03c37ea9c695cc2c8a8fe1526a967e6dc22b2c2c1740dffe341",
+      "git_blob_sha1": "b99c50f150f0b5d67cdacbefc3824d717823d4ec",
+      "bytes": 2522
+    },
+    "native/io/MidiOutputManager.h": {
+      "sha256": "0d1ca2a730e9b6143d7a8ce86df18259d6fcfbd05629ab985f99fdfb83e949d8",
+      "git_blob_sha1": "2b349057e873e2b66a3df2e2a83f6e3722745d24",
+      "bytes": 6669
+    },
+    "native/io/MidiRouteManager.h": {
+      "sha256": "3283e151504d3bc6c84ebf20bbc2ea93f987077c4505e561e4d0645e1b206184",
+      "git_blob_sha1": "c2d08070ad11d70a86eed39ee611b50bf9bb3546",
+      "bytes": 25343
+    },
+    "native/io/NativeBridgeServer.h": {
+      "sha256": "ea6218676159518eb3b68db3fb8f909fc0a5a67e2e91f2207277cd25e94e0ce0",
+      "git_blob_sha1": "91c4066e7c704c7dab3a1877420f4f07c233dfef",
+      "bytes": 56996
+    },
+    "native/io/RecordProfile.h": {
+      "sha256": "b218582cc33ade641eda5e8d234a1a1651a57658cb2a3c99c1adfd935c3821b2",
+      "git_blob_sha1": "e96ecac7408a702be6604f0698a9d8b37157e9b7",
+      "bytes": 6579
+    },
+    "native/modules/backend/CurlopDspNode.h": {
+      "sha256": "584be5c144a3a21e3fac538b5ed70b8e33f8e10eae26cd23dd39c92ec2dc0184",
+      "git_blob_sha1": "697bb3d3ebbb99ee8ab6552c487a8f24204b5368",
+      "bytes": 1215
+    },
+    "native/modules/backend/FaustControlInputRewrite.h": {
+      "sha256": "0d82c966f90bac4cd4bfb95df7183e668110098062d4ac231cc1e4ea21eee7b3",
+      "git_blob_sha1": "3c918d6b707fe26ba5e959a588bcfcbf52e3f028",
+      "bytes": 19392
+    },
+    "native/modules/backend/FaustNode.cpp": {
+      "sha256": "08e8ecf0cf43bbdb8b8caec404fb9c29bc9233a28f810891280263f6d4fb8937",
+      "git_blob_sha1": "d71f99b428e34b8b7dc72b9b34a124dd89c677fd",
+      "bytes": 133788
+    },
+    "native/modules/backend/FaustNode.h": {
+      "sha256": "39fd8def7785fd39b87fb31d89839b104c38bc0ef4cde14d3d3c2e90c745849a",
+      "git_blob_sha1": "6efc40d7713cd7d022181229885c5d76e960e75c",
+      "bytes": 15012
+    },
+    "native/modules/backend/FaustRuntime.cpp": {
+      "sha256": "bb78bef599529249026a1429f04fb4879979132ff8f6e101ef4783a2ce06195b",
+      "git_blob_sha1": "9d7940a4e125ea1ac548dc022b87986be7543a03",
+      "bytes": 21050
+    },
+    "native/modules/backend/FaustRuntime.h": {
+      "sha256": "f8597061c9762eb6857eb5f5b5260af7740b51a02aaf412d789b37fb40732baa",
+      "git_blob_sha1": "f11ebc68fa9cce57dab3e86c2997a4afa551a830",
+      "bytes": 8160
+    },
+    "native/modules/backend/FaustSourceMetadata.h": {
+      "sha256": "c532109b2d772b6b5b1f37d6dfdef3fc69bb6a9f42bfdfe8ac8d71309062108e",
+      "git_blob_sha1": "c67ee74931772a16bc0b22b3ef7f267ae7d92a7a",
+      "bytes": 14870
+    },
+    "native/modules/backend/FaustUiCapture.h": {
+      "sha256": "50c407b67bfa0fd9a60b5b327230c4a47857b5199faca339cedd6d33603bac87",
+      "git_blob_sha1": "a2c88fa77f9dc785da8746047de96270a55d798e",
+      "bytes": 39362
+    },
+    "native/modules/contract/FaceplateTypes.h": {
+      "sha256": "e266a2325ee825891dcc2b703bc6217ff1dcc70bb206700eaa3eade67339beb5",
+      "git_blob_sha1": "91623abffe801f95b37c3ba1eeeec48b6ccb6b4f",
+      "bytes": 19341
+    },
+    "native/modules/contract/ModuleContract.h": {
+      "sha256": "5508e8463ecd71f8a423589aa24077905e7e5d4563face1af2bedf2e49f7f53f",
+      "git_blob_sha1": "a98405690a8838ff9984d3fb64e190738dfd899e",
+      "bytes": 14766
+    },
+    "native/modules/contract/ModuleTypes.h": {
+      "sha256": "f959771f4652525038f986333dc699f6d2393952e684f2bb83a97abec23eaca3",
+      "git_blob_sha1": "7e98aabae51fb90fa0eb7eb3f63cb5a39399b2c0",
+      "bytes": 20911
+    },
+    "native/modules/contract/ParameterValue.h": {
+      "sha256": "769ccda245ebaf0adbb23d1b4df31fa24f5ec4935df5bf2a115d26891e1a38fa",
+      "git_blob_sha1": "e6664ed3fb1ae2554ab21a7b6d86df2a8ca30387",
+      "bytes": 6383
+    },
+    "native/modules/library/ModuleVersionStore.h": {
+      "sha256": "d95b1d2492c34cc34209c8d3fcb7a276a1292ee583f2aebe134030841990617a",
+      "git_blob_sha1": "a3881951f1c7498d4b44e25ec3002ff7d4474384",
+      "bytes": 87340
+    },
+    "native/modules/visual/VisualShaderModule.h": {
+      "sha256": "49656600a7e6a71755a9bd55eed033d2ad6f214cebd656e3c664ca07f79c1a6d",
+      "git_blob_sha1": "85271a73e5985a626231de9e7e034b94a145a360",
+      "bytes": 12229
+    },
+    "native/runtime/DeclarationRowMap.h": {
+      "sha256": "9fc89e2dbd26b6af27155c78189c22981b5bb21fe4856d40dbef3504458102da",
+      "git_blob_sha1": "7e185642bb736c0cd095f33a54e3e864f8ba8ac9",
+      "bytes": 13374
+    },
+    "native/runtime/EngineSlot.h": {
+      "sha256": "3486db2903a149878cdc1234b2fcc9a746c35dc0b0cafd965775809bdbd54950",
+      "git_blob_sha1": "9d274639d888244a62c9f394cf0e820559ca3f9a",
+      "bytes": 98567
+    },
+    "native/shell/BootEmits.h": {
+      "sha256": "bac087da627d5cdb9fe10fc5fdb4583c2d7a382efb9637a8ab4a5b14d0f57150",
+      "git_blob_sha1": "a0c2c8800292b8e60cfa60f9dc68e9096bcd8878",
+      "bytes": 3447
+    },
+    "native/shell/CurlopDebug.h": {
+      "sha256": "b57f2cbf64d54b1e62345d63614d458517dda47d9acc24a371c57503c73ce517",
+      "git_blob_sha1": "df07b1e5a056b6dd9e562712cd37d2b4418bc3de",
+      "bytes": 10633
+    },
+    "native/shell/PayloadNumber.h": {
+      "sha256": "9e93ea1d1cff2f38b417eb18cd97e0661ed81562f24cad805cccd17bc5b168e6",
+      "git_blob_sha1": "69fd203ba9d37234d1443cb509fb21f8f8861acc",
+      "bytes": 5135
+    },
+    "native/shell/ProjectRuntimeAdmission.h": {
+      "sha256": "538ea40f6af31a719b148f2a43a3b1ce0eaa7e13e4ed02346bfc550548b26bbd",
+      "git_blob_sha1": "c5a64b9b772b1d5aeb3444527f732f0ff19844fe",
+      "bytes": 2058
+    },
+    "native/shell/WebViewContract.h": {
+      "sha256": "8835f9ea520645759d0646ca4798732fabb7bfd0c5f1dfbdf7ed77253c73104b",
+      "git_blob_sha1": "f651a2cd052c8f0f53bf69f2734cd47fde80b572",
+      "bytes": 2317
+    },
+    "native/shell/WireJson.h": {
+      "sha256": "176f0df8e4d88007d1ddff6efdf10aeb7a53b69f75269ce51d1d57ca7215c68d",
+      "git_blob_sha1": "7756368967bd67bfa4bd72b65da0a70a9dd67f7d",
+      "bytes": 15201
+    },
+    "native/transport/reporter/MeterAccumulator.h": {
+      "sha256": "b15af1c3957199c4ec7dd8c2cf860f60149b2135a33b045f9e0a5a506e72ffd3",
+      "git_blob_sha1": "b66f406ba1d6a39dea298fc86740454d8d9bf86a",
+      "bytes": 4518
+    },
+    "native/transport/reporter/TransportReporter.h": {
+      "sha256": "3a63f00be963428e5632e77eaa5782a43fbd08d8d30e68e5e6c67c818d0085f2",
+      "git_blob_sha1": "0cb79397a55cdd66e10cc010f9f0c827920691a0",
+      "bytes": 3567
+    }
+  }
+}
