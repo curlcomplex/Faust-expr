@@ -1,0 +1,5 @@
+# Retained authoring: public execution of the established native benchmark
+
+The owner authorized publication of the benchmark's required CURLOP source dependencies. The exact snapshot lives in `vendor/curlop-latency`; `SOURCE-MANIFEST.json` records original identities. This build wrapper preserves the existing 46 native tests, fused product renderer, and predeclared per-sample numerical checks. No private repository credentials or user media are required by test CI.
+
+Run `python3 experiments/retained-host/run.py --output evidence/retained-host` on macOS with Faust, CMake, Python and Node installed. Public JUCE/CHOC dependencies are pinned to the original product revisions. The normal scalar/current-product reference remains intact. Retained-instance code is experimental authoring execution, not a production fallback or proof of general state migration. Hardware, source commit, first-build costs, edit timings, state tests and raw captures are retained; VM measurements must not be labelled physical-Mac or real-time device acceptance.

@@ -1,0 +1,73 @@
+name: Retained authoring - public macOS benchmark
+on:
+  push:
+    branches: [research/retained-authoring]
+    paths:
+      - 'vendor/curlop-latency/**'
+      - 'experiments/retained-host/**'
+      - '.github/workflows/retained-authoring-public.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: retained-authoring-public-vm
+  cancel-in-progress: false
+jobs:
+  benchmark:
+    if: github.repository == 'curlcomplex/Faust-expr' && github.actor == 'curlcomplex' && github.ref == 'refs/heads/research/retained-authoring'
+    runs-on: macos-15
+    timeout-minutes: 35
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      GIT_LFS_SKIP_SMUDGE: 1
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Install public diagnostic toolchain and isolated analyser dependencies
+        run: |
+          brew install faust
+          python3 -m venv .venv
+          .venv/bin/python -m pip install numpy matplotlib
+          echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
+      - name: Record source and machine identity
+        run: |
+          mkdir -p evidence/retained-host
+          {
+            git rev-parse HEAD
+            uname -sm
+            sw_vers
+            sysctl hw.physicalcpu hw.logicalcpu machdep.cpu.brand_string
+            faust -v
+            cmake --version
+            clang++ --version
+            node --version
+            python3 --version
+            python3 -m pip freeze
+          } > evidence/retained-host/environment.txt 2>&1
+          git archive HEAD vendor/curlop-latency experiments/retained-host | gzip > evidence/retained-host/public-source.tar.gz
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          root=Path('vendor/curlop-latency')
+          m=json.loads((root/'BENCHMARK-IMPORT.json').read_text())
+          for name,wanted in m['original_git_blobs'].items():
+              b=(root/name).read_bytes();actual=hashlib.sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()
+              if actual!=wanted:raise RuntimeError('import mismatch: '+name)
+          print('Original benchmark and generator imports verified')
+          PY
+      - name: Existing public laboratory checks
+        run: |
+          python3 -m unittest discover -s tests -v > evidence/retained-host/laboratory-tests.txt 2>&1
+          bash scripts/build.sh > evidence/retained-host/laboratory-build.txt 2>&1
+      - name: Execute full retained-DSP benchmark against actual fused renderer
+        run: python3 experiments/retained-host/run.py --output evidence/retained-host
+      - name: Retain raw audio, exact sources, timings and failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retained-authoring-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence/retained-host/
+          if-no-files-found: error
+          retention-days: 14
