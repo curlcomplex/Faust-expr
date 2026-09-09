@@ -41,7 +41,7 @@ void trace(const std::string& family,int count,int mode,int frames,int variant,c
         }perf.flush();
     };
     for(int offset=0;offset<4096;offset+=frames)capture(-1);measure("initial");
-    Pins pins;std::vector<EdgeEntry> deletedEdges;
+    Pins pins;std::vector<EdgeEntry> deletedEdges;GraphState undoEndpoint,undoInsertion;
     const std::vector<std::string> names={"external-connect","external-disconnect","expose-member-input","connect-member-input","disconnect-member-input",
         "expose-member-output","connect-member-output","disconnect-member-output","endpoint-rewire","undo-endpoint-rewire","insert-node","remove-inserted-node",
         "member-source-change","undo-member-source","delete-member","restore-member","explicit-compact","repeat-after-compact"};
@@ -55,10 +55,11 @@ void trace(const std::string& family,int count,int mode,int frames,int variant,c
         case 5:pins.outputs.insert(member);break;
         case 6:wire(g,member,monitor);break;
         case 7:removeWire(g,member,monitor);break;
-        case 8:removeWire(g,parallel?0:prev,last);wire(g,parallel?f.marker:first,last);break;
-        case 9:removeWire(g,parallel?f.marker:first,last);wire(g,parallel?0:prev,last);break;
-        case 10:addNode(g,module(inserted,"inserted","process=*(0.6),*(0.6);",true));removeWire(g,parallel?0:prev,last);wire(g,parallel?0:prev,inserted);wire(g,inserted,last);break;
-        case 11:removeNode(g,inserted);wire(g,parallel?0:prev,last);break;
+        case 8:undoEndpoint=g;removeWire(g,parallel?0:prev,last);wire(g,parallel?f.marker:first,last);break;
+        // Undo restores delay identity too; addEdge may auto-insert z^-1 in a cycle.
+        case 9:g=undoEndpoint;break;
+        case 10:undoInsertion=g;addNode(g,module(inserted,"inserted","process=*(0.6),*(0.6);",true));removeWire(g,parallel?0:prev,last);wire(g,parallel?0:prev,inserted);wire(g,inserted,last);break;
+        case 11:g=undoInsertion;break;
         case 12:{auto& m=mutableEntry(g,last);auto pos=m.code.find("process");require(pos!=std::string::npos,"source anchor");m.code.replace(pos,7,"priorprocess");m.code+="\nprocess=priorprocess : *(0.75),*(0.75);\n";break;}
         case 13:mutableEntry(g,last).code=originalSource;break;
         case 14:deletedEdges=g.edges();pins.inputs.erase(member);pins.outputs.erase(member);removeNode(g,member);if(!parallel)wire(g,before,after);break;
