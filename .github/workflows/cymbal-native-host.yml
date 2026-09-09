@@ -1,0 +1,51 @@
+name: Cymbal native host compile check
+on:
+  push:
+    branches: [cym-id-materials-01]
+    paths:
+      - 'experiments/cym-id-materials/native-host/**'
+      - '.github/workflows/cymbal-native-host.yml'
+  pull_request:
+    paths:
+      - 'experiments/cym-id-materials/native-host/**'
+      - '.github/workflows/cymbal-native-host.yml'
+permissions:
+  contents: read
+concurrency:
+  group: cymbal-native-host-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  compile-apple-silicon:
+    runs-on: macos-15
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Compile output-only Core Audio host
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/native-host
+          uname -a | tee build/native-host/platform.txt
+          xcrun clang++ --version | tee build/native-host/compiler.txt
+          test "$(uname -m)" = arm64
+          xcrun clang++ -std=c++20 -O2 -Wall -Wextra -ffp-contract=off \
+            -mmacosx-version-min=11.0 \
+            experiments/cym-id-materials/native-host/audio_harness.cpp \
+            -framework AudioToolbox -framework CoreAudio \
+            -o build/native-host/audio_harness
+      - name: Run non-audio host smoke check
+        shell: bash
+        run: |
+          set -euo pipefail
+          build/native-host/audio_harness --selftest | tee build/native-host/smoke.json
+          printf '%s\n' 'This checks host compilation and AUHAL component availability only. No full model, audio device, M1 Pro benchmark or realtime validation is run.' > build/native-host/SCOPE.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-host-compile-${{ github.sha }}
+          path: |
+            build/native-host/*.txt
+            build/native-host/*.json
+          retention-days: 3
