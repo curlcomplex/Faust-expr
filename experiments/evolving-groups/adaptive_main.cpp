@@ -155,7 +155,15 @@ void negative(int frames,const fs::path& out){
     std::ofstream rows(out/"rejections.tsv");rows<<"case\trejected\tplan_unchanged\n";std::vector<float>x,y;
     for(int k=0;k<6;++k){auto bad=f.graph;Pins pins;bool preserve=false;std::string label;
         if(k==0){pins.inputs.insert(7);preserve=true;label="preserve-only-split";}
-        if(k==1){addWire(bad,4,1);label="undeclared-cycle";}
+        if(k==1){
+            addWire(bad,4,1);
+            // GraphState normally inserts z^-1 automatically. Deliberately
+            // corrupt only this private negative fixture after ingress, so
+            // the validator sees an actually undeclared cycle.
+            auto& malformed=const_cast<std::vector<EdgeEntry>&>(bad.edges());
+            for(auto& e:malformed)if(e.srcIndex==4&&e.tgtIndex==1)e.feedbackBoundary=curlop::FeedbackBoundary::None;
+            label="undeclared-cycle";
+        }
         if(k==2){mutableEntry(bad,6).physicalVoices=4;label="hidden-polyphony";}
         if(k==3){mutableEntry(bad,6).code="process=;";label="bad-hidden-source";}
         if(k==4){pins.outputs.insert(210);label="absent-pin";}
