@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "module_id": "kick-analog-sharp",
+  "sound_version": "0.2.0-experiment",
+  "status": "authored-behavioural-prototype-not-hardware-matched",
+  "inputs": 0,
+  "outputs": 1,
+  "controls": {
+    "pitch_hz": {"min":20,"max":160,"default":52,"unit":"Hz"},
+    "sweep_time": {"min":0,"max":1,"default":0.45,"unit":"normalized; 3–150 ms exponential tau, onset latched"},
+    "sweep": {"min":0,"max":1,"default":0.48,"unit":"normalized; 0–4 octave pitch rise, onset latched"},
+    "decay": {"min":0,"max":1,"default":0.52,"unit":"normalized; 20 ms–1.8 s exponential tau, onset latched"},
+    "wave": {"min":0,"max":11,"default":0,"unit":"categorical, paired reset/free: sine, asymmetric, triangle, sinetooth, saw, square"},
+    "hold": {"min":0,"max":1,"default":0,"unit":"normalized; 0–2 s quadratic, onset latched"},
+    "click": {"min":0,"max":1,"default":0.15,"unit":"normalized; squared transient gain, onset latched"},
+    "drive": {"min":0,"max":1,"default":0.18,"unit":"normalized, live 3 ms smoothing and onset snap"},
+    "gate": {"min":0,"max":1,"default":0,"unit":"boolean; rising edge triggers, fall does not choke"},
+    "velocity": {"min":0,"max":1,"default":1,"unit":"linear amplitude, onset latched"}
+  },
+  "musical_control_order": ["pitch_hz","sweep_time","sweep","decay","wave","hold","click","drive"],
+  "phase": "reset/free phase selected by wave pairs; free phase requires continuous processing when silent",
+  "precision": "float32",
+  "oversampling": "not built into kernel; high-rate diagnostic only",
+  "recordings": [],
+  "remaining": ["controlled dry firmware/settings reference captures","musical approval","device realtime/memory qualification","high-register nonlinear aliasing","retrigger crossfade/voice-steal policy"]
+}
