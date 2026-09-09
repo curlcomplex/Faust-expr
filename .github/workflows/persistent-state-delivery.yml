@@ -1,0 +1,43 @@
+name: Persistent state final evidence reconciliation
+on:
+  push:
+    branches: [research/persistent-state-transition]
+    paths: ['experiments/persistent-state-delivery/**', '.github/workflows/persistent-state-delivery.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Retrieve exact qualified online bytes and preceding independent audits
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run download 34415439350 --repo curlcomplex/Faust-expr --name persistent-state-online-full-34415439350-1 --dir online
+          gh run download 34415821471 --repo curlcomplex/Faust-expr --name persistent-state-postflight-34415821471 --dir prior
+          mkdir -p delivery
+      - name: Recheck complete live audio, source-only correction and actual changed master samples
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m venv .verify-venv
+          .verify-venv/bin/pip install numpy
+          .verify-venv/bin/python experiments/persistent-state-next/audit_live.py online/live delivery | tee delivery/online-independent-audit.log
+          .verify-venv/bin/python experiments/persistent-state-delivery/verify.py online prior delivery . | tee delivery/final-reconciliation.log
+          git archive HEAD experiments/persistent-state-audit experiments/persistent-state-verification experiments/persistent-state-postflight experiments/persistent-state-delivery .github/workflows/persistent-state-delivery.yml | gzip > delivery/independent-auditor-source.tar.gz
+          git rev-parse HEAD > delivery/delivery-head.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: persistent-state-qualified-checkpoint-${{ github.run_id }}
+          path: delivery/
+          if-no-files-found: error
+          retention-days: 14
