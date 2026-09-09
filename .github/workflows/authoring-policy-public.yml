@@ -1,0 +1,72 @@
+name: Authoring policy tradeoff - native public macOS
+on:
+  push:
+    branches: [research/authoring-policy-tradeoff]
+    paths:
+      - 'experiments/authoring-policy/**'
+      - '.github/workflows/authoring-policy-public.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: authoring-policy-tradeoff-public
+  cancel-in-progress: false
+jobs:
+  benchmark:
+    if: github.repository == 'curlcomplex/Faust-expr' && github.actor == 'curlcomplex' && github.ref == 'refs/heads/research/authoring-policy-tradeoff'
+    runs-on: macos-15
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [regression, policy-0, policy-1]
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      GIT_LFS_SKIP_SMUDGE: 1
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Public toolchain and isolated evidence dependencies
+        run: |
+          set -euo pipefail
+          brew install faust
+          python3 -m venv .policy-venv
+          .policy-venv/bin/python -m pip install numpy matplotlib
+          echo "$GITHUB_WORKSPACE/.policy-venv/bin" >> "$GITHUB_PATH"
+      - name: Record exact source and environment; preserve existing laboratory checks
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/policy
+          {
+            git rev-parse HEAD
+            uname -sm
+            sw_vers
+            sysctl hw.physicalcpu hw.logicalcpu machdep.cpu.brand_string
+            faust -v
+            cmake --version
+            clang++ --version
+            python3 --version
+            python3 -m pip freeze
+          } > evidence/policy/environment.txt 2>&1
+          git archive HEAD vendor/curlop-latency experiments | gzip > evidence/policy/executed-source.tar.gz
+          python3 -m unittest discover -s tests -v > evidence/policy/laboratory-tests.log 2>&1
+          bash scripts/build.sh > evidence/policy/laboratory-build.log 2>&1
+      - name: Execute unchanged 92-case native regression suite
+        if: matrix.suite == 'regression'
+        run: python3 experiments/evolving-groups/run.py --output evidence/policy
+      - name: Execute policy comparison shard zero
+        if: matrix.suite == 'policy-0'
+        run: python3 experiments/authoring-policy/run.py --shard 0 --output evidence/policy
+      - name: Execute policy comparison shard one
+        if: matrix.suite == 'policy-1'
+        run: python3 experiments/authoring-policy/run.py --shard 1 --output evidence/policy
+      - name: Retain exact sources, raw audio, edit/reset logs and failed attempts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: authoring-policy-${{ matrix.suite }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence/policy/
+          if-no-files-found: error
+          retention-days: 14
