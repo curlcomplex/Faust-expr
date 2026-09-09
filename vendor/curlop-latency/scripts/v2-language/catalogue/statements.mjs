@@ -1,0 +1,48 @@
+export default [
+  {
+    id: "statement.definition", name: "definition", family: "statements",
+    syntax: ["name = material"], contexts: ["top_level"],
+    binding: { parser: "parseProgramV2", compiler: "compileV2" },
+    example: "phrase = [c3 / e3]",
+    arguments: [{ name: "name", type: "identifier", example: "phrase" }, { name: "material", type: "material expression", example: "[c3 / e3]" }],
+    completion: null,
+  },
+  {
+    id: "statement.function", name: "function", family: "statements",
+    syntax: ["name(arg, ...) = expression"], contexts: ["top_level", "receiver_expression"],
+    binding: { parser: "parseProgramV2", compiler: "compileV2" },
+    example: "shape(rate, low, high) = lfo(sine, rate, low, high)",
+    arguments: [{ name: "name", type: "identifier", example: "shape" }, { name: "arg", type: "parameter identifier", example: "rate" }, { name: "expression", type: "signal expression", example: "lfo(sine, rate, low, high)" }],
+    completion: null,
+  },
+  {
+    id: "statement.route", name: "route", family: "routing",
+    syntax: ["target < material", "target & target < material"], contexts: ["top_level", "module_route"],
+    binding: { parser: "appendRouteBranch", compiler: "compileV2" },
+    example: "bass < [c2 / e2]",
+    arguments: [{ name: "target", type: "module identifier", example: "bass" }, { name: "material", type: "material expression", example: "[c2 / e2]" }],
+    completion: { label: "self", insert: "self < ", summary: "route/process every concrete V2 output target", kind: "keyword" },
+  },
+  {
+    id: "statement.socket_export", name: "socket export", family: "routing",
+    syntax: [">name = material", ">name(selector, ...) = material"], contexts: ["top_level", "local_output"],
+    binding: { parser: "appendRouteBranch", compiler: "compileV2" }, completion: null,
+    example: ">notes(gate, pitch) = [c2 / e2]",
+    arguments: [{ name: "name", type: "output socket identifier", example: "notes" }, { name: "selector", type: "socket field identifier", optional: true, example: "gate" }, { name: "material", type: "material expression", example: "[c2 / e2]" }],
+  },
+  {
+    id: "statement.socket_route", name: "socket route", family: "routing",
+    syntax: [">output < <input : transform(...)"], contexts: ["top_level", "graph_route"],
+    binding: { parser: "appendRouteBranch", compiler: "compileV2" }, completion: null,
+    example: ">motion < <env : clip(0, 1)",
+    arguments: [{ name: "output", type: "output socket identifier", example: "motion" }, { name: "input", type: "input socket identifier", example: "env" }, { name: "transform", type: "signal transform", optional: true, example: "clip(0, 1)" }],
+  },
+  {
+    id: "statement.session", name: "session", family: "statements",
+    syntax: ["session.bpm(value)"], contexts: ["top_level"], support: "partial",
+    binding: { parser: "parseProgramV2", compiler: "compileV2" },
+    example: "session.bpm(120)\nbass < [c2]",
+    arguments: [{ name: "value", type: "BPM value", example: 120 }],
+    completion: { label: "session.bpm", insert: "session.bpm(", summary: "set the script/source BPM target", kind: "keyword" },
+  },
+];

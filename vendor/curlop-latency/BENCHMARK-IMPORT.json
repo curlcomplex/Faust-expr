@@ -1,0 +1,17 @@
+{
+  "source_commit": "055c7a156e88e97d1db207769565fb6c7fcdff00",
+  "authorization": "Owner explicitly permitted public publication of the benchmark and its required source dependencies in this conversation.",
+  "original_git_blobs": {
+    "scripts/bench/patching_latency/RetainedFaustGraph.h": "3331779003feb0ca4b0c999f4f06a888ac7c87eb",
+    "scripts/bench/patching_latency/retained_main.cpp": "02d8610412124f13a94afc62860352784de72e84",
+    "scripts/bench/patching_latency/analyze_retained.py": "10da52dca865a117562dc4888a809be19baa0231",
+    "scripts/bench/patching_latency/test_retained_analysis.py": "0c47cedd40ac362aedd188b0fcd81a33ee70d5a5",
+    "scripts/v2-language/generate-catalogue.mjs": "5fc09cfefe747e088a907a77de0e259a9a0b1998",
+    "scripts/v2-language/catalogue/generators.mjs": "c8799b6deb6e4567b62c7e2b85cf5de1782bdf98",
+    "scripts/v2-language/catalogue/material.mjs": "f1bc6a70406053a64d2ddd0e3d5caddfe270303c",
+    "scripts/v2-language/catalogue/parsed_only.mjs": "4c9d62260d3c9c8205d5be7bab549f4aab5cde3e",
+    "scripts/v2-language/catalogue/primer.mjs": "47083d7fe9d541294342b47ab4254d9f906a3921",
+    "scripts/v2-language/catalogue/processors.mjs": "baeb60cd161c0dd2a370911ad9545b6491b0e2eb",
+    "scripts/v2-language/catalogue/statements.mjs": "a9513fc66b50aef6f7fe1193149b438e0b8b8f13"
+  }
+}
