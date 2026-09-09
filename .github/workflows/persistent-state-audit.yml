@@ -1,0 +1,42 @@
+name: Persistent state independent evidence audit
+on:
+  push:
+    branches: [research/persistent-state-transition]
+    paths: ['experiments/persistent-state-audit/**', '.github/workflows/persistent-state-audit.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Fetch the exact public executed artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh run download 34410082115 --repo curlcomplex/Faust-expr --name persistent-state-34410082115-1 --dir raw
+      - name: Independent source, audio and timing audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m venv .audit-venv
+          .audit-venv/bin/pip install numpy
+          mkdir -p audit-evidence
+          .audit-venv/bin/python experiments/persistent-state-audit/audit.py raw audit-evidence | tee audit-evidence/audit.log
+          cp raw/gate/gate-summary.json audit-evidence/native-gate-summary.json
+          if [[ -f raw/transitions/transition-summary.json ]]; then cp raw/transitions/transition-summary.json audit-evidence/native-transition-summary.json; fi
+          cp raw/environment.txt raw/identity.json audit-evidence/
+          git archive HEAD experiments/persistent-state-audit .github/workflows/persistent-state-audit.yml | gzip > audit-evidence/auditor-source.tar.gz
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: persistent-state-independent-audit-${{ github.run_id }}
+          path: audit-evidence/
+          if-no-files-found: error
+          retention-days: 14

@@ -1,0 +1,56 @@
+name: Persistent state postflight diagnostics
+on:
+  push:
+    branches: [research/persistent-state-transition]
+    paths: ['experiments/persistent-state-postflight/**', '.github/workflows/persistent-state-postflight.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Read the exact completed output-only native evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run download 34414210244 --repo curlcomplex/Faust-expr --name persistent-state-next-full-34414210244-1 --dir raw
+          mkdir -p review
+          cp raw/environment.txt raw/identity.json raw/executed-experiment-source.tar.gz review/
+      - name: Independent full-capture, regression and compiled-code checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m venv .audit-venv
+          .audit-venv/bin/pip install numpy
+          .audit-venv/bin/python experiments/persistent-state-audit/audit.py raw review/static-state | tee review/static-state-audit.log
+          .audit-venv/bin/python experiments/persistent-state-verification/verify_regression.py raw/original-regression review/regression | tee review/regression-audit.log
+          # Safe import path: our inspect.py must not shadow Python's stdlib inspect.
+          .audit-venv/bin/python -P experiments/persistent-state-postflight/inspect.py raw review/contract | tee review/contract-audit.log
+          .audit-venv/bin/python - <<'PY' | tee review/result-scope.log
+          import pathlib,json,statistics
+          root=pathlib.Path('raw');r=json.loads((root/'independent/independent-audit.json').read_text())
+          print('CASE_MEDIAN_RATIOS',{k:statistics.median(c['ratios'][k] for c in r['gate_cases']) for k in ['dsp','with-observers']})
+          print('LAB_TEST_TAIL',(root/'laboratory-tests.log').read_text()[-500:])
+          print('LAB_PROBE_TAIL',(root/'laboratory-probe.log').read_text()[-500:])
+          print('LIVE_AUDIT_FAILURE_RETAINED',(root/'independent-online-audit.log').read_text())
+          live=json.loads((root/'live/live-cases.json').read_text());print('LIVE_NATIVE_EXITS',[(c['name'],c['returncode']) for c in live])
+          for c in live:
+              meta=json.loads((root/'live'/c['name']/'live-result.json').read_text())
+              print('INVALID_REPORT_TYPES',c['name'],{k:repr(meta[k]) for k in ['state_instances_created_during_edits','state_bytes_copied_during_edits']})
+          PY
+          git archive HEAD experiments/persistent-state-audit experiments/persistent-state-postflight experiments/persistent-state-verification .github/workflows/persistent-state-postflight.yml | gzip > review/independent-auditor-source.tar.gz
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: persistent-state-postflight-${{ github.run_id }}
+          path: review/
+          if-no-files-found: error
+          retention-days: 14

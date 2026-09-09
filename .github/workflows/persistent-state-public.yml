@@ -1,0 +1,50 @@
+name: Persistent state transition - public macOS
+on:
+  push:
+    branches: [research/persistent-state-transition]
+    paths: ['experiments/persistent-state/**', '.github/workflows/persistent-state-public.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: persistent-state-transition-public
+  cancel-in-progress: false
+jobs:
+  benchmark:
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Public toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          brew list faust >/dev/null 2>&1 || brew install faust
+          mkdir -p evidence/persistent-state
+          { git rev-parse HEAD; uname -sm; sysctl hw.physicalcpu hw.logicalcpu machdep.cpu.brand_string; faust -v; clang++ --version; } > evidence/persistent-state/environment.txt 2>&1
+      - name: Probe actual installed backend contracts
+        run: python3 experiments/persistent-state/probe.py --output evidence/persistent-state/capabilities
+      - name: Run gated performance and transition experiment when present
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f experiments/persistent-state/run.py ]]; then
+            python3 experiments/persistent-state/run.py --output evidence/persistent-state
+          else
+            echo 'Compiler capability probe only; no performance or transition test at this head.' > evidence/persistent-state/PROBE-ONLY.txt
+          fi
+      - name: Preserve all evidence and exact experimental source
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p evidence/persistent-state
+          git archive HEAD experiments/persistent-state .github/workflows/persistent-state-public.yml | gzip > evidence/persistent-state/experiment-source.tar.gz
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: persistent-state-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence/persistent-state/
+          if-no-files-found: error
+          retention-days: 14

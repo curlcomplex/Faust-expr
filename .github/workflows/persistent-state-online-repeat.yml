@@ -1,0 +1,62 @@
+name: Persistent state online gate - typed report qualification
+on:
+  push:
+    branches: [research/persistent-state-transition]
+    paths: ['experiments/persistent-state-online-repeat/**', '.github/workflows/persistent-state-online-repeat.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: persistent-state-online-repeat-public
+  cancel-in-progress: false
+jobs:
+  benchmark:
+    runs-on: macos-15
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Retrieve the exact accepted preceding gates and kernel bytes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh run download 34414210244 --repo curlcomplex/Faust-expr --name persistent-state-next-full-34414210244-1 --dir previous
+      - name: Public toolchain and verification dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          brew list faust >/dev/null 2>&1 || brew install faust
+          python3 -m venv .online-venv
+          .online-venv/bin/pip install numpy
+          mkdir -p evidence/online
+          { git rev-parse HEAD; uname -sm; sysctl hw.physicalcpu hw.logicalcpu machdep.cpu.brand_string; faust -v; clang++ --version; } > evidence/online/environment.txt 2>&1
+      - name: Repeat real online compilation and stress with strict unmodified verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          .online-venv/bin/python experiments/persistent-state-online-repeat/run.py --previous previous --output evidence/online
+      - name: Compact qualification summaries
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p evidence/online
+          python3 experiments/persistent-state-next/pack_summary.py evidence/online evidence/online-summary
+          if [[ -f evidence/online/executed-source.tar.gz ]]; then cp evidence/online/executed-source.tar.gz evidence/online-summary/; fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: persistent-state-online-summary-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence/online-summary/
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: persistent-state-online-full-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence/online/
+          if-no-files-found: error
+          retention-days: 14
