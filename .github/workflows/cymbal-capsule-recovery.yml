@@ -1,0 +1,62 @@
+name: Cymbal staged-data recovery
+on:
+  push:
+    branches: [cym-id-materials-01]
+    paths: ['.github/workflows/cymbal-capsule-recovery.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read only the explicitly identified repository blobs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/capsule-recovery
+          python3 - <<'PY'
+          import base64, hashlib, json, os, pathlib, urllib.request, urllib.error
+          out=pathlib.Path('build/capsule-recovery')
+          shas='''807c28b9dffb1a5b1f4afd55a5f8e01237e39404
+          d75a8614a83e1f3e8ef63a58f0c3fc07432cadfb
+          028fcd21e94bc68f20ee09f67398f1f7d5b839ff
+          b8751908fdcd04d80fc3e6de2c856cecf08fe22b
+          b41eb61d53d6c47ae206e0641edb705bfa722953
+          f131ef406a7d5822d1288dbbd9d6c75c186deca8
+          c831d4bac7320b7d9138c0624e85e4d4ae6171c0
+          57fc8527cc82ed5a1b291a273e0342bf6230d5d8
+          b067d8941e7651bf73daf027f32f6a3125f7d9eb
+          cb0d80ace675c98625e14eb02550241a9be645ca
+          efc2f0e20642979d388723296a1bfabeef27b433
+          9ea2fe67a595a09d52d02d32cbf1add2898937c4
+          4e25ae24ea43238b27c48eda6c681656caa9a639
+          353d79f960214d0d65ab93bfd66ed3958dd8ba7e'''.split()
+          report=[]
+          for sha in shas:
+              request=urllib.request.Request('https://api.github.com/repos/curlcomplex/Faust-expr/git/blobs/'+sha,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              try:
+                  with urllib.request.urlopen(request,timeout=30) as response: item=json.load(response)
+              except urllib.error.HTTPError as exc:
+                  if exc.code==404:
+                      report.append({'sha':sha,'found':False}); continue
+                  raise
+              assert item['encoding']=='base64'
+              data=base64.b64decode(item['content'])
+              assert len(data)==item['size'] and len(data)<2000000
+              actual=hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+              assert actual==sha
+              (out/(sha+'.blob')).write_bytes(data)
+              report.append({'sha':sha,'found':True,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()})
+          (out/'inventory.json').write_text(json.dumps(report,indent=2)+'\n')
+          print(json.dumps(report,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cymbal-staged-data-${{ github.sha }}
+          path: build/capsule-recovery
+          if-no-files-found: error
+          retention-days: 7
