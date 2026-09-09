@@ -24,7 +24,7 @@ inline std::string fingerprint(const std::string& text){
     for(unsigned char c:text){value^=c;value*=1099511628211ull;}
     std::ostringstream o;o<<std::hex<<std::setw(16)<<std::setfill('0')<<value;return o.str();
 }
-inline std::array<float,2> gains(const EdgeEntry& e){
+inline std::array<float,2> gains(const curlop::EdgeEffective& e){
     float gain=e.audible?std::clamp(e.gain,0.f,2.f):0.f;
     if(e.feedbackBoundary==curlop::FeedbackBoundary::OneSample)return {gain,gain};
     if(e.signalDescriptor.layout()&&*e.signalDescriptor.layout()=="stereo"){
@@ -53,7 +53,7 @@ inline ModuleEntry compileUnit(const GraphState& g,const Boundary& b){
     auto edges=g.computeEffectiveEdges(); std::set<int> members(b.members.begin(),b.members.end());
     auto unit=entry(g,b.first);unit.moduleId="stable-group-"+std::to_string(b.first);
     unit.dslName="group"+std::to_string(b.first);unit.code.clear();unit.params.clear();unit.paramValues.clear();
-    std::ostringstream declarations,body;std::vector<const EdgeEntry*> feedback;
+    std::ostringstream declarations,body;std::vector<const curlop::EdgeEffective*> feedback;
     for(auto& e:edges)if(members.count(e.srcIndex)&&members.count(e.tgtIndex)){
         check(!e.modulation,"group control route unsupported");
         if(e.feedbackBoundary==curlop::FeedbackBoundary::OneSample)feedback.push_back(&e);
@@ -107,7 +107,7 @@ inline GraphState collapse(const GraphState& g,const Layout& l){
     auto mapIndex=[&](int i){auto it=l.owner.find(i);return it==l.owner.end()?i:it->second;};
     auto boundary=[&](int owner)->const Boundary&{for(auto& b:l.units)if(b.first==owner)return b;throw std::runtime_error("missing boundary");};
     using Key=std::pair<int,int>;
-    std::map<Key,std::vector<EdgeEntry>> buckets;
+    std::map<Key,std::vector<curlop::EdgeEffective>> buckets;
     for(auto e:g.computeEffectiveEdges()){
         int s=mapIndex(e.srcIndex),t=mapIndex(e.tgtIndex);
         if(s==t){check(l.owner.count(e.srcIndex),"standalone self edge unsupported");continue;}
@@ -122,7 +122,11 @@ inline GraphState collapse(const GraphState& g,const Layout& l){
         if(l.owner.count(e.srcIndex)&&boundary(k.first).parallel)expected=boundary(k.first).members.size();
         check(old.size()==expected,"partial fan-in/out cannot be represented by this fixed group port");
         for(auto& x:old)check(x.gain==e.gain&&x.pan==e.pan&&x.audible==e.audible&&x.feedbackBoundary==e.feedbackBoundary,"incompatible boundary wire attributes");
-        e.srcIndex=k.first;e.tgtIndex=k.second;e.srcPort="OUT";e.tgtPort="IN";routes.push_back(e);
+        EdgeEntry route;route.srcIndex=k.first;route.tgtIndex=k.second;
+        route.srcPort="OUT";route.tgtPort="IN";route.signalDescriptor=e.signalDescriptor;
+        route.feedbackBoundary=e.feedbackBoundary;route.modulation=e.modulation;
+        route.gain=e.gain;route.pan=e.pan;route.muted=!e.audible;route.audible=e.audible;
+        routes.push_back(std::move(route));
     }
     GraphState out;check(out.replace(std::move(modules),std::move(routes),{}),"collapsed graph rejected");return out;
 }

@@ -54,6 +54,10 @@ def analyze(root,phase):
                 expected_length=(4096+32*4*frames)*2
                 ref=audio(folder/'fused-oracle.f32')
                 if len(ref)!=expected_length:raise ValueError('matrix length')
+                dry=audio(folder/'unpatched-negative.f32')
+                if len(dry)!=len(ref):raise ValueError('negative control length')
+                r['edit_effect_peak']=max(abs(x-y) for x,y in zip(ref,dry))
+                if r['edit_effect_peak']<=1e-4:raise ValueError('insufficient connection effect; false-positive risk')
                 blocks=tsv(folder/'blocks.tsv');edits=tsv(folder/'edits.tsv');perf=tsv(folder/'throughput.tsv');initial=tsv(folder/'initial.tsv')
                 expected_blocks=4096//frames+128
                 if [int(b['block']) for b in blocks]!=list(range(expected_blocks)):raise ValueError('block inventory')

@@ -14,7 +14,7 @@ const std::vector<Config> configs={{"serial",32,4},{"serial",32,8},{"parallel",3
 ModuleEntry& mutableEntry(GraphState& g,int id){for(auto& m:g.modulesMutable())if(m.index==id)return m;throw std::runtime_error("module missing");}
 Fixture makeFixture(const Config& c,bool memory=false){
     auto f=fixture(c.family=="nonlinear"?"serial":c.family,c.size);
-    if(c.family=="nonlinear")mutableEntry(f.graph,c.width+2).code="sat(x)=x/(1+abs(x)); process=*(3),*(3) : sat,sat;";
+    if(c.family=="nonlinear")mutableEntry(f.graph,c.size-c.width+2).code="sat(x)=x/(1+abs(x)); process=*(3),*(3) : sat,sat;";
     if(memory){
         mutableEntry(f.graph,0).code="import(\"stdfaust.lib\"); process=os.osc(173)*0.1, (1-1')*0.05;";
         for(int i=1;i<=c.size;++i)mutableEntry(f.graph,i).code=i==1?"process=_, _ @ 6000;":"process=_,_;";
@@ -22,7 +22,7 @@ Fixture makeFixture(const Config& c,bool memory=false){
     return f;
 }
 Layout grouping(const Config& c){return layout(c.size,c.width,c.family=="parallel");}
-std::vector<int> inputTargets(const Layout& l){auto& b=l.units[l.units.size()>1?1:0];return b.parallel?b.members:std::vector<int>{b.first};}
+std::vector<int> inputTargets(const Layout& l){auto& b=l.units.back();return b.parallel?b.members:std::vector<int>{b.first};}
 void wire(Fixture& f,const Layout& l,bool connected){
     for(int target:inputTargets(l)){
         if(connected)require(f.graph.addEdge(edge(f.marker,target)),"new exposed-port wire rejected");
@@ -106,11 +106,12 @@ void matrix(const Config& c,int frames,const fs::path& out,const fs::path& aot){
     auto f=makeFixture(c);auto l=grouping(c);auto oracle=f;wire(oracle,l,true);
     mutableEntry(oracle.graph,f.marker).code="time=+(1)~_; phase=int((time-4097)/"+std::to_string(4*frames)+"); active=(time>4096)&(time<="+std::to_string(4096+32*4*frames)+")&((phase%2)==0); process=0.02*float(active),0.01*float(active);";
     auto fused=build(oracle.graph,frames);auto es=engines(f.graph,l,frames,aot,out);
+    Engine dry("modules",f.graph,l,frames,"none",out);
     std::ofstream initial(out/"initial.tsv");initial<<"backend\tprepare_us\tinstances\texternal_feedback_sample_mode\n"<<std::setprecision(15);
     for(auto& e:es)initial<<e->name<<'\t'<<e->coldUs<<'\t'<<e->plan->created<<'\t'<<e->plan->singleSample<<'\n';
     std::ofstream edits(out/"edits.tsv");edits<<"trial\tbackend\tconnected\tgraph_mutation_us\tgroup_and_routing_prepare_us\tprepare_and_first_compute_us\tcreated\treused\tacquired\n"<<std::setprecision(15);
     std::ofstream blocks(out/"blocks.tsv");blocks<<"block\tconnected\n";
-    std::vector<std::vector<float>> captures(es.size());std::vector<float> refCapture;
+    std::vector<std::vector<float>> captures(es.size());std::vector<float> refCapture,dryCapture;
     juce::AudioBuffer<float>b(2,frames),reference(2,frames);juce::MidiBuffer midi;std::size_t block=0;
     auto renderBlock=[&](bool connected,int trial,double mutation){
         std::vector<std::vector<float>> current(es.size());
@@ -121,6 +122,7 @@ void matrix(const Config& c,int frames,const fs::path& out,const fs::path& aot){
             if(trial>=0)edits<<trial<<'\t'<<e->name<<'\t'<<connected<<'\t'<<mutation<<'\t'<<preparation<<'\t'<<done-t<<'\t'<<e->plan->created<<'\t'<<e->plan->reused<<'\t'<<e->plan->acquired<<'\n';
         }
         process(*fused.renderer,reference,midi);auto y=interleave(reference);append(refCapture,y);
+        dry.render(b);append(dryCapture,interleave(b));
         for(std::size_t i=0;i<es.size();++i){append(captures[i],current[i]);compare(current[i],y,es[i]->name+" block "+std::to_string(block));}
         blocks<<block++<<'\t'<<connected<<'\n';
     };
@@ -128,6 +130,8 @@ void matrix(const Config& c,int frames,const fs::path& out,const fs::path& aot){
     for(int trial=0;trial<32;++trial){bool connected=trial%2==0;auto start=now();wire(f,l,connected);double mutation=now()-start;
         renderBlock(connected,trial,mutation);for(int k=0;k<3;++k)renderBlock(connected,-1,0);}
     for(std::size_t i=0;i<es.size();++i)raw(out/(es[i]->name+".f32"),captures[i]);raw(out/"fused-oracle.f32",refCapture);
+    raw(out/"unpatched-negative.f32",dryCapture);
+    require(delta(refCapture,dryCapture)>1e-4,"connection effect too small to qualify the audio comparison");
     throughput(out,es,frames);
     // Boundaries are explicit: hidden internals must not silently lose cables.
     if(c.width>1&&c.family!="parallel"){
