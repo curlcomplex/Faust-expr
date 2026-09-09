@@ -1,0 +1,11 @@
+{
+ "status":"authored; no hardware preset fit or endorsement",
+ "anchors":{
+  "Round":{"pitch_hz":48,"sweep_time":0.4,"sweep":0.24,"decay":0.59,"wave":0,"hold":0,"click":0.1,"drive":0.08},
+  "Sharp":{"pitch_hz":60,"sweep_time":0.18,"sweep":0.63,"decay":0.32,"wave":2,"hold":0,"click":0.48,"drive":0.34},
+  "Triangle":{"pitch_hz":52,"sweep_time":0.49,"sweep":0.42,"decay":0.5,"wave":4,"hold":0.05,"click":0.12,"drive":0.2},
+  "Rubber":{"pitch_hz":42,"sweep_time":0.78,"sweep":0.48,"decay":0.53,"wave":6,"hold":0,"click":0.05,"drive":0.28},
+  "Driven":{"pitch_hz":46,"sweep_time":0.29,"sweep":0.48,"decay":0.58,"wave":8,"hold":0.08,"click":0.3,"drive":0.75},
+  "Long":{"pitch_hz":36,"sweep_time":0.5,"sweep":0.2,"decay":0.79,"wave":10,"hold":0.27,"click":0.03,"drive":0.3}
+ }
+}

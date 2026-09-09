@@ -1,0 +1,19 @@
+{
+  "id": "kick-analog",
+  "version": "0.1.0-experiment",
+  "status": "authored analog-style experiment; not a recovered Elektron circuit",
+  "controls": {
+    "pitch_hz": {"min": 20, "max": 160, "default": 52},
+    "decay": {"min": 0, "max": 1, "default": 0.52},
+    "sweep": {"min": 0, "max": 1, "default": 0.48},
+    "punch": {"min": 0, "max": 1, "default": 0.55},
+    "tone": {"min": 0, "max": 1, "default": 0.52},
+    "body": {"min": 0, "max": 1, "default": 0.62},
+    "drive": {"min": 0, "max": 1, "default": 0.18},
+    "click": {"min": 0, "max": 1, "default": 0.18}
+  },
+  "events": {"gate": "trigger edge; gate-off does not truncate body", "velocity": "latched at trigger"},
+  "architecture": ["pitch excitation", "resonant oscillator body", "independent click path", "bounded saturation", "lowpass coloration", "DC blocker"],
+  "reference_lead": "Syntakt BD Sharp; no hardware capture used in this public batch",
+  "acceptance_remaining": ["Felix listening approval", "hardware/reference capture comparison", "target-device realtime qualification"]
+}

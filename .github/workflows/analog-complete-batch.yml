@@ -1,0 +1,35 @@
+name: Analog sharp full batch
+on:
+  push:
+    branches: [35-analog-kick-full-batch]
+    paths: ['modules/kick-analog/sharp-02/**', 'tools/modules/sharp_*', 'tests/test_sharp_contract.py', '.github/workflows/analog-complete-batch.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: analog-complete-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install build and analysis dependencies on disposable runner
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy
+      - name: Check independent arithmetic and manifest fixtures
+        run: /usr/bin/python3 -m unittest discover -s tests -p test_sharp_contract.py -v
+      - name: Build, render, compare, stress and benchmark all candidates
+        run: /usr/bin/python3 tools/modules/sharp_qualification.py --out build/analog-complete
+      - name: Keep bounded experiment evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: analog-sharp-${{ github.sha }}
+          path: build/analog-complete/
+          if-no-files-found: error
+          retention-days: 7

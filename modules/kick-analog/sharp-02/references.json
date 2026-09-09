@@ -1,0 +1,47 @@
+{
+  "reviewed_on": "2026-09-09",
+  "primary_target": {"manufacturer":"Elektron","product":"Syntakt","machine":"BD Sharp","captured_firmware":null},
+  "status": "documented-control-inspired; no qualified hardware recordings",
+  "captures": [],
+  "hardware_fit_training": [],
+  "hardware_fit_holdouts": [],
+  "sources": [
+    {
+      "url":"https://manuals.plus/m/c8781a2f37da076182fea0b38d398320dfca541b75d9cc0133272410d5c772ae.pdf",
+      "kind":"manufacturer-authored Syntakt manual, third-party mirror",
+      "pages_printed":[96,97],
+      "supports":"BD Sharp exposes tune, sweep time/depth, decay, waveform/phase behavior, hold, tick and overdrive. The text names sine, asymmetric sine, triangle, sinetooth, saw and square, despite a stale count of five.",
+      "does_not_establish":"Exact oscillator equations, wave order, time/macro scaling, circuit, velocity law, nonlinear placement or our onset-latching policy.",
+      "inspection":"Parsed document text inspected; requested PDF screenshot rendering failed with cache-miss, so figure/layout verification is not claimed. No manual redistributed."
+    },
+    {
+      "url":"https://www.elektronauts.com/t/syntakt-os-1-30/221676",
+      "kind":"Elektron manufacturer announcement, 2024-10-16",
+      "supports":"OS 1.30 added a square waveform to BD Sharp. This is a firmware-specific design reference, not a statement of current latest firmware."
+    },
+    {
+      "url":"https://www.elektronauts.com/t/syntakt-science-lab-21-bd-sharp-bd-classic/248585",
+      "kind":"creator machine-specific performances",
+      "eligibility":"discovery only; inspected material is processed/multi-track, not isolated firmware-and-settings-controlled dry capture",
+      "downloaded":false
+    },
+    {
+      "url":"https://particlesintowaves.bandcamp.com/album/syntakt-designer-drums",
+      "kind":"creator collection used in earlier PM-kick research",
+      "eligibility":"rejected for analog calibration: the collection describes digital machines; BDM files are BD Modern, not BD Sharp",
+      "downloaded_for_this_module":false
+    },
+    {
+      "url":"https://faustlibraries.grame.fr/libs/vaeffects/",
+      "kind":"Faust library documentation",
+      "supports":"Available virtual-analog building blocks, not an existing Syntakt circuit model"
+    },
+    {
+      "url":"https://faustlibraries.grame.fr/libs/wdmodels/",
+      "kind":"Faust library documentation",
+      "supports":"Available wave-digital modeling components; no target component network or values identified here"
+    }
+  ],
+  "search_outcome":"Machine-specific searches found manuals, firmware announcements, processed performances and different-hardware patch descriptions, not a qualified dry BD Sharp dataset. No sonic matching score is claimed.",
+  "capture_requirements":["firmware and full synth/amp/filter/FX settings","note timing and velocity","fixed recording gain and lossless dry output","repeated hits in reset and free-phase modes","permission/storage provenance and original hashes"]
+}
