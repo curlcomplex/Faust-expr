@@ -1,0 +1,62 @@
+name: Evolving retained groups - native public macOS
+on:
+  push:
+    branches: [research/evolving-retained-groups]
+    paths:
+      - 'experiments/evolving-groups/**'
+      - '.github/workflows/evolving-groups-public.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  # This dedicated group contains only this experiment's hosted-VM runs.
+  # Superseded revisions need not consume a second complete native build.
+  group: evolving-retained-groups-public
+  cancel-in-progress: true
+jobs:
+  benchmark:
+    if: github.repository == 'curlcomplex/Faust-expr' && github.actor == 'curlcomplex' && github.ref == 'refs/heads/research/evolving-retained-groups'
+    runs-on: macos-15
+    timeout-minutes: 45
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: 1
+      GIT_LFS_SKIP_SMUDGE: 1
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Public toolchain and evidence dependencies
+        run: |
+          brew install faust
+          python3 -m venv "$RUNNER_TEMP/evolving-venv"
+          "$RUNNER_TEMP/evolving-venv/bin/pip" install numpy matplotlib
+          echo "$RUNNER_TEMP/evolving-venv/bin" >> "$GITHUB_PATH"
+      - name: Record execution identity and original laboratory checks
+        run: |
+          mkdir -p evidence/evolving
+          {
+            git rev-parse HEAD
+            uname -sm
+            sw_vers
+            sysctl hw.physicalcpu hw.logicalcpu machdep.cpu.brand_string
+            faust -v
+            cmake --version
+            clang++ --version
+            python3 --version
+          } > evidence/evolving/environment.txt 2>&1
+          echo 'Trace stimulus uses analytic wire gains; each event reference peak must exceed 1e-4. Raw recordings are not normalized.' > evidence/evolving/signal-qualified.txt
+          git archive HEAD vendor/curlop-latency experiments/retained-host experiments/retained-groups experiments/adaptive-groups experiments/evolving-groups | gzip > evidence/evolving/executed-source.tar.gz
+          python3 -m unittest discover -s tests -v > evidence/evolving/laboratory-tests.log 2>&1
+          bash scripts/build.sh > evidence/evolving/laboratory-build.log 2>&1
+          python3 experiments/adaptive-groups/test_policy.py > evidence/evolving/previous-policy-tests.log 2>&1
+      - name: Actual evolving graph and preserved native regressions
+        run: python3 experiments/evolving-groups/run.py --output evidence/evolving
+      - name: Preserve source, raw waveforms, topology transitions and failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: evolving-groups-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence/evolving/
+          if-no-files-found: error
+          retention-days: 14
