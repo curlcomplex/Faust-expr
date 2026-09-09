@@ -1,0 +1,13 @@
+{
+ "status":"Authored before reference analysis; descriptive audition names, not recovered presets.",
+ "anchors":{
+  "Tick":{"pitch_hz":2100,"decay":0.14,"color":0.58,"shape":0.73,"sweep":0.61,"contour":0.87,"punch":0.85,"drive":0.08},
+  "Closed":{"pitch_hz":1560,"decay":0.24,"color":0.83,"shape":0.96,"sweep":0.74,"contour":0.65,"punch":0.55,"drive":0.12},
+  "Open":{"pitch_hz":1900,"decay":0.53,"color":0.75,"shape":0.90,"sweep":0.57,"contour":0.18,"punch":0.35,"drive":0.10},
+  "Ride":{"pitch_hz":610,"decay":0.72,"color":0.68,"shape":0.83,"sweep":0.81,"contour":0.57,"punch":0.68,"drive":0.05},
+  "Bell":{"pitch_hz":210,"decay":0.65,"color":0.20,"shape":0.39,"sweep":0.19,"contour":0.54,"punch":0.2,"drive":0},
+  "Plate":{"pitch_hz":135,"decay":0.59,"color":0.91,"shape":0.9,"sweep":0.67,"contour":0.29,"punch":0.71,"drive":0.35},
+  "Wash":{"pitch_hz":1220,"decay":0.94,"color":0.78,"shape":0.99,"sweep":0.93,"contour":0.08,"punch":0.1,"drive":0.12},
+  "Industrial":{"pitch_hz":360,"decay":0.45,"color":0.93,"shape":1,"sweep":0.87,"contour":0.38,"punch":0.85,"drive":0.83}
+ }
+}

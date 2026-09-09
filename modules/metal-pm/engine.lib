@@ -1,0 +1,74 @@
+// metal-pm 0.2: independently authored electronics, not an Elektron algorithm.
+// Six sinusoidal oscillators; no sampled/noise/reverb layer. See README.
+import("stdfaust.lib");
+pitch=hslider("pitch_hz",420,70,3000,.001);
+decay=hslider("decay",.46,0,1,.001);
+color=hslider("color",.45,0,1,.001);
+shape=hslider("shape",.65,0,1,.001);
+sweep=hslider("sweep",.52,0,1,.001);
+contour=hslider("contour",.5,0,1,.001);
+punch=hslider("punch",.3,0,1,.001);
+drive=hslider("drive",.08,0,1,.001);
+gate=button("gate"); velocity=hslider("velocity",1,0,1,.001);
+choke=button("choke");
+
+hit=gate>gate'; killEdge=choke>choke';
+latched(x)=ba.sAndH(hit,x);
+seen=max(hit)~_;
+f0=latched(pitch); colorValue=latched(color); sh=latched(shape);
+sw=latched(sweep); ct=latched(contour); pu=latched(punch);
+dr=latched(drive); vel=latched(velocity);
+age=(+(1.0):min(60.0*ma.SR):*(1.0-hit))~_;
+t=age/ma.SR;
+bodyTau=latched(.015*pow(160.0,decay));
+attackTau=latched(.00018+.0007*(1.0-punch)*(1.0-punch));
+
+// Direct exponentials are the accepted envelope. A previous multiplicative
+// recurrence accumulated about 2.1% audible-region error on the longest
+// 44.1 kHz decay, so it is retained only as rejected optimization evidence.
+ampReference=(1.0-exp(-t/max(.00018,attackTau)))*exp(-t/max(.015,bodyTau));
+ampFast=ampReference;
+
+// Rejected recurrence experiment: never use this in the product entry point.
+recRejected(c)=loop~_ with {
+    loop(previous)=select2(hit,select2(previous>1.0e-20,0.0,previous*c),1.0);
+};
+bodyCoefficient=latched(exp(-1.0/(ma.SR*(.015*pow(160.0,decay)))));
+attackCoefficient=latched(exp(-1.0/(ma.SR*(.00018+.0007*(1.0-punch)*(1.0-punch)))));
+ampRecurrenceRejected=(1.0-recRejected(attackCoefficient))*recRejected(bodyCoefficient);
+
+// This envelope controls harmonic evolution independently from amplitude.
+modTau=.008+.18*(1.0-ct)*(1.0-ct);
+modEnv=(1.0-ct)+ct*exp(-t/modTau);
+// Color and Sweep independently tune A and B; Sweep is NOT a pitch envelope.
+rA=.50+4.50*colorValue*colorValue; rB=.73+4.77*sw*sw;
+rC=1.19+2.31*colorValue+1.47*sw;
+phase(hz)=os.hs_phasor(1.0,hz,hit);
+feedbackScale=1.0; // diagnostic substitution only, not a shipping parameter
+fbosc(ph,amount)=loop~_ with {
+    loop(previous)=sin(ph+amount*(1.0-hit)*previous);
+};
+fb=.72*sh*sh*modEnv*feedbackScale;
+a=fbosc(2.0*ma.PI*phase(f0*rA),fb);
+b=fbosc(2.0*ma.PI*phase(f0*rB),fb*.81);
+c=fbosc(2.0*ma.PI*phase(f0*rC),fb*.63);
+index=sh*(.08+3.2*sh)*modEnv;
+x=sin(2.0*ma.PI*phase(f0)+index*(.72*a+.28*b));
+y=sin(2.0*ma.PI*phase(f0*(1.37+1.73*colorValue))+index*(.68*b+.32*c));
+z=sin(2.0*ma.PI*phase(f0*(3.57+1.63*sw))+index*(.61*c+.39*a));
+sparse=x;
+dense=(1.0-sh*sh)*x+sh*sh*(.50*x+.30*y+.20*z);
+amount=dr*dr;
+shaper(v)=(1.0-amount)*v+amount*ma.tanh(v*(1.0+11.0*amount))/ma.tanh(1+11*amount);
+// DC removal is part of the kernel and BEFORE the final amplitude/choke. This
+// makes a finished choke exactly silent without freezing pending filter state.
+colored(v)=v:shaper:fi.dcblockerat(12);
+// A choke rising edge starts an 8 ms smoothstep fade. Releasing the button does
+// not resurrect the tail. A fresh trigger reopens; trigger wins simultaneous
+// trigger/choke. Choke is an event, NOT an onset-latched note-length mode.
+killed=(max(killEdge):*(1.0-hit))~_;
+chokeAge=(+(1.0):min(.008*ma.SR):*(killed*killed'))~_;
+q=max(0.0,1.0-chokeAge/(.008*ma.SR));
+chokeGain=select2(killed,1.0,q*q*(3.0-2.0*q));
+punchGain=1.0+.45*pu*exp(-t/.006);
+finish(v,env)=colored(v)*env*punchGain*.30*vel*seen*chokeGain;

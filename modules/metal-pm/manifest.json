@@ -1,0 +1,22 @@
+{
+ "schema":1,"module_id":"metal-pm","sound_version":"0.2.0-experiment",
+ "status":"authored-electronic-prototype-not-hardware-matched","inputs":0,"outputs":1,
+ "entry":"metal.dsp","arithmetic_reference":"reference.dsp","alternate":"sparse.dsp",
+ "controls":{
+  "pitch_hz":{"min":70,"max":3000,"default":420,"unit":"Hz; base oscillator, not dominant spectral peak"},
+  "decay":{"min":0,"max":1,"default":0.46,"unit":"normalized; amplitude tau 15 ms to 2.4 s"},
+  "color":{"min":0,"max":1,"default":0.45,"unit":"normalized; A tuning and related carrier ratios"},
+  "shape":{"min":0,"max":1,"default":0.65,"unit":"normalized; PM depth, bounded feedback and readout density"},
+  "sweep":{"min":0,"max":1,"default":0.52,"unit":"normalized; B tuning, not a pitch sweep"},
+  "contour":{"min":0,"max":1,"default":0.5,"unit":"normalized; modulation depth/time relationship"},
+  "punch":{"min":0,"max":1,"default":0.3,"unit":"normalized; onset speed and early amplitude emphasis"},
+  "drive":{"min":0,"max":1,"default":0.08,"unit":"normalized; squared nonlinear blend, neutral zero"},
+  "gate":{"min":0,"max":1,"default":0,"unit":"boolean; rising edge triggers, falling edge does not choke"},
+  "velocity":{"min":0,"max":1,"default":1,"unit":"linear amplitude, onset latched"},
+  "choke":{"min":0,"max":1,"default":0,"unit":"boolean; rising edge starts 8 ms fade; onset has simultaneous-event priority"}
+ },
+ "musical_control_order":["pitch_hz","decay","color","shape","sweep","contour","punch","drive"],
+ "lifecycle":"All musical controls and velocity latch at onset. Gate and choke are events. Persistent state; no sleep optimization. New onset restarts oscillator phases/envelopes, not fixed filter state. Choke release cannot revive a tail.",
+ "numerical_oracles":{"peak_limit":0.92,"recurrence_max_abs":0.0015,"recurrence_relative_rms":0.005,"vector_max_abs":0.0003,"envelope_relative_above_minus60":0.015},
+ "hardware_fidelity":false,"human_approved":false,"device_qualified":false
+}

@@ -1,0 +1,43 @@
+name: Metal PM full batch
+on:
+  push:
+    branches: [17-metal-full-batch]
+    paths: ['modules/metal-pm/**','tools/modules/metal_*','tools/modules/fetch_metal_references.py','tests/test_metal_batch.py','tests/test_metal_acceptance.py','.github/workflows/metal-complete-batch.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+concurrency:
+  group: metal-full-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Install dependencies on disposable hosted runner
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ ffmpeg python3-numpy python3-scipy
+      - name: Independent contract and analyzer unit tests
+        run: /usr/bin/python3 -m unittest discover -s tests -p 'test_metal*.py' -v
+      - name: Fixed licensed CY Alloy references
+        run: /usr/bin/python3 tools/modules/fetch_metal_references.py --out build/metal-references
+      - name: Actual Faust, regression, reference coverage, audition and paired benchmark
+        run: /usr/bin/python3 tools/modules/metal_acceptance.py --out build/metal-full --references build/metal-references
+      - name: Preserve exact-commit replay source
+        if: always()
+        run: |
+          mkdir -p build/metal-full
+          git rev-parse HEAD > build/metal-full/commit.txt
+          git diff --check > build/metal-full/diff-check.txt
+          git archive --format=tar HEAD > build/metal-full/repository-source.tar
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: metal-full-${{ github.sha }}
+          path: |
+            build/metal-full/
+            build/metal-references/
+          if-no-files-found: error
+          retention-days: 7
