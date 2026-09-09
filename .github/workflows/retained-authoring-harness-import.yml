@@ -1,0 +1,87 @@
+name: Import exact authorized benchmark baseline
+on:
+  push:
+    branches: [research/retained-authoring]
+    paths: ['.github/workflows/retained-authoring-harness-import.yml']
+permissions:
+  contents: write
+jobs:
+  publish-harness:
+    if: github.repository == 'curlcomplex/Faust-expr' && github.actor == 'curlcomplex' && github.ref == 'refs/heads/research/retained-authoring'
+    runs-on: macos-15
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Create ephemeral archive-transport key
+        run: |
+          umask 077
+          mkdir -p "$RUNNER_TEMP/key" public-key
+          openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out "$RUNNER_TEMP/key/private.pem" 2>/dev/null
+          openssl pkey -in "$RUNNER_TEMP/key/private.pem" -pubout -out public-key/public.pem
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: retained-harness-public-key-${{ github.run_id }}
+          path: public-key/
+          retention-days: 1
+      - name: Publish exact baseline source, no captures or private metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import base64, hashlib, io, json, os, subprocess, tarfile, time, zipfile
+          from pathlib import Path
+          import sys
+          sys.path.insert(0,'scripts')
+          from import_retained_snapshot import fetch,git_sha,BRANCH
+          key=Path(os.environ['RUNNER_TEMP'])/'key/private.pem'
+          fingerprint=hashlib.sha256(Path('public-key/public.pem').read_bytes()).hexdigest()
+          envelope=None
+          for _ in range(120):
+              try:
+                  candidate=json.loads(base64.b64decode(subprocess.check_output(['gh','api','repos/curlcomplex/Faust-expr/contents/.github/retained-import.encrypted.json?ref='+BRANCH,'--jq','.content'],stderr=subprocess.DEVNULL)))
+                  if candidate.get('key_sha256')==fingerprint:envelope=candidate;break
+              except (ValueError,subprocess.CalledProcessError):pass
+              time.sleep(3)
+          if envelope is None:raise RuntimeError('source reference not received')
+          plaintext=[]
+          for block in envelope['blocks']:
+              p=subprocess.run(['openssl','pkeyutl','-decrypt','-inkey',str(key),'-pkeyopt','rsa_padding_mode:oaep','-pkeyopt','rsa_oaep_md:sha256'],input=base64.b64decode(block,validate=True),stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+              if p.returncode:raise RuntimeError('decryption failed')
+              plaintext.append(p.stdout)
+          payload=json.loads(b''.join(plaintext));data=fetch(payload['archive']['url'])
+          if hashlib.sha256(data).hexdigest()!=payload['archive']['sha256']:raise RuntimeError('archive digest')
+          with zipfile.ZipFile(io.BytesIO(data)) as z:inner=z.read('harness-source.tar.gz')
+          expected={'main.cpp':'8026275e8b71ece5113ca929313635991bf7dc84','analyze.py':'b26d7f90fcf4fe104794e85f5d5f4b3a03829447','run.py':'a8691bab5269d86b8b92777da6d9492178281ed3','test_analyze.py':'f3bc51fb5a5905d968a76c585c3b34bf5ad6f900','README.md':'4c2ecdba462d23622712f421a74f4115753f78c3'}
+          source={}
+          with tarfile.open(fileobj=io.BytesIO(inner),mode='r:gz') as tar:
+              for member in tar:
+                  if member.name.startswith('scripts/bench/patching_latency/') and member.isfile() and Path(member.name).name in expected:
+                      if member.size>100000:raise RuntimeError('unexpected source size')
+                      value=tar.extractfile(member).read()
+                      if git_sha(value)!=expected[Path(member.name).name]:raise RuntimeError('baseline source hash mismatch')
+                      source[member.name]=value
+          if len(source)!=len(expected):raise RuntimeError('missing baseline source')
+          subprocess.run(['git','fetch','origin',BRANCH],check=True,stdout=subprocess.DEVNULL)
+          changed=subprocess.check_output(['git','diff','--name-only','HEAD..FETCH_HEAD'],text=True).splitlines()
+          if any(p!='.github/retained-import.encrypted.json' for p in changed):raise RuntimeError('concurrent branch change')
+          subprocess.run(['git','merge','--ff-only','FETCH_HEAD'],check=True,stdout=subprocess.DEVNULL)
+          root=Path('vendor/curlop-latency');manifest=json.loads((root/'SOURCE-MANIFEST.json').read_text())
+          for relative,value in source.items():
+              path=root/relative
+              if path.exists():raise RuntimeError('refusing source overwrite')
+              path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(value)
+              manifest['files'][relative]={'sha256':hashlib.sha256(value).hexdigest(),'git_blob_sha1':git_sha(value),'bytes':len(value)}
+          (root/'SOURCE-MANIFEST.json').write_text(json.dumps(manifest,indent=2)+'\n')
+          subprocess.run(['git','add','--','vendor/curlop-latency'],check=True)
+          subprocess.run(['git','-c','user.name=github-actions[bot]','-c','user.email=41898282+github-actions[bot]@users.noreply.github.com','commit','-m','Import the exact executed patching baseline harness'],check=True,stdout=subprocess.DEVNULL)
+          header='AUTHORIZATION: basic '+base64.b64encode(('x-access-token:'+os.environ['GH_TOKEN']).encode()).decode()
+          p=subprocess.run(['git','-c','http.https://github.com/.extraheader='+header,'push','origin','HEAD:refs/heads/'+BRANCH],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+          if p.returncode:raise RuntimeError('source publication rejected; no force push')
+          print('Published five exact baseline source files')
+          PY
+      - name: Destroy key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/key/private.pem"
