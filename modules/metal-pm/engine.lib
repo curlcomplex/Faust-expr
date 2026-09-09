@@ -1,35 +1,66 @@
-// Independent electronic metallic-percussion study. Not Elektron source or recovered ratios.
+// metal-pm 0.2: independently authored electronics, not an Elektron algorithm.
+// Six sinusoidal oscillators; no sampled/noise/reverb layer. See README.
 import("stdfaust.lib");
 pitch=hslider("pitch_hz",420,70,3000,.001);
-color=hslider("color",.45,0,1,.001);
-shape=hslider("shape",.52,0,1,.001);
-sweep=hslider("sweep",.22,0,1,.001);
-contour=hslider("contour",.5,0,1,.001);
 decay=hslider("decay",.46,0,1,.001);
+color=hslider("color",.45,0,1,.001);
+shape=hslider("shape",.65,0,1,.001);
+sweep=hslider("sweep",.52,0,1,.001);
+contour=hslider("contour",.5,0,1,.001);
 punch=hslider("punch",.3,0,1,.001);
 drive=hslider("drive",.08,0,1,.001);
-choke=checkbox("choke");
-gate=button("gate");velocity=hslider("velocity",1,0,1,.001);
-hit=gate>gate'; latched(x)=ba.sAndH(hit,x); vel=latched(velocity);
-age=(+(1):min(40*ma.SR):*(1-hit))~_; t=age/ma.SR;
-f0=latched(pitch); co=latched(color); sh=latched(shape); sw=latched(sweep); ct=latched(contour); de=latched(decay); pu=latched(punch); dr=latched(drive); ch=latched(choke);
-// Ratios intentionally traverse harmonic-ish to increasingly inharmonic regions.
-r1=1.0; r2=1.47+1.24*co; r3=2.11+2.73*co*co; r4=3.03+4.62*co; r5=4.17+6.81*co*co; r6=5.43+9.37*co;
-pitchTau=.0025+.045*(1-pu)*(1-pu); f=f0*(1+(pow(2,2.5*sw)-1)*exp(-t/pitchTau));
-modTau=.004*pow(70,ct); modEnv=.04*(1-ct)+.96*exp(-t/modTau);
-phase(hz)=os.hs_phasor(1,hz,hit);
-o6=sin(2*ma.PI*phase(f*r6));
-o5=sin(2*ma.PI*(phase(f*r5)+o6*(.02+.14*sh)*modEnv));
-o4=sin(2*ma.PI*(phase(f*r4)+o5*(.02+.17*sh)*modEnv));
-o3=sin(2*ma.PI*(phase(f*r3)+o4*(.025+.19*sh)*modEnv));
-o2=sin(2*ma.PI*(phase(f*r2)+o3*(.03+.22*sh)*modEnv));
-o1=sin(2*ma.PI*(phase(f*r1)+o2*(.035+.25*sh)*modEnv));
-// Crossfade sparse/dense readouts of the same six-state network.
-sparse=.68*o1+.2*o3+.12*o5; dense=(o1+o2+o3+o4+o5+o6)/2.75;
-body=(1-sh*sh)*sparse+sh*sh*dense;
-bodyTau=.018*pow(120,de); amp=(1-exp(-t/(.00018+.0014*(1-pu))))*exp(-t/bodyTau);
-// Optional choke is an explicit performance articulation, not a hidden decay rewrite.
-releaseAge=(+(1):min(5*ma.SR):*(1-(gate'<:ch)))~_; rel=select2(ch,1,exp(-(releaseAge/ma.SR)/.008));
-raw=body*amp*rel;
-amount=dr*dr; driven=(1-amount)*raw+amount*ma.tanh(raw*(1+11*amount))/ma.tanh(1+11*amount);
-finish=driven*.31*vel : fi.dcblockerat(12);
+gate=button("gate"); velocity=hslider("velocity",1,0,1,.001);
+choke=button("choke");
+
+hit=gate>gate'; killEdge=choke>choke';
+latched(x)=ba.sAndH(hit,x);
+seen=max(hit)~_;
+f0=latched(pitch); co=latched(color); sh=latched(shape);
+sw=latched(sweep); ct=latched(contour); pu=latched(punch);
+dr=latched(drive); vel=latched(velocity);
+age=(+(1.0):min(60.0*ma.SR):*(1.0-hit))~_;
+t=age/ma.SR;
+bodyTau=latched(.015*pow(160.0,decay));
+attackTau=latched(.00018+.0007*(1.0-punch)*(1.0-punch));
+// Direct exponentials are retained as the arithmetic reference. Coefficients
+// for the recurrence are evaluated BEFORE latching, not exp'd per sample.
+rec(c)=loop~_ with { loop(previous)=select2(hit,previous*c,1.0); };
+bodyCoefficient=latched(exp(-1.0/(ma.SR*(.015*pow(160.0,decay)))));
+attackCoefficient=latched(exp(-1.0/(ma.SR*(.00018+.0007*(1.0-punch)*(1.0-punch)))));
+ampReference=(1.0-exp(-t/max(.00018,attackTau)))*exp(-t/max(.015,bodyTau));
+ampFast=(1.0-rec(attackCoefficient))*rec(bodyCoefficient);
+// This envelope controls harmonic evolution independently from amplitude.
+modTau=.008+.18*(1.0-ct)*(1.0-ct);
+modEnv=(1.0-ct)+ct*exp(-t/modTau);
+// Color and Sweep independently tune A and B; Sweep is NOT a pitch envelope.
+rA=.50+4.50*co*co; rB=.73+4.77*sw*sw;
+rC=1.19+2.31*co+1.47*sw;
+phase(hz)=os.hs_phasor(1.0,hz,hit);
+feedbackScale=1.0; // diagnostic substitution only, not a shipping parameter
+fbosc(ph,amount)=loop~_ with {
+    loop(previous)=sin(ph+amount*(1.0-hit)*previous);
+};
+fb=.72*sh*sh*modEnv*feedbackScale;
+a=fbosc(2.0*ma.PI*phase(f0*rA),fb);
+b=fbosc(2.0*ma.PI*phase(f0*rB),fb*.81);
+c=fbosc(2.0*ma.PI*phase(f0*rC),fb*.63);
+index=sh*(.08+3.2*sh)*modEnv;
+x=sin(2.0*ma.PI*phase(f0)+index*(.72*a+.28*b));
+y=sin(2.0*ma.PI*phase(f0*(1.37+1.73*co))+index*(.68*b+.32*c));
+z=sin(2.0*ma.PI*phase(f0*(3.57+1.63*sw))+index*(.61*c+.39*a));
+sparse=x;
+dense=(1.0-sh*sh)*x+sh*sh*(.50*x+.30*y+.20*z);
+amount=dr*dr;
+shaper(v)=(1.0-amount)*v+amount*ma.tanh(v*(1.0+11.0*amount))/ma.tanh(1.0+11.0*amount);
+// DC removal is part of the kernel and BEFORE the final amplitude/choke. This
+// makes a finished choke exactly silent without freezing pending filter state.
+colored(v)=v:shaper:fi.dcblockerat(12);
+// A choke rising edge starts an 8 ms smoothstep fade. Releasing the button does
+// not resurrect the tail. A fresh trigger reopens; trigger wins simultaneous
+// trigger/choke. Choke is an event, NOT an onset-latched note-length mode.
+killed=(max(killEdge):*(1.0-hit))~_;
+chokeAge=(+(1.0):min(.008*ma.SR):*(killed*killed'))~_;
+q=max(0.0,1.0-chokeAge/(.008*ma.SR));
+chokeGain=select2(killed,1.0,q*q*(3.0-2.0*q));
+punchGain=1.0+.45*pu*exp(-t/.006);
+finish(v,env)=colored(v)*env*punchGain*.30*vel*seen*chokeGain;
