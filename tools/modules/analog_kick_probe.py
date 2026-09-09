@@ -49,10 +49,13 @@ def main(out):
   check(f'{rate}:velocity',np.max(abs(h-.5*x))<3e-5,error=float(np.max(abs(h-.5*x))))
   held,_,_=render(out,f'{rate}-held',scalar,defaults,[(on,'gate',1.)],rate)
   check(f'{rate}:gateoff-trigger-only',np.max(abs(held[off:]-x[off:]))<2e-6,error=float(np.max(abs(held[off:]-x[off:]))))
-  # 96k vs 48k basic HF diagnostic: not an alias-proof oversampling claim.
+  # 96k vs 48k deterministic nonlinear-body diagnostic. Click/noise is zero
+  # here because independent random streams cannot be waveform-compared after
+  # resampling and would turn this into a noise-seed test rather than HF evidence.
   if rate==96000:
-   lo,_,_=render(out,'48000-alias-proxy',scalar,defaults|{'tone':1.,'drive':1.,'click':1.},events,48000)
-   hi,_,_=render(out,'96000-alias-proxy',scalar,defaults|{'tone':1.,'drive':1.,'click':1.},[(101,'gate',1.),(101+round(.08*96000),'gate',0.)],96000)
+   alias_params=defaults|{'tone':1.,'drive':1.,'click':0.,'body':1.}
+   lo,_,_=render(out,'48000-alias-proxy',scalar,alias_params,[(101,'gate',1.)],48000)
+   hi,_,_=render(out,'96000-alias-proxy',scalar,alias_params,[(101,'gate',1.)],96000)
    hi2=hi[::2][:len(lo)]; check('alias-proxy-bounded',np.sqrt(np.mean((lo-hi2)**2))<.18,rms_difference=float(np.sqrt(np.mean((lo-hi2)**2))))
  # Endpoint safety over all seven non-pitch timbre controls, alternating pitch endpoints.
  keys=[k for k in man['controls'] if k!='pitch_hz']; events=[]
