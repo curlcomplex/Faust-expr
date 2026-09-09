@@ -59,6 +59,12 @@ jobs:
         run: |
           set -euo pipefail
           PATH=/usr/bin:/bin:$PATH /usr/bin/python3 tools/modules/tail_probe.py --out build/kick-tail-05
+      - name: Verify compact controls, gestures and locked patterns
+        if: hashFiles('tools/modules/control_surface_probe.py') != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          PATH=/usr/bin:/bin:$PATH /usr/bin/python3 tools/modules/control_surface_probe.py --out build/kick-controls-06
       - name: Save commit-specific audio and test evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -70,5 +76,6 @@ jobs:
             build/kick-pm-02/
             build/kick-color-04/
             build/kick-tail-05/
+            build/kick-controls-06/
           if-no-files-found: warn
           retention-days: 3
