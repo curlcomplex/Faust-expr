@@ -1,0 +1,60 @@
+name: Persistent state required-output and online-compile gates
+on:
+  push:
+    branches: [research/persistent-state-transition]
+    paths: ['experiments/persistent-state-next/**', '.github/workflows/persistent-state-next.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: persistent-state-next-public
+  cancel-in-progress: false
+jobs:
+  benchmark:
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Public toolchain and isolated verification dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          brew list faust >/dev/null 2>&1 || brew install faust
+          python3 -m venv .state-venv
+          .state-venv/bin/pip install numpy matplotlib
+          mkdir -p evidence/persistent-state-next
+          { git rev-parse HEAD; uname -sm; sysctl hw.physicalcpu hw.logicalcpu machdep.cpu.brand_string; faust -v; clang++ --version; } > evidence/persistent-state-next/environment.txt 2>&1
+      - name: Existing laboratory tests and actual Faust-generated probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          source .state-venv/bin/activate
+          python3 -m unittest discover -s tests -v > evidence/persistent-state-next/laboratory-tests.log 2>&1
+          bash scripts/build.sh > evidence/persistent-state-next/laboratory-probe.log 2>&1
+      - name: Required-output cost, continuity and genuine background compilation
+        shell: bash
+        run: |
+          set -euo pipefail
+          .state-venv/bin/python experiments/persistent-state-next/run.py --output evidence/persistent-state-next
+      - name: Package compact results separately
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p evidence/persistent-state-next
+          python3 experiments/persistent-state-next/pack_summary.py evidence/persistent-state-next evidence/summary
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: persistent-state-next-summary-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence/summary/
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: persistent-state-next-full-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence/persistent-state-next/
+          if-no-files-found: error
+          retention-days: 14
