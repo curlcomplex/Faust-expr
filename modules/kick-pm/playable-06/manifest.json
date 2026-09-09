@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "kick-pm-compact",
+  "sound_version": "06-experimental",
+  "status": "authored-control-prototype-not-reference-map",
+  "profiles": {"pre": "pre.dsp", "post": "post.dsp"},
+  "profile_selection": "Explicit compile-time choice. No automatic switching by preset, pitch or macro.",
+  "mapping_source": "controls.lib",
+  "kernel_source": "../candidates/color-04.dsp",
+  "musical_controls": {
+    "pitch_hz": {"min": 20, "max": 160, "default": 52, "unit": "Hz", "label": "Pitch"},
+    "decay": {"min": 0, "max": 1, "default": 0.5, "unit": "normalized", "label": "Decay"},
+    "sweep": {"min": 0, "max": 1, "default": 0.5, "unit": "normalized", "label": "Sweep"},
+    "punch": {"min": 0, "max": 1, "default": 0.45, "unit": "normalized", "label": "Punch"},
+    "color": {"min": 0, "max": 1, "default": 0.25, "unit": "normalized", "label": "Color"},
+    "shape": {"min": 0, "max": 1, "default": 0.25, "unit": "normalized", "label": "Shape"},
+    "contour": {"min": 0, "max": 1, "default": 0.7, "unit": "normalized", "label": "Contour"},
+    "drive": {"min": 0, "max": 1, "default": 0.2, "unit": "normalized", "label": "Drive"}
+  },
+  "events": {"gate": "binary gate, rising edge retriggers; falling edge starts additional release", "velocity": "0..1 linear amplitude, latched on rising gate"},
+  "motion": "3 ms one-pole on normalized macros; pitch in log Hz; snap all controls to exact target at onset. No smoothing of gate/velocity.",
+  "gain": "Fixed kernel level 0.6. No output normalization, limiter, EQ or reverb. Drive profiles need level-aware audition, not a promise of equal loudness.",
+  "incompatible_with": "Not a replacement for existing Tracker IDs or frozen lab presets. 17 diagnostic controls are not all independently reachable from this eight-control manifold.",
+  "open_gates": ["Felix listening approval", "final drive profile", "known-settings hardware macro matching", "high-register aliasing", "live retrigger discontinuity audition", "mobile realtime qualification", "host integration"]
+}

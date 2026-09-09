@@ -1,0 +1,11 @@
+{
+  "provenance": "Authored eight-control patches, NOT fitted hardware presets; both profiles use identical values",
+  "anchors": {
+    "round": {"pitch_hz": 46, "decay": 0.58, "sweep": 0.38, "punch": 0.30, "color": 0, "shape": 0, "contour": 0.8, "drive": 0},
+    "punch": {"pitch_hz": 58, "decay": 0.35, "sweep": 0.70, "punch": 0.82, "color": 0.35, "shape": 0.28, "contour": 0.90, "drive": 0.4},
+    "colored": {"pitch_hz": 52, "decay": 0.58, "sweep": 0.5, "punch": 0.60, "color": 0.78, "shape": 0.68, "contour": 0.48, "drive": 0.5},
+    "long": {"pitch_hz": 38, "decay": 0.95, "sweep": 0.32, "punch": 0.42, "color": 0.45, "shape": 0.6, "contour": 0.25, "drive": 0.7}
+  },
+  "sweep_baseline": {"pitch_hz": 52, "decay": 0.88, "sweep": 0.4, "punch": 0.5, "color": 0.6, "shape": 0.6, "contour": 0.35, "drive": 0.4},
+  "sweep_order": ["pitch_hz", "decay", "sweep", "punch", "color", "shape", "contour", "drive"]
+}

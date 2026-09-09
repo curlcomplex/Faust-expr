@@ -1,0 +1,58 @@
+// Authored compact control layer 06. NOT recovered Elektron macro curves.
+// Canonical maps live here; the frozen color-04 kernel is reused by explicit
+// substitution, not copied or rewritten. No hold stage or preset interpolation.
+import("stdfaust.lib");
+rawPitch = hslider("pitch_hz",52,20,160,.001);
+rawDecay = hslider("decay",.5,0,1,.001);
+rawSweep = hslider("sweep",.5,0,1,.001);
+rawPunch = hslider("punch",.45,0,1,.001);
+rawColor = hslider("color",.25,0,1,.001);
+rawShape = hslider("shape",.25,0,1,.001);
+rawContour = hslider("contour",.7,0,1,.001);
+rawDrive = hslider("drive",.2,0,1,.001);
+controlGate = button("gate");
+controlVelocity = hslider("velocity",1,0,1,.001);
+onset = controlGate > controlGate';
+// 3 ms time constant during a sustained note, exact target on every onset.
+// Gate and velocity are NOT smoothed. The kernel latches velocity at onset.
+coefficient = exp(-1.0/(.003*ma.SR));
+follow(x) = loop ~ _ with {
+    loop(previous) = select2(onset, x*(1.0-coefficient)+previous*coefficient, x);
+};
+pitchValue = exp(follow(log(rawPitch)));
+decayValue = follow(rawDecay);
+sweepValue = follow(rawSweep);
+punchValue = follow(rawPunch);
+colorValue = follow(rawColor);
+shapeValue = follow(rawShape);
+contourValue = follow(rawContour);
+driveValue = follow(rawDrive);
+
+mappedAmount = pitchValue*(pow(2.0,3.5*sweepValue)-1.0);
+mappedPitchTau = .055*pow(.1,punchValue);
+mappedAttackTau = .0015*pow(.1,punchValue);
+mappedBodyTau = .018*pow(100.0,decayValue);
+mappedReleaseTau = .012*pow(25.0,decayValue);
+mappedModTau = .012*pow(16.0,1.0-contourValue);
+
+// placement is a COMPILE-TIME profile choice: 0 before body, 1 after body.
+// It never switches from a preset name, MIDI note or knob threshold.
+voice(placement) = component("../candidates/color-04.dsp")[
+    frequency = pitchValue;
+    pitchAmount = mappedAmount;
+    pitchTau = mappedPitchTau;
+    bodyTau = mappedBodyTau;
+    releaseTau = mappedReleaseTau;
+    attackTau = mappedAttackTau;
+    phaseCycles = 0.0;
+    level = .6;
+    velocity = controlVelocity;
+    gate = controlGate;
+    square = colorValue*colorValue;
+    triangle = shapeValue*shapeValue;
+    modDepth = contourValue;
+    modTau = mappedModTau;
+    drive = driveValue*driveValue;
+    afterBody = placement;
+    feedbackMode = 1.0;
+];

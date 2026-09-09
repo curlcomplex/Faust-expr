@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "kick-pm",
+  "version": "0.0.1-experiment",
+  "sound_version": "hypothesis-01",
+  "status": "experimental-not-reference-calibrated",
+  "source": "kick.dsp",
+  "inputs": 0,
+  "outputs": 1,
+  "precision": "float32",
+  "trigger": "rising-edge gate; gate-off does not truncate decay",
+  "retrigger": "restart elapsed time and oscillator phases on a real computed rising edge; one persistent instance",
+  "velocity": "latched at onset, linear output amplitude; reference velocity law unknown",
+  "controls": {
+    "frequency_hz": {"min": 20, "max": 200, "default": 52, "unit": "Hz"},
+    "sweep": {"min": 0, "max": 1, "default": 0.32, "unit": "normalized"},
+    "punch": {"min": 0, "max": 1, "default": 0, "unit": "boolean"},
+    "decay_s": {"min": 0.025, "max": 2.5, "default": 0.45, "unit": "seconds to -60 dB, before attack factor"},
+    "square": {"min": 0, "max": 1, "default": 0.15, "unit": "normalized"},
+    "triangle": {"min": 0, "max": 1, "default": 0.2, "unit": "normalized"},
+    "mod_envelope": {"min": 0, "max": 1, "default": 0.7, "unit": "normalized envelope depth"},
+    "drive": {"min": 0, "max": 1, "default": 0, "unit": "normalized dry-to-driven blend"},
+    "velocity": {"min": 0, "max": 1, "default": 1, "unit": "linear amplitude, latched"},
+    "gate": {"min": 0, "max": 1, "default": 0, "unit": "boolean"},
+    "feedback_mode": {"min": 0, "max": 1, "default": 0, "unit": "boolean laboratory ablation"}
+  },
+  "live_controls": "all except velocity; changes apply at score event boundaries, no click-free automation claim",
+  "latency_samples": 0,
+  "idle": "always computes; no silence-based suspension",
+  "tail": "exponential, no fixed hard cutoff; age saturates after 20 s",
+  "release_gaps": ["controlled reference audio", "identified macro curves", "antialiasing qualification", "click-free retrigger/automation qualification", "host integration", "target-device realtime qualification", "licensing decision"]
+}

@@ -1,0 +1,35 @@
+{
+  "experiment": "body-gate-03",
+  "date": "2026-09-09",
+  "prior_study_archive_sha256": "f0cc091d6fe675adc88d969d2e6d410be2e16bfb3818f5694111d8a813b2dbf2",
+  "prior_source": "Delivered study-02 frozen estimates; this experiment performs no search",
+  "reference_wav_sha256": "201337a4a19b9280b993af4b562cde56cec57caf9554b4a615336bb63d4f308d",
+  "prior_continuous_estimates": {
+    "frequency_hz": 65.40880359815039,
+    "pitch_amount_hz": 353.71157939584424,
+    "pitch_tau_s": 0.025197441908593105,
+    "phase_cycles": 0.9376711617415117,
+    "body_tau_s": 0.1765702106458001,
+    "release_tau_s": 0.037066839329984384,
+    "level": 0.9096252939275787,
+    "attack_tau_s": 0.0001,
+    "gate_off_s": 0.33728456562681464,
+    "velocity": 1
+  },
+  "old_fitted_parameters": {
+    "frequency_hz": 65.36863358043271,
+    "sweep": 0.6645798544047414,
+    "decay_s": 0.7003502104931554,
+    "square": 0.023736122022254447,
+    "triangle": 0.0037574902699915036,
+    "mod_envelope": 0.588196298899639,
+    "drive": 0.03490000394122045,
+    "punch": 0,
+    "feedback_mode": 1,
+    "velocity": 1
+  },
+  "comparison": "Reference / previously fitted experiment-01 / isolated actual-Faust sine body with hertz sweep and separate gate-release layer",
+  "phase_conversion": "For reset phasor phase[n]=sum(k=1..n) f[k]/Fs, native depth = continuous_depth * Fs*tau*expm1(1/(Fs*tau)). This compensates quadrature convention, not a fitted sonic change.",
+  "unknowns": ["firmware", "hardware parameters", "note length", "capture gain", "whether release is inside machine or track"],
+  "validation": "One previously inspected lossy recording; not held out. No generalized hardware or musical acceptance."
+}

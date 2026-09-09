@@ -14,12 +14,12 @@ concurrency:
 
 jobs:
   smoke:
-    # Standard hosted runner; no paid larger runner.
+    # Standard hosted runner; no paid larger runner. No personal-machine access.
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - name: Check out this public repository only
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
       - name: Install distribution compiler and analysis tools
@@ -33,13 +33,64 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p evidence
-          # Use the same distribution Python as the apt-installed libraries.
           PATH=/usr/bin:/bin:$PATH bash scripts/build.sh 2>&1 | tee evidence/build.log
+      - name: Compile and render the first module experiment
+        if: hashFiles('modules/kick-pm/kick.dsp') != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/kick-pm-01 evidence
+          PATH=/usr/bin:/bin:$PATH /usr/bin/python3 tools/modules/lab.py --out build/kick-pm-01 2>&1 | tee evidence/module-run.log
+      - name: Compile reference-led body candidates without external recordings
+        if: hashFiles('tools/modules/build_pilot.py') != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          PATH=/usr/bin:/bin:$PATH /usr/bin/python3 tools/modules/build_pilot.py --out build/kick-pm-02
+      - name: Verify gated color candidate and ablations
+        if: hashFiles('tools/modules/color_probe.py') != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          PATH=/usr/bin:/bin:$PATH /usr/bin/python3 tools/modules/color_probe.py --out build/kick-color-04
+      - name: Verify isolated amplitude-hold hypothesis
+        if: hashFiles('tools/modules/tail_probe.py') != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          PATH=/usr/bin:/bin:$PATH /usr/bin/python3 tools/modules/tail_probe.py --out build/kick-tail-05
+      - name: Verify compact controls, gestures and locked patterns
+        if: hashFiles('tools/modules/control_surface_probe.py') != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          PATH=/usr/bin:/bin:$PATH /usr/bin/python3 tools/modules/control_surface_probe.py --out build/kick-controls-06
+      - name: Generate Tracker consumer AOT source
+        if: hashFiles('modules/kick-pm/playable-06/consumers/tracker-machine-0.dsp') != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/tracker-consumer
+          faust -lang cpp -cn TrackerMachineKick \
+            -vec -lv 0 -vs 32 -clang -fm def -ftz 2 \
+            modules/kick-pm/playable-06/consumers/tracker-machine-0.dsp \
+            -o build/tracker-consumer/TrackerMachineKick.cpp
+          cp modules/kick-pm/playable-06/consumers/tracker-machine-0.dsp \
+            build/tracker-consumer/tracker-machine-0.dsp
+          sha256sum build/tracker-consumer/* > build/tracker-consumer/SHA256SUMS.txt
+          faust -v > build/tracker-consumer/faust-version.txt 2>&1
       - name: Save commit-specific audio and test evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: faust-evidence-${{ github.sha }}-${{ github.run_attempt }}
-          path: evidence/
+          path: |
+            evidence/
+            build/kick-pm-01/
+            build/kick-pm-02/
+            build/kick-color-04/
+            build/kick-tail-05/
+            build/kick-controls-06/
+            build/tracker-consumer/
           if-no-files-found: warn
           retention-days: 3

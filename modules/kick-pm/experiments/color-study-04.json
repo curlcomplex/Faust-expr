@@ -1,0 +1,147 @@
+{
+  "experiment": "kick-color-04",
+  "dsp_commit": "6605eb051115ada779541fe6d4516d8a2b2c9fb3",
+  "protocol": "spectral RMSE + 0.15 envelope RMSE; pitch independently acceptable <=15 cents. In-sample descriptive preview fits, not hardware controls or blind validation.",
+  "cases": {
+    "BDM-05": {
+      "selected_label": "BDM-05-PM-stage0",
+      "parameters": {
+        "frequency_hz": 65.36485708013413,
+        "level": 0.65,
+        "velocity": 1.0,
+        "gate": 0.0,
+        "square": 0.08793547391218073,
+        "triangle": 0.2645749001668436,
+        "mod_envelope": 0.9999940391390134,
+        "mod_tau_s": 0.02362536268864452,
+        "drive_after_body": 0.0,
+        "feedback_mode": 1.0,
+        "pitch_amount_hz": 1056.5999933552166,
+        "pitch_tau_s": 0.012073815735944463,
+        "body_tau_s": 0.1438684559294513,
+        "release_tau_s": 0.10638757280809678,
+        "attack_tau_s": 1.537522566077076e-06,
+        "phase_cycles": 0.6003975533799627,
+        "drive": 0.1387818184460999
+      },
+      "gate_off_frame": 7096,
+      "reference_sha256": "104ec4297c197a4042d9097d82aa32c2828b623236e7d103c43ec3f8961f5a82",
+      "old_parameters": {
+        "frequency_hz": 65.33634686834202,
+        "sweep": 0.7132986155530187,
+        "decay_s": 0.5092622553092637,
+        "square": 0.1852371499921326,
+        "triangle": 0.3773131951711488,
+        "mod_envelope": 0.9928705131671539,
+        "drive": 0.293639485409792,
+        "punch": 0.0,
+        "feedback_mode": 1.0,
+        "velocity": 1.0
+      },
+      "candidate_raw_sha256": "d56e2097d49b415f542c7efac0265f481f1aed560e9d097f529b36ecd5c3a763",
+      "search_metrics": {
+        "spectral_rmse_db": 1.6708193034497114,
+        "per_resolution_db": [
+          1.9075478343053405,
+          1.7083019546524747,
+          1.3966081213913184
+        ],
+        "envelope_rmse_db": 1.2035398156103239,
+        "rms_gain": 2.016704119059677,
+        "reference_late_peak_hz": 65.36485708013413,
+        "candidate_late_peak_hz": 65.36368665713846,
+        "pitch_error_cents": -0.030999750843097116,
+        "pitch_acceptable": true,
+        "raw_peak": 0.6493422389030457,
+        "raw_rms": 0.14912298561932769,
+        "energy_quantiles": {
+          "0.5": {
+            "reference_s": 0.06306122448979593,
+            "candidate_s": 0.04421768707482993,
+            "error_s": -0.018843537414965993
+          },
+          "0.9": {
+            "reference_s": 0.14959183673469387,
+            "candidate_s": 0.13444444444444445,
+            "error_s": -0.015147392290249417
+          },
+          "0.99": {
+            "reference_s": 0.2180045351473923,
+            "candidate_s": 0.20773242630385488,
+            "error_s": -0.010272108843537409
+          }
+        }
+      }
+    },
+    "BDM-09": {
+      "selected_label": "BDM-09-PM-stage1",
+      "parameters": {
+        "frequency_hz": 65.38610859633003,
+        "level": 0.65,
+        "velocity": 1.0,
+        "gate": 0.0,
+        "square": 0.001420293190583084,
+        "triangle": 0.005506834242462748,
+        "mod_envelope": 0.5282952668848093,
+        "mod_tau_s": 0.012736419420246774,
+        "drive_after_body": 1.0,
+        "feedback_mode": 1.0,
+        "pitch_amount_hz": 15.251666039492637,
+        "pitch_tau_s": 0.01647274237274275,
+        "body_tau_s": 0.1532332541307795,
+        "release_tau_s": 0.4677237360610585,
+        "attack_tau_s": 0.0009756509090281925,
+        "phase_cycles": 0.5605783988858684,
+        "drive": 0.23453835153433888
+      },
+      "gate_off_frame": 66130,
+      "reference_sha256": "7116c8e245d786e47719b8a2a154d9fe7f8102fbf45fb82e12271b66ddeb0ab4",
+      "old_parameters": {
+        "frequency_hz": 65.35918053583214,
+        "sweep": 0.18786715585913244,
+        "decay_s": 1.360683070973493,
+        "square": 0.03567034846529005,
+        "triangle": 0.01981825922485786,
+        "mod_envelope": 0.887362587054809,
+        "drive": 0.4970483519469936,
+        "punch": 0.0,
+        "feedback_mode": 1.0,
+        "velocity": 1.0
+      },
+      "candidate_raw_sha256": "330864da8748650c874b01cd4270bc911a8ff67660a4c27d224dd73e2fd06054",
+      "search_metrics": {
+        "spectral_rmse_db": 0.7562136122888621,
+        "per_resolution_db": [
+          0.7120372485560296,
+          0.9089277639404493,
+          0.6476758243701075
+        ],
+        "envelope_rmse_db": 0.6387672075162067,
+        "rms_gain": 1.3807968685377041,
+        "reference_late_peak_hz": 65.38610859633003,
+        "candidate_late_peak_hz": 65.38530857653704,
+        "pitch_error_cents": -0.02118232769075472,
+        "pitch_acceptable": true,
+        "raw_peak": 0.6217551827430725,
+        "raw_rms": 0.13751661305385418,
+        "energy_quantiles": {
+          "0.5": {
+            "reference_s": 0.08900226757369614,
+            "candidate_s": 0.08414965986394558,
+            "error_s": -0.004852607709750559
+          },
+          "0.9": {
+            "reference_s": 0.2447392290249433,
+            "candidate_s": 0.26537414965986394,
+            "error_s": 0.020634920634920645
+          },
+          "0.99": {
+            "reference_s": 0.44900226757369616,
+            "candidate_s": 0.45913832199546484,
+            "error_s": 0.010136054421768681
+          }
+        }
+      }
+    }
+  }
+}
