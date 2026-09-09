@@ -16,7 +16,9 @@ Six sinusoidal oscillators form three interacting pairs. The sparse entry reads 
 
 ## Optimization and experiments
 
-`reference.dsp` is our exponential-amplitude arithmetic reference, NOT hardware audio. `metal.dsp` uses multiplicative attack/body recurrences with onset-latched coefficients. It retains the exact same oscillators, PM envelopes and shaper; rounding differences are measured against committed numerical bounds. `sparse.dsp` is an architectural alternative, not an optimization claim. `no-feedback.dsp` is only a rate diagnostic. Never choose a winner from a filename.
+`metal.dsp` and `reference.dsp` now both use the **direct exponential amplitude law**. The faster multiplication recurrence failed the 1.5% long-decay limit and is not used for playback. `ampFast` and the report's `fast` build label are historical aliases, not evidence of an optimization win. `rejected-envelope.dsp` deliberately renders the old law as a negative control; it must still exceed the unchanged rejection threshold. `sparse.dsp` remains a controlled architectural alternate, not an equivalent faster implementation.
+
+The final gate also compares generated envelope audio against an independent float64 closed form, rather than merely comparing two outputs with the same equation. Scalar/vector builds are measured against the same complete sound. We retain accurate scalar rendering as the conservative starting point; device profiling decides whether vectorization helps. No new envelope approximation is required before using the instrument.
 
 The whole suite builds actual scalar/vector Faust, checks latching, same-sample locks, choke equation/priority, clean base pitch, persistent endpoint and rapid-retrigger trajectories, long tails, sample-rate/segmentation behavior, arithmetic approximation and fixed-gain musical examples. Four-voice paired benchmarks rotate the three equivalent processing paths. Record p50/p95/p99/max, memory, stack and ordinary-new evidence; no inference to an iPhone or hardware module without target tests.
 
@@ -29,13 +31,13 @@ Manufacturer manual source: Syntakt OS 1.30 manual dated 16 October 2024, Append
 ## Execute and replay
 
 ```
-python3 -m unittest discover -s tests -p test_metal_batch.py -v
+python3 -m unittest discover -s tests -p 'test_metal*.py' -v
 python3 tools/modules/fetch_metal_references.py --out build/metal-references
-python3 tools/modules/metal_batch.py --out build/metal-full --references build/metal-references
+python3 tools/modules/metal_acceptance.py --out build/metal-full --references build/metal-references
 # Without Faust, using an exact source snapshot and saved generated C++:
-python3 tools/modules/metal_batch.py --out build/replayed --references /path/to/metal-references --replay /path/to/metal-full
+python3 tools/modules/metal_acceptance.py --out build/replayed --references /path/to/metal-references --replay /path/to/metal-full
 ```
 
 Build prerequisites: Faust, C++17, NumPy/SciPy; FFmpeg only for intentional acquisition. Replay validates source/generated/reference hashes before use. Source, generated code, raw renders and score identities remain distinct. Relative reference-audition gains are logged; core auditions remain fixed-gain PCM16 without normalization/added effects. Native device work and consumer UI/merge belong to Tracker.
 
-Status at this commit: full batch written; execution results must come from the corresponding CI/artifact, not this README. No pass, hardware match, audible approval or performance win is asserted in advance.
+See [QUALIFICATION.md](QUALIFICATION.md) for the corrected evidence and [INTEGRATION.md](INTEGRATION.md) for the consumer contract. Exact-head build results live in PR #41 and its identified CI artifact. This remains a draft prototype, not a hardware clone, musical approval or device release.

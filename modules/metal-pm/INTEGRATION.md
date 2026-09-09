@@ -6,10 +6,13 @@ No automatic merge, Tracker code change or legacy METAL replacement is authorize
 ## Consume, do not rewrite
 
 Pin the exact tested source commit, `engine.lib`, manifest and chosen entry point.
-`metal.dsp` is the dense/readout candidate with recurrent amplitude evaluation;
-`reference.dsp` preserves the same sound with explicit amplitude exponentials;
+`metal.dsp` is the dense/readout candidate using explicit amplitude exponentials;
+`reference.dsp` now uses the identical envelope. The inaccurate recurrent amplitude
+is rejected and must not be imported as an optimization;
 `sparse.dsp` is a musical architecture alternate, not a cheaper equivalent voice.
-`no-feedback.dsp` and `envelopes.dsp` are diagnostics, not additional released machines.
+`no-feedback.dsp`, `envelopes.dsp` and `rejected-envelope.dsp` are diagnostics,
+not additional released machines. The latter intentionally reproduces a rejected
+numerical approximation. Historical `fast` labels do not authorize using it.
 Generated AOT or interpreter artifacts are derived and must retain source/build
 identity. Neither the word "reference" nor a green build establishes hardware fidelity.
 
