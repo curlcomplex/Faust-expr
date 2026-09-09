@@ -1,0 +1,8 @@
+{
+  "anchors": {
+    "round": {"pitch_hz": 50, "decay": 0.58, "sweep": 0.34, "punch": 0.42, "tone": 0.42, "body": 0.72, "drive": 0.08, "click": 0.08},
+    "sharp": {"pitch_hz": 54, "decay": 0.38, "sweep": 0.72, "punch": 0.82, "tone": 0.72, "body": 0.46, "drive": 0.16, "click": 0.42},
+    "deep": {"pitch_hz": 38, "decay": 0.84, "sweep": 0.26, "punch": 0.34, "tone": 0.28, "body": 0.90, "drive": 0.10, "click": 0.03},
+    "driven": {"pitch_hz": 56, "decay": 0.52, "sweep": 0.52, "punch": 0.64, "tone": 0.66, "body": 0.70, "drive": 0.72, "click": 0.22}
+  }
+}
