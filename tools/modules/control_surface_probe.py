@@ -54,7 +54,9 @@ class Study:
         faust=os.environ.get('FAUST','faust');cxx=os.environ.get('CXX','c++')
         self.run([faust,'-I',MODULE,'-I',MODULE.parent/'candidates','-e',source,'-o',d/'expanded.dsp'])
         flags=['-lang','cpp','-single','-cn','ModuleDSP']+(['-vec','-lv','0','-vs','32'] if vector else [])
-        self.run([faust,*flags,d/'expanded.dsp','-o',d/'generated.hpp'])
+        # Faust 2.70.3 expansion preserves hyphens in component metadata keys.
+        # Keep expansion as provenance, but compile original source normally.
+        self.run([faust,'-I',MODULE,'-I',MODULE.parent/'candidates',*flags,source,'-o',d/'generated.hpp'])
         self.run([cxx,'-std=c++17','-O2','-ffp-contract=off','-I'+str(d),ROOT/'tools/modules/render.cpp','-o',d/'render'])
         controls=self.run([d/'render','--controls']);(d/'controls.tsv').write_text(controls)
         self.report['builds'][label]=dict(source=str(source.relative_to(ROOT)),source_sha256=sha(source),
