@@ -65,6 +65,20 @@ jobs:
         run: |
           set -euo pipefail
           PATH=/usr/bin:/bin:$PATH /usr/bin/python3 tools/modules/control_surface_probe.py --out build/kick-controls-06
+      - name: Generate Tracker consumer AOT source
+        if: hashFiles('modules/kick-pm/playable-06/consumers/tracker-machine-0.dsp') != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/tracker-consumer
+          faust -lang cpp -cn TrackerMachineKick \
+            -vec -lv 0 -vs 32 -clang -fm def -ftz 2 \
+            modules/kick-pm/playable-06/consumers/tracker-machine-0.dsp \
+            -o build/tracker-consumer/TrackerMachineKick.cpp
+          cp modules/kick-pm/playable-06/consumers/tracker-machine-0.dsp \
+            build/tracker-consumer/tracker-machine-0.dsp
+          sha256sum build/tracker-consumer/* > build/tracker-consumer/SHA256SUMS.txt
+          faust -v > build/tracker-consumer/faust-version.txt 2>&1
       - name: Save commit-specific audio and test evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -77,5 +91,6 @@ jobs:
             build/kick-color-04/
             build/kick-tail-05/
             build/kick-controls-06/
+            build/tracker-consumer/
           if-no-files-found: warn
           retention-days: 3
