@@ -22,17 +22,21 @@ age=(+(1.0):min(60.0*ma.SR):*(1.0-hit))~_;
 t=age/ma.SR;
 bodyTau=latched(.015*pow(160.0,decay));
 attackTau=latched(.00018+.0007*(1.0-punch)*(1.0-punch));
-// Direct exponentials are retained as the arithmetic reference. Coefficients
-// for the recurrence are evaluated BEFORE latching, not exp'd per sample.
-// End below -400 dB before state can become a costly subnormal. This is
-// far below the numerical/sonic test floor; never clip or normalize audio.
-rec(c)=loop~_ with {
+
+// Direct exponentials are the accepted envelope. A previous multiplicative
+// recurrence accumulated about 2.1% audible-region error on the longest
+// 44.1 kHz decay, so it is retained only as rejected optimization evidence.
+ampReference=(1.0-exp(-t/max(.00018,attackTau)))*exp(-t/max(.015,bodyTau));
+ampFast=ampReference;
+
+// Rejected recurrence experiment: never use this in the product entry point.
+recRejected(c)=loop~_ with {
     loop(previous)=select2(hit,select2(previous>1.0e-20,0.0,previous*c),1.0);
 };
 bodyCoefficient=latched(exp(-1.0/(ma.SR*(.015*pow(160.0,decay)))));
 attackCoefficient=latched(exp(-1.0/(ma.SR*(.00018+.0007*(1.0-punch)*(1.0-punch)))));
-ampReference=(1.0-exp(-t/max(.00018,attackTau)))*exp(-t/max(.015,bodyTau));
-ampFast=(1.0-rec(attackCoefficient))*rec(bodyCoefficient);
+ampRecurrenceRejected=(1.0-recRejected(attackCoefficient))*recRejected(bodyCoefficient);
+
 // This envelope controls harmonic evolution independently from amplitude.
 modTau=.008+.18*(1.0-ct)*(1.0-ct);
 modEnv=(1.0-ct)+ct*exp(-t/modTau);
