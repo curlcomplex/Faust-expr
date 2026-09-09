@@ -18,8 +18,9 @@
     "velocity":{"min":0,"max":1,"default":1,"unit":"linear output amplitude, onset latched"}
   },
   "musical_control_order":["pitch_hz","sweep","punch","decay","inharm","shape","contour","drive"],
-  "candidate_a":"deterministic PM body/crack only",
-  "candidate_b":"same PM body plus dedicated filtered-noise tail; architecture choice is evidence/listening led",
+  "candidate_a":"deterministic.dsp is a legacy filename: PM body plus reduced-gain crack that includes pseudo-noise, without dedicated noise tail",
+  "candidate_b":"hybrid.dsp: same PM body, full-gain crack and dedicated filtered-noise tail; provisional audition default",
+  "diagnostic_ablation":"tail-off.dsp removes only hybrid noiseSignal, preserving full crack/body/drive; not a shipping choice",
   "precision":"float32",
   "remaining":["Felix musical approval","controlled firmware/settings capture for exact macro fitting","target-device realtime/memory qualification","high-register nonlinear aliasing","consumer saved-project/version adapter"]
 }
