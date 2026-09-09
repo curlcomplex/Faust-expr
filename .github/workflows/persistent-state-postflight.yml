@@ -32,7 +32,8 @@ jobs:
           .audit-venv/bin/pip install numpy
           .audit-venv/bin/python experiments/persistent-state-audit/audit.py raw review/static-state | tee review/static-state-audit.log
           .audit-venv/bin/python experiments/persistent-state-verification/verify_regression.py raw/original-regression review/regression | tee review/regression-audit.log
-          .audit-venv/bin/python experiments/persistent-state-postflight/inspect.py raw review/contract | tee review/contract-audit.log
+          # Safe import path: our inspect.py must not shadow Python's stdlib inspect.
+          .audit-venv/bin/python -P experiments/persistent-state-postflight/inspect.py raw review/contract | tee review/contract-audit.log
           .audit-venv/bin/python - <<'PY' | tee review/result-scope.log
           import pathlib,json,statistics
           root=pathlib.Path('raw');r=json.loads((root/'independent/independent-audit.json').read_text())
