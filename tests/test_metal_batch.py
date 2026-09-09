@@ -23,5 +23,13 @@ class MetalTests(unittest.TestCase):
  def test_finite_descriptor(self):
   with self.assertRaises(ValueError):m.descriptor(np.array([np.nan]))
  def test_disjoint_reference_split(self):self.assertFalse(set(m.TRAIN)&set(m.TEST));self.assertEqual(len(m.TRAIN)+len(m.TEST),8)
+ def test_silent_tail_does_not_become_broadband(self):
+  x=np.zeros(48000*3);x[:2400]=np.sin(2*np.pi*500*np.arange(2400)/48000)
+  d=m.descriptor(x);np.testing.assert_array_equal(d[14:],np.zeros(12))
+ def test_descriptor_tracks_sustained_energy(self):
+  t=np.arange(48000*3)/48000
+  short=m.descriptor(np.sin(2*np.pi*500*t)*np.exp(-t/.005))
+  long=m.descriptor(np.sin(2*np.pi*500*t)*np.exp(-t/2))
+  self.assertGreater(long[1],short[1]);self.assertGreater(long[14],short[14])
  def test_eight_musical_controls(self):self.assertEqual(len(self.man['musical_control_order']),8);self.assertNotIn('choke',self.man['musical_control_order'])
 if __name__=='__main__':unittest.main()
