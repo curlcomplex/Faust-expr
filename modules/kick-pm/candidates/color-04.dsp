@@ -42,8 +42,8 @@ triShape(x) = 2.0/ma.PI*asin(sin(x));
 // Clear the feedback contribution in the FORWARD path on this onset sample.
 triOp = (*(feedbackMode*.85*triangle*modEnv*(1.0-hit)) : +(triPhase) : triShape) ~ _;
 phaseModulation = .18*square*modEnv*squareOp+.30*triangle*modEnv*triOp;
-waveform = sin(carrierPhase+2.0*ma.PI*phaseModulation);
+carrierWave = sin(carrierPhase+2.0*ma.PI*phaseModulation);
 shape(x) = (1.0-drive)*x+drive*ma.tanh(x*(1.0+31.0*drive))/ma.tanh(1.0+31.0*drive);
-colored = (1.0-afterBody)*bodyEnvelope*shape(waveform)+afterBody*shape(bodyEnvelope*waveform);
+colored = (1.0-afterBody)*bodyEnvelope*shape(carrierWave)+afterBody*shape(bodyEnvelope*carrierWave);
 // Capture/track articulation remains separately gated, NOT identified machine DSP.
 process = seen*level*vel*releaseEnvelope*colored;
