@@ -1,0 +1,13 @@
+{
+  "status":"authored exploration; not hardware presets or fitted control values",
+  "anchors":{
+    "Woody":{"pitch_hz":145,"sweep":0.12,"punch":0.34,"decay":0.42,"inharm":0.18,"shape":0.22,"contour":0.25,"drive":0.08},
+    "Tight":{"pitch_hz":215,"sweep":0.38,"punch":0.82,"decay":0.18,"inharm":0.34,"shape":0.42,"contour":0.2,"drive":0.12},
+    "Crack":{"pitch_hz":195,"sweep":0.26,"punch":0.9,"decay":0.38,"inharm":0.62,"shape":0.72,"contour":0.42,"drive":0.22},
+    "Rattle":{"pitch_hz":175,"sweep":0.16,"punch":0.48,"decay":0.62,"inharm":0.78,"shape":0.7,"contour":0.84,"drive":0.14},
+    "Noise":{"pitch_hz":260,"sweep":0.2,"punch":0.62,"decay":0.46,"inharm":0.9,"shape":0.96,"contour":0.64,"drive":0.18},
+    "Ring":{"pitch_hz":285,"sweep":0.08,"punch":0.22,"decay":0.7,"inharm":0.46,"shape":0.3,"contour":0.72,"drive":0.08},
+    "Driven":{"pitch_hz":160,"sweep":0.5,"punch":0.82,"decay":0.5,"inharm":0.58,"shape":0.82,"contour":0.48,"drive":0.72},
+    "Soft":{"pitch_hz":125,"sweep":0.08,"punch":0.12,"decay":0.48,"inharm":0.25,"shape":0.38,"contour":0.56,"drive":0.02}
+  }
+}

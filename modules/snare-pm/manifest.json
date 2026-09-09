@@ -1,0 +1,25 @@
+{
+  "schema":1,
+  "module_id":"snare-pm",
+  "sound_version":"0.1.0-experiment",
+  "status":"reference-led-authored-prototype-not-hardware-clone",
+  "inputs":0,
+  "outputs":1,
+  "controls":{
+    "pitch_hz":{"min":60,"max":500,"default":185,"unit":"Hz; onset latched"},
+    "sweep":{"min":0,"max":1,"default":0.28,"unit":"normalized; 0–2.5 octave onset pitch rise"},
+    "punch":{"min":0,"max":1,"default":0.48,"unit":"normalized articulation macro"},
+    "decay":{"min":0,"max":1,"default":0.48,"unit":"normalized; body exponential time constant"},
+    "inharm":{"min":0,"max":1,"default":0.42,"unit":"normalized operator-ratio macro"},
+    "shape":{"min":0,"max":1,"default":0.58,"unit":"normalized PM depth / hybrid noise-color macro"},
+    "contour":{"min":0,"max":1,"default":0.5,"unit":"normalized modulation/noise-envelope macro"},
+    "drive":{"min":0,"max":1,"default":0.12,"unit":"normalized neutral-at-zero nonlinear blend"},
+    "gate":{"min":0,"max":1,"default":0,"unit":"boolean rising-edge trigger; note-off does not choke"},
+    "velocity":{"min":0,"max":1,"default":1,"unit":"linear output amplitude, onset latched"}
+  },
+  "musical_control_order":["pitch_hz","sweep","punch","decay","inharm","shape","contour","drive"],
+  "candidate_a":"deterministic PM body/crack only",
+  "candidate_b":"same PM body plus dedicated filtered-noise tail; architecture choice is evidence/listening led",
+  "precision":"float32",
+  "remaining":["Felix musical approval","controlled firmware/settings capture for exact macro fitting","target-device realtime/memory qualification","high-register nonlinear aliasing","consumer saved-project/version adapter"]
+}

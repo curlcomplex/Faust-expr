@@ -1,0 +1,39 @@
+name: Synthetic snare full batch
+on:
+  push:
+    branches: [16-snare-full-batch]
+    paths: ['modules/snare-pm/**','tools/modules/snare_*','tools/modules/fetch_snare_references.py','tests/test_snare_contract.py','.github/workflows/snare-complete-batch.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: snare-complete-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install bounded disposable dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ ffmpeg python3-numpy python3-scipy
+      - name: Contract fixtures
+        run: /usr/bin/python3 -m unittest discover -s tests -p test_snare_contract.py -v
+      - name: Acquire fixed licensed Syntakt snare previews
+        run: /usr/bin/python3 tools/modules/fetch_snare_references.py --out build/snare-references
+      - name: Build actual Faust, stress, compare architectures and benchmark
+        run: /usr/bin/python3 tools/modules/snare_batch.py --references build/snare-references --out build/snare-complete
+      - name: Preserve bounded research evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: snare-pm-${{ github.sha }}
+          path: |
+            build/snare-complete/
+            build/snare-references/
+          if-no-files-found: error
+          retention-days: 7
