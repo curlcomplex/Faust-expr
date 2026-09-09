@@ -1,0 +1,37 @@
+name: Snare complete delivery and isolated ablation
+on:
+  push:
+    branches: [16-snare-full-batch]
+    paths: ['modules/snare-pm/**', 'tools/modules/snare_*', 'tests/*snare*', '.github/workflows/snare-delivery.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: snare-delivery-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install dependencies on disposable hosted runner
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ ffmpeg python3-numpy python3-scipy python3-matplotlib
+      - name: Analyzer and score-boundary fixtures
+        run: /usr/bin/python3 -m unittest discover -s tests -v
+      - name: Fixed licensed reference acquisition
+        run: /usr/bin/python3 tools/modules/fetch_snare_references.py --out build/snare-refs-delivery
+      - name: Actual DSP, isolated ablation, same-sample locks and paired benchmark
+        run: /usr/bin/python3 tools/modules/snare_delivery.py --references build/snare-refs-delivery --out build/snare-delivery
+      - name: Preserve full source and evidence for offline replay
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: snare-delivery-${{ github.sha }}
+          path: build/snare-delivery/
+          if-no-files-found: error
+          retention-days: 7

@@ -1,0 +1,65 @@
+// Independent compact PM snare study. Not Elektron source or a recovered algorithm.
+import("stdfaust.lib");
+pitch = hslider("pitch_hz",185,60,500,.001);
+sweep = hslider("sweep",.28,0,1,.001);
+punch = hslider("punch",.48,0,1,.001);
+decay = hslider("decay",.48,0,1,.001);
+inharm = hslider("inharm",.42,0,1,.001);
+shape = hslider("shape",.58,0,1,.001);
+contour = hslider("contour",.5,0,1,.001);
+drive = hslider("drive",.12,0,1,.001);
+gate = button("gate");
+velocity = hslider("velocity",1,0,1,.001);
+
+hit = gate > gate';
+seen = max(hit) ~ _;
+latched(x) = ba.sAndH(hit,x);
+vel = latched(velocity);
+age = (+(1.0) : min(30.0*ma.SR) : *(1.0-hit)) ~ _;
+t = age/ma.SR;
+
+// Per-hit musical state. The ranges are authored, not recovered knob curves.
+f0 = latched(pitch);
+sweepAmount = latched(pow(2.0,2.5*sweep)-1.0);
+pitchTau = latched(.004 + .050*pow(1.0-punch,2.0));
+bodyTau = latched(.025*pow(36.0,decay));
+inh = latched(inharm);
+sh = latched(shape);
+ct = latched(contour);
+ratioA = 1.35 + 4.65*inh*inh;
+ratioB = 2.05 + 6.25*inh;
+modTau = .004*pow(55.0,ct);
+modEnv = (.05*(1.0-ct) + .95*exp(-t/modTau));
+freq = f0*(1.0+sweepAmount*exp(-t/pitchTau));
+attackTau = .00025 + .0018*pow(1.0-latched(punch),2.0);
+bodyEnv = (1.0-exp(-t/attackTau))*exp(-t/bodyTau);
+phase(hz) = os.hs_phasor(1.0,hz,hit);
+opA = sin(2.0*ma.PI*phase(freq*ratioA));
+opB = sin(2.0*ma.PI*(phase(freq*ratioB) + opA*(.03+.22*sh)*modEnv));
+bodyPM = sin(2.0*ma.PI*(phase(freq) + opB*(.04+.28*sh)*modEnv));
+side = sin(2.0*ma.PI*(phase(freq*(1.72+.8*inh)) + opA*.08*modEnv));
+bodySignal = bodyEnv*(bodyPM*.76 + side*(.08+.18*inh));
+
+// Fixed filter states avoid coefficient jumps at parameter-lock boundaries.
+noise = no.noise;
+noiseDark = noise : fi.highpass(1,550.0) : fi.lowpass(1,4300.0);
+noiseMid = noise : fi.highpass(1,1500.0) : fi.lowpass(1,8500.0);
+noiseBright = noise : fi.highpass(1,3500.0) : fi.lowpass(1,14500.0);
+noiseColor = noiseDark*(1.0-sh)*(1.0-inh) + noiseMid*(.35+.65*inh)*(1.0-.55*sh) + noiseBright*sh;
+noiseTau = bodyTau*(.22+1.65*ct);
+noiseEnv = exp(-t/max(.006,noiseTau));
+noiseAmount = sh*sh*(.26+.34*inh);
+noiseSignal = noiseColor*noiseEnv*noiseAmount;
+
+// Punch changes the initial articulation, not just output level.
+p = latched(punch);
+punchEnv = exp(-t/(.0012+.006*(1.0-p)));
+crack = punchEnv*p*(.11*sin(2.0*ma.PI*phase(3200.0+6200.0*sh)) + .08*noiseMid);
+punchGain = 1.0 + .55*p*exp(-t/.014);
+
+driveNow = latched(drive);
+driveAmount = driveNow*driveNow;
+shapeDrive(x) = (1.0-driveAmount)*x + driveAmount*ma.tanh(x*(1.0+10.0*driveAmount))/ma.tanh(1.0+10.0*driveAmount);
+deterministic = shapeDrive((bodySignal + crack*.55)*punchGain);
+hybrid = shapeDrive((bodySignal + crack + noiseSignal)*punchGain);
+finish(x) = x*.34*vel*seen : fi.dcblockerat(12);
