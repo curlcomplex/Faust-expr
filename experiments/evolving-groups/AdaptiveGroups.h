@@ -56,7 +56,13 @@ inline void insert(Layout& l,const Boundary& b){
 }
 inline std::string edgeKey(const Edge& e,bool includeEndpoints=true){
     std::ostringstream s;if(includeEndpoints)s<<e.srcIndex<<','<<e.tgtIndex<<';';
-    s<<number(e.gain)<<','<<number(e.pan)<<','<<e.audible<<','<<int(e.feedbackBoundary)<<','<<e.srcPort<<','<<e.tgtPort;return s.str();
+    s<<number(e.gain)<<','<<number(e.pan)<<','<<e.audible<<','<<int(e.feedbackBoundary)<<','<<e.srcPort<<','<<e.tgtPort;
+    // The existing stereo gain law depends on layout, so equal scalar wire
+    // values do not by themselves imply identical compiled arithmetic.
+    const auto& layout=e.signalDescriptor.layout();
+    s<<';'<<e.signalDescriptor.width()<<','<<int(e.signalDescriptor.rate())<<','<<bool(layout);
+    if(layout)s<<':'<<layout->size()<<':'<<*layout;
+    return s.str();
 }
 inline std::string parallelKey(const View& v,int id){
     std::vector<std::string> pieces;
