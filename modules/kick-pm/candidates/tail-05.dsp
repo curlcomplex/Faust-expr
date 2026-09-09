@@ -29,7 +29,7 @@ vel = ba.sAndH(hit,velocity);
 frequencyNow = frequency + pitchAmount*exp(-t/pitchTau);
 // Only architectural change: delay BODY decay, not attack, pitch, modulation,
 // or note-off. hold=0 preserves color-04. No timed automatic note-off is added.
-bodyEnvelope = (1.0-exp(-t/attackTau))*exp(-max(0.0,t-bodyHold)/bodyTau);
+bodyEnvelope = (1.0-exp(-t/attackTau))*exp((0.0-max(0.0,t-bodyHold))/bodyTau);
 fall = gate < gate';
 releaseAge = (+(1.0) : min(60.0*ma.SR) : *(1.0-max(gate,fall))) ~ _;
 releaseEnvelope = exp(-releaseAge/(ma.SR*releaseTau));
