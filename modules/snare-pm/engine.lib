@@ -48,7 +48,10 @@ noiseBright = noise : fi.highpass(1,3500.0) : fi.lowpass(1,14500.0);
 noiseColor = noiseDark*(1.0-sh)*(1.0-inh) + noiseMid*(.35+.65*inh)*(1.0-.55*sh) + noiseBright*sh;
 noiseTau = bodyTau*(.22+1.65*ct);
 noiseEnv = exp(-t/max(.006,noiseTau));
-noiseAmount = sh*sh*(.26+.34*inh);
+// Shape can be strongly modulated without forcing a long/noisy snare. Contour
+// governs how far the dedicated noise path joins the PM body, so low Contour
+// retains dry/tonal Vintage-like territory while high Contour opens rattling tails.
+noiseAmount = sh*sh*(.20+.40*inh)*(.08+.92*ct*ct);
 noiseSignal = noiseColor*noiseEnv*noiseAmount;
 
 // Punch changes the initial articulation, not just output level.
