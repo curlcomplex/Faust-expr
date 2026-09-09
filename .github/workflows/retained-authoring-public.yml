@@ -29,7 +29,7 @@ jobs:
         run: |
           brew install faust
           python3 -m venv .venv
-          .venv/bin/python -m pip install numpy
+          .venv/bin/python -m pip install numpy matplotlib
           echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
       - name: Record source and machine identity
         run: |
