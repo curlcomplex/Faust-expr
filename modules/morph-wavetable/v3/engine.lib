@@ -36,10 +36,11 @@ getSample(i)=rdtable(tableSamples,int(i));
 readEndpoint(b,f,s,d,p)=v1+0.5*u*(v2-v0+u*(2*v0-5*v1+4*v2-v3+u*(3*(v1-v2)+v3-v0))) with {
  id=slot(b,f,s,d); offset=rdtable(tableOffsets,id);N=rdtable(tableLengths,id);
  x=p*N;i=int(x);u=x-i;
- v0=getSample(offset+(i-1+int(N))%int(N));
- v1=getSample(offset+i%int(N));
- v2=getSample(offset+(i+1)%int(N));
- v3=getSample(offset+(i+2)%int(N));
+ // All generated lengths are powers of two; avoid runtime integer divisions.
+ v0=getSample(offset+((i-1+int(N)) & (int(N)-1)));
+ v1=getSample(offset+(i & (int(N)-1)));
+ v2=getSample(offset+((i+1) & (int(N)-1)));
+ v3=getSample(offset+((i+2) & (int(N)-1)));
 };
 frame(b,f,p)=
  (1-driveMix)*((1-brightness)*readEndpoint(b,f,0,0,p)+brightness*readEndpoint(b,f,1,0,p))
