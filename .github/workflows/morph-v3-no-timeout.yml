@@ -1,4 +1,4 @@
-name: Morph v3 no-timeout verification
+name: Morph v3 complete verification
 
 on:
   push:
@@ -19,8 +19,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
-      OPENBLAS_NUM_THREADS: 1
-      OMP_NUM_THREADS: 1
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
@@ -29,37 +29,67 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy
-      - name: Remove only the harness's artificial Faust/subprocess timeouts
+      - name: Independent band and interpolation tests
+        run: /usr/bin/python3 -m unittest discover -s tests -p test_morph_wavetable.py -v
+      - name: Actual Faust and unchanged full qualification, with explicit build budget
         shell: bash
         run: |
           set -euo pipefail
-          cp tools/modules/morph_wavetable_batch.py /tmp/morph_wavetable_batch.py.before
-          python3 - <<'PY'
+          mkdir -p build/morph-complete
+          /usr/bin/time -v /usr/bin/python3 - <<'PY' 2>&1 | tee build/morph-complete/run.log
+          import json, os, sys, time
           from pathlib import Path
-          p=Path('tools/modules/morph_wavetable_batch.py')
-          s=p.read_text()
-          old="base.cmd([os.getenv('FAUST','faust'),'-t','240','-I',source.parent,'-I',self.out/'bank',*flags,source,'-o',d/'generated.hpp'],timeout=270)"
-          new="base.cmd([os.getenv('FAUST','faust'),'-I',source.parent,'-I',self.out/'bank',*flags,source,'-o',d/'generated.hpp'],timeout=3600)"
-          if old not in s:
-              raise SystemExit('expected artificial-timeout call not found')
-          p.write_text(s.replace(old,new))
+          sys.path.insert(0, str(Path('tools/modules').resolve()))
+          import morph_wavetable_batch as suite
+          original_cmd = suite.base.cmd
+          compiler_runs = []
+          def extended_build_cmd(args, timeout=180):
+              actual = [str(x) for x in args]
+              compiler = actual[0] == os.environ.get('FAUST', 'faust')
+              if compiler:
+                  cleaned = [actual[0]]
+                  i = 1
+                  while i < len(actual):
+                      if actual[i] in ('-t', '--timeout'):
+                          i += 2
+                      else:
+                          cleaned.append(actual[i]); i += 1
+                  actual = cleaned[:1] + ['-t', '3600'] + cleaned[1:]
+                  timeout = 3660
+              elif 'c++' in Path(actual[0]).name or 'g++' in Path(actual[0]).name:
+                  timeout = 3660
+              start = time.monotonic()
+              try:
+                  return original_cmd(actual, timeout=timeout)
+              finally:
+                  if compiler:
+                      compiler_runs.append({'argv': actual, 'wall_seconds': time.monotonic()-start})
+          suite.base.cmd = extended_build_cmd
+          study = suite.Study(Path('build/morph-complete/run').resolve())
+          failure = None
+          try:
+              study.run()
+          except Exception as error:
+              failure = repr(error)
+          finally:
+              study.save(failure)
+              Path('build/morph-complete/compiler-invocations.json').write_text(json.dumps(compiler_runs, indent=2)+'\n')
+          if failure:
+              raise SystemExit(failure)
           PY
-          diff -u /tmp/morph_wavetable_batch.py.before tools/modules/morph_wavetable_batch.py | tee /tmp/timeout-removal.diff || test $? -eq 1
-      - name: Run actual Faust and complete qualification
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p build/morph-no-timeout
-          faust -v | tee build/morph-no-timeout/faust-version.txt
-          date -u +%FT%TZ > build/morph-no-timeout/start.txt
-          /usr/bin/time -v /usr/bin/python3 tools/modules/morph_wavetable_batch.py --out build/morph-no-timeout/run 2>&1 | tee build/morph-no-timeout/run.log
-          date -u +%FT%TZ > build/morph-no-timeout/end.txt
-          cp /tmp/timeout-removal.diff build/morph-no-timeout/timeout-removal.diff
-      - name: Preserve evidence
+      - name: Preserve exact source and compiler evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        run: |
+          mkdir -p build/morph-complete
+          git rev-parse HEAD > build/morph-complete/commit.txt
+          git archive --format=tar HEAD > build/morph-complete/source.tar
+          git diff --check > build/morph-complete/diff-check.txt
+          faust -v > build/morph-complete/faust-version.txt
+          c++ --version > build/morph-complete/compiler-version.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
         with:
-          name: morph-v3-no-timeout-${{ github.sha }}
-          path: build/morph-no-timeout/
-          if-no-files-found: warn
+          name: morph-complete-${{ github.sha }}
+          path: build/morph-complete/
+          if-no-files-found: error
           retention-days: 7
