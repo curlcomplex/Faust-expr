@@ -33,6 +33,15 @@ def main():
     native=replace(native,'effect->compute(n,outputs,outputs);clock+=n;','float* effected[]={temp.getWritePointer(0),temp.getWritePointer(1)};effect->compute(n,outputs,effected);for(int c=0;c<2;++c)std::copy_n(effected[c],n,outputs[c]);clock+=n;')
     import repair
     native=repair.apply(native)
+    # Keep the PR45 DSP/allocator/repairs intact; replace only the online harness.
+    native=replace(native,'namespace combined {','#include "job_probe.h"\nnamespace combined {')
+    native=replace(native,'std::uint64_t thread=0;};','std::uint64_t thread=0;job_probe::Timing timing;};')
+    old='void process(ProcessContext& pc) override{for(int i=first;i<last;++i)renderSlot(slots[i],int(pc.numSamples));}'
+    new='void process(ProcessContext& pc) override{if(!job_probe::enabled){for(int i=first;i<last;++i)renderSlot(slots[i],int(pc.numSamples));return;}auto& t=slots[first].timing;t.begin=now();auto cpu=job_probe::cpuUs();for(int i=first;i<last;++i)renderSlot(slots[i],int(pc.numSamples));t.cpu=job_probe::cpuUs()-cpu;t.end=now();}'
+    native=replace(native,old,new)
+    start=native.index('static void liveTest(')
+    end=native.index('} // namespace combined',start)
+    native=native[:start]+'#include "handoff.h"\n'+native[end:]
     (HERE/'main.native.cpp').write_text(native)
     pins={'parent':'4c0dc25026e767ec74058e0fef8f4a23a28d8b5a','previous_cpp_sha256':hashlib.sha256((NEXT/'main.generated.cpp').read_bytes()).hexdigest(),
           'adapter_cpp_sha256':hashlib.sha256(source.encode()).hexdigest(),'generator_sha256':hashlib.sha256((HERE/'generate.py').read_bytes()).hexdigest(),
