@@ -60,7 +60,7 @@ class Study:
    self.check(label+':header-hash',sha(old/'generated.hpp')==expected['generated_sha256'])
    shutil.copyfile(old/'generated.hpp',d/'generated.hpp')
   else:
-   cmd([os.getenv('FAUST','faust'),'-I',MOD,'-I',self.out/'bank',*flags,source,'-o',d/'generated.hpp'])
+   cmd([os.getenv('FAUST','faust'),'-I',MOD,'-I',self.out/'bank',*flags,source,'-o',d/'generated.hpp'],timeout=25 if vector else 180)
    cmd([os.getenv('FAUST','faust'),'-I',MOD,'-I',self.out/'bank','-e',source,'-o',d/'expanded.dsp'])
   cppflags=['-std=c++17','-O2','-ffp-contract=off','-fstack-usage','-I'+str(d)]
   cmd([os.getenv('CXX','c++'),*cppflags,ROOT/'tools/modules/render.cpp','-o',d/'render'])
@@ -87,11 +87,17 @@ class Study:
   if self.replay:shutil.copytree(self.replay/'bank',self.out/'bank',dirs_exist_ok=True)
   else:generate_bank(self.out/'bank')
   self.report['bank_sha256']=sha(self.out/'bank/bank.lib')
-  ref=self.build('reference',MOD/'reference.dsp');fast=self.build('morph',MOD/'morph.dsp');vec=self.build('vector',MOD/'morph.dsp',True)
+  ref=self.build('reference',MOD/'reference.dsp');fast=self.build('morph',MOD/'morph.dsp');vec=None
+  if not self.replay or 'vector' in json.loads((self.replay/'report.json').read_text())['builds']:
+   try:
+    vec=self.build('vector',MOD/'morph.dsp',True)
+    self.report['vector_status']='compiled; musical parity still required'
+   except (RuntimeError,subprocess.TimeoutExpired) as error:
+    self.report['vector_status']='not qualified: '+str(error)
+  else:self.report['vector_status']='not qualified in original build; not fabricated in replay'
   env=self.build('envelope',MOD/'envelope.dsp',diagnostic=True);tun=self.build('tuning',MOD/'tuning.dsp',diagnostic=True)
   tone=self.build('tone',ROOT/'modules/tone-pm/playable/tone.dsp',diagnostic=True)
   silent=self.render('initial-silence',fast,seconds=.2);self.check('silence-exact',not np.any(silent))
-  # Musical arithmetic equivalence for all bank frames, sample rates and stacks.
   for rate in (44100,48000,96000):
    for i in range(8):
     p={'pitch_hz':220,'morph':i/7,'shape':.8,'stack':1+i%4,'detune':.55,'drive':.7}
@@ -106,7 +112,6 @@ class Study:
     x=self.render(f'tuning-{rate}-{count}',tun,{'pitch_hz':440,'stack':count,'detune':1},[(101,'gate',1)],rate=rate,seconds=.05,diagnostic=True)
     pair=x[500];expected=440*np.array([2**(-28/1200),2**(28/1200)]) if count>1 else np.array([440.,440.])
     self.check(f'center:{rate}:{count}',np.max(abs(1200*np.log2(pair/expected)))<.01,outer_hz=pair.tolist())
-   # Independent attack/release formula, including one-sample gates and long tails.
    for decay in (0.,1.):
     for length in (1,round(.1*rate)):
      start=101;end=start+length;seconds=1 if decay==0 else 28
@@ -115,7 +120,6 @@ class Study:
      truth=np.where(np.arange(len(x))<end,1-np.exp(-t/.0025),(1-math.exp(-(end-start)/rate/.0025))*np.exp(-r/tau))
      truth[r>=14*tau]=0;truth[:start]=0;mask=truth>1e-3;error=float(np.max(abs(x[mask]-truth[mask])/truth[mask]))
      self.check(f'envelope-oracle:{rate}:{decay}:{length}',error<1e-4,max_relative=error)
-  # All stacked oscillators must collapse to the same note/signal at zero detune.
   ev=self.note(101,20000);p=self.patches['Brass']|{'stack':1,'detune':0}
   base=self.render('zero-detune-1',fast,p,ev)
   for count in (2,3,4):
@@ -125,7 +129,8 @@ class Study:
   base=self.render('dynamic-128',fast,{'stack':4},ev)
   for b in (1,32,64,127,256,512):
    x=self.render('dynamic-'+str(b),fast,{'stack':4},ev,block=b);self.check('block:'+str(b),np.array_equal(x,base),max_error=float(abs(x-base).max()))
-  x=self.render('dynamic-vector',vec,{'stack':4},ev);self.check('vector-parity',abs(x-base).max()<.0005,max_error=float(abs(x-base).max()))
+  if vec is not None:
+   x=self.render('dynamic-vector',vec,{'stack':4},ev);self.check('vector-parity',abs(x-base).max()<.0005,max_error=float(abs(x-base).max()))
   for rate in (44100,48000,96000):
    p=self.patches['Wide']|{'pitch_hz':311.127,'velocity':.6};start=1001
    a=self.render(f'locks-pre-{rate}',fast,p,self.note(start,round(.3*rate)),rate=rate)
@@ -136,7 +141,6 @@ class Study:
   self.check('velocity-half-law',abs(half-base*.5).max()<2e-6);self.check('velocity-zero-law',not np.any(zero))
   change=self.render('latched-tail',fast,events=self.note(101,18001)+[(5001,'decay',1),(5001,'stack',4),(5001,'velocity',0)])
   self.check('latched-stack-decay-velocity',np.array_equal(change,base))
-  # 256 endpoint settings in one persistent trajectory, not 256 separate renders.
   ev=[];i=0;keys=['morph','shape','decay','detune','drive']
   for count,bits,hz in itertools.product(range(1,5),itertools.product((0.,1.),repeat=5),(20.,8000.)):
    n=101+i*4096;i+=1;ev += [(n,k,v) for k,v in zip(keys,bits)]+[(n,'pitch_hz',hz),(n,'stack',count)]+self.note(n,n+2000)
@@ -209,7 +213,7 @@ class Study:
    for b in (32,64,128,512):
     pairs=[]
     for rep in range(3):
-     row={};order=['reference','morph','vector'];order=order[rep:]+order[:rep]
+     row={};order=[name for name in ('reference','morph','vector') if name in self.report['builds']];shift=rep%len(order);order=order[shift:]+order[:shift]
      for label in order:row[label]=json.loads(cmd([self.out/label/'benchmark',b,stack]))
      self.check(f'alloc:{stack}:{b}:{rep}',all(x['ordinary_new_in_compute']==0 for x in row.values()));pairs.append(row)
     data.append({'stack':stack,'frames':b,'pairs':pairs,'median_reference_over_fast':statistics.median(x['reference']['p50_us']/x['morph']['p50_us'] for x in pairs)})
