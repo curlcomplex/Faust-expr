@@ -22,7 +22,6 @@ spreadCents=28.0*follow(detuneCtl); driveMix=pow(follow(driveCtl),2.0);
 location(i)=(voices>1)*(2.0*i/max(1,voices-1)-1.0);
 hz(i)=frequency*pow(2.0,location(i)*spreadCents/1200.0);
 maxHz=frequency*pow(2.0,(voices>1)*spreadCents/1200.0);
-// Seven bounded comparisons locate the interval; no logarithmic approximation.
 freqAt(i)=rdtable(bandFrequencies,int(min(bandCount-1,max(0,i))));
 search(step,k)=k+step*(maxHz>=freqAt(k+step))*(k+step<bandCount);
 s0=search(64,0);s1=search(32,s0);s2=search(16,s1);s3=search(8,s2);
@@ -36,11 +35,12 @@ getSample(i)=rdtable(tableSamples,int(i));
 readEndpoint(b,f,s,d,p)=v1+0.5*u*(v2-v0+u*(2*v0-5*v1+4*v2-v3+u*(3*(v1-v2)+v3-v0))) with {
  id=slot(b,f,s,d); offset=rdtable(tableOffsets,id);N=rdtable(tableLengths,id);
  x=p*N;i=int(x);u=x-i;
- // All generated lengths are powers of two; avoid runtime integer divisions.
- v0=getSample(offset+((i-1+int(N)) & (int(N)-1)));
- v1=getSample(offset+(i & (int(N)-1)));
- v2=getSample(offset+((i+1) & (int(N)-1)));
- v3=getSample(offset+((i+2) & (int(N)-1)));
+ // Reconstruct the negative half using exact odd symmetry; no signal reduction.
+ sample(j)=getSample(offset+min(j,int(N)-j))*(1.0-2.0*(j>int(N)/2));
+ v0=sample((i-1+int(N)) & (int(N)-1));
+ v1=sample(i & (int(N)-1));
+ v2=sample((i+1) & (int(N)-1));
+ v3=sample((i+2) & (int(N)-1));
 };
 frame(b,f,p)=
  (1-driveMix)*((1-brightness)*readEndpoint(b,f,0,0,p)+brightness*readEndpoint(b,f,1,0,p))

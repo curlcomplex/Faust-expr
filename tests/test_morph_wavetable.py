@@ -25,11 +25,14 @@ class TableTests(unittest.TestCase):
    k=min(len(BAND_HZ)-2,k);self.assertLessEqual(BAND_HZ[k],f);self.assertGreaterEqual(BAND_HZ[k+1],f)
  def test_sine_deduplicates_and_is_periodic(self):
   c=np.zeros((8,64));c[:,0]=.75;samples,offsets,lengths=build_arrays(c,c)
-  self.assertEqual(len(set(offsets)),1);self.assertEqual(len(samples),128);self.assertTrue(np.all(lengths==128));self.assertAlmostEqual(float(samples[32]),.75);self.assertAlmostEqual(float(samples[96]),-.75)
+  self.assertEqual(len(set(offsets)),1);self.assertEqual(len(samples),65);self.assertTrue(np.all(lengths==128));self.assertAlmostEqual(float(samples[32]),.75);self.assertAlmostEqual(float(-samples[128-96]),-.75)
  def test_cubic_wrap_matches_sine(self):
   n=128;data=.75*np.sin(2*np.pi*np.arange(n)/n);p=np.array([0.,1e-6,.999999,.15,.75]);x=p*n;i=x.astype(int);u=x-i
   a,b,c,d=[data[(i+j)%n] for j in (-1,0,1,2)];y=b+.5*u*(c-a+u*(2*a-5*b+4*c-d+u*(3*(b-c)+d-a)))
   np.testing.assert_allclose(y,.75*np.sin(2*np.pi*p),atol=2e-6,rtol=0)
+ def test_half_storage_reflection_for_mixed_harmonics(self):
+  n=256;p=np.arange(n)/n;full=.5*np.sin(2*np.pi*p)+.2*np.sin(4*np.pi*p)+.1*np.sin(14*np.pi*p);half=full[:n//2+1]
+  i=np.arange(n);rebuild=half[np.minimum(i,n-i)]*(1-2*(i>n//2));np.testing.assert_allclose(full,rebuild,atol=2e-15,rtol=0)
  def test_no_dedicated_chord_or_host_dependency(self):
   s=(Path(__file__).resolve().parents[1]/'modules/morph-wavetable/v3/engine.lib').read_text();self.assertNotIn('soundfile(',s);self.assertIn('readEndpoint',s);self.assertIn('voices=max(1,int(latch(stackCtl)))',s)
 if __name__=='__main__':unittest.main()
