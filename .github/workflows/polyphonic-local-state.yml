@@ -1,65 +1,14 @@
-name: Combined polyphonic local-state engine
+name: Archived hosted polyphonic experiment - physical runner required
+# The owner requires this experiment to execute on the physical M1 Pro.
+# The private CURLOP workflow polyphonic-physical-fix.yml executes a reviewed
+# immutable public commit through native-build.py and the existing Pueue queue.
 on:
-  push:
-    branches: [research/polyphonic-local-state]
-    paths: ['experiments/polyphonic-local-state/**', '.github/workflows/polyphonic-local-state.yml']
   workflow_dispatch:
 permissions:
   contents: read
-concurrency:
-  group: combined-polyphonic-public
-  cancel-in-progress: false
 jobs:
-  combined:
+  hosted-disabled:
+    if: ${{ false }}
     runs-on: macos-15
-    timeout-minutes: 45
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-        with:
-          persist-credentials: false
-      - name: Public toolchain
-        shell: bash
-        run: |
-          set -euo pipefail
-          brew list faust >/dev/null 2>&1 || brew install faust
-          python3 -m venv .combined-venv
-          .combined-venv/bin/pip install numpy matplotlib
-          mkdir -p evidence/combined
-          { git rev-parse HEAD; uname -sm; sysctl hw.physicalcpu hw.logicalcpu machdep.cpu.brand_string; faust -v; clang++ --version; } > evidence/combined/environment.txt 2>&1
-      - name: Preserved laboratory tests and actual Faust probe
-        run: |
-          set -euo pipefail
-          source .combined-venv/bin/activate
-          python3 -m unittest discover -s tests -v > evidence/combined/lab-tests.log 2>&1
-          bash scripts/build.sh > evidence/combined/faust-probe.log 2>&1
-      - name: Voice lifecycle, worker scaling and localized background compilation
-        shell: bash
-        run: |
-          set -euo pipefail
-          .combined-venv/bin/python experiments/polyphonic-local-state/run.py --output evidence/combined --participants 1,2,3 --build-jobs 3
-      - name: Retain compact diagnostics separately
-        if: always()
-        run: |
-          mkdir -p evidence/compact
-          python3 - <<'PY'
-          import pathlib,shutil
-          root=pathlib.Path('evidence/combined');out=pathlib.Path('evidence/compact')
-          for p in root.rglob('*'):
-              if p.is_file() and (p.parent==root or p.name in ['result.json','summary.json','retained-summary.json','adapter.json']):
-                  if p.suffix in ['.json','.log','.txt'] or p.name=='executed-source.tar.gz':
-                      q=out/p.relative_to(root);q.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(p,q)
-          PY
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        if: always()
-        with:
-          name: combined-poly-summary-${{ github.run_id }}-${{ github.run_attempt }}
-          path: evidence/compact/
-          if-no-files-found: error
-          retention-days: 14
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        if: always()
-        with:
-          name: combined-poly-full-${{ github.run_id }}-${{ github.run_attempt }}
-          path: evidence/combined/
-          if-no-files-found: error
-          retention-days: 14
+      - run: echo 'Hosted execution disabled. Use the private physical-Mac workflow.'

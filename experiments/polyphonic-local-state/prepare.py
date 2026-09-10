@@ -31,6 +31,8 @@ def main():
     # Stock Faust does not promise in-place processing without -inpl. Keep
     # the shared effect's inputs and outputs distinct in every compared arm.
     native=replace(native,'effect->compute(n,outputs,outputs);clock+=n;','float* effected[]={temp.getWritePointer(0),temp.getWritePointer(1)};effect->compute(n,outputs,effected);for(int c=0;c<2;++c)std::copy_n(effected[c],n,outputs[c]);clock+=n;')
+    import repair
+    native=repair.apply(native)
     (HERE/'main.native.cpp').write_text(native)
     pins={'parent':'4c0dc25026e767ec74058e0fef8f4a23a28d8b5a','previous_cpp_sha256':hashlib.sha256((NEXT/'main.generated.cpp').read_bytes()).hexdigest(),
           'adapter_cpp_sha256':hashlib.sha256(source.encode()).hexdigest(),'generator_sha256':hashlib.sha256((HERE/'generate.py').read_bytes()).hexdigest(),
