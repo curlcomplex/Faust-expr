@@ -11,7 +11,7 @@ import numpy as np
 
 HARMONICS = 64
 CYCLE_SIZE = 8192
-TABLE_SIZE = 256
+TABLE_SIZE = 512
 # Dense log-spaced max-oscillator frequencies let table interpolation approximate
 # v2's continuous 16--19 kHz harmonic taper, rather than hard harmonic bins.
 BAND_FREQUENCIES = np.geomspace(20.0, 9000.0, 48)
@@ -50,7 +50,6 @@ def write_tables(path: Path, clean: np.ndarray, driven: np.ndarray) -> dict:
     phase = 2*np.pi*np.arange(TABLE_SIZE)/TABLE_SIZE
     basis = np.sin(n[:, None]*phase)
     values = []
-    # Flatten order must match v3 flatIndex: band, frame, shape, drive, sample.
     for max_hz in BAND_FREQUENCIES:
         taper = np.clip((19000.0 - n*max_hz)/3000.0, 0.0, 1.0)
         for frame in range(len(NAMES)):
