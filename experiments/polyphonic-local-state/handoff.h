@@ -155,6 +155,12 @@ static void liveTest(Engine& e,const fs::path& root,const fs::path& out,int part
     if(fault!="none")compare(capture,counterfactual);
     V r=obj();prop(r,"context",option("PS_RT_CONTEXT","legacy"));
     auto policyJson=[](const job_probe::Policy& p){V x=obj();prop(x,"result",p.result);prop(x,"default",p.defaultPolicy);prop(x,"period",double(p.period));prop(x,"computation",double(p.computation));prop(x,"constraint",double(p.constraint));return x;};
+    prop(r,"worker_budget",workerBudget);prop(r,"configured_player_frames",scene.player->getBlockSize());prop(r,"configured_player_rate",scene.player->getSampleRate());
+    mach_timebase_info_data_t timebase{};require(mach_timebase_info(&timebase)==KERN_SUCCESS,"Mach timebase unavailable");
+    prop(r,"mach_tick_ns",double(timebase.numer)/timebase.denom);
+    juce::Array<V> startupPolicies;
+    if(probing)for(std::size_t i=0;i<scene.slots.size();i+=std::size_t(grain)){const auto& t=scene.slots[i].timing;V item=policyJson(t.scheduling);prop(item,"caller",t.caller);startupPolicies.add(item);}
+    prop(r,"batch_startup_policies",startupPolicies);
     prop(r,"caller_thread_policy",policyJson(callerPolicy));prop(r,"compiler_thread_policy",policyJson(prepared.compilerPolicy));prop(r,"policy",policy);prop(r,"handoff",handoff);prop(r,"fault",fault);prop(r,"job_probe",probing);
     prop(r,"request_us",request);prop(r,"ready_us",readyTime);prop(r,"compile_begin_us",prepared.build.started);prop(r,"compile_end_us",prepared.build.finished);
     prop(r,"load_begin_us",prepared.loadBegin);prop(r,"load_end_us",prepared.loadEnd);prop(r,"published_us",prepared.published);

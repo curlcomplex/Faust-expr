@@ -13,7 +13,7 @@ OLD='''        for (size_t i = 0; i < numThreads; ++i)
             setThreadPriority (threads.back(), 10);
             tryToUpgradeCurrentThreadToRealtime (rtOpts);
         }'''
-NEW='''        // PR45_WORKER_CONTEXT: original arm retained in the same binary.
+PREVIOUS='''        // PR45_WORKER_CONTEXT: original arm retained in the same binary.
         const auto* context = std::getenv ("PS_RT_CONTEXT");
         const bool workerContext = context != nullptr && std::string (context) == "workers";
         for (size_t i = 0; i < numThreads; ++i)
@@ -43,12 +43,37 @@ NEW='''        // PR45_WORKER_CONTEXT: original arm retained in the same binary.
                 tryToUpgradeCurrentThreadToRealtime (rtOpts);
             }
         }'''
+NEW=PREVIOUS.replace(
+    '        for (size_t i = 0; i < numThreads; ++i)',
+    '''        // Worker budget is a separate experimental axis. Keep creator policy
+        // fixed to the previous control to isolate worker-only effects.
+        const auto* budget = std::getenv ("PS_RT_BUDGET");
+        const bool matched = budget != nullptr && std::string (budget) != "startup";
+        auto workerOptions = rtOpts;
+        if (budget != nullptr && std::string (budget) == "periodic")
+        {
+            const double periodMs = 1000.0 * player.getBlockSize() / player.getSampleRate();
+            workerOptions = workerOptions.withPeriodMs (periodMs)
+                                         .withProcessingTimeMs (periodMs * 0.5)
+                                         .withMaximumProcessingTimeMs (periodMs);
+        }
+        const auto creatorOptions = matched
+            ? juce::Thread::RealtimeOptions().withPriority (10)
+                    .withApproximateAudioProcessingTime (512, 44100.0)
+            : rtOpts;
+        for (size_t i = 0; i < numThreads; ++i)''', 1)
+NEW=NEW.replace('[this, rtOpts, ready', '[this, workerOptions, ready')
+NEW=NEW.replace('                    tryToUpgradeCurrentThreadToRealtime (rtOpts);',
+                '                    tryToUpgradeCurrentThreadToRealtime (workerOptions);')
+NEW=NEW.replace('tryToUpgradeCurrentThreadToRealtime (rtOpts);',
+                'tryToUpgradeCurrentThreadToRealtime (creatorOptions);')
 INCLUDE='#include <future> // PR45_WORKER_CONTEXT\n#include <cstdlib> // PR45_WORKER_CONTEXT\n'
 def main(path):
     text=path.read_text()
     if 'PR45_WORKER_CONTEXT' in text:
-        assert text.count(NEW)==1 and text.count(INCLUDE)==1,'unrecognized prior pool patch'
-        text=text.replace(NEW,OLD).replace(INCLUDE,'')
+        known=NEW if text.count(NEW)==1 else PREVIOUS
+        assert text.count(known)==1 and text.count(INCLUDE)==1,'unrecognized prior pool patch'
+        text=text.replace(known,OLD).replace(INCLUDE,'')
     assert blob(text)==PIN,'pinned Tracktion source changed; refusing to patch'
     index=text.index('struct ThreadPoolSemHybrid')
     prefix,suffix=text[:index],text[index:]
