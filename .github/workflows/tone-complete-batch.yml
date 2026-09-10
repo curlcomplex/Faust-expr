@@ -2,7 +2,7 @@ name: Tone PM full batch
 on:
   push:
     branches: [19-tone-full-batch]
-    paths: ['modules/tone-pm/**','tools/modules/tone_batch.py','tools/modules/fetch_tone_references.py','.github/workflows/tone-complete-batch.yml']
+    paths: ['modules/tone-pm/**','tools/modules/tone_batch.py','tools/modules/tone_delivery.py','tools/modules/tone_benchmark.cpp','tools/modules/fetch_tone_references.py','.github/workflows/tone-complete-batch.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -22,8 +22,10 @@ jobs:
           sudo apt-get install -y --no-install-recommends faust g++ ffmpeg python3-numpy python3-scipy
       - name: Fixed licensed comparator set
         run: /usr/bin/python3 tools/modules/fetch_tone_references.py --out build/tone-references
-      - name: Build, render, test, compare and benchmark
+      - name: Build, render and qualify musical contract
         run: /usr/bin/python3 tools/modules/tone_batch.py --out build/tone-full --references build/tone-references
+      - name: Controlled PM ablation, rate diagnostic and four-voice benchmark
+        run: /usr/bin/python3 tools/modules/tone_delivery.py --build build/tone-full --references build/tone-references
       - name: Preserve evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
