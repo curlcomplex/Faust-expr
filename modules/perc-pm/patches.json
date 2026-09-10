@@ -1,0 +1,13 @@
+{
+  "status":"authored audition patches, not reconstructed factory presets",
+  "anchors":{
+    "Tom":{"pitch_hz":92,"sweep":0.26,"punch":0.28,"decay":0.52,"inharmonicity":0.08,"modulation":0.18,"mod_envelope":0.72,"drive":0.05},
+    "Wood":{"pitch_hz":185,"sweep":0.12,"punch":0.42,"decay":0.28,"inharmonicity":0.28,"modulation":0.28,"mod_envelope":0.82,"drive":0.08},
+    "Block":{"pitch_hz":310,"sweep":0.06,"punch":0.22,"decay":0.42,"inharmonicity":0.47,"modulation":0.34,"mod_envelope":0.48,"drive":0.06},
+    "Bell":{"pitch_hz":420,"sweep":0.02,"punch":0.12,"decay":0.72,"inharmonicity":0.68,"modulation":0.43,"mod_envelope":0.22,"drive":0.04},
+    "Zap":{"pitch_hz":170,"sweep":0.82,"punch":0.66,"decay":0.22,"inharmonicity":0.52,"modulation":0.56,"mod_envelope":0.92,"drive":0.18},
+    "Carbon":{"pitch_hz":235,"sweep":0.32,"punch":0.48,"decay":0.48,"inharmonicity":0.75,"modulation":0.72,"mod_envelope":0.58,"drive":0.22},
+    "Glass":{"pitch_hz":690,"sweep":0.05,"punch":0.18,"decay":0.58,"inharmonicity":0.88,"modulation":0.31,"mod_envelope":0.34,"drive":0.02},
+    "Industrial":{"pitch_hz":128,"sweep":0.44,"punch":0.72,"decay":0.61,"inharmonicity":0.91,"modulation":0.9,"mod_envelope":0.4,"drive":0.62}
+  }
+}
