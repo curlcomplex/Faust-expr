@@ -17,21 +17,20 @@ jobs:
         with: {persist-credentials: false}
       - name: Dependencies on disposable hosted runner
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends faust g++ ffmpeg python3-numpy python3-scipy
-      - name: Generate authored bank and actual Faust implementations
+      - name: Independent arithmetic and contract tests
+        run: /usr/bin/python3 -m unittest discover -s tests -p test_morph_v2.py -v
+      - name: Actual Faust, musical oracles, stereo unison, comparative audio and benchmark
         shell: bash
         run: |
           set -euo pipefail
-          python3 tools/modules/generate_morph_bank.py --out build/morph-v2/bank
-          for kind in reference morph envelope tuning; do
-            mkdir -p build/morph-v2/$kind
-            faust -I modules/morph-wavetable/v2 -I build/morph-v2/bank -lang cpp -single -cn ModuleDSP modules/morph-wavetable/v2/$kind.dsp -o build/morph-v2/$kind/generated.hpp
-            c++ -std=c++17 -O2 -ffp-contract=off -Ibuild/morph-v2/$kind tools/modules/render.cpp -o build/morph-v2/$kind/render
-          done
+          mkdir -p build/morph-v2
+          /usr/bin/python3 tools/modules/morph_v2_batch.py --out build/morph-v2 2>&1 | tee build/morph-v2/build.log
       - name: Preserve exact source and evidence
         if: always()
         run: |
           mkdir -p build/morph-v2
           git rev-parse HEAD > build/morph-v2/commit.txt
+          git diff --check > build/morph-v2/diff-check.txt
           git archive --format=tar HEAD > build/morph-v2/source.tar
           faust -v > build/morph-v2/faust-version.txt
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
