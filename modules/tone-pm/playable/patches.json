@@ -1,0 +1,13 @@
+{
+ "status":"independently authored, not recovered hardware presets",
+ "anchors":{
+  "Pure":{"pitch_hz":220,"ratio":0.4,"punch":0,"decay":0.30,"feedback":0,"modulation":0,"mod_env":0,"drive":0,"gate_mode":1},
+  "Bell":{"pitch_hz":330,"ratio":0.6175,"punch":0.12,"decay":0.48,"feedback":0.12,"modulation":0.66,"mod_env":0.60,"drive":0,"gate_mode":0},
+  "Bass":{"pitch_hz":55,"ratio":0.4,"punch":0.2,"decay":0.20,"feedback":0.38,"modulation":0.43,"mod_env":0.33,"drive":0.12,"gate_mode":1},
+  "Keys":{"pitch_hz":220,"ratio":0.6,"punch":0.10,"decay":0.33,"feedback":0.18,"modulation":0.46,"mod_env":0.58,"drive":0,"gate_mode":1},
+  "Hollow":{"pitch_hz":146.832,"ratio":0.2,"punch":0,"decay":0.32,"feedback":0.16,"modulation":0.63,"mod_env":0.15,"drive":0.05,"gate_mode":1},
+  "Reed":{"pitch_hz":220,"ratio":0.4,"punch":0.06,"decay":0.26,"feedback":0.56,"modulation":0.48,"mod_env":0.10,"drive":0.18,"gate_mode":1},
+  "Glass":{"pitch_hz":440,"ratio":0.72,"punch":0,"decay":0.50,"feedback":0.23,"modulation":0.70,"mod_env":0.65,"drive":0,"gate_mode":0},
+  "Acid":{"pitch_hz":82.407,"ratio":0.4,"punch":0.22,"decay":0.18,"feedback":0.77,"modulation":0.66,"mod_env":0.45,"drive":0.5,"gate_mode":1}
+ }
+}

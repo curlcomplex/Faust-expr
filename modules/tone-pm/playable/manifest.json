@@ -1,0 +1,27 @@
+{
+  "module_id":"tone-pm",
+  "sound_version":"0.2.0-experiment",
+  "status":"playable-independent-prototype-not-hardware-calibrated",
+  "source":"tone.dsp",
+  "inputs":0,"outputs":1,
+  "musical_control_order":["pitch_hz","ratio","punch","decay","feedback","modulation","mod_env","drive"],
+  "controls":{
+    "pitch_hz":{"min":20,"max":8000,"default":110,"unit":"Hz","timing":"live smoothed; exact onset snap"},
+    "ratio":{"min":0,"max":1,"default":0.4,"unit":"normalized; .25*32^x modulator/carrier ratio","timing":"live smoothed; exact onset snap"},
+    "punch":{"min":0,"max":1,"default":0.15,"unit":"normalized; transient coloration and attack","timing":"onset latched"},
+    "decay":{"min":0,"max":1,"default":0.55,"unit":"normalized; .03*200^x seconds exponential tau","timing":"onset latched"},
+    "feedback":{"min":0,"max":1,"default":0.08,"unit":"normalized; .90*x^2 radians one-sample feedback","timing":"live smoothed; exact onset snap"},
+    "modulation":{"min":0,"max":1,"default":0.28,"unit":"normalized; 7*x^2 radians PM depth","timing":"live smoothed; exact onset snap"},
+    "mod_env":{"min":0,"max":1,"default":0.45,"unit":"normalized; sustained color to short modulation burst","timing":"onset latched"},
+    "drive":{"min":0,"max":1,"default":0.08,"unit":"normalized; neutral at zero","timing":"live smoothed; exact onset snap"},
+    "gate":{"min":0,"max":1,"default":0,"unit":"boolean note on/off"},
+    "gate_mode":{"min":0,"max":1,"default":0,"unit":"boolean articulation; 0=one-shot, 1=held then decay","timing":"onset latched"},
+    "velocity":{"min":0,"max":1,"default":1,"unit":"linear output amplitude","timing":"onset latched"}
+  },
+  "ratio_landmarks":{"0":0.25,"0.2":0.5,"0.4":1,"0.6":2,"0.8":4,"1":8},
+  "ratio_inverse":"log(ratio/0.25)/log(32); no hidden detents or pitch quantization",
+  "articulation":"gate mode sustains its attack level until note-off, then decays from the exact note-off level; modulation envelope continues independently. One-shot ignores note-off.",
+  "legato":"pitch changes without a new gate edge glide with 3 ms time constant; no oscillator/envelope retrigger. Host owns note priority and voice allocation.",
+  "compatibility":"0.1 tone.dsp preserved. .2 changes Punch neutrality, modulation-envelope mapping, DC/envelope ordering and live controls. Never silently substitute in old projects.",
+  "limits":["high-register PM and feedback aliasing","one-sample feedback varies with sample rate","ordinary phase-reset retrigger may interrupt old tail","no hardware-matched ratio curve or firmware claim","no target-device realtime qualification"]
+}

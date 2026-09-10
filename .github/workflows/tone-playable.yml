@@ -1,0 +1,43 @@
+name: Tone playable full delivery
+on:
+  push:
+    branches: [19-tone-full-batch]
+    paths: ['modules/tone-pm/playable/**','tools/modules/tone_playable.py','tests/test_tone_playable.py','.github/workflows/tone-playable.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+concurrency:
+  group: tone-playable-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Install on disposable hosted runner
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ ffmpeg python3-numpy python3-scipy
+      - name: Independent contract and analyzer tests
+        run: /usr/bin/python3 -m unittest discover -s tests -p test_tone_playable.py -v
+      - name: Fixed licensed comparator acquisition
+        run: /usr/bin/python3 tools/modules/fetch_tone_references.py --out build/tone-references
+      - name: Actual Faust playable, envelope and control qualification
+        run: /usr/bin/python3 tools/modules/tone_playable.py --out build/tone-playable --references build/tone-references
+      - name: Preserve exact source even on failure
+        if: always()
+        run: |
+          mkdir -p build/tone-playable
+          git rev-parse HEAD > build/tone-playable/commit.txt
+          git diff --check > build/tone-playable/diff-check.txt
+          git archive --format=tar HEAD > build/tone-playable/repository-source.tar
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: tone-playable-${{ github.sha }}
+          path: |
+            build/tone-playable/
+            build/tone-references/
+          if-no-files-found: error
+          retention-days: 7
