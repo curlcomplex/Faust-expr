@@ -2,7 +2,7 @@ name: Tone playable full delivery
 on:
   push:
     branches: [19-tone-full-batch]
-    paths: ['modules/tone-pm/playable/**','tools/modules/tone_playable.py','tests/test_tone_playable.py','.github/workflows/tone-playable.yml']
+    paths: ['modules/tone-pm/playable/**','tools/modules/tone_playable.py','tools/modules/tone_finish.py','tests/test_tone_playable.py','.github/workflows/tone-playable.yml']
   workflow_dispatch:
 permissions: {contents: read}
 concurrency:
@@ -23,8 +23,8 @@ jobs:
         run: /usr/bin/python3 -m unittest discover -s tests -p test_tone_playable.py -v
       - name: Fixed licensed comparator acquisition
         run: /usr/bin/python3 tools/modules/fetch_tone_references.py --out build/tone-references
-      - name: Actual Faust playable, envelope and control qualification
-        run: /usr/bin/python3 tools/modules/tone_playable.py --out build/tone-playable --references build/tone-references
+      - name: Actual Faust playable and complete delivery qualification
+        run: /usr/bin/python3 tools/modules/tone_finish.py --out build/tone-playable --references build/tone-references
       - name: Preserve exact source even on failure
         if: always()
         run: |
