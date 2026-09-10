@@ -1,0 +1,48 @@
+name: Morph compiler diagnostic bundle
+on:
+  push:
+    branches: [20-morph-wavetable-full-batch]
+    paths: ['.github/workflows/morph-compiler-diagnostic.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bundle:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Install disposable compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust
+      - name: Bundle exact compiler and runtime dependencies for isolated diagnosis
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p diagnostic/bin diagnostic/lib diagnostic/share
+          cp /usr/bin/faust diagnostic/bin/
+          cp -R /usr/share/faust diagnostic/share/
+          ldd /usr/bin/faust | tee diagnostic/ldd.txt
+          python3 - <<'PY'
+          import pathlib, subprocess, shutil, re
+          pending=[pathlib.Path('/usr/bin/faust')]; seen=set()
+          while pending:
+              file=pending.pop()
+              text=subprocess.run(['ldd',str(file)],capture_output=True,text=True).stdout
+              for item in re.findall(r'(?:=>\s+)(/[^\s]+)',text):
+                  p=pathlib.Path(item)
+                  if p.name.startswith(('libc.so','libm.so','libpthread.so','libdl.so','librt.so','ld-linux')):
+                      continue
+                  if p.name not in seen:
+                      seen.add(p.name);shutil.copyfile(p,pathlib.Path('diagnostic/lib')/p.name);pending.append(p)
+          PY
+          faust -v > diagnostic/version.txt
+          dpkg-query -W faust faust-common libfaust2t64 > diagnostic/packages.txt
+          find diagnostic -type f -print0 | sort -z | xargs -0 sha256sum > diagnostic-checksums.txt
+          tar -czf morph-compiler-diagnostic.tar.gz diagnostic diagnostic-checksums.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: morph-compiler-diagnostic
+          path: morph-compiler-diagnostic.tar.gz
+          if-no-files-found: error
+          retention-days: 3
