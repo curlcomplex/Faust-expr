@@ -22,20 +22,22 @@ def generate():
  clean=[];driven=[];cycles=[]
  for row in c:
   row=row*(.75/np.max(np.abs(row@basis)))
-  waveform=row@basis
-  sat=np.tanh(4*waveform)
+  wave=row@basis
+  sat=np.tanh(4*wave)
   coeff=-np.fft.rfft(sat).imag[1:HARMONICS+1]*2/CYCLE_SIZE
   coeff*=.75/np.max(np.abs(coeff@basis))
-  clean.append(row);driven.append(coeff);cycles.extend([waveform,coeff@basis])
+  clean.append(row);driven.append(coeff);cycles.extend([wave,coeff@basis])
  return np.array(clean),np.array(driven),np.array(cycles)
 
 def write(out:Path):
  out.mkdir(parents=True,exist_ok=True);clean,driven,cycles=generate()
  lines=['// GENERATED from generate_morph_bank.py. Do not hand edit.','import("stdfaust.lib");']
+ # Both indices are compile-time integers in the unrolled oscillator graph.
+ # Pattern clauses avoid expanding 64-way runtime selectors at every call.
  for name,values in [('clean',clean),('driven',driven)]:
   for i,row in enumerate(values):
-   lines.append(f'{name}{i}(n)=('+','.join(f'{v:.17e}' for v in row)+'):ba.selectn(64,n-1);')
-  lines.append(name+'(k,n)=('+','.join(f'{name}{i}(n)' for i in range(8))+'):ba.selectn(8,k);')
+   for n,value in enumerate(row,1):
+    lines.append(f'{name}({i},{n})={value:.17e};')
  content='\n'.join(lines)+'\n';(out/'bank.lib').write_text(content)
  cycles.astype('<f4').tofile(out/'wavetable-cycles.f32')
  info={'schema':1,'names':NAMES,'harmonics':HARMONICS,'cycle_size':CYCLE_SIZE,
