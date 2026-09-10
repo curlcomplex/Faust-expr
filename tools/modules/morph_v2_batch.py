@@ -60,8 +60,10 @@ class Study:
    self.check(label+':header-hash',sha(old/'generated.hpp')==expected['generated_sha256'])
    shutil.copyfile(old/'generated.hpp',d/'generated.hpp')
   else:
-   cmd([os.getenv('FAUST','faust'),'-I',MOD,'-I',self.out/'bank',*flags,source,'-o',d/'generated.hpp'],timeout=25 if vector else 180)
-   cmd([os.getenv('FAUST','faust'),'-I',MOD,'-I',self.out/'bank','-e',source,'-o',d/'expanded.dsp'])
+   # Each module owns its library directory: do not accidentally import Morph's
+   # engine.lib when compiling the independent Tone comparison.
+   cmd([os.getenv('FAUST','faust'),'-I',source.parent,'-I',self.out/'bank',*flags,source,'-o',d/'generated.hpp'],timeout=25 if vector else 180)
+   cmd([os.getenv('FAUST','faust'),'-I',source.parent,'-I',self.out/'bank','-e',source,'-o',d/'expanded.dsp'])
   cppflags=['-std=c++17','-O2','-ffp-contract=off','-fstack-usage','-I'+str(d)]
   cmd([os.getenv('CXX','c++'),*cppflags,ROOT/'tools/modules/render.cpp','-o',d/'render'])
   text=cmd([d/'render','--controls']);(d/'controls.tsv').write_text(text)
@@ -224,7 +226,7 @@ class Study:
   self.report['failure']=error;self.report['cxx']=cmd([os.getenv('CXX','c++'),'--version']).strip()
   self.report['faust']='offline generated-C++ replay' if self.replay else cmd([os.getenv('FAUST','faust'),'-v']).strip()
   self.report['source_files']={}
-  for p in list(MOD.glob('*'))+[ROOT/'tools/modules/render.cpp',ROOT/'tools/modules/generate_morph_bank.py',ROOT/'tools/modules/morph_v2_batch.py',ROOT/'tools/modules/morph_v2_benchmark.cpp']:
+  for p in list(MOD.glob('*'))+[ROOT/'modules/tone-pm/playable/engine.lib',ROOT/'tools/modules/render.cpp',ROOT/'tools/modules/generate_morph_bank.py',ROOT/'tools/modules/morph_v2_batch.py',ROOT/'tools/modules/morph_v2_benchmark.cpp']:
    if p.is_file():self.report['source_files'][str(p.relative_to(ROOT))]=sha(p)
   try:self.report['source_commit']=cmd(['git','rev-parse','HEAD']).strip()
   except Exception:self.report['source_commit']=json.loads((self.replay/'report.json').read_text()).get('source_commit') if self.replay else None

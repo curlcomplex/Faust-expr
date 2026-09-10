@@ -1,4 +1,4 @@
-declare name "morph-morph";
+declare name "morph-wavetable";
 declare version "0.2.0-experiment";
 e=library("engine.lib");
 process=e.render(e.fastOsc);
