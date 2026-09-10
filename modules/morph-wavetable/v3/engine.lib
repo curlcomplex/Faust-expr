@@ -11,17 +11,16 @@ flatIndex(b,f,s,d,i)=i+N*(d+ND*(s+NS*(f+NF*b)));
 // because v2's coefficient tilt is exactly linear in brightness. Drive is also
 // linear between clean/driven coefficient endpoints; Morph interpolation stays
 // runtime-continuous between adjacent authored frames.
-tableValue = sum(n,64, coefficient(n+1)*sin((n+1)*theta)) with {
+tableValue = sum(h,64, coefficient(h+1)*sin((h+1)*theta)) with {
   q=ba.time%TOTAL;
   i=q%N; r0=int(q/N);
   d=r0%ND; r1=int(r0/ND);
   s=r1%NS; r2=int(r1/NS);
   fidx=r2%NF; b=int(r2/NF);
   theta=2.0*ma.PI*float(i)/N;
-  source=(1-d)*bank.clean(fidx,n)+(d)*bank.driven(fidx,n);
-  dark=1.0/(1.0+.08*(n-1)*(n-1));
-  tilt=(1-s)*dark+s;
-  coefficient=source*tilt*(n<=limit(b));
+  source(n)=(1-d)*bank.clean(fidx,n)+d*bank.driven(fidx,n);
+  tilt(n)=(1-s)/(1.0+.08*(n-1)*(n-1))+s;
+  coefficient(n)=source(n)*tilt(n)*(n<=limit(b));
 };
 lookup(index)=rdtable(TOTAL,tableValue,index);
 
