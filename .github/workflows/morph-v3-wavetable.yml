@@ -1,0 +1,46 @@
+name: Morph v3 verified wavetable playback
+on:
+  push:
+    branches: [20-morph-wavetable-full-batch]
+    paths: ['modules/morph-wavetable/v3/**', 'tools/modules/generate_morph_tables.py', 'tools/modules/morph_wavetable_*', 'tests/test_morph_wavetable.py', '.github/workflows/morph-v3-wavetable.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: morph-v3-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  compare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Disposable compiler and analyzer dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy
+      - name: Independent band/interpolation arithmetic
+        run: /usr/bin/python3 -m unittest discover -s tests -p test_morph_wavetable.py -v
+      - name: Actual Faust, full musical regressions, fidelity and three-way benchmarks
+        run: /usr/bin/python3 tools/modules/morph_wavetable_batch.py --out build/morph-lookup
+      - name: Preserve exact source and compiler evidence
+        if: always()
+        run: |
+          mkdir -p build/morph-lookup
+          git rev-parse HEAD > build/morph-lookup/commit.txt
+          git archive --format=tar HEAD > build/morph-lookup/source.tar
+          git diff --check > build/morph-lookup/diff-check.txt
+          faust -v > build/morph-lookup/faust-version.txt
+          c++ --version > build/morph-lookup/compiler-version.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: morph-lookup-${{ github.sha }}
+          path: build/morph-lookup/
+          if-no-files-found: error
+          retention-days: 7

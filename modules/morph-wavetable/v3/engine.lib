@@ -1,0 +1,62 @@
+// Morph v3: conventional shared, band-limited wavetable playback.
+// Identical v2 controls/phase/envelopes; cubic lookup approximates Fourier sound.
+import("stdfaust.lib");
+import("tablebank.lib");
+pitchCtl=hslider("pitch_hz",220,20,8000,.001);
+morphCtl=hslider("morph",.28,0,1,.001);
+shapeCtl=hslider("shape",.55,0,1,.001);
+decayCtl=hslider("decay",.5,0,1,.001);
+detuneCtl=hslider("detune",.20,0,1,.001);
+stackCtl=hslider("stack",1,1,4,1);
+driveCtl=hslider("drive",0,0,1,.001);
+gate=button("gate");velocityCtl=hslider("velocity",1,0,1,.001);
+hit=gate>gate';off=gate<gate';seen=max(hit)~_;
+latch(v)=ba.sAndH(hit,v);
+vel=latch(velocityCtl); voices=max(1,int(latch(stackCtl)));
+releaseSeconds=latch(.035*pow(100.0,decayCtl));
+smoothing=exp(-1.0/(.003*ma.SR));
+follow(v)=loop~_ with {loop(previous)=select2(hit,v*(1-smoothing)+previous*smoothing,v);};
+frequency=exp(follow(log(pitchCtl)));
+position=7.0*follow(morphCtl); brightness=follow(shapeCtl);
+spreadCents=28.0*follow(detuneCtl); driveMix=pow(follow(driveCtl),2.0);
+location(i)=(voices>1)*(2.0*i/max(1,voices-1)-1.0);
+hz(i)=frequency*pow(2.0,location(i)*spreadCents/1200.0);
+maxHz=frequency*pow(2.0,(voices>1)*spreadCents/1200.0);
+freqAt(i)=rdtable(bandFrequencies,int(min(bandCount-1,max(0,i))));
+// Coarse 1Hz index, followed by at most two exact boundary corrections.
+// The generated knot set has at most two knots per 1Hz bin (verified).
+coarse=rdtable(bandIndex,int(min(9000,max(20,floor(maxHz)))));
+step1=coarse+(maxHz>=freqAt(coarse+1))*(coarse+1<bandCount-1);
+step2=step1+(maxHz>=freqAt(step1+1))*(step1+1<bandCount-1);
+b0=min(bandCount-2,step2);b1=b0+1;
+bf=max(0.0,min(1.0,(maxHz-freqAt(b0))/(freqAt(b1)-freqAt(b0))));
+fp=max(0.0,min(7.0,position)); f0=int(fp);f1=min(7,f0+1);
+fu=fp-f0; ff=fu*fu*(3.0-2.0*fu);
+slot(b,f,s,d)=d+2*(s+2*(f+8*b));
+getSample(i)=rdtable(tableSamples,int(i));
+readEndpoint(b,f,s,d,p)=v1+0.5*u*(v2-v0+u*(2*v0-5*v1+4*v2-v3+u*(3*(v1-v2)+v3-v0))) with {
+ id=slot(b,f,s,d); offset=rdtable(tableOffsets,id);N=rdtable(tableLengths,id);
+ x=p*N;i=int(x);u=x-i;
+ // Reconstruct the negative half using exact odd symmetry; no signal reduction.
+ sample(j)=getSample(offset+min(j,int(N)-j))*(1.0-2.0*(j>int(N)/2));
+ v0=sample((i-1+int(N)) & (int(N)-1));
+ v1=sample(i & (int(N)-1));
+ v2=sample((i+1) & (int(N)-1));
+ v3=sample((i+2) & (int(N)-1));
+};
+frame(b,f,p)=
+ (1-driveMix)*((1-brightness)*readEndpoint(b,f,0,0,p)+brightness*readEndpoint(b,f,1,0,p))
+ +driveMix*((1-brightness)*readEndpoint(b,f,0,1,p)+brightness*readEndpoint(b,f,1,1,p));
+scan(b,p)=(1-ff)*frame(b,f0,p)+ff*frame(b,f1,p);
+osc(p)=(1-bf)*scan(b0,p)+bf*scan(b1,p);
+voice(i)=osc(os.hs_phasor(1.0,hz(i),hit));
+left=sum(i,4,voice(i)*(voices>i)*(1-.75*location(i)))/voices;
+right=sum(i,4,voice(i)*(voices>i)*(1+.75*location(i)))/voices;
+age=(+(1.0):min(60.0*ma.SR):*(1.0-hit))~_;
+releaseAge=(+(1.0):min(60.0*ma.SR):*((1.0-gate)*(1.0-off)))~_;
+time=age/ma.SR; releaseTime=releaseAge/ma.SR;
+attack=1.0-exp(-time/.0025); releaseStart=ba.sAndH(off,attack);
+released=releaseStart*exp(-releaseTime/max(.035,releaseSeconds))*(releaseTime<14.0*releaseSeconds);
+envelope=seen*select2(gate,released,attack);
+process=((left*seen:fi.dcblockerat(8))*.65*vel*envelope),
+        ((right*seen:fi.dcblockerat(8))*.65*vel*envelope);

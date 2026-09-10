@@ -1,0 +1,117 @@
+// Morph 0.2. Independently authored spectral frames, not Nord/Elektron assets.
+// Same-note unison only. One host note remains one independently gated voice.
+import("stdfaust.lib");
+bank=library("bank.lib");
+pitchCtl=hslider("pitch_hz",220,20,8000,.001);
+morphCtl=hslider("morph",.28,0,1,.001);
+shapeCtl=hslider("shape",.55,0,1,.001);
+decayCtl=hslider("decay",.5,0,1,.001);
+detuneCtl=hslider("detune",.20,0,1,.001);
+stackCtl=hslider("stack",1,1,4,1);
+driveCtl=hslider("drive",0,0,1,.001);
+gate=button("gate");velocityCtl=hslider("velocity",1,0,1,.001);
+hit=gate>gate';off=gate<gate';seen=max(hit)~_;
+latch(v)=ba.sAndH(hit,v);
+vel=latch(velocityCtl); voices=max(1,int(latch(stackCtl)));
+releaseSeconds=latch(.035*pow(100.0,decayCtl));
+smoothing=exp(-1.0/(.003*ma.SR));
+follow(v)=loop~_ with {loop(previous)=select2(hit,v*(1-smoothing)+previous*smoothing,v);};
+frequency=exp(follow(log(pitchCtl)));
+position=7.0*follow(morphCtl); brightness=follow(shapeCtl);
+spreadCents=28.0*follow(detuneCtl); driveMix=pow(follow(driveCtl),2.0);
+// Every active set is symmetric in cents; N=1 is EXACTLY the host frequency.
+location(i)=(voices>1)*(2.0*i/max(1,voices-1)-1.0);
+hz(i)=frequency*pow(2.0,location(i)*spreadCents/1200.0);
+maxHz=frequency*pow(2.0,(voices>1)*spreadCents/1200.0);
+// Smoothstep crossfades share phase and sum to one between adjacent frames.
+weight(k)=u*u*(3.0-2.0*u) with {u=max(0.0,1.0-abs(position-k));};
+frameCoefficient(n)=sum(k,8,weight(k)*((1-driveMix)*bank.clean(k,n)+driveMix*bank.driven(k,n)));
+// Shape is spectral brightness, not extra FM; its endpoint is genuinely dark.
+tilt(n)=brightness+(1-brightness)/(1.0+.08*(n-1)*(n-1));
+// Fixed 16--19 kHz spectral edge for supported 44.1/48/96 kHz rates.
+// Drive is authored into the frame spectra BEFORE this band limit, not a
+// nonlinear post-stack effect producing uncontrolled harmonics above Nyquist.
+coefficient(n)=frameCoefficient(n)*tilt(n)*max(0.0,min(1.0,(19000.0-n*maxHz)/3000.0));
+referenceOsc(theta)=sum(i,64,coefficient(i+1)*sin((i+1)*theta));
+fastOsc(theta)=sin(theta)*b1 with {
+ c=2.0*cos(theta); b65=0.0; b66=0.0;
+ b64=coefficient(64)+c*b65-b66;
+ b63=coefficient(63)+c*b64-b65;
+ b62=coefficient(62)+c*b63-b64;
+ b61=coefficient(61)+c*b62-b63;
+ b60=coefficient(60)+c*b61-b62;
+ b59=coefficient(59)+c*b60-b61;
+ b58=coefficient(58)+c*b59-b60;
+ b57=coefficient(57)+c*b58-b59;
+ b56=coefficient(56)+c*b57-b58;
+ b55=coefficient(55)+c*b56-b57;
+ b54=coefficient(54)+c*b55-b56;
+ b53=coefficient(53)+c*b54-b55;
+ b52=coefficient(52)+c*b53-b54;
+ b51=coefficient(51)+c*b52-b53;
+ b50=coefficient(50)+c*b51-b52;
+ b49=coefficient(49)+c*b50-b51;
+ b48=coefficient(48)+c*b49-b50;
+ b47=coefficient(47)+c*b48-b49;
+ b46=coefficient(46)+c*b47-b48;
+ b45=coefficient(45)+c*b46-b47;
+ b44=coefficient(44)+c*b45-b46;
+ b43=coefficient(43)+c*b44-b45;
+ b42=coefficient(42)+c*b43-b44;
+ b41=coefficient(41)+c*b42-b43;
+ b40=coefficient(40)+c*b41-b42;
+ b39=coefficient(39)+c*b40-b41;
+ b38=coefficient(38)+c*b39-b40;
+ b37=coefficient(37)+c*b38-b39;
+ b36=coefficient(36)+c*b37-b38;
+ b35=coefficient(35)+c*b36-b37;
+ b34=coefficient(34)+c*b35-b36;
+ b33=coefficient(33)+c*b34-b35;
+ b32=coefficient(32)+c*b33-b34;
+ b31=coefficient(31)+c*b32-b33;
+ b30=coefficient(30)+c*b31-b32;
+ b29=coefficient(29)+c*b30-b31;
+ b28=coefficient(28)+c*b29-b30;
+ b27=coefficient(27)+c*b28-b29;
+ b26=coefficient(26)+c*b27-b28;
+ b25=coefficient(25)+c*b26-b27;
+ b24=coefficient(24)+c*b25-b26;
+ b23=coefficient(23)+c*b24-b25;
+ b22=coefficient(22)+c*b23-b24;
+ b21=coefficient(21)+c*b22-b23;
+ b20=coefficient(20)+c*b21-b22;
+ b19=coefficient(19)+c*b20-b21;
+ b18=coefficient(18)+c*b19-b20;
+ b17=coefficient(17)+c*b18-b19;
+ b16=coefficient(16)+c*b17-b18;
+ b15=coefficient(15)+c*b16-b17;
+ b14=coefficient(14)+c*b15-b16;
+ b13=coefficient(13)+c*b14-b15;
+ b12=coefficient(12)+c*b13-b14;
+ b11=coefficient(11)+c*b12-b13;
+ b10=coefficient(10)+c*b11-b12;
+ b9=coefficient(9)+c*b10-b11;
+ b8=coefficient(8)+c*b9-b10;
+ b7=coefficient(7)+c*b8-b9;
+ b6=coefficient(6)+c*b7-b8;
+ b5=coefficient(5)+c*b6-b7;
+ b4=coefficient(4)+c*b5-b6;
+ b3=coefficient(3)+c*b4-b5;
+ b2=coefficient(2)+c*b3-b4;
+ b1=coefficient(1)+c*b2-b3;
+};
+// Same phase at onset: zero Detune does not cancel or shift the note. The
+// phases then separate through their actual detuned frequencies, not an LFO.
+voice(osc,i)=osc(2.0*ma.PI*os.hs_phasor(1.0,hz(i),hit));
+left(osc)=sum(i,4,voice(osc,i)*(voices>i)*(1.0-.75*location(i)))/voices;
+right(osc)=sum(i,4,voice(osc,i)*(voices>i)*(1.0+.75*location(i)))/voices;
+age=(+(1.0):min(60.0*ma.SR):*(1.0-hit))~_;
+releaseAge=(+(1.0):min(60.0*ma.SR):*((1.0-gate)*(1.0-off)))~_;
+time=age/ma.SR; releaseTime=releaseAge/ma.SR;
+attack=1.0-exp(-time/.0025); releaseStart=ba.sAndH(off,attack);
+released=releaseStart*exp(-releaseTime/max(.035,releaseSeconds))*(releaseTime<14.0*releaseSeconds);
+envelope=seen*select2(gate,released,attack);
+// Do not fill filters with invisible startup oscillation. Keep histories
+// advancing after the first note; never suspend a ringing/released instance.
+render(osc)=((left(osc)*seen:fi.dcblockerat(8))*.65*vel*envelope),
+            ((right(osc)*seen:fi.dcblockerat(8))*.65*vel*envelope);

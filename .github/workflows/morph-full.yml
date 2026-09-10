@@ -1,0 +1,35 @@
+name: Morph wavetable full delivery
+on:
+  push:
+    branches: [20-morph-wavetable-full-batch]
+    paths: ['modules/morph-wavetable/**','tools/modules/morph_batch.py','.github/workflows/morph-full.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: morph-full-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install disposable build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy
+      - name: Build and qualify Morph
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 tools/modules/morph_batch.py --out build/morph-full
+      - name: Preserve evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: morph-${{ github.sha }}
+          path: build/morph-full/
+          if-no-files-found: error
+          retention-days: 7

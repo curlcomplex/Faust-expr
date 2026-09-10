@@ -1,0 +1,95 @@
+name: Morph v3 complete verification
+
+on:
+  push:
+    branches: [20-morph-wavetable-full-batch]
+    paths:
+      - '.github/workflows/morph-v3-no-timeout.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: morph-v3-no-timeout-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install compiler dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy
+      - name: Independent band and interpolation tests
+        run: /usr/bin/python3 -m unittest discover -s tests -p test_morph_wavetable.py -v
+      - name: Actual Faust and unchanged full qualification, with explicit build budget
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/morph-complete
+          /usr/bin/time -v /usr/bin/python3 - <<'PY' 2>&1 | tee build/morph-complete/run.log
+          import json, os, sys, time
+          from pathlib import Path
+          sys.path.insert(0, str(Path('tools/modules').resolve()))
+          import morph_wavetable_batch as suite
+          original_cmd = suite.base.cmd
+          compiler_runs = []
+          def extended_build_cmd(args, timeout=180):
+              actual = [str(x) for x in args]
+              compiler = actual[0] == os.environ.get('FAUST', 'faust')
+              if compiler:
+                  cleaned = [actual[0]]
+                  i = 1
+                  while i < len(actual):
+                      if actual[i] in ('-t', '--timeout'):
+                          i += 2
+                      else:
+                          cleaned.append(actual[i]); i += 1
+                  actual = cleaned[:1] + ['-t', '3600'] + cleaned[1:]
+                  timeout = 3660
+              elif 'c++' in Path(actual[0]).name or 'g++' in Path(actual[0]).name:
+                  timeout = 3660
+              start = time.monotonic()
+              try:
+                  return original_cmd(actual, timeout=timeout)
+              finally:
+                  if compiler:
+                      compiler_runs.append({'argv': actual, 'wall_seconds': time.monotonic()-start})
+          suite.base.cmd = extended_build_cmd
+          study = suite.Study(Path('build/morph-complete/run').resolve())
+          failure = None
+          try:
+              study.run()
+          except Exception as error:
+              failure = repr(error)
+          finally:
+              study.save(failure)
+              Path('build/morph-complete/compiler-invocations.json').write_text(json.dumps(compiler_runs, indent=2)+'\n')
+          if failure:
+              raise SystemExit(failure)
+          PY
+      - name: Preserve exact source and compiler evidence
+        if: always()
+        run: |
+          mkdir -p build/morph-complete
+          git rev-parse HEAD > build/morph-complete/commit.txt
+          git archive --format=tar HEAD > build/morph-complete/source.tar
+          git diff --check > build/morph-complete/diff-check.txt
+          faust -v > build/morph-complete/faust-version.txt
+          c++ --version > build/morph-complete/compiler-version.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: morph-complete-${{ github.sha }}
+          path: build/morph-complete/
+          if-no-files-found: error
+          retention-days: 7

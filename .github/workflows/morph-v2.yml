@@ -1,0 +1,42 @@
+name: Morph v2 full delivery
+on:
+  push:
+    branches: [20-morph-wavetable-full-batch]
+    paths: ['modules/morph-wavetable/v2/**','tools/modules/morph_v2*','tools/modules/generate_morph_bank.py','tests/test_morph_v2.py','.github/workflows/morph-v2.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+concurrency:
+  group: morph-v2-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Dependencies on disposable hosted runner
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends faust g++ ffmpeg python3-numpy python3-scipy
+      - name: Independent arithmetic and contract tests
+        run: /usr/bin/python3 -m unittest discover -s tests -p test_morph_v2.py -v
+      - name: Actual Faust, musical oracles, stereo unison, comparative audio and benchmark
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/morph-v2
+          /usr/bin/python3 tools/modules/morph_v2_batch.py --out build/morph-v2 2>&1 | tee build/morph-v2/build.log
+      - name: Preserve exact source and evidence
+        if: always()
+        run: |
+          mkdir -p build/morph-v2
+          git rev-parse HEAD > build/morph-v2/commit.txt
+          git diff --check > build/morph-v2/diff-check.txt
+          git archive --format=tar HEAD > build/morph-v2/source.tar
+          faust -v > build/morph-v2/faust-version.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: morph-v2-${{ github.sha }}
+          path: build/morph-v2/
+          if-no-files-found: error
+          retention-days: 7
