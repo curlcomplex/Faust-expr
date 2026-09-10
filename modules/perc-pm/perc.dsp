@@ -18,7 +18,7 @@ hit=gate>gate';
 latched(x)=ba.sAndH(hit,x);
 seen=max(hit)~_;
 f0=latched(pitch); sw=latched(sweep); pu=latched(punch);
-de=latched(decay); ih=latched(inharm); md=latched(modulation);
+decayValue=latched(decay); ih=latched(inharm); md=latched(modulation);
 ct=latched(contour); dr=latched(drive); vel=latched(velocity);
 age=(+(1.0):min(30.0*ma.SR):*(1.0-hit))~_;
 t=age/ma.SR;
@@ -31,7 +31,7 @@ f=f0*(1.0+(sweepRatio-1.0)*exp(-t/sweepTau));
 
 // Body and modulation decay independently so the same body can become a knock,
 // ringing block or brittle transient without a hidden effect tail.
-bodyTau=.018*pow(85.0,de);
+bodyTau=.018*pow(85.0,decayValue);
 attackTau=.00016+.0009*(1.0-pu)*(1.0-pu);
 amp=(1.0-exp(-t/attackTau))*exp(-t/bodyTau);
 modTau=.006+.22*(1.0-ct)*(1.0-ct);
