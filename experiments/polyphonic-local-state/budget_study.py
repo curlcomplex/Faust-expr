@@ -7,29 +7,12 @@ import csv, hashlib, json, math, os, random, statistics, subprocess, time
 from pathlib import Path
 import tail_study as tail
 import verify
+from policy_evidence import policy_check
 HERE=Path(__file__).resolve().parent
 BUDGETS=('startup','geometry','periodic')
 SHAPES=(('serial',16),('parallel',16),('feedback',8),('memory',8))
 def write(path,value):path.write_text(json.dumps(value,indent=2)+'\n')
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
-def policy_check(folder,case):
-    m=tail.read(folder/'result.json');b=case['budget'];period=case['block']/48.0
-    assert m['worker_budget']==b and m['configured_player_rate']==48000
-    assert m['configured_player_frames']==(512 if b=='startup' else case['block'])
-    convert=m['mach_tick_ns']/1e6
-    # Every final batch retains the policy observed by its actual execution
-    # thread. There may be duplicate thread observations; do not claim otherwise.
-    workers=[p for p in m['batch_startup_policies'] if not p['caller']]
-    assert workers and all(p['result']==0 and not p['default'] for p in workers)
-    expected_constraint=512/44.1 if b=='startup' else period
-    for p in workers:
-        assert abs(p['constraint']*convert-expected_constraint)<.002,(b,p,convert)
-        assert abs(p['period']*convert-(period if b=='periodic' else 0))<.002
-        assert abs(p['computation']*convert-(period*.5 if b=='periodic' else expected_constraint))<.002
-    caller=m['caller_thread_policy']
-    assert caller['result']==0 and not caller['default'] and caller['period']==0
-    assert abs(caller['constraint']*convert-512/44.1)<.002,'caller policy was not held constant'
-    return dict(worker_constraint_ms=expected_constraint,worker_period_ms=period if b=='periodic' else 0,caller_constraint_ms=caller['constraint']*convert,worker_observations=len(workers))
 def execute(exe,kernels,out,c):
     out.mkdir(parents=True,exist_ok=True)
     cmd=[str(exe),c['mode'],c['family'],str(c['stages']),str(c['block']),str(c['voices']),str(c['participants']),str(c['grain']),str(kernels/f"{c['family']}-{c['stages']}"),str(out)]
@@ -64,18 +47,21 @@ def summarize(out,completed,costs):
       for p in (4,8):
        for handoff in ('prepared','prebuilt'):
         items=[r for r in completed if r['case']['budget']==budget and r['case']['participants']==p and r['case']['handoff']==handoff]
+        assert len(items)==8,(budget,p,handoff,len(items))
         callbacks=sum(r['audit']['all_callback_us']['count'] for r in items)
         over=sum(sum(v['callback_over_budget'] for v in r['audit']['phases'].values()) for r in items)
         summaries.append(dict(budget=budget,participants=p,handoff=handoff,cases=len(items),callbacks=callbacks,over_budget=over,over_budget_pct=100*over/callbacks,deadline_misses=sum(r['audit']['all_deadline_misses'] for r in items),maximum_callback_us=max(r['audit']['all_callback_us']['maximum'] for r in items),maximum_output_interval_ms=max(r['audit']['maximum_output_interval_ms'] for r in items),median_case_median_us=statistics.median(r['audit']['all_callback_us']['median'] for r in items)))
     throughput=[]
-    for budget in BUDGETS:
-      for p in (1,2,4,8):
+    if costs:
+      for budget in BUDGETS:
+       for p in (1,2,4,8):
         rows=[r for r in costs[budget]['cases'] if r['participants']==p]
         gm=lambda key:math.exp(statistics.mean(math.log(r[key]) for r in rows))
         throughput.append(dict(budget=budget,participants=p,cases=len(rows),speedup_vs_stock=gm('optimized_pool_speedup_vs_stock_llvm'),speedup_vs_shared_serial=gm('pool_speedup_vs_same_shared_serial'),local_over_whole=gm('local_over_whole_fallback')))
-    result=dict(passed=True,online_cases=len(completed),throughput_cases=sum(len(v['cases']) for v in costs.values()),additional_conformance_cases=64,online=summaries,throughput=throughput,device_acceptance=False)
+    result=dict(passed=True,online_cases=len(completed),throughput_cases=sum(len(v['cases']) for v in costs.values()),throughput_execution='executed' if costs else 'not rerun; retain separately identified prior evidence',additional_conformance_cases=64,online=summaries,throughput=throughput,device_acceptance=False)
     write(out/'summary.json',result)
     for name,rows in [('online',summaries),('throughput',throughput)]:
+        if not rows:continue
         with (out/(name+'.csv')).open('w') as f:
             w=csv.DictWriter(f,fieldnames=list(rows[0]));w.writeheader();w.writerows(rows)
     print('BUDGET_SUMMARY',json.dumps(result),flush=True)
@@ -83,27 +69,30 @@ def summarize(out,completed,costs):
 
 def run(exe,kernels,out,base_cases):
     out.mkdir(parents=True,exist_ok=True)
-    identity=dict(executable_sha256=sha(exe),source_sha256={p.name:sha(p) for p in HERE.iterdir() if p.is_file()},baseline='57ae54480db4bd90a4e0997515638bdf46718cd4',caller_policy='held at 512 frames /44100Hz in all worker-only arms')
+    online_only=os.environ.get('PS_BUDGET_ONLINE_ONLY','0')=='1'
+    identity=dict(executable_sha256=sha(exe),source_sha256={p.name:sha(p) for p in HERE.iterdir() if p.is_file()},baseline='d473fbd66164b3421be67b5b68e7c0db384713aa',caller_policy='held at 512 frames /44100Hz in all worker-only arms',online_only=online_only)
     write(out/'identity.json',identity)
     # The baseline conformance has already passed in run.py. Reuse precisely
     # its existing inventory, complete one-participant serial case first.
     defs=[tuple(c[k] for k in ('mode','family','stages','block','voices','participants','grain')) for c in base_cases]
     assert len(defs)==32 and defs[0]==('conformance','serial',16,64,8,1,4)
     for b in BUDGETS[1:]:native_suite(exe,kernels,out/b/'conformance',b,defs)
-    # Requalify against genuine stock whole-Faust LLVM, identical graph families,
-    # sizes, sample rates, note workloads, observers and nine trials. Grain4
-    # only in this slice; no claim to rerun the historical grain1 matrix.
-    definitions=[('benchmark',f,n,block,v,p,4) for f,n in SHAPES for block in (64,128) for v in (4,16) for p in (1,2,4,8)]
-    shuffled=[(b,d) for b in BUDGETS for d in definitions];random.Random(261112).shuffle(shuffled)
-    records={b:[] for b in BUDGETS}
-    for b in BUDGETS:
-        folder=out/b/'throughput';folder.mkdir(parents=True,exist_ok=True);write(folder/'planned-cases.json',definitions)
-    for b,d in shuffled:
-        mode,f,n,block,v,p,g=d;name=f'{mode}-{f}-{n}-b{block}-v{v}-p{p}-g{g}';c=dict(mode=mode,family=f,stages=n,block=block,voices=v,participants=p,grain=g,budget=b,name=name)
-        folder=out/b/'throughput';records[b].append(execute(exe,kernels,folder/'cases'/name,c));write(folder/'cases.json',records[b])
     costs={}
-    for b in BUDGETS:
-        folder=out/b/'throughput';verify.main(folder);costs[b]=tail.read(folder/'summary.json')
+    if not online_only:
+        # Requalify against genuine stock whole-Faust LLVM, identical graph
+        # families and nine trials. Grain4 only; no grain1 claim.
+        definitions=[('benchmark',f,n,block,v,p,4) for f,n in SHAPES for block in (64,128) for v in (4,16) for p in (1,2,4,8)]
+        shuffled=[(b,d) for b in BUDGETS for d in definitions];random.Random(261112).shuffle(shuffled)
+        records={b:[] for b in BUDGETS}
+        for b in BUDGETS:
+            folder=out/b/'throughput';folder.mkdir(parents=True,exist_ok=True);write(folder/'planned-cases.json',definitions)
+        for b,d in shuffled:
+            mode,f,n,block,v,p,g=d;name=f'{mode}-{f}-{n}-b{block}-v{v}-p{p}-g{g}';c=dict(mode=mode,family=f,stages=n,block=block,voices=v,participants=p,grain=g,budget=b,name=name)
+            folder=out/b/'throughput';records[b].append(execute(exe,kernels,folder/'cases'/name,c));write(folder/'cases.json',records[b])
+        for b in BUDGETS:
+            folder=out/b/'throughput';verify.main(folder);costs[b]=tail.read(folder/'summary.json')
+    else:
+        print('THROUGHPUT_NOT_RERUN: earlier immutable d473fbd results remain separate evidence',flush=True)
     planned=[]
     for repeat in range(2):
       for family,n in SHAPES[:2]:

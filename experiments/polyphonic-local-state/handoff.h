@@ -20,6 +20,10 @@ struct CallbackRecord {
     int workerTC=0,workerOther=0,callerTC=0,policyErrors=0;
     int phase=0; // 0=before, 1=editable-B, 2=pending-A, 3=optimized-B
 };
+// The final block can legitimately be processed entirely by the caller.
+// Preserve every batch observation instead of treating that last snapshot as
+// lifetime worker evidence. These remain cached startup policies, not live OS polls.
+struct PolicyObservation {job_probe::Policy policy;bool caller=false;};
 static const char* phaseName(int value) {
     return std::array<const char*,4>{"before","editable-B","pending-A","optimized-B"}[std::size_t(value)];
 }
@@ -58,6 +62,8 @@ static void liveTest(Engine& e,const fs::path& root,const fs::path& out,int part
     std::vector<CallbackRecord> records(capacity);
     std::vector<float> capture(capacity*std::size_t(block)*2,0.f);
     std::vector<unsigned char> topology(capacity,0);
+    const std::size_t batchCount=(scene.slots.size()+std::size_t(grain)-1)/std::size_t(grain);
+    std::vector<PolicyObservation> policyHistory(probing?capacity*batchCount:0);
     // Precompiled no-compiler control pays all load/prewarm costs before timing.
     if(prebuilt){prepareCode(prepared,e,root/"kernel-B.dylib",block);}
     double request=0,readyTime=0;bool adopted=false,sent=false;
@@ -117,6 +123,7 @@ static void liveTest(Engine& e,const fs::path& root,const fs::path& out,int part
         if(probing){
             for(std::size_t i=0;i<scene.slots.size();i+=std::size_t(grain)){
                 const auto& t=scene.slots[i].timing;
+                policyHistory[completed*batchCount+i/std::size_t(grain)]={t.scheduling,t.caller};
                 row.jobCpu+=t.cpu;row.policyErrors+=t.scheduling.result!=0;
                 if(t.caller)row.callerTC+=t.scheduling.realtime();else if(t.scheduling.realtime())++row.workerTC;else ++row.workerOther;
                 row.jobMaxWall=std::max(row.jobMaxWall,t.end-t.begin);
@@ -140,6 +147,15 @@ static void liveTest(Engine& e,const fs::path& root,const fs::path& out,int part
         detail<<k*block<<'\t'<<block<<'\t'<<phaseName(r.phase)<<'\t'<<r.scheduled<<'\t'<<r.entry<<'\t'<<r.renderBegin<<'\t'<<r.renderEnd<<'\t'<<r.end<<'\t'<<r.cpu<<'\t'<<r.jobCpu<<'\t'<<r.jobMaxWall<<'\t'<<r.jobMaxOffCpu<<'\t'<<r.jobLastStart<<'\t'<<r.workerTC<<'\t'<<r.workerOther<<'\t'<<r.callerTC<<'\t'<<r.policyErrors<<'\n';
     }
     trace.flush();detail.flush();
+    if(probing){
+        std::ofstream policies(out/"worker-policy.tsv");
+        policies<<"sample\tbatch\tcaller\tresult\tdefault\tperiod\tcomputation\tconstraint\n";
+        for(std::size_t k=0;k<completed;++k)for(std::size_t j=0;j<batchCount;++j){
+            const auto& observation=policyHistory[k*batchCount+j];const auto& p=observation.policy;
+            policies<<k*block<<'\t'<<j<<'\t'<<int(observation.caller)<<'\t'<<p.result<<'\t'<<p.defaultPolicy<<'\t'<<p.period<<'\t'<<p.computation<<'\t'<<p.constraint<<'\n';
+        }
+        require(bool(policies),"worker policy evidence write failed");
+    }
     require(scene.identities()==ids,"handoff replaced sounding voice state");
     if(fault=="none")require(adopted&&postBlocks==128,"prepared code was not adopted within the bound: "+prepared.error);
     else {require(!adopted,"invalid code was adopted");if(failCompile)require(prepared.build.code>0&&prepared.build.code!=124,"failure negative was a timeout, not rejection");if(failCompile||badSchema)require(prepared.built.load()==-1,"failure negative did not reject");if(stale)require(prepared.built.load()==2,"stale negative was not published");}
@@ -161,6 +177,8 @@ static void liveTest(Engine& e,const fs::path& root,const fs::path& out,int part
     juce::Array<V> startupPolicies;
     if(probing)for(std::size_t i=0;i<scene.slots.size();i+=std::size_t(grain)){const auto& t=scene.slots[i].timing;V item=policyJson(t.scheduling);prop(item,"caller",t.caller);startupPolicies.add(item);}
     prop(r,"batch_startup_policies",startupPolicies);
+    prop(r,"worker_policy_rows",double(probing?completed*batchCount:0));
+    prop(r,"worker_policy_capture","per-callback cached startup policy; not continuous OS polling");
     prop(r,"caller_thread_policy",policyJson(callerPolicy));prop(r,"compiler_thread_policy",policyJson(prepared.compilerPolicy));prop(r,"policy",policy);prop(r,"handoff",handoff);prop(r,"fault",fault);prop(r,"job_probe",probing);
     prop(r,"request_us",request);prop(r,"ready_us",readyTime);prop(r,"compile_begin_us",prepared.build.started);prop(r,"compile_end_us",prepared.build.finished);
     prop(r,"load_begin_us",prepared.loadBegin);prop(r,"load_end_us",prepared.loadEnd);prop(r,"published_us",prepared.published);
