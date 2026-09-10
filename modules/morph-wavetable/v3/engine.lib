@@ -70,4 +70,4 @@ time=age/ma.SR; releaseTime=releaseAge/ma.SR;
 attack=1.0-exp(-time/.0025); releaseStart=ba.sAndH(off,attack);
 released=releaseStart*exp(-releaseTime/max(.035,releaseSeconds))*(releaseTime<14.0*releaseSeconds);
 envelope=seen*select2(gate,released,attack);
-render(dummy)=((left*seen:fi.dcblockerat(8))*.65*vel*envelope),((right*seen:fi.dcblockerat(8))*.65*vel*envelope);
+render(dummy)=((left+0.0*dummy)*seen:fi.dcblockerat(8))*.65*vel*envelope,((right+0.0*dummy)*seen:fi.dcblockerat(8))*.65*vel*envelope;
