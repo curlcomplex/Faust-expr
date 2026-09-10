@@ -3,7 +3,7 @@
 import("stdfaust.lib");
 import("tablebank.lib");
 
-N=256; NB=48; NF=8; NS=2; ND=2;
+N=512; NB=48; NF=8; NS=2; ND=2;
 flatIndex(b,f,s,d,i)=i+N*(d+ND*(s+NS*(f+NF*b)));
 lookup(index)=rdtable(tableBank,index);
 
