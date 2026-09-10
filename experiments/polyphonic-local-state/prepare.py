@@ -23,6 +23,7 @@ def main():
     # already-owned wrappers by public gate-zone address, outside processing.
     # This registry is test instrumentation, not the audio ownership mechanism.
     native=(HERE/'main.cpp').read_text()
+    native=replace(native,'GUI::ztimedmap GUI::gTimedZoneMap;','ztimedmap GUI::gTimedZoneMap;')
     native=replace(native,'class Voice final:public ::dsp {','class Voice final:public ::dsp {\n    inline static std::map<float*,Voice*> registry;')
     native=replace(native,'audio(engine.planes){reset();}','audio(engine.planes){reset();registry[&values[2]]=this;}\n    ~Voice() override{registry.erase(&values[2]);}\n    static Voice* lookup(float* gate){return registry.at(gate);}')
     native=replace(native,'auto* d=dynamic_cast<Voice*>(v->getDSP());','auto* d=Voice::lookup(v->getParamZone("gate"));')
