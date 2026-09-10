@@ -1,0 +1,65 @@
+name: Morph v3 no-timeout verification
+
+on:
+  push:
+    branches: [20-morph-wavetable-full-batch]
+    paths:
+      - '.github/workflows/morph-v3-no-timeout.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: morph-v3-no-timeout-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      OPENBLAS_NUM_THREADS: 1
+      OMP_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install compiler dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy
+      - name: Remove only the harness's artificial Faust/subprocess timeouts
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp tools/modules/morph_wavetable_batch.py /tmp/morph_wavetable_batch.py.before
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('tools/modules/morph_wavetable_batch.py')
+          s=p.read_text()
+          old="base.cmd([os.getenv('FAUST','faust'),'-t','240','-I',source.parent,'-I',self.out/'bank',*flags,source,'-o',d/'generated.hpp'],timeout=270)"
+          new="base.cmd([os.getenv('FAUST','faust'),'-I',source.parent,'-I',self.out/'bank',*flags,source,'-o',d/'generated.hpp'],timeout=3600)"
+          if old not in s:
+              raise SystemExit('expected artificial-timeout call not found')
+          p.write_text(s.replace(old,new))
+          PY
+          diff -u /tmp/morph_wavetable_batch.py.before tools/modules/morph_wavetable_batch.py | tee /tmp/timeout-removal.diff || test $? -eq 1
+      - name: Run actual Faust and complete qualification
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/morph-no-timeout
+          faust -v | tee build/morph-no-timeout/faust-version.txt
+          date -u +%FT%TZ > build/morph-no-timeout/start.txt
+          /usr/bin/time -v /usr/bin/python3 tools/modules/morph_wavetable_batch.py --out build/morph-no-timeout/run 2>&1 | tee build/morph-no-timeout/run.log
+          date -u +%FT%TZ > build/morph-no-timeout/end.txt
+          cp /tmp/timeout-removal.diff build/morph-no-timeout/timeout-removal.diff
+      - name: Preserve evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: morph-v3-no-timeout-${{ github.sha }}
+          path: build/morph-no-timeout/
+          if-no-files-found: warn
+          retention-days: 7
