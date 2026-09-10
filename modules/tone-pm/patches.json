@@ -1,0 +1,13 @@
+{
+  "status":"authored examples; not reconstructed Elektron presets",
+  "anchors":{
+    "Pure":{"pitch_hz":110,"ratio":0.40,"punch":0.05,"decay":0.62,"feedback":0,"modulation":0.04,"mod_env":0.15,"drive":0},
+    "Bell":{"pitch_hz":220,"ratio":0.57,"punch":0.08,"decay":0.72,"feedback":0.05,"modulation":0.48,"mod_env":0.72,"drive":0.03},
+    "Bass":{"pitch_hz":55,"ratio":0.46,"punch":0.32,"decay":0.58,"feedback":0.16,"modulation":0.34,"mod_env":0.44,"drive":0.28},
+    "Wood":{"pitch_hz":165,"ratio":0.32,"punch":0.55,"decay":0.35,"feedback":0.08,"modulation":0.42,"mod_env":0.64,"drive":0.12},
+    "Hollow":{"pitch_hz":132,"ratio":0.68,"punch":0.12,"decay":0.66,"feedback":0.28,"modulation":0.52,"mod_env":0.48,"drive":0.14},
+    "Growl":{"pitch_hz":73.416,"ratio":0.51,"punch":0.36,"decay":0.64,"feedback":0.76,"modulation":0.68,"mod_env":0.36,"drive":0.5},
+    "Glass":{"pitch_hz":440,"ratio":0.78,"punch":0.06,"decay":0.68,"feedback":0.12,"modulation":0.62,"mod_env":0.82,"drive":0.06},
+    "Acid":{"pitch_hz":82.407,"ratio":0.43,"punch":0.72,"decay":0.47,"feedback":0.58,"modulation":0.76,"mod_env":0.56,"drive":0.78}
+  }
+}

@@ -1,0 +1,58 @@
+// tone-pm 0.2: playable independent PM voice. The 0.1 entry remains unchanged.
+// No proprietary code, samples, hidden always-on saturation or output limiter.
+import("stdfaust.lib");
+pitchCtl=hslider("pitch_hz",110,20,8000,.001);
+ratioCtl=hslider("ratio",.4,0,1,.001);
+punchCtl=hslider("punch",.15,0,1,.001);
+decayCtl=hslider("decay",.55,0,1,.001);
+feedbackCtl=hslider("feedback",.08,0,1,.001);
+modulationCtl=hslider("modulation",.28,0,1,.001);
+modEnvCtl=hslider("mod_env",.45,0,1,.001);
+driveCtl=hslider("drive",.08,0,1,.001);
+gate=button("gate"); velocity=hslider("velocity",1,0,1,.001);
+gateModeCtl=checkbox("gate_mode");
+hit=gate>gate'; off=gate<gate';
+seen=max(hit)~_;
+latch(v)=ba.sAndH(hit,v);
+// Sample-rate smoothing with an exact target snap BEFORE onset renders.
+smoothing=exp(-1.0/(.003*ma.SR));
+follow(v)=loop~_ with {loop(previous)=select2(hit,v*(1-smoothing)+previous*smoothing,v);};
+frequency=follow(pitchCtl);
+ratioPosition=follow(ratioCtl);
+operatorRatio=.25*pow(32.0,ratioPosition);
+feedbackAmount=.90*pow(follow(feedbackCtl),2.0);
+modAmount=7.0*pow(follow(modulationCtl),2.0);
+driveValue=follow(driveCtl);
+punchValue=latch(punchCtl); envValue=latch(modEnvCtl);
+decaySeconds=latch(.03*pow(200.0,decayCtl));
+attackSeconds=latch(.0004-.00025*punchCtl);
+mode=latch(gateModeCtl); vel=latch(velocity);
+// Counters remain bounded below float32's exact-integer limit at 96 kHz.
+age=(+(1.0):min(120.0*ma.SR):*(1.0-hit))~_;
+releaseAge=(+(1.0):min(120.0*ma.SR):*((1.0-gate)*(1.0-off)))~_;
+time=age/ma.SR;
+attackLevel=1.0-exp(-time/max(.00015,attackSeconds));
+releaseLevel=ba.sAndH(off,attackLevel);
+releaseTime=releaseAge/ma.SR;
+// Independent direct exponential is deliberate: no rounded recursive decay.
+oneShot=attackLevel*exp(-time/max(.03,decaySeconds));
+held=select2(gate,releaseLevel*exp(-releaseTime/max(.03,decaySeconds)),attackLevel);
+envelope=seen*select2(mode,oneShot,held);
+// At 0: sustained modulation; at 1: short bright attack returning to sine.
+modTime=.005+.8*(1.0-envValue)*(1.0-envValue);
+modEnvelope=(1.0-envValue)+envValue*exp(-time/modTime);
+phase(hz)=os.hs_phasor(1.0,hz,hit);
+modPhase=2.0*ma.PI*phase(frequency*operatorRatio);
+modulator=(+(modPhase):sin)~*(feedbackAmount*(1.0-hit));
+carrierPhase=2.0*ma.PI*phase(frequency);
+raw=sin(carrierPhase+modAmount*modEnvelope*modulator);
+// Punch is a short dry/wet coloration, EXACTLY dry at zero.
+punchMix=punchValue*exp(-time/.012);
+punchGain=1.0+3.0*punchValue;
+punched=(1.0-punchMix)*raw+punchMix*ma.tanh(raw*punchGain)/ma.tanh(punchGain);
+driveMix=driveValue*driveValue;
+shaped=(1-driveMix)*punched+driveMix*ma.tanh(punched*(1+12*driveMix))/ma.tanh(1+12*driveMix);
+// Do not excite the filter before the first note. Otherwise inaudible startup
+// oscillation changes the first attack when a patch is written at onset.
+// After the first hit the state continues advancing, including through rests.
+output=(shaped*seen:fi.dcblockerat(8))*.45*vel*envelope;

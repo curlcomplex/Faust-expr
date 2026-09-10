@@ -1,0 +1,38 @@
+name: Tone PM full batch
+on:
+  push:
+    branches: [19-tone-full-batch]
+    paths: ['modules/tone-pm/**','tools/modules/tone_batch.py','tools/modules/tone_delivery.py','tools/modules/tone_benchmark.cpp','tools/modules/fetch_tone_references.py','.github/workflows/tone-complete-batch.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: tone-complete-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Dependencies on disposable hosted runner
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ ffmpeg python3-numpy python3-scipy
+      - name: Fixed licensed comparator set
+        run: /usr/bin/python3 tools/modules/fetch_tone_references.py --out build/tone-references
+      - name: Build, render and qualify musical contract
+        run: /usr/bin/python3 tools/modules/tone_batch.py --out build/tone-full --references build/tone-references
+      - name: Controlled PM ablation, rate diagnostic and four-voice benchmark
+        run: /usr/bin/python3 tools/modules/tone_delivery.py --build build/tone-full --references build/tone-references
+      - name: Preserve evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: tone-full-${{ github.sha }}
+          path: |
+            build/tone-full/
+            build/tone-references/
+          if-no-files-found: error
+          retention-days: 7
