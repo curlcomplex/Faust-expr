@@ -25,8 +25,11 @@ def main():
     assert 'sumSquares / (count * numOutputs)' in poly, 'voice RMS contract changed'
     fade=int('fadeIn(count/2, count/2, fMixBuffer);' in poly)
     (out/'tested-poly-dsp.h').write_bytes(header.read_bytes())
+    ui_headers={}
+    for name in ('MapUI.h','PathBuilder.h'):
+        data=(prefix/'include/faust/gui'/name).read_bytes();(out/('tested-'+name)).write_bytes(data);ui_headers[name]=hashlib.sha256(data).hexdigest()
     identity={'head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=REPO,text=True).strip(),'faust':subprocess.check_output(['faust','--version'],text=True),
-        'clang':subprocess.check_output(['clang++','--version'],text=True),'poly_header_git_blob':polyhash,'poly_fade_in':fade,'tracktion_pin':'4536d8a21664fe6ec2aa34b25abc87fa2a0d3b86','participants':participants,'source_sha256':{}}
+        'clang':subprocess.check_output(['clang++','--version'],text=True),'poly_header_git_blob':polyhash,'poly_fade_in':fade,'tracktion_pin':'4536d8a21664fe6ec2aa34b25abc87fa2a0d3b86','participants':participants,'ui_header_sha256':ui_headers,'source_sha256':{}}
     for f in HERE.iterdir():
         if f.is_file():identity['source_sha256'][str(f.relative_to(REPO))]=sha(f)
     (out/'identity.json').write_text(json.dumps(identity,indent=2)+'\n')
