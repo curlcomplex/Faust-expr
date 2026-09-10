@@ -23,11 +23,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends faust g++ python3-numpy
-      - name: Build Fourier oracle and table playback
+      - name: Generate authored bank, build Fourier oracle and table playback
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p build/morph-v3/{v2,v3}
+          /usr/bin/python3 tools/modules/generate_morph_bank.py --out modules/morph-wavetable/v2
           faust -lang cpp -single -cn ModuleDSP -I modules/morph-wavetable/v2 modules/morph-wavetable/v2/morph.dsp -o build/morph-v3/v2/generated.hpp
           c++ -std=c++17 -O3 -ffp-contract=off -I build/morph-v3/v2 tools/modules/render.cpp -o build/morph-v3/v2/render
           faust -lang cpp -single -cn ModuleDSP -I modules/morph-wavetable/v3 -I modules/morph-wavetable/v2 modules/morph-wavetable/v3/morph.dsp -o build/morph-v3/v3/generated.hpp
@@ -73,7 +74,6 @@ jobs:
             row['max_error']=float(np.max(np.abs(err)))
             row['speedup_compute']=row['v2_compute_ms_median']/row['v3_compute_ms_median']
             results.append(row)
-          # Sweep stack counts at the same oscillator settings.
           stack_bench=[]
           for stack in (1,2,3,4):
             score=root/f'stack-{stack}.tsv'; score.write_text('\n'.join([
@@ -90,7 +90,7 @@ jobs:
             stack_bench.append(row)
           report={'schema':1,'cases':results,'stack_benchmark':stack_bench,
                   'scope':'hosted Linux offline generated Faust C++; not device realtime acceptance',
-                  'parity_note':'v3 uses finite 1024-sample tables and half-octave band crossfades; error versus v2 is measured, not assumed exact.'}
+                  'parity_note':'v3 uses 1024-sample tables and half-octave band crossfades; error versus v2 is measured, not assumed exact.'}
           (root/'report.json').write_text(json.dumps(report,indent=2)+'\n')
           print(json.dumps(report,indent=2))
           if not all(r['speedup_compute']>1 for r in results): raise SystemExit('v3 did not beat v2 in every selected case')
