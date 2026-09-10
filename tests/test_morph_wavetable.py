@@ -23,6 +23,14 @@ class TableTests(unittest.TestCase):
    for step in (64,32,16,8,4,2,1):
     if k+step<len(BAND_HZ) and f>=BAND_HZ[k+step]:k+=step
    k=min(len(BAND_HZ)-2,k);self.assertLessEqual(BAND_HZ[k],f);self.assertGreaterEqual(BAND_HZ[k+1],f)
+ def test_lookup_index_two_corrections(self):
+  f=np.array(BAND_HZ);index=np.clip(np.searchsorted(f,np.arange(9001),side='right')-1,0,len(f)-2)
+  self.assertLessEqual(np.bincount(f.astype(int)).max(),2)
+  probes=np.r_[np.linspace(20,9000,10001),f,f+1e-7,f-1e-7];probes=np.clip(probes,20,9000)
+  for hz in probes:
+   k=int(index[int(hz)])
+   for _ in range(2):k+=int(k+1<len(f)-1 and hz>=f[k+1])
+   self.assertLessEqual(f[k],hz);self.assertGreaterEqual(f[k+1],hz)
  def test_sine_deduplicates_and_is_periodic(self):
   c=np.zeros((8,64));c[:,0]=.75;samples,offsets,lengths=build_arrays(c,c)
   self.assertEqual(len(set(offsets)),1);self.assertEqual(len(samples),65);self.assertTrue(np.all(lengths==128));self.assertAlmostEqual(float(samples[32]),.75);self.assertAlmostEqual(float(-samples[128-96]),-.75)
@@ -34,5 +42,5 @@ class TableTests(unittest.TestCase):
   n=256;p=np.arange(n)/n;full=.5*np.sin(2*np.pi*p)+.2*np.sin(4*np.pi*p)+.1*np.sin(14*np.pi*p);half=full[:n//2+1]
   i=np.arange(n);rebuild=half[np.minimum(i,n-i)]*(1-2*(i>n//2));np.testing.assert_allclose(full,rebuild,atol=2e-15,rtol=0)
  def test_no_dedicated_chord_or_host_dependency(self):
-  s=(Path(__file__).resolve().parents[1]/'modules/morph-wavetable/v3/engine.lib').read_text();self.assertNotIn('soundfile(',s);self.assertIn('readEndpoint',s);self.assertIn('voices=max(1,int(latch(stackCtl)))',s)
+  s=(Path(__file__).resolve().parents[1]/'modules/morph-wavetable/v3/engine.lib').read_text();self.assertNotIn('soundfile(',s);self.assertIn('readEndpoint',s);self.assertIn('rdtable(bandIndex',s);self.assertIn('voices=max(1,int(latch(stackCtl)))',s)
 if __name__=='__main__':unittest.main()

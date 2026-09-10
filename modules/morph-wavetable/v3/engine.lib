@@ -23,10 +23,12 @@ location(i)=(voices>1)*(2.0*i/max(1,voices-1)-1.0);
 hz(i)=frequency*pow(2.0,location(i)*spreadCents/1200.0);
 maxHz=frequency*pow(2.0,(voices>1)*spreadCents/1200.0);
 freqAt(i)=rdtable(bandFrequencies,int(min(bandCount-1,max(0,i))));
-search(step,k)=k+step*(maxHz>=freqAt(k+step))*(k+step<bandCount);
-s0=search(64,0);s1=search(32,s0);s2=search(16,s1);s3=search(8,s2);
-s4=search(4,s3);s5=search(2,s4);s6=search(1,s5);
-b0=min(bandCount-2,s6);b1=b0+1;
+// Coarse 1Hz index, followed by at most two exact boundary corrections.
+// The generated knot set has at most two knots per 1Hz bin (verified).
+coarse=rdtable(bandIndex,int(min(9000,max(20,floor(maxHz)))));
+step1=coarse+(maxHz>=freqAt(coarse+1))*(coarse+1<bandCount-1);
+step2=step1+(maxHz>=freqAt(step1+1))*(step1+1<bandCount-1);
+b0=min(bandCount-2,step2);b1=b0+1;
 bf=max(0.0,min(1.0,(maxHz-freqAt(b0))/(freqAt(b1)-freqAt(b0))));
 fp=max(0.0,min(7.0,position)); f0=int(fp);f1=min(7,f0+1);
 fu=fp-f0; ff=fu*fu*(3.0-2.0*fu);
