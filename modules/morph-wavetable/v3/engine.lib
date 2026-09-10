@@ -61,13 +61,13 @@ readFrameBand(b,f,p)=
 readMorphBand(b,p)=(1-ff)*readFrameBand(b,f0,p)+ff*readFrameBand(b,f1,p);
 tableOsc(p)=(1-bf)*readMorphBand(b0,p)+bf*readMorphBand(b1,p);
 phase(i)=os.hs_phasor(1.0,hz(i),hit);
-voice(i)=tableOsc(phase(i));
-left=sum(i,4,voice(i)*(voices>i)*(1.0-.75*location(i)))/voices;
-right=sum(i,4,voice(i)*(voices>i)*(1.0+.75*location(i)))/voices;
+voice(osc,i)=osc(phase(i));
+left(osc)=sum(i,4,voice(osc,i)*(voices>i)*(1.0-.75*location(i)))/voices;
+right(osc)=sum(i,4,voice(osc,i)*(voices>i)*(1.0+.75*location(i)))/voices;
 age=(+(1.0):min(60.0*ma.SR):*(1.0-hit))~_;
 releaseAge=(+(1.0):min(60.0*ma.SR):*((1.0-gate)*(1.0-off)))~_;
 time=age/ma.SR; releaseTime=releaseAge/ma.SR;
 attack=1.0-exp(-time/.0025); releaseStart=ba.sAndH(off,attack);
 released=releaseStart*exp(-releaseTime/max(.035,releaseSeconds))*(releaseTime<14.0*releaseSeconds);
 envelope=seen*select2(gate,released,attack);
-render(dummy)=((left+0.0*dummy)*seen:fi.dcblockerat(8))*.65*vel*envelope,((right+0.0*dummy)*seen:fi.dcblockerat(8))*.65*vel*envelope;
+render(osc)=((left(osc)*seen:fi.dcblockerat(8))*.65*vel*envelope),((right(osc)*seen:fi.dcblockerat(8))*.65*vel*envelope);
