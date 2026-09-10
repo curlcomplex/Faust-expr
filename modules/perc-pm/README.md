@@ -1,9 +1,39 @@
-# perc-pm 0.1
+# Perc PM — tuned and inharmonic struck percussion
 
-Full-service tuned/inharmonic percussion experiment for #18. Primary reference family is Syntakt PC Carbon; Model:Cycles Perc supplies the compact FM-machine philosophy. Elektron's Syntakt OS 1.30 manual describes PC Carbon's SYN controls as Tune, Sweep (depth/time), Punch, Decay, Inharmonicity, Modulation, Modulation Envelope and Overdrive. This implementation independently authors the hidden curves and oscillator network; no firmware, tables or proprietary code are used.
+Owning issue [#18](https://github.com/curlcomplex/Faust-expr/issues/18), draft PR [#43](https://github.com/curlcomplex/Faust-expr/pull/43). Consumer handoff: curlcomplex/curlop-tracker#43. Canonical identity: **perc-pm / 0.1.0-experiment**. This is a working, independently authored prototype, not a recovered Elektron algorithm or a released host feature.
 
-The engine is deliberately distinct from kick and snare. A three-partial inharmonic PM body moves continuously from tom/wood/block territory to bell, glass and abrasive percussion. `sweep` coordinates depth and time, `inharmonicity` stretches operator ratios, `modulation` controls PM/feedback, and `mod_envelope` controls harmonic evolution. `punch` combines a short impact with early nonlinear emphasis. All musical controls latch at onset so locks cannot rewrite an already-ringing hit.
+## Instrument
 
-Reference previews are fixed before descriptor analysis. They are CC BY 4.0 PC Carbon one-shots from Winston Edwards / Particles Into Waves, *Syntakt Designer Drums*. They are lossy public previews with unknown firmware/settings/gain and therefore establish broad timbral/decay coverage only, not exact macro recovery or clone fidelity.
+The small PM network has three weighted audible tonal paths, a bounded feedback modulator and a short synthesized impact. There is no sample playback, snare-like noise tail or reverb layer. Model:Cycles Perc is the conceptual family; Syntakt PC Carbon provides published control roles and separately identified reference recordings. The ratios and macro curves are our own.
 
-Qualification must render actual Faust at 44.1/48/96 kHz, varied block segmentation, repeated/persistent hits, same-sample locks, endpoint stress and high-register diagnostics. Audition files retain fixed kernel gain; reference collages use separately documented level matching. Musical approval, device realtime qualification and Tracker integration are separate gates.
+| Stable ID | Musical behavior |
+| --- | --- |
+| pitch_hz | 35–1800 Hz base tuning; continuous and microtonal |
+| sweep | Coupled pitch-rise depth and fall time; 0–3 octaves and 4–79 ms time constant |
+| punch | Faster attack, short tonal/noise impact, and early nonlinear emphasis |
+| decay | Body exponential time constant, 18 ms–1.53 s; not total audible duration |
+| inharmonicity | Stretches the relative oscillator frequencies |
+| modulation | PM depth and internal feedback, with finer control near zero |
+| mod_envelope | Persistent coloration at zero toward a short initial modulation burst at one |
+| drive | Additional nonlinear shaping; Punch can still add transient shaping at zero Drive |
+
+Gate and velocity are separate event inputs. All musical controls and velocity latch at onset: moving a knob during a tail changes the next hit, not the ringing sound. Note-off does not choke. A real computed low gate is required before another rising edge. Oscillator/feedback onset state resets; the pseudo-noise and DC-filter state remain persistent. Recreating the DSP for every hit is not equivalent.
+
+These policies favor predictable per-step sound changes; continuous modulation of ringing notes is not a supported claim. A phase-reset retrigger can interrupt a tail, so finite/headroom tests are not proof of click-free voice stealing.
+
+## What is retained
+
+`perc.dsp` and the eight authored patches are unchanged from the initial verified source `71d088cd9ff37c879677606893a6f377e31ea0df`. The delivery pass improves measurement, replay, source provenance and event checks rather than silently revoicing the instrument. `additive-diagnostic.dsp` removes PM/feedback while preserving the rest of the engine; `envelope-diagnostic.dsp` exposes the actual amplitude calculation. Neither is a new shipping machine.
+
+## Build and replay
+
+With an installed Faust compiler, C++17 compiler, Python, NumPy and SciPy:
+
+```sh
+python3 -m unittest discover -s tests -p test_perc_delivery.py -v
+python3 tools/modules/perc_delivery.py --out build/perc-delivery --references PATH_TO_FROZEN_REFERENCES
+```
+
+Reference acquisition is a separate intentional operation (`fetch_perc_references.py`, requiring ffmpeg/ffprobe and network); normal synthesis never downloads audio. The delivery bundle includes the frozen references and supports `--replay PATH_TO_GOLDEN` to verify hashes and compile its unchanged generated C++ without Faust or network access. That is independent native C++ replay, not a second Faust compilation.
+
+See [QUALIFICATION.md](QUALIFICATION.md) for actual evidence and limits, [REFERENCES.md](REFERENCES.md) for provenance, and [INTEGRATION.md](INTEGRATION.md) for consumer requirements. The PR carries the latest exact-commit run and artifact identifiers. Musical approval and minimum-device realtime/thermal qualification remain separate gates; no automatic merge.
