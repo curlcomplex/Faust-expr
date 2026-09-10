@@ -49,25 +49,20 @@ class Study:
   half=self.render('velocity-half',scalar,{'velocity':.5},self.hit(101));self.check('velocity-linear',np.max(np.abs(half-pulse*.5))<2e-6)
   tailchange=self.render('latched-tail',scalar,events=self.hit(101)+[(3001,'ratio',1),(3001,'decay',0),(3001,'feedback',1),(3001,'modulation',1),(3001,'mod_env',1),(3001,'drive',1),(3001,'punch',1),(3001,'pitch_hz',900)])
   self.check('all-controls-latched',np.array_equal(pulse,tailchange))
-  # Same-onset locks equal one-sample pre-applied values because controls latch on hit.
   p=self.patches['Acid'];pre=self.render('lock-pre',scalar,p,self.hit(1001));same=self.render('lock-same',scalar,events=[(1001,k,v) for k,v in p.items()]+self.hit(1001));self.check('same-sample-locks',np.array_equal(pre,same))
-  # Endpoint stress in one persistent trajectory.
   ev=[];keys=['ratio','punch','decay','feedback','modulation','mod_env','drive'];i=0
   for bits in itertools.product((0.,1.),repeat=7):
    n=101+i*1024;i+=1;ev += [(n,k,v) for k,v in zip(keys,bits)]+[(n,'pitch_hz',55 if i%2 else 1760)]+self.hit(n)
   self.render('endpoint-stress',scalar,events=ev,seconds=(101+i*1024+48000)/48000,block=127)
-  # Auditions.
   ev=[];timeline=[]
   for i,(name,p) in enumerate(self.patches.items()):
    n=2400+i*120000;ev += [(n,k,v) for k,v in p.items()]+[(n,'velocity',1)]+self.hit(n);ev += [(n+48000,'velocity',.55)]+self.hit(n+48000);timeline.append({'start_s':n/48000,'patch':name})
   a=self.render('anchors',scalar,events=ev,seconds=20.5);wav(self.out/'tone-anchors.wav',a)
-  # Melodic/locked pattern uses pitch as notes and cycles timbre locks.
   notes=[55,73.416,82.407,110,146.832,164.814,220,293.665];ev=[]
   for i in range(48):
    n=2400+i*6000;p=list(self.patches.values())[(i//8)%len(self.patches)]
    if i%2==0 or i in (7,15,23,31,39,47):ev += [(n,k,v) for k,v in p.items()]+[(n,'pitch_hz',notes[i%len(notes)]),(n,'velocity',1 if i%8==0 else .55)]+self.hit(n)
   pat=self.render('pattern',scalar,events=ev,seconds=6.5);wav(self.out/'tone-pattern.wav',pat)
-  # Control traversal.
   ev=[];order=self.man['musical_control_order']
   for j,key in enumerate(order):
    for q in range(8):
@@ -76,21 +71,21 @@ class Study:
     else:p[key]=q/7
     ev += [(n,k,v) for k,v in p.items() if k!='gate']+self.hit(n)
   c=self.render('controls',scalar,events=ev,seconds=25);wav(self.out/'tone-controls.wav',c)
-  # Reference broad-descriptor coverage. No fitting to settings.
   if self.refs and (self.refs/'manifest.json').exists():
    manifest=json.loads((self.refs/'manifest.json').read_text());rd={}
    for row in manifest['records']:
-    rate,x=wavfile.read(self.refs/row['id']+'.wav');x=np.asarray(x,dtype=float).reshape(-1);rd[row['id']]=desc(x,rate)
+    rate,x=wavfile.read(self.refs/(row['id']+'.wav'));x=np.asarray(x,dtype=float).reshape(-1);rd[row['id']]=desc(x,rate)
    pool=[]
    for name,p in self.patches.items():
     x=self.render('refpool-'+name,scalar,p,self.hit(101),seconds=2.5);pool.append((name,desc(x)))
    nearest={k:min((distance(v,d),n) for n,d in pool) for k,v in rd.items()};self.report['reference_coverage']={'nearest':nearest,'mean':float(np.mean([v[0] for v in nearest.values()])), 'warning':'broad descriptors; unknown settings; not clone score or fitted presets'}
-  # Timing proxy, same musical score repeated 5x for scalar/vector.
   perf={}
   for label,exe in [('scalar',scalar),('vector',vector)]:
    vals=[]
-   for r in range(5):vals.append(self.render(f'perf-{label}-{r}',exe,self.patches['Growl'],self.hit(101),seconds=3,block=128)[0]*0 + self.report['renders'][-1]['diag']['instrumented_compute_ns'])
-   perf[label]=[float(v) for v in vals]
+   for r in range(5):
+    self.render(f'perf-{label}-{r}',exe,self.patches['Growl'],self.hit(101),seconds=3,block=128)
+    vals.append(float(self.report['renders'][-1]['diag']['instrumented_compute_ns']))
+   perf[label]=vals
   self.report['performance']={k:{'median_compute_ns':statistics.median(v),'runs':v} for k,v in perf.items()};self.report['auditions']={'tone-anchors.wav':timeline,'tone-pattern.wav':'persistent 48-step pitched/locked phrase','tone-controls.wav':order};self.report['passed']=True
  def save(self,error=None):
   self.report['failure']=error
