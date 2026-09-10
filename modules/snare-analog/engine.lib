@@ -1,0 +1,39 @@
+// Independent conventional/electronic snare. Not Elektron source or recovered circuit.
+import("stdfaust.lib");
+pitch = hslider("pitch_hz",180,70,500,.001);
+balance = hslider("balance",.55,0,1,.001);
+crack = hslider("crack",.48,0,1,.001);
+decay = hslider("decay",.5,0,1,.001);
+noiseColor = hslider("noise_color",.55,0,1,.001);
+tone = hslider("tone",.45,0,1,.001);
+drive = hslider("drive",.12,0,1,.001);
+gate = button("gate");
+velocity = hslider("velocity",1,0,1,.001);
+hit = gate > gate';
+seen = max(hit) ~ _;
+latched(x)=ba.sAndH(hit,x);
+f0=latched(pitch);bal=latched(balance);cr=latched(crack);de=latched(decay);nc=latched(noiseColor);tn=latched(tone);dr=latched(drive);vel=latched(velocity);
+age=(+(1.0):min(30.0*ma.SR):*(1.0-hit))~_;t=age/ma.SR;
+bodyTau=.025*pow(42.0,de);noiseTau=.018*pow(65.0,de)*(.55+.9*bal);
+attackTau=.0002+.0016*pow(1.0-cr,2.0);
+env=(1.0-exp(-t/attackTau))*exp(-t/bodyTau);
+phase(hz)=os.hs_phasor(1.0,hz,hit);
+// Two resonant modes with authored detuning/weighting. No PM body reused from snare-pm.
+r2=1.47+.42*tn;
+body1=sin(2.0*ma.PI*phase(f0));body2=sin(2.0*ma.PI*phase(f0*r2));
+body=env*(body1*(.72-.20*tn)+body2*(.18+.28*tn));
+noise=no.noise;
+dark=noise:fi.highpass(1,350.0):fi.lowpass(1,3600.0);
+mid=noise:fi.highpass(1,900.0):fi.lowpass(1,8200.0);
+bright=noise:fi.highpass(1,2200.0):fi.lowpass(1,15000.0);
+colored=dark*(1.0-nc)*(1.0-nc)+mid*(1.0-abs(2.0*nc-1.0))+bright*nc*nc;
+noiseEnv=exp(-t/max(.004,noiseTau));
+noisePart=colored*noiseEnv*(.08+.58*bal);
+// Clustered initial excitation: three short events with fixed sample-time delays.
+clusterEnv(x)=exp(-max(0.0,x)/(.0007+.0035*(1.0-cr)))*(x>=0.0);
+cluster=.10*cr*(clusterEnv(t)*sin(2.0*ma.PI*phase(3100.0+4300.0*tn))
+ +.72*clusterEnv(t-.0032)*sin(2.0*ma.PI*phase(4200.0+2600.0*nc))
+ +.48*clusterEnv(t-.0067)*colored);
+raw=body*(1.0-.38*bal)+noisePart+cluster;
+a=dr*dr;shaped=(1.0-a)*raw+a*ma.tanh(raw*(1.0+9.0*a))/ma.tanh(1.0+9.0*a);
+process=shaped*.42*vel*seen:fi.dcblockerat(10);
