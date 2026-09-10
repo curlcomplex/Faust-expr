@@ -1,0 +1,73 @@
+// Morph v3 table-playback experiment. The v2 Fourier engine remains the oracle.
+// Independent authored spectra only; no Nord/Elektron waveform assets.
+import("stdfaust.lib");
+bank=library("../v2/bank.lib");
+
+N=1024; NB=13; NF=8; NS=2; ND=2; TOTAL=N*NB*NF*NS*ND;
+// Half-octave harmonic ceilings, chosen offline from 64 down to 1.
+limit(b)=(64,45,32,23,16,11,8,6,4,3,2,1,1):ba.selectn(13,b);
+flatIndex(b,f,s,d,i)=i+N*(d+ND*(s+NS*(f+NF*b)));
+// The table is initialized once. Shape is stored only at dark/bright endpoints
+// because v2's coefficient tilt is exactly linear in brightness. Drive is also
+// linear between clean/driven coefficient endpoints; Morph interpolation stays
+// runtime-continuous between adjacent authored frames.
+tableValue = sum(n,64, coefficient(n+1)*sin((n+1)*theta)) with {
+  q=ba.time%TOTAL;
+  i=q%N; r0=int(q/N);
+  d=r0%ND; r1=int(r0/ND);
+  s=r1%NS; r2=int(r1/NS);
+  fidx=r2%NF; b=int(r2/NF);
+  theta=2.0*ma.PI*float(i)/N;
+  source=(1-d)*bank.clean(fidx,n)+(d)*bank.driven(fidx,n);
+  dark=1.0/(1.0+.08*(n-1)*(n-1));
+  tilt=(1-s)*dark+s;
+  coefficient=source*tilt*(n<=limit(b));
+};
+lookup(index)=rdtable(TOTAL,tableValue,index);
+
+pitchCtl=hslider("pitch_hz",220,20,8000,.001);
+morphCtl=hslider("morph",.28,0,1,.001);
+shapeCtl=hslider("shape",.55,0,1,.001);
+decayCtl=hslider("decay",.5,0,1,.001);
+detuneCtl=hslider("detune",.20,0,1,.001);
+stackCtl=hslider("stack",1,1,4,1);
+driveCtl=hslider("drive",0,0,1,.001);
+gate=button("gate"); velocityCtl=hslider("velocity",1,0,1,.001);
+hit=gate>gate'; off=gate<gate'; seen=max(hit)~_;
+latch(v)=ba.sAndH(hit,v);
+vel=latch(velocityCtl); voices=max(1,int(latch(stackCtl)));
+releaseSeconds=latch(.035*pow(100.0,decayCtl));
+smoothing=exp(-1.0/(.003*ma.SR));
+follow(v)=loop~_ with {loop(previous)=select2(hit,v*(1-smoothing)+previous*smoothing,v);};
+frequency=exp(follow(log(pitchCtl)));
+position=7.0*follow(morphCtl); brightness=follow(shapeCtl);
+spreadCents=28.0*follow(detuneCtl); driveMix=pow(follow(driveCtl),2.0);
+location(i)=(voices>1)*(2.0*i/max(1,voices-1)-1.0);
+hz(i)=frequency*pow(2.0,location(i)*spreadCents/1200.0);
+maxHz=frequency*pow(2.0,(voices>1)*spreadCents/1200.0);
+// Select adjacent half-octave band tables from the highest allowed harmonic.
+maxH=max(1.0,min(64.0,18000.0/max(20.0,maxHz)));
+bandPosition=max(0.0,min(12.0,2.0*log(64.0/maxH)/log(2.0)));
+b0=int(bandPosition); b1=min(12,b0+1); bf=bandPosition-b0;
+framePosition=max(0.0,min(7.0,position)); f0=int(framePosition); f1=min(7,f0+1);
+fu=framePosition-f0; ff=fu*fu*(3.0-2.0*fu);
+// Four endpoint dimensions are bilinearly interpolated: shape and drive.
+readEndpoint(b,f,s,d,p) = (1-pf)*lookup(flatIndex(b,f,s,d,i0)) + pf*lookup(flatIndex(b,f,s,d,i1)) with {
+  x=p*N; i0=int(x)%N; i1=(i0+1)%N; pf=x-int(x);
+};
+readFrameBand(b,f,p)=
+  (1-driveMix)*((1-brightness)*readEndpoint(b,f,0,0,p)+brightness*readEndpoint(b,f,1,0,p))
+  +driveMix*((1-brightness)*readEndpoint(b,f,0,1,p)+brightness*readEndpoint(b,f,1,1,p));
+readMorphBand(b,p)=(1-ff)*readFrameBand(b,f0,p)+ff*readFrameBand(b,f1,p);
+tableOsc(p)=(1-bf)*readMorphBand(b0,p)+bf*readMorphBand(b1,p);
+phase(i)=os.hs_phasor(1.0,hz(i),hit);
+voice(i)=tableOsc(phase(i));
+left=sum(i,4,voice(i)*(voices>i)*(1.0-.75*location(i)))/voices;
+right=sum(i,4,voice(i)*(voices>i)*(1.0+.75*location(i)))/voices;
+age=(+(1.0):min(60.0*ma.SR):*(1.0-hit))~_;
+releaseAge=(+(1.0):min(60.0*ma.SR):*((1.0-gate)*(1.0-off)))~_;
+time=age/ma.SR; releaseTime=releaseAge/ma.SR;
+attack=1.0-exp(-time/.0025); releaseStart=ba.sAndH(off,attack);
+released=releaseStart*exp(-releaseTime/max(.035,releaseSeconds))*(releaseTime<14.0*releaseSeconds);
+envelope=seen*select2(gate,released,attack);
+processOut=((left*seen:fi.dcblockerat(8))*.65*vel*envelope),((right*seen:fi.dcblockerat(8))*.65*vel*envelope);
