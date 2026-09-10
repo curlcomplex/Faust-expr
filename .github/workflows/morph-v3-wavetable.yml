@@ -31,7 +31,7 @@ jobs:
           /usr/bin/python3 tools/modules/generate_morph_bank.py --out modules/morph-wavetable/v2
           faust -lang cpp -single -cn ModuleDSP -I modules/morph-wavetable/v2 modules/morph-wavetable/v2/morph.dsp -o build/morph-v3/v2/generated.hpp
           c++ -std=c++17 -O3 -ffp-contract=off -I build/morph-v3/v2 tools/modules/render.cpp -o build/morph-v3/v2/render
-          faust -lang cpp -single -cn ModuleDSP -I modules/morph-wavetable/v3 -I modules/morph-wavetable/v2 modules/morph-wavetable/v3/morph.dsp -o build/morph-v3/v3/generated.hpp
+          faust -lang cpp -single -cn ModuleDSP -I modules/morph-wavetable/v3 -I modules/morph-wavetable/v2 modules/morph-wavetable/v3/engine.lib -o build/morph-v3/v3/generated.hpp
           c++ -std=c++17 -O3 -ffp-contract=off -I build/morph-v3/v3 tools/modules/render.cpp -o build/morph-v3/v3/render
       - name: Render parity and benchmark matrix
         shell: bash
