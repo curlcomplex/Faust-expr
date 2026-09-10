@@ -1,0 +1,45 @@
+name: Perc full delivery verification
+on:
+  push:
+    branches: [18-perc-full-batch]
+    paths: ['modules/perc-pm/**', 'tools/modules/perc_*', 'tests/test_perc_delivery.py', '.github/workflows/perc-delivery.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: perc-delivery-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Dependencies on disposable hosted runner
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ ffmpeg python3-numpy python3-scipy
+      - name: Independent analyzer and contract fixtures
+        run: /usr/bin/python3 -m unittest discover -s tests -p test_perc_delivery.py -v
+      - name: Acquire the fixed licensed reference set
+        run: /usr/bin/python3 tools/modules/fetch_perc_references.py --out build/perc-references
+      - name: Compile, render, compare full tails, test locks and benchmark
+        run: /usr/bin/python3 tools/modules/perc_delivery.py --out build/perc-delivery --references build/perc-references
+      - name: Record clean diff and exact source identity
+        if: always()
+        run: |
+          mkdir -p build/perc-delivery
+          git rev-parse HEAD > build/perc-delivery/commit.txt
+          git diff --check > build/perc-delivery/diff-check.txt
+      - name: Preserve source and render evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: perc-delivery-${{ github.sha }}
+          path: |
+            build/perc-delivery/
+            build/perc-references/
+          if-no-files-found: error
+          retention-days: 7

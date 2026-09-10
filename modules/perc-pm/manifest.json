@@ -1,0 +1,25 @@
+{
+  "schema":1,
+  "module_id":"perc-pm",
+  "sound_version":"0.1.0-experiment",
+  "status":"authored-prototype-not-hardware-matched",
+  "inputs":0,
+  "outputs":1,
+  "controls":{
+    "pitch_hz":{"min":35,"max":1800,"default":145,"unit":"Hz"},
+    "sweep":{"min":0,"max":1,"default":0.28,"unit":"normalized; coupled pitch-sweep depth/time"},
+    "punch":{"min":0,"max":1,"default":0.32,"unit":"normalized; impact and early nonlinear emphasis"},
+    "decay":{"min":0,"max":1,"default":0.45,"unit":"normalized body decay"},
+    "inharmonicity":{"min":0,"max":1,"default":0.36,"unit":"normalized operator-ratio stretch"},
+    "modulation":{"min":0,"max":1,"default":0.38,"unit":"normalized PM/feedback amount"},
+    "mod_envelope":{"min":0,"max":1,"default":0.58,"unit":"normalized modulation-envelope depth/time macro"},
+    "drive":{"min":0,"max":1,"default":0.08,"unit":"normalized nonlinear amount"},
+    "gate":{"min":0,"max":1,"default":0,"unit":"boolean rising-edge trigger"},
+    "velocity":{"min":0,"max":1,"default":1,"unit":"linear amplitude, onset latched"}
+  },
+  "musical_control_order":["pitch_hz","sweep","punch","decay","inharmonicity","modulation","mod_envelope","drive"],
+  "lifecycle":"all musical controls and velocity latch on rising gate; note-off does not choke; oscillator/feedback phases restart on trigger",
+  "tail":"body exponential, no silence-based suspension in kernel",
+  "references":"PC Carbon primary Syntakt comparator; Model:Cycles Perc conceptual family. Exact mappings/topology unknown.",
+  "remaining":["Felix musical approval","controlled known-settings hardware capture","Tracker adapter","minimum-device realtime/thermal qualification","extreme high-register aliasing/retrigger audition"]
+}

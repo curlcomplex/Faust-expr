@@ -1,0 +1,51 @@
+name: Perc PM full batch
+on:
+  push:
+    branches: [18-perc-full-batch]
+    paths: ['modules/perc-pm/**','tools/modules/perc_batch.py','tools/modules/perc_benchmark.cpp','tools/modules/fetch_perc_references.py','.github/workflows/perc-complete-batch.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: perc-complete-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ ffmpeg python3-numpy python3-scipy
+      - name: Acquire licensed PC Carbon comparators
+        run: /usr/bin/python3 tools/modules/fetch_perc_references.py --out build/perc-references
+      - name: Build, stress, compare and audition actual Faust
+        run: /usr/bin/python3 tools/modules/perc_batch.py --out build/perc-full --refs build/perc-references
+      - name: Four-voice scalar/vector cost probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          for kind in scalar vector; do
+            c++ -std=c++17 -O2 -ffp-contract=off -Ibuild/perc-full/$kind -Itools/modules tools/modules/perc_benchmark.cpp -o build/perc-full/$kind/benchmark
+            : > build/perc-full/performance-$kind.jsonl
+            for block in 32 64 128 512; do
+              build/perc-full/$kind/benchmark "$block" >> build/perc-full/performance-$kind.jsonl
+            done
+          done
+      - name: Preserve evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: perc-full-${{ github.sha }}
+          path: |
+            build/perc-full/
+            build/perc-references/
+            modules/perc-pm/
+            tools/modules/perc_batch.py
+            tools/modules/perc_benchmark.cpp
+            tools/modules/fetch_perc_references.py
+          if-no-files-found: error
+          retention-days: 7
