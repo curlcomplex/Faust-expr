@@ -1,3 +1,4 @@
-declare name "morph-wavetable-tableplayback";
+declare name "morph-wavetable-lookup";
 declare version "0.3.0-experiment";
-process=component("engine.lib");
+e=library("engine.lib");
+process=e.process;

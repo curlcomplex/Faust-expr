@@ -1,11 +1,8 @@
-name: Morph v3 wavetable playback
+name: Morph v3 verified wavetable playback
 on:
   push:
     branches: [20-morph-wavetable-full-batch]
-    paths:
-      - 'modules/morph-wavetable/v3/**'
-      - 'tools/modules/generate_morph_bank.py'
-      - '.github/workflows/morph-v3-wavetable.yml'
+    paths: ['modules/morph-wavetable/v3/**', 'tools/modules/generate_morph_tables.py', 'tools/modules/morph_wavetable_*', 'tests/test_morph_wavetable.py', '.github/workflows/morph-v3-wavetable.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -16,89 +13,34 @@ jobs:
   compare:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
-      - name: Install disposable build dependencies
+      - name: Disposable compiler and analyzer dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy
-      - name: Generate authored bank, build Fourier oracle and static-table playback
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p build/morph-v3/{v2,v3}
-          /usr/bin/python3 tools/modules/generate_morph_bank.py --out modules/morph-wavetable/v2 --table-out modules/morph-wavetable/v3/tablebank.lib | tee build/morph-v3/table-generation.json
-          cp modules/morph-wavetable/v3/tablebank.lib build/morph-v3/v3/tablebank.lib
-          faust -lang cpp -single -cn ModuleDSP -I modules/morph-wavetable/v2 modules/morph-wavetable/v2/morph.dsp -o build/morph-v3/v2/generated.hpp
-          c++ -std=c++17 -O3 -ffp-contract=off -I build/morph-v3/v2 tools/modules/render.cpp -o build/morph-v3/v2/render
-          faust -lang cpp -single -cn ModuleDSP -I modules/morph-wavetable/v3 modules/morph-wavetable/v3/engine.lib -o build/morph-v3/v3/generated.hpp
-          c++ -std=c++17 -O3 -ffp-contract=off -I build/morph-v3/v3 tools/modules/render.cpp -o build/morph-v3/v3/render
-          wc -c build/morph-v3/v2/generated.hpp build/morph-v3/v3/generated.hpp modules/morph-wavetable/v3/tablebank.lib | tee build/morph-v3/generated-sizes.txt
-      - name: Render parity and benchmark matrix
-        shell: bash
-        run: |
-          set -euo pipefail
-          /usr/bin/python3 - <<'PY'
-          from pathlib import Path
-          import json, subprocess, time, statistics, numpy as np
-          root=Path('build/morph-v3'); rate=48000; frames=rate*2
-          cases=[
-            ('pure1',220,.00,1.0,.5,0.0,1,0.0),
-            ('wide4',110,.35,.75,.65,.55,4,.15),
-            ('glass4',440,.82,.92,.45,.8,4,.45),
-            ('bright2',1760,.62,1.0,.35,.35,2,.25),
-          ]
-          results=[]
-          for name,pitch,morph,shape,decay,detune,stack,drive in cases:
-            score=root/(name+'.tsv')
-            score.write_text('\n'.join([
-              f'0\tpitch_hz\t{pitch}',f'0\tmorph\t{morph}',f'0\tshape\t{shape}',f'0\tdecay\t{decay}',
-              f'0\tdetune\t{detune}',f'0\tstack\t{stack}',f'0\tdrive\t{drive}',f'0\tvelocity\t1',
-              '2400\tgate\t1','36000\tgate\t0'])+'\n')
-            row={'case':name,'stack':stack}; audio={}
-            for version in ('v2','v3'):
-              out=root/f'{name}-{version}.f32'; diags=[]; elapsed=[]
-              for rep in range(7):
-                t=time.perf_counter()
-                p=subprocess.run([str(root/version/'render'),str(score),str(out),str(rate),'128',str(frames),'0'],capture_output=True,text=True,check=True)
-                elapsed.append((time.perf_counter()-t)*1000)
-                diags.append(json.loads(p.stdout)['instrumented_compute_ns']/1e6)
-              audio[version]=np.fromfile(out,dtype='<f4')
-              row[version+'_wall_ms_median']=statistics.median(elapsed)
-              row[version+'_compute_ms_median']=statistics.median(diags)
-            a,b=audio['v2'],audio['v3']; err=a.astype(float)-b.astype(float)
-            row['rms_error']=float(np.sqrt(np.mean(err*err)))
-            row['relative_rms_error_db']=float(20*np.log10(max(1e-15,np.sqrt(np.mean(err*err)))/max(1e-15,np.sqrt(np.mean(a.astype(float)**2)))))
-            row['max_error']=float(np.max(np.abs(err)))
-            row['speedup_compute']=row['v2_compute_ms_median']/row['v3_compute_ms_median']
-            results.append(row)
-          stack_bench=[]
-          for stack in (1,2,3,4):
-            score=root/f'stack-{stack}.tsv'; score.write_text('\n'.join([
-              '0\tpitch_hz\t220','0\tmorph\t0.55','0\tshape\t0.8','0\tdecay\t0.5','0\tdetune\t0.5',f'0\tstack\t{stack}','0\tdrive\t0.35','0\tvelocity\t1','2400\tgate\t1','36000\tgate\t0'])+'\n')
-            row={'stack':stack}
-            for version in ('v2','v3'):
-              vals=[]
-              for rep in range(9):
-                out=root/f'stack-{stack}-{version}.f32'
-                p=subprocess.run([str(root/version/'render'),str(score),str(out),str(rate),'128',str(frames),'0'],capture_output=True,text=True,check=True)
-                vals.append(json.loads(p.stdout)['instrumented_compute_ns']/1e6)
-              row[version+'_compute_ms_median']=statistics.median(vals)
-            row['speedup']=row['v2_compute_ms_median']/row['v3_compute_ms_median']; stack_bench.append(row)
-          report={'schema':2,'cases':results,'stack_benchmark':stack_bench,
-                  'scope':'hosted Linux offline generated Faust C++; not device realtime acceptance',
-                  'table_bank':'13 bands x 8 frames x 2 shape endpoints x 2 drive endpoints x 256 samples; linear phase, frame, band, shape and drive interpolation',
-                  'parity_note':'v3 is a finite multiband lookup renderer derived from the v2 authored coefficients. Error versus v2 is measured and expected, not assumed exact.'}
-          (root/'report.json').write_text(json.dumps(report,indent=2)+'\n'); print(json.dumps(report,indent=2))
-          if not all(r['speedup_compute']>1 for r in results): raise SystemExit('v3 did not beat v2 in every selected case')
-          PY
-      - name: Preserve exact evidence
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy
+      - name: Independent band/interpolation arithmetic
+        run: /usr/bin/python3 -m unittest discover -s tests -p test_morph_wavetable.py -v
+      - name: Actual Faust, full musical regressions, fidelity and three-way benchmarks
+        run: /usr/bin/python3 tools/modules/morph_wavetable_batch.py --out build/morph-lookup
+      - name: Preserve exact source and compiler evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        run: |
+          mkdir -p build/morph-lookup
+          git rev-parse HEAD > build/morph-lookup/commit.txt
+          git archive --format=tar HEAD > build/morph-lookup/source.tar
+          git diff --check > build/morph-lookup/diff-check.txt
+          faust -v > build/morph-lookup/faust-version.txt
+          c++ --version > build/morph-lookup/compiler-version.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
         with:
-          name: morph-v3-${{ github.sha }}
-          path: build/morph-v3/
+          name: morph-lookup-${{ github.sha }}
+          path: build/morph-lookup/
           if-no-files-found: error
           retention-days: 7
