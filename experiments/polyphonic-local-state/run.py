@@ -13,6 +13,7 @@ def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('--output',type=Path,required=True);ap.add_argument('--participants',default='1,2,3');ap.add_argument('--build-jobs',type=int,default=3);a=ap.parse_args();out=a.output.resolve();out.mkdir(parents=True,exist_ok=True)
     participants=sorted(set(map(int,a.participants.split(','))));assert participants and min(participants)>=1 and max(participants)<=8 and 1<=a.build_jobs<=8
+    if 1 not in participants:ap.error("participants must include the single-participant correctness baseline")
     previous.verify_snapshot();records=[]
     def run(cmd,name,timeout=180,check=True):
         r=previous.command(cmd,out/(name+'.log'),timeout=timeout,cwd=REPO);records.append(r);(out/'commands.json').write_text(json.dumps(records,indent=2)+'\n')
@@ -52,17 +53,26 @@ def main():
     for family,n in SHAPES:
       for p in sorted(set([1,max(participants)])):
         for mode in ('whole','local','deferred'):definitions.append((mode,family,n,128,16,p,4))
-    # Keep all conformance before performance; shuffle within each stage.
-    rng=random.Random(260910);groups=[[d for d in definitions if d[0]=='conformance'],[d for d in definitions if d[0]=='benchmark'],[d for d in definitions if d[0] not in ('conformance','benchmark')]]
-    for group in groups:rng.shuffle(group)
-    (out/'planned-cases.json').write_text(json.dumps(definitions,indent=2)+'\n');cases=[]
+    # First run the dirty-buffer control and a complete one-participant case.
+    # Reuse one member of the existing matrix, not a duplicate smoke workflow.
+    first=('conformance','serial',16,64,8,1,4)
+    assert first in definitions
+    rng=random.Random(260910)
+    groups=[[first],[d for d in definitions if d[0]=='conformance' and d!=first],
+            [d for d in definitions if d[0]=='benchmark'],
+            [d for d in definitions if d[0] not in ('conformance','benchmark')]]
+    for group in groups[1:]:rng.shuffle(group)
+    planned=[d for group in groups for d in group]
+    assert len(planned)==len(definitions) and set(planned)==set(definitions)
+    (out/'planned-cases.json').write_text(json.dumps(planned,indent=2)+'\n');cases=[]
     for stage,group in enumerate(groups):
         for mode,family,n,block,voices,p,grain in group:
             name=f'{mode}-{family}-{n}-b{block}-v{voices}-p{p}-g{grain}';folder=out/'cases'/name;folder.mkdir(parents=True,exist_ok=True)
             r=previous.command([exe,mode,family,n,block,voices,p,grain,kernels/f'{family}-{n}',folder],out/(name+'.log'),timeout=180,cwd=REPO)
             r.update(name=name,mode=mode,family=family,stages=n,block=block,voices=voices,participants=p,grain=grain);cases.append(r);(out/'cases.json').write_text(json.dumps(cases,indent=2)+'\n');print('COMBINED_CASE',name,r['returncode'],flush=True)
-        if stage==0 and any(c['returncode'] for c in cases):
-            (out/'LATER-STAGES-NOT-RUN.txt').write_text('Polyphonic conformance failed; performance/online claims gated.\n');break
+        if stage<=1 and any(c['returncode'] for c in cases):
+            reason='Single-participant correctness failed' if stage==0 else 'Polyphonic conformance failed'
+            (out/'LATER-STAGES-NOT-RUN.txt').write_text(reason+'; remaining combined stages were not run.\n');break
     # Old engine regressions remain separate: a legacy paced-event miss must not
     # become a fabricated success for either the old or the new engine.
     regressions=[f for f in build.rglob('RetainedPatchingBench') if f.is_file() and os.access(f,os.X_OK)]
