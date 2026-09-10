@@ -6,6 +6,7 @@ include(FetchContent)
 # uses SSH and is neither needed nor permitted as an additional dependency here.
 FetchContent_Declare(tracktion_dep GIT_REPOSITORY https://github.com/Tracktion/tracktion_engine.git GIT_TAG 4536d8a21664fe6ec2aa34b25abc87fa2a0d3b86 GIT_SUBMODULES "" SOURCE_SUBDIR not-a-cmake-project)
 FetchContent_MakeAvailable(tracktion_dep)
+execute_process(COMMAND python3 "${CMAKE_CURRENT_SOURCE_DIR}/patch_worker_context.py" "${tracktion_dep_SOURCE_DIR}/modules/tracktion_graph/tracktion_graph/tracktion_NodePlayerThreadPools.cpp" COMMAND_ERROR_IS_FATAL ANY)
 juce_add_module("${tracktion_dep_SOURCE_DIR}/modules/tracktion_core")
 juce_add_module("${tracktion_dep_SOURCE_DIR}/modules/tracktion_graph")
 get_target_property(SUPPORT RetainedPatchingBench SOURCES)

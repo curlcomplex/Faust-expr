@@ -62,7 +62,12 @@ def audit(folder,case):
         else:assert m['precompiled_control'] and m['load_end_us']<rows[0]['entry_us']
         if case['policy']!='deferred' and case['handoff']!='prebuilt':
             assert rows[int(changed[0])//block]['end_us']<m['compile_end_us']
-    summary=dict(case=case,max_error=error,frames=len(x),adopted=m['adopted'],phases={})
+    assert m['context']==case['context']
+    policy_counts={key:sum(int(r[key]) for r in rows) for key in ('worker_tc_jobs','worker_other_jobs','caller_tc_jobs','policy_errors')}
+    if case['probe']:
+        assert policy_counts['policy_errors']==0 and policy_counts['worker_tc_jobs']+policy_counts['worker_other_jobs']>0
+        if case['context']=='workers':assert policy_counts['worker_tc_jobs']>0 and policy_counts['worker_other_jobs']==0,'worker realtime policy not installed'
+    summary=dict(case=case,max_error=error,frames=len(x),adopted=m['adopted'],phases={},thread_policy_counts=policy_counts,caller_thread_policy=m['caller_thread_policy'],compiler_thread_policy=m['compiler_thread_policy'])
     summary['load_ms']=(m['load_end_us']-m['load_begin_us'])/1000 if m['load_end_us'] else None
     summary['compile_ms']=(m['compile_end_us']-m['compile_begin_us'])/1000
     summary['first_changed_block_ms']=(rows[int(changed[0])//block]['end_us']-m['request_us'])/1000 if len(changed) else None
@@ -82,8 +87,8 @@ def audit(folder,case):
 
 def definitions(phase):
     cases=[]
-    def add(family,n,p,grain,policy,handoff,repeat=0,fault='none',probe=False):
-        cases.append(dict(family=family,stages=n,participants=p,grain=grain,policy=policy,handoff=handoff,repeat=repeat,fault=fault,probe=probe,block=128,voices=16))
+    def add(family,n,p,grain,policy,handoff,repeat=0,fault='none',probe=False,context='legacy'):
+        cases.append(dict(family=family,stages=n,participants=p,grain=grain,policy=policy,handoff=handoff,repeat=repeat,fault=fault,probe=probe,block=128,voices=16,context=context))
     if phase=='handoff':
         for fault in ('compile','stale','schema'):add('serial',16,1,4,'deferred','prepared',fault=fault)
         for repeat in range(2):
@@ -103,6 +108,13 @@ def definitions(phase):
         for family,n in [('serial',16),('parallel',16)]:
             for p in (4,8):
                 for handoff in ('prepared','prebuilt'):add(family,n,p,4,'local',handoff,probe=True)
+    elif phase=='context':
+        for repeat in range(3):
+            for family,n in [('serial',16),('parallel',16)]:
+                for p in (4,8):
+                    for policy in ('local','deferred'):
+                        for handoff in ('prepared','prebuilt'):
+                            for context in ('legacy','workers'):add(family,n,p,4,policy,handoff,repeat,probe=True,context=context)
     else:raise ValueError('unknown phase')
     random.Random(261010 if phase=='handoff' else 261011).shuffle(cases)
     return cases
@@ -117,8 +129,8 @@ def run(exe,kernels,out,phase):
         name=f"{index:03d}-{c['policy']}-{c['family']}-p{c['participants']}-g{c['grain']}-{c['handoff']}-r{c['repeat']}-{c['fault']}-probe{int(c['probe'])}"
         folder=out/name;folder.mkdir(exist_ok=True)
         cmd=[str(exe),c['policy'],c['family'],str(c['stages']),str(c['block']),str(c['voices']),str(c['participants']),str(c['grain']),str(kernels/f"{c['family']}-{c['stages']}"),str(folder)]
-        env=os.environ.copy();env.update(PS_HANDOFF=c['handoff'],PS_HANDOFF_FAULT=c['fault'],PS_JOB_PROBE=str(int(c['probe'])))
-        record=dict(name=name,case=c,command=cmd,environment={k:env[k] for k in ('PS_HANDOFF','PS_HANDOFF_FAULT','PS_JOB_PROBE','PS_FAUST_PREFIX')})
+        env=os.environ.copy();env.update(PS_HANDOFF=c['handoff'],PS_HANDOFF_FAULT=c['fault'],PS_JOB_PROBE=str(int(c['probe'])),PS_RT_CONTEXT=c['context'])
+        record=dict(name=name,case=c,command=cmd,environment={k:env[k] for k in ('PS_HANDOFF','PS_HANDOFF_FAULT','PS_JOB_PROBE','PS_FAUST_PREFIX','PS_RT_CONTEXT')})
         start=time.monotonic()
         try:
             with (folder/'native.log').open('w') as log:r=subprocess.run(cmd,env=env,stdout=log,stderr=subprocess.STDOUT,timeout=100)
@@ -141,7 +153,7 @@ def run(exe,kernels,out,phase):
     return summary
 
 if __name__=='__main__':
-    ap=argparse.ArgumentParser();ap.add_argument('--prepared-root',type=Path,required=True);ap.add_argument('--output',type=Path,required=True);ap.add_argument('--phase',choices=['handoff','scheduler'],required=True)
+    ap=argparse.ArgumentParser();ap.add_argument('--prepared-root',type=Path,required=True);ap.add_argument('--output',type=Path,required=True);ap.add_argument('--phase',choices=['handoff','scheduler','context'],required=True)
     args=ap.parse_args();root=args.prepared_root.resolve();exe=HERE/'build/CombinedPolyBench'
     assert digest(exe)==read(root/'identity.json')['executable_sha256'],'prepared executable changed'
     run(exe,root/'kernels',args.output.resolve(),args.phase)

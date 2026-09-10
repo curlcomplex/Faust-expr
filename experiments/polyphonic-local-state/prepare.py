@@ -37,7 +37,7 @@ def main():
     native=replace(native,'namespace combined {','#include "job_probe.h"\nnamespace combined {')
     native=replace(native,'std::uint64_t thread=0;};','std::uint64_t thread=0;job_probe::Timing timing;};')
     old='void process(ProcessContext& pc) override{for(int i=first;i<last;++i)renderSlot(slots[i],int(pc.numSamples));}'
-    new='void process(ProcessContext& pc) override{if(!job_probe::enabled){for(int i=first;i<last;++i)renderSlot(slots[i],int(pc.numSamples));return;}auto& t=slots[first].timing;t.begin=now();auto cpu=job_probe::cpuUs();for(int i=first;i<last;++i)renderSlot(slots[i],int(pc.numSamples));t.cpu=job_probe::cpuUs()-cpu;t.end=now();}'
+    new='void process(ProcessContext& pc) override{if(!job_probe::enabled){for(int i=first;i<last;++i)renderSlot(slots[i],int(pc.numSamples));return;}auto& t=slots[first].timing;thread_local const auto scheduling=job_probe::policy();t.scheduling=scheduling;t.caller=std::this_thread::get_id()==job_probe::owner;t.begin=now();auto cpu=job_probe::cpuUs();for(int i=first;i<last;++i)renderSlot(slots[i],int(pc.numSamples));t.cpu=job_probe::cpuUs()-cpu;t.end=now();}'
     native=replace(native,old,new)
     start=native.index('static void liveTest(')
     end=native.index('} // namespace combined',start)

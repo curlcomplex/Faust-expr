@@ -11,7 +11,7 @@ spec=importlib.util.spec_from_file_location('previous_groups',HERE.parent/'retai
 SHAPES=[('serial',16),('parallel',16),('feedback',8),('memory',8)]
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
-    ap=argparse.ArgumentParser();ap.add_argument('--output',type=Path,required=True);ap.add_argument('--participants',default='1,2,3');ap.add_argument('--build-jobs',type=int,default=3);ap.add_argument('--handoff-study',action='store_true');a=ap.parse_args();out=a.output.resolve();out.mkdir(parents=True,exist_ok=True)
+    ap=argparse.ArgumentParser();ap.add_argument('--output',type=Path,required=True);ap.add_argument('--participants',default='1,2,3');ap.add_argument('--build-jobs',type=int,default=3);ap.add_argument('--handoff-study',action='store_true');ap.add_argument('--worker-study',action='store_true');a=ap.parse_args();out=a.output.resolve();out.mkdir(parents=True,exist_ok=True)
     participants=sorted(set(map(int,a.participants.split(','))));assert participants and min(participants)>=1 and max(participants)<=8 and 1<=a.build_jobs<=8
     if 1 not in participants:ap.error("participants must include the single-participant correctness baseline")
     previous.verify_snapshot();records=[]
@@ -37,6 +37,9 @@ def main():
         for name in identity['source_sha256']:t.add(REPO/name,arcname=name)
     build=HERE/'build';exe=build/'CombinedPolyBench'
     run(['cmake','-S',HERE,'-B',build,'-DCMAKE_BUILD_TYPE=RelWithDebInfo','-DFAUST_ROOT='+str(prefix),'-DPOLY_HAS_FADE_IN='+str(fade)],'configure',600)
+    pools=list(build.rglob('tracktion_NodePlayerThreadPools.cpp'));assert len(pools)==1
+    (out/'tested-tracktion-pool.cpp').write_bytes(pools[0].read_bytes())
+    (out/'tested-tracktion-pool.json').write_bytes(pools[0].with_suffix('.pr45.json').read_bytes())
     run(['cmake','--build',build,'--target','CombinedPolyBench','RetainedPatchingBench','--parallel',a.build_jobs],'build',1600)
     identity['executable_sha256']=sha(exe);(out/'identity.json').write_text(json.dumps(identity,indent=2)+'\n')
     kernels=out/'kernels';kernels.mkdir(exist_ok=True)
@@ -56,7 +59,7 @@ def main():
     for family,n in SHAPES:
       for p in sorted(set([1,max(participants)])):
         for mode in ('whole','local','deferred'):definitions.append((mode,family,n,128,16,p,4))
-    if a.handoff_study:definitions=[d for d in definitions if d[0]=='conformance']
+    if a.handoff_study or a.worker_study:definitions=[d for d in definitions if d[0]=='conformance']
     # First run the dirty-buffer control and a complete one-participant case.
     # Reuse one member of the existing matrix, not a duplicate smoke workflow.
     first=('conformance','serial',16,64,8,1,4)
@@ -84,10 +87,11 @@ def main():
         legacy=run([sys.executable,HERE.parent/'persistent-state-next/regression.py',regressions[0],out/'original-regression'],'original-regression',900,check=False);identity['original_regression_exit']=legacy['returncode']
     run([sys.executable,HERE/'verify.py',out],'independent-verification',300)
     print((out/'independent-verification.log').read_text(),flush=True)
-    if a.handoff_study:
+    if a.handoff_study or a.worker_study:
         if identity.get('original_regression_exit')!=0:raise RuntimeError('original regressions did not pass')
         import tail_study
-        tail_study.run(exe,kernels,out.parent/'handoff', 'handoff')
+        phase='context' if a.worker_study else 'handoff'
+        tail_study.run(exe,kernels,out.parent/phase,phase)
     previous.verify_snapshot()
     for name,want in identity['source_sha256'].items():assert sha(REPO/name)==want,name
     (out/'identity.json').write_text(json.dumps(identity,indent=2)+'\n')

@@ -11,12 +11,13 @@ struct HandoffOwner {
     std::atomic<bool> request{false};
     std::string error;
     double loadBegin=0,loadEnd=0,published=0;
-    std::thread::id loadingThread;
+    std::thread::id loadingThread;job_probe::Policy compilerPolicy;
 };
 struct CompilerJoin {std::atomic<bool>& cancel;std::thread& thread;~CompilerJoin(){cancel.store(true,std::memory_order_release);if(thread.joinable())thread.join();}};
 struct CallbackRecord {
     double scheduled=0,entry=0,renderBegin=0,renderEnd=0,end=0,cpu=0;
     double jobCpu=0,jobMaxWall=0,jobMaxOffCpu=0,jobLastStart=0;
+    int workerTC=0,workerOther=0,callerTC=0,policyErrors=0;
     int phase=0; // 0=before, 1=editable-B, 2=pending-A, 3=optimized-B
 };
 static const char* phaseName(int value) {
@@ -50,6 +51,7 @@ static void liveTest(Engine& e,const fs::path& root,const fs::path& out,int part
     HandoffOwner prepared;
     require(prepared.ready.is_lock_free()&&prepared.request.is_lock_free()&&prepared.built.is_lock_free(),"handoff atomics are not lock-free");
     Scene scene(e,4,voices,0,participants,grain,true);scene.notes(voices);
+    job_probe::owner=std::this_thread::get_id();const auto callerPolicy=job_probe::policy();
     const auto ids=scene.identities();
     juce::AudioBuffer<float> audio(2,maxBlock);
     constexpr std::size_t capacity=4096;
@@ -64,6 +66,7 @@ static void liveTest(Engine& e,const fs::path& root,const fs::path& out,int part
     // atomic request; no thread creation, future::get or future destruction.
     std::atomic<bool> cancel{false};
     std::thread compiler([&]{
+      prepared.compilerPolicy=job_probe::policy();
       while(!prepared.request.load(std::memory_order_acquire)&&!cancel.load(std::memory_order_acquire))std::this_thread::sleep_for(std::chrono::microseconds(100));
       if(cancel.load(std::memory_order_acquire))return;
       try {
@@ -114,7 +117,8 @@ static void liveTest(Engine& e,const fs::path& root,const fs::path& out,int part
         if(probing){
             for(std::size_t i=0;i<scene.slots.size();i+=std::size_t(grain)){
                 const auto& t=scene.slots[i].timing;
-                row.jobCpu+=t.cpu;
+                row.jobCpu+=t.cpu;row.policyErrors+=t.scheduling.result!=0;
+                if(t.caller)row.callerTC+=t.scheduling.realtime();else if(t.scheduling.realtime())++row.workerTC;else ++row.workerOther;
                 row.jobMaxWall=std::max(row.jobMaxWall,t.end-t.begin);
                 row.jobMaxOffCpu=std::max(row.jobMaxOffCpu,t.end-t.begin-t.cpu);
                 row.jobLastStart=std::max(row.jobLastStart,t.begin-row.renderBegin);
@@ -130,10 +134,10 @@ static void liveTest(Engine& e,const fs::path& root,const fs::path& out,int part
     raw(out/"live.f32",capture);
     std::ofstream trace(out/"callbacks.tsv"),detail(out/"deadline.tsv");
     trace<<"sample\tframes\tphase\tbegin_us\tend_us\n"<<std::setprecision(16);
-    detail<<"sample\tframes\tphase\tscheduled_us\tentry_us\trender_begin_us\trender_end_us\tend_us\towner_cpu_us\tjob_cpu_us\tjob_max_wall_us\tjob_max_off_cpu_us\tjob_last_start_us\n"<<std::setprecision(16);
+    detail<<"sample\tframes\tphase\tscheduled_us\tentry_us\trender_begin_us\trender_end_us\tend_us\towner_cpu_us\tjob_cpu_us\tjob_max_wall_us\tjob_max_off_cpu_us\tjob_last_start_us\tworker_tc_jobs\tworker_other_jobs\tcaller_tc_jobs\tpolicy_errors\n"<<std::setprecision(16);
     for(std::size_t k=0;k<completed;++k){const auto& r=records[k];
         trace<<k*block<<'\t'<<block<<'\t'<<phaseName(r.phase)<<'\t'<<r.renderBegin<<'\t'<<r.renderEnd<<'\n';
-        detail<<k*block<<'\t'<<block<<'\t'<<phaseName(r.phase)<<'\t'<<r.scheduled<<'\t'<<r.entry<<'\t'<<r.renderBegin<<'\t'<<r.renderEnd<<'\t'<<r.end<<'\t'<<r.cpu<<'\t'<<r.jobCpu<<'\t'<<r.jobMaxWall<<'\t'<<r.jobMaxOffCpu<<'\t'<<r.jobLastStart<<'\n';
+        detail<<k*block<<'\t'<<block<<'\t'<<phaseName(r.phase)<<'\t'<<r.scheduled<<'\t'<<r.entry<<'\t'<<r.renderBegin<<'\t'<<r.renderEnd<<'\t'<<r.end<<'\t'<<r.cpu<<'\t'<<r.jobCpu<<'\t'<<r.jobMaxWall<<'\t'<<r.jobMaxOffCpu<<'\t'<<r.jobLastStart<<'\t'<<r.workerTC<<'\t'<<r.workerOther<<'\t'<<r.callerTC<<'\t'<<r.policyErrors<<'\n';
     }
     trace.flush();detail.flush();
     require(scene.identities()==ids,"handoff replaced sounding voice state");
@@ -149,7 +153,9 @@ static void liveTest(Engine& e,const fs::path& root,const fs::path& out,int part
     }
     raw(out/"reference.f32",expected);raw(out/"counterfactual-A.f32",counterfactual);compare(capture,expected);
     if(fault!="none")compare(capture,counterfactual);
-    V r=obj();prop(r,"policy",policy);prop(r,"handoff",handoff);prop(r,"fault",fault);prop(r,"job_probe",probing);
+    V r=obj();prop(r,"context",option("PS_RT_CONTEXT","legacy"));
+    auto policyJson=[](const job_probe::Policy& p){V x=obj();prop(x,"result",p.result);prop(x,"default",p.defaultPolicy);prop(x,"period",double(p.period));prop(x,"computation",double(p.computation));prop(x,"constraint",double(p.constraint));return x;};
+    prop(r,"caller_thread_policy",policyJson(callerPolicy));prop(r,"compiler_thread_policy",policyJson(prepared.compilerPolicy));prop(r,"policy",policy);prop(r,"handoff",handoff);prop(r,"fault",fault);prop(r,"job_probe",probing);
     prop(r,"request_us",request);prop(r,"ready_us",readyTime);prop(r,"compile_begin_us",prepared.build.started);prop(r,"compile_end_us",prepared.build.finished);
     prop(r,"load_begin_us",prepared.loadBegin);prop(r,"load_end_us",prepared.loadEnd);prop(r,"published_us",prepared.published);
     prop(r,"compiler_exit",prepared.build.code);prop(r,"adopted",adopted);prop(r,"loader_on_render_owner",prepared.loadingThread==std::this_thread::get_id());prop(r,"precompiled_control",prebuilt);
