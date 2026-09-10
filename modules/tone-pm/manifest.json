@@ -1,0 +1,24 @@
+{
+  "schema":1,
+  "module_id":"tone-pm",
+  "sound_version":"0.1.0-experiment",
+  "status":"authored-prototype-not-hardware-matched",
+  "inputs":0,
+  "outputs":1,
+  "controls":{
+    "pitch_hz":{"min":20,"max":8000,"default":110,"unit":"Hz; onset latched"},
+    "ratio":{"min":0,"max":1,"default":0.40,"unit":"normalized; maps exponentially 0.25–8x; onset latched"},
+    "punch":{"min":0,"max":1,"default":0.15,"unit":"normalized early emphasis/distortion; onset latched"},
+    "decay":{"min":0,"max":1,"default":0.55,"unit":"normalized; 30 ms–6 s exponential body tau; onset latched"},
+    "feedback":{"min":0,"max":1,"default":0.08,"unit":"normalized; squared to 0–0.95 one-sample phase feedback; onset latched"},
+    "modulation":{"min":0,"max":1,"default":0.28,"unit":"normalized PM index; onset latched"},
+    "mod_env":{"min":0,"max":1,"default":0.45,"unit":"normalized coordinated modulation-envelope depth/time; onset latched"},
+    "drive":{"min":0,"max":1,"default":0.08,"unit":"normalized nonlinear shaping, neutral at zero; onset latched"},
+    "velocity":{"min":0,"max":1,"default":1,"unit":"linear amplitude; onset latched"},
+    "gate":{"min":0,"max":1,"default":0,"unit":"boolean rising-edge trigger; note-off does not choke"}
+  },
+  "musical_control_order":["pitch_hz","ratio","punch","decay","feedback","modulation","mod_env","drive"],
+  "phase":"carrier/modulator reset on onset; feedback contribution reset on onset",
+  "precision":"float32",
+  "remaining":["human musical approval","controlled known-settings Cycles/Syntakt capture","target-device realtime/thermal qualification","feedback sample-rate sensitivity","upper-register nonlinear aliasing","ratio detent versus continuous mapping decision"]
+}
