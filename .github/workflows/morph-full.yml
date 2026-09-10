@@ -1,0 +1,16 @@
+name: Morph wavetable full delivery
+on:
+  push:
+    branches: [20-morph-wavetable-full-batch]
+    paths: ['modules/morph-wavetable/**','tools/modules/morph_batch.py','.github/workflows/morph-full.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends faust g++ python3

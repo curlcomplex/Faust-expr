@@ -1,0 +1,9 @@
+{
+ "schema":1,"id":"morph-wavetable","version":"0.1.0-experiment","status":"audition-candidate-not-reference-clone",
+ "role":"single-note spectral-morph/unison melodic voice","inputs":0,"outputs":1,
+ "controls":{"pitch_hz":[20,8000,220,"Hz live"],"morph":[0,1,.28,"live spectral position"],"shape":[0,1,.45,"live spectral tilt"],"detune":[0,1,.18,"live; max +/-28 cents"],"stack":[1,4,2,"integer same-note oscillator count; onset latched"],"decay":[0,1,.55,"release tau 35 ms-3.5 s; onset latched"],"drive":[0,1,.08,"live; neutral zero"],"velocity":[0,1,1,"onset latched linear amplitude"],"gate":[0,1,0,"held gate then release"]},
+ "tracker_visible_non_pitch":["morph","shape","detune","stack","decay","drive"],
+ "explicit_absences":["native chord intervals","inversions","scale logic","internal arpeggiator","LFO"],
+ "source_provenance":"all eight spectral frames authored as formulas in morph.dsp; no proprietary tables or extracted assets",
+ "go_no_go":"retain only if listening demonstrates territory clearly distinct from tone-pm"
+}
