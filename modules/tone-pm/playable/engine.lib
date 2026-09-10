@@ -52,5 +52,7 @@ punchGain=1.0+3.0*punchValue;
 punched=(1.0-punchMix)*raw+punchMix*ma.tanh(raw*punchGain)/ma.tanh(punchGain);
 driveMix=driveValue*driveValue;
 shaped=(1-driveMix)*punched+driveMix*ma.tanh(punched*(1+12*driveMix))/ma.tanh(1+12*driveMix);
-// DC state continuously advances. Enveloping last gives exact initial silence.
-output=(shaped:fi.dcblockerat(8))*.45*vel*envelope;
+// Do not excite the filter before the first note. Otherwise inaudible startup
+// oscillation changes the first attack when a patch is written at onset.
+// After the first hit the state continues advancing, including through rests.
+output=(shaped*seen:fi.dcblockerat(8))*.45*vel*envelope;
