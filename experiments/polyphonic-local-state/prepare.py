@@ -9,6 +9,19 @@ def load(name,path):
 def replace(s,a,b):
     assert s.count(a)==1,a
     return s.replace(a,b)
+def device_include(native):
+    """Keep the qualified engine byte-for-byte; rename only its CLI entry.
+
+    A global `main` macro is not valid here: an inherited fixture defines and
+    undefines that macro inside its include. This explicit unique replacement
+    is performed after the complete reviewed adapter has been generated.
+    """
+    return replace(native, 'int main(int argc,char** argv)',
+                   'int pr45_combined_cli_main(int argc,char** argv)')
+def write_text_if_changed(path,text):
+    if not path.exists() or path.read_text()!=text:path.write_text(text)
+def write_bytes_if_changed(path,data):
+    if not path.exists() or path.read_bytes()!=data:path.write_bytes(data)
 def main():
     load('prior_prepare',NEXT/'prepare.py').main()
     source=(NEXT/'main.generated.cpp').read_text()
@@ -16,9 +29,9 @@ def main():
     source=source.replace('#include "live.h"','#include "../persistent-state-next/live.h"')
     anchor='    void gain(float g){auto* z=uis[0]->getParamZone("m0_gain");'
     source=replace(source,anchor,'    void parameter(const char* name,float value){auto* z=uis[0]->getParamZone(name);require(z,"independent LLVM parameter missing");*z=value;}\n'+anchor)
-    (HERE/'previous.generated.inc').write_text(source)
-    (HERE/'api.h').write_bytes((NEXT/'api.h').read_bytes())
-    (HERE/'generate.py').write_bytes((NEXT/'generate.py').read_bytes())
+    write_text_if_changed(HERE/'previous.generated.inc',source)
+    write_bytes_if_changed(HERE/'api.h',(NEXT/'api.h').read_bytes())
+    write_bytes_if_changed(HERE/'generate.py',(NEXT/'generate.py').read_bytes())
     # Faust's decorator deliberately has no getDSP accessor. Record our own
     # already-owned wrappers by public gate-zone address, outside processing.
     # This registry is test instrumentation, not the audio ownership mechanism.
@@ -56,7 +69,8 @@ def main():
     native=replace(native,
         'tg::getPoolCreatorFunction(tg::ThreadPoolStrategy::lightweightSemHybrid));',
         'tg::getPoolCreatorFunction(tg::ThreadPoolStrategy::lightweightSemHybrid),std::move(workgroup));')
-    (HERE/'main.native.cpp').write_text(native)
+    write_text_if_changed(HERE/'main.native.cpp',native)
+    write_text_if_changed(HERE/'device_scene.generated.inc',device_include(native))
     pins={'parent':'4c0dc25026e767ec74058e0fef8f4a23a28d8b5a','previous_cpp_sha256':hashlib.sha256((NEXT/'main.generated.cpp').read_bytes()).hexdigest(),
           'adapter_cpp_sha256':hashlib.sha256(source.encode()).hexdigest(),'generator_sha256':hashlib.sha256((HERE/'generate.py').read_bytes()).hexdigest(),
           'authored_main_sha256':hashlib.sha256((HERE/'main.cpp').read_bytes()).hexdigest(),'executed_main_sha256':hashlib.sha256(native.encode()).hexdigest()}

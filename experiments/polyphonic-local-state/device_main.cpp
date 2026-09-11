@@ -1,6 +1,6 @@
-#define main pr45_combined_cli_main
-#include "main.native.cpp"
-#undef main
+// Generated from the qualified native implementation. Only its CLI symbol is
+// renamed; no global main macro can be clobbered by inherited fixture includes.
+#include "device_scene.generated.inc"
 
 #include <juce_audio_devices/juce_audio_devices.h>
 #include <algorithm>
