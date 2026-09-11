@@ -15,14 +15,14 @@ velocity = hslider("velocity", 1, 0, 1, .001);
 hit = gate > gate';
 seen = max(hit) ~ _;
 latched(x) = ba.sAndH(hit,x);
-f0=latched(pitch); sp=latched(spacing); pn=latched(punch); dc=latched(decay);
+f0=latched(pitch); spaceCtl=latched(spacing); punchCtl=latched(punch); decayCtl=latched(decay);
 bal=latched(balance); bd=latched(body); be=latched(bodyEnvCtl); dr=latched(drive); vel=latched(velocity);
 age=(+(1.0):min(30.0*ma.SR):*(1.0-hit))~_; t=age/ma.SR;
 
 // Four separately windowed clap impulses. SPACING controls separation and window duration;
 // its upper half progressively adds a high-frequency crunch path.
-gap=.0015+.0200*sp*sp;
-clTau=.0007+.0048*(1.0-sp)+.0020*(1.0-pn);
+gap=.0015+.0200*spaceCtl*spaceCtl;
+clTau=.0007+.0048*(1.0-spaceCtl)+.0020*(1.0-punchCtl);
 d0=max(0.0,t); g0=min(1.0,max(0.0,t*ma.SR)); w0=g0*exp(-d0/clTau);
 x1=t-gap; d1=max(0.0,x1); g1=min(1.0,max(0.0,x1*ma.SR)); w1=g1*exp(-d1/clTau);
 x2=t-2.07*gap; d2=max(0.0,x2); g2=min(1.0,max(0.0,x2*ma.SR)); w2=g2*exp(-d2/clTau);
@@ -34,12 +34,12 @@ dark=noise:fi.highpass(1,450):fi.lowpass(1,4200);
 mid=noise:fi.highpass(1,1100):fi.lowpass(1,9000);
 bright=noise:fi.highpass(1,2600):fi.lowpass(1,16000);
 color=.40*dark+.45*mid+.15*bright;
-crunchAmt=max(0.0,2.0*sp-1.0);
+crunchAmt=max(0.0,2.0*spaceCtl-1.0);
 crunch=(noise:fi.highpass(1,4800):fi.lowpass(1,18500));
 cluster=(1.0-.55*crunchAmt)*color*clusterEnv + .55*crunchAmt*crunch*clusterEnv;
 
 // Diffuse tail remains independent of early sub-attacks.
-tailTau=.022*pow(48.0,dc);
+tailTau=.022*pow(48.0,decayCtl);
 tailAttack=1.0-exp(-t/.0035);
 tail=tailAttack*exp(-t/tailTau)*(.55*dark+.45*mid);
 noiseVoice=.64*cluster + .44*tail;
@@ -66,12 +66,12 @@ noTailMixed=noiseGain*noTailNoise + bodyGain*bodyVoice;
 noBodyMixed=noiseGain*noiseVoice;
 
 // Punch and Drive are identical across the full and controlled ablation paths.
-punchEnv=exp(-t/(.004+.014*(1.0-pn)));
-punchAmt=.42*pn*pn;
+punchEnv=exp(-t/(.004+.014*(1.0-punchCtl)));
+punchAmt=.42*punchCtl*punchCtl;
 a=dr*dr;
 post(x)=withPunch:withDrive with {
-  emphasized = x*(1.0+.72*pn*punchEnv);
-  withPunch = (1.0-punchAmt)*emphasized + punchAmt*ma.tanh(emphasized*(1.0+5.0*pn))/ma.tanh(1.0+5.0*pn);
+  emphasized = x*(1.0+.72*punchCtl*punchEnv);
+  withPunch = (1.0-punchAmt)*emphasized + punchAmt*ma.tanh(emphasized*(1.0+5.0*punchCtl))/ma.tanh(1.0+5.0*punchCtl);
   withDrive = (1.0-a)*withPunch+a*ma.tanh(withPunch*(1.0+10.0*a))/ma.tanh(1.0+10.0*a);
 };
 full=post(mixed);
