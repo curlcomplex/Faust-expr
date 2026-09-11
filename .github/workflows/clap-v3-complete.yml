@@ -1,0 +1,51 @@
+name: Clap v3 identity rebuild
+on:
+  push:
+    branches: [49-clap-full-batch]
+    paths: ['modules/clap/v3/**', 'tools/modules/clap_v3*', '.github/workflows/clap-v3-complete.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+concurrency: {group: 'clap-v3-${{ github.ref }}', cancel-in-progress: true}
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ ffmpeg python3-numpy python3-scipy
+      - name: Pinned manufacturer clap reference for analysis
+        run: |
+          /usr/bin/python3 - <<'PY'
+          import sys,urllib.request,pathlib,json,hashlib,datetime
+          sys.path.insert(0,'tools/modules')
+          from clap_v3_reference_report import URL,HASH
+          out=pathlib.Path('build/clap-v3/references');out.mkdir(parents=True,exist_ok=True)
+          req=urllib.request.Request(URL,headers={'User-Agent':'ClapSynthesisReferenceStudy/1.0'})
+          with urllib.request.urlopen(req,timeout=40) as response:
+              data=response.read(30_000_001)
+          if len(data)>30_000_000 or hashlib.sha256(data).hexdigest()!=HASH:
+              raise ValueError('Reference changed or exceeds size limit')
+          (out/'106_drm1mk4_clap.mp3').write_bytes(data)
+          (out/'manifest.json').write_text(json.dumps({'url':URL,'sha256':HASH,'retrieved_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'rights':'Analysis only. Complete demo removed before artifact upload; only short A/B excerpts retained.','settings':'Unknown manufacturer demonstration, not a controlled hardware capture.'},indent=2))
+          PY
+      - name: Actual Faust builds, negative controls and 43 renders
+        run: /usr/bin/python3 tools/modules/clap_v3_delivery.py --out build/clap-v3/run
+      - name: Reference measurements and level-matched listening files
+        run: /usr/bin/python3 tools/modules/clap_v3_reference_report.py --references build/clap-v3/references --render build/clap-v3/run --out build/clap-v3/audition
+      - name: Exact source evidence; remove complete manufacturer recording
+        if: always()
+        run: |
+          mkdir -p build/clap-v3
+          rm -f build/clap-v3/references/*.mp3 build/clap-v3/audition/_decoded.wav
+          git rev-parse HEAD > build/clap-v3/commit.txt
+          git archive --format=tar HEAD > build/clap-v3/source.tar
+          git diff --check > build/clap-v3/diff-check.txt
+          faust --version > build/clap-v3/faust-version.txt
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with: {name: 'clap-v3-${{ github.sha }}', path: build/clap-v3/, if-no-files-found: error, retention-days: 7}

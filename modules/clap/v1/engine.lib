@@ -1,0 +1,75 @@
+// Independent CP-Vintage-inspired clap architecture; not recovered Elektron source.
+import("stdfaust.lib");
+
+pitch = hslider("pitch_hz", 210, 70, 900, .001);
+spacing = hslider("spacing", .44, 0, 1, .001);
+punch = hslider("punch", .42, 0, 1, .001);
+decay = hslider("decay", .50, 0, 1, .001);
+balance = hslider("balance", .42, 0, 1, .001);
+body = hslider("body", .38, 0, 1, .001);
+bodyEnvCtl = hslider("body_env", .46, 0, 1, .001);
+drive = hslider("drive", .10, 0, 1, .001);
+gate = button("gate");
+velocity = hslider("velocity", 1, 0, 1, .001);
+
+hit = gate > gate';
+seen = max(hit) ~ _;
+latched(x) = ba.sAndH(hit,x);
+f0=latched(pitch); spaceCtl=latched(spacing); punchCtl=latched(punch); decayCtl=latched(decay);
+bal=latched(balance); bd=latched(body); be=latched(bodyEnvCtl); dr=latched(drive); vel=latched(velocity);
+age=(+(1.0):min(30.0*ma.SR):*(1.0-hit))~_; t=age/ma.SR;
+
+gap=.0015+.0200*spaceCtl*spaceCtl;
+clTau=.0007+.0048*(1.0-spaceCtl)+.0020*(1.0-punchCtl);
+d0=max(0.0,t); g0=min(1.0,max(0.0,t*ma.SR)); w0=g0*exp(-d0/clTau);
+x1=t-gap; d1=max(0.0,x1); g1=min(1.0,max(0.0,x1*ma.SR)); w1=g1*exp(-d1/clTau);
+x2=t-2.07*gap; d2=max(0.0,x2); g2=min(1.0,max(0.0,x2*ma.SR)); w2=g2*exp(-d2/clTau);
+x3=t-3.24*gap; d3=max(0.0,x3); g3=min(1.0,max(0.0,x3*ma.SR)); w3=g3*exp(-d3/clTau);
+clusterEnv=w0+.88*w1+.70*w2+.52*w3;
+
+noise=no.noise;
+dark=noise:fi.highpass(1,450):fi.lowpass(1,4200);
+mid=noise:fi.highpass(1,1100):fi.lowpass(1,9000);
+bright=noise:fi.highpass(1,2600):fi.lowpass(1,16000);
+color=.40*dark+.45*mid+.15*bright;
+crunchAmt=max(0.0,2.0*spaceCtl-1.0);
+crunch=(noise:fi.highpass(1,4800):fi.lowpass(1,18500));
+cluster=(1.0-.55*crunchAmt)*color*clusterEnv + .55*crunchAmt*crunch*clusterEnv;
+
+tailTau=.022*pow(48.0,decayCtl);
+tailAttack=1.0-exp(-t/.0035);
+tail=tailAttack*exp(-t/tailTau)*(.55*dark+.45*mid);
+noiseVoice=.64*cluster + .44*tail;
+
+phase=os.hs_phasor(1.0,f0,hit);
+theta=2.0*ma.PI*phase;
+ratio=1.20+5.30*bd*bd;
+modPhase=ratio*theta;
+modulator=sin(modPhase + 2.2*bd*bd*sin(.5*theta));
+bodyTau=.010*pow(75.0,be);
+bodyEnvelope=(1.0-exp(-t/.0008))*exp(-t/bodyTau);
+index=.12+4.8*bd*bd;
+bodyVoice=bodyEnvelope*sin(theta + index*bodyEnvelope*modulator);
+
+singleNoise=.64*(color*w0)+.44*tail;
+noTailNoise=.64*cluster;
+noiseGain=sqrt(max(0.0,1.0-bal));
+bodyGain=sqrt(max(0.0,bal));
+mixed=noiseGain*noiseVoice + bodyGain*bodyVoice;
+singleMixed=noiseGain*singleNoise + bodyGain*bodyVoice;
+noTailMixed=noiseGain*noTailNoise + bodyGain*bodyVoice;
+noBodyMixed=noiseGain*noiseVoice;
+
+punchEnv=exp(-t/(.004+.014*(1.0-punchCtl)));
+punchAmt=.42*punchCtl*punchCtl;
+a=dr*dr;
+post(x)=out with {
+  emphasized = x*(1.0+.72*punchCtl*punchEnv);
+  shaped = (1.0-punchAmt)*emphasized + punchAmt*ma.tanh(emphasized*(1.0+5.0*punchCtl))/ma.tanh(1.0+5.0*punchCtl);
+  out = (1.0-a)*shaped+a*ma.tanh(shaped*(1.0+10.0*a))/ma.tanh(1.0+10.0*a);
+};
+full=post(mixed);
+singleFull=post(singleMixed);
+noTailFull=post(noTailMixed);
+noBodyFull=post(noBodyMixed);
+finish(x)=x*.40*vel*seen:fi.dcblockerat(10);

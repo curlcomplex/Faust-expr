@@ -1,0 +1,38 @@
+name: Clap v2 complete qualification
+on:
+  push:
+    branches: [49-clap-full-batch]
+    paths: ['modules/clap/v2/**','tools/modules/clap_v2*','tests/test_clap_v2.py','.github/workflows/clap-v2-complete.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+concurrency: {group: 'clap-v2-${{ github.ref }}', cancel-in-progress: true}
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Build dependencies on disposable hosted runner
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ ffmpeg python3-numpy python3-scipy
+      - name: Syntax and independent arithmetic contracts
+        run: |
+          /usr/bin/python3 -m py_compile tools/modules/clap_v2_delivery.py tools/modules/clap_v2_references.py
+          /usr/bin/python3 -m unittest discover -s tests -p test_clap_v2.py -v
+      - name: Licensed public reference capture with provenance
+        run: /usr/bin/python3 tools/modules/clap_v2_references.py --out build/clap-v2/references
+      - name: Actual Faust, full render suite, comparison and paired benchmarks
+        run: /usr/bin/python3 tools/modules/clap_v2_delivery.py --out build/clap-v2/run --references build/clap-v2/references
+      - name: Exact source evidence
+        if: always()
+        run: |
+          mkdir -p build/clap-v2
+          git rev-parse HEAD > build/clap-v2/commit.txt
+          git archive --format=tar HEAD > build/clap-v2/source.tar
+          git diff --check > build/clap-v2/diff-check.txt
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with: {name: 'clap-v2-${{ github.sha }}', path: build/clap-v2/, if-no-files-found: error, retention-days: 7}
