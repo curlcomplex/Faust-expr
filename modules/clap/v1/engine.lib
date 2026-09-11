@@ -19,8 +19,6 @@ f0=latched(pitch); spaceCtl=latched(spacing); punchCtl=latched(punch); decayCtl=
 bal=latched(balance); bd=latched(body); be=latched(bodyEnvCtl); dr=latched(drive); vel=latched(velocity);
 age=(+(1.0):min(30.0*ma.SR):*(1.0-hit))~_; t=age/ma.SR;
 
-// Four separately windowed clap impulses. SPACING controls separation and window duration;
-// its upper half progressively adds a high-frequency crunch path.
 gap=.0015+.0200*spaceCtl*spaceCtl;
 clTau=.0007+.0048*(1.0-spaceCtl)+.0020*(1.0-punchCtl);
 d0=max(0.0,t); g0=min(1.0,max(0.0,t*ma.SR)); w0=g0*exp(-d0/clTau);
@@ -38,14 +36,11 @@ crunchAmt=max(0.0,2.0*spaceCtl-1.0);
 crunch=(noise:fi.highpass(1,4800):fi.lowpass(1,18500));
 cluster=(1.0-.55*crunchAmt)*color*clusterEnv + .55*crunchAmt*crunch*clusterEnv;
 
-// Diffuse tail remains independent of early sub-attacks.
 tailTau=.022*pow(48.0,decayCtl);
 tailAttack=1.0-exp(-t/.0035);
 tail=tailAttack*exp(-t/tailTau)*(.55*dark+.45*mid);
 noiseVoice=.64*cluster + .44*tail;
 
-// Authored FM body. BODY coordinates ratio/index/feedback-like phase complexity;
-// BODY_ENV controls only its amplitude/modulation falloff.
 phase=os.hs_phasor(1.0,f0,hit);
 theta=2.0*ma.PI*phase;
 ratio=1.20+5.30*bd*bd;
@@ -65,14 +60,13 @@ singleMixed=noiseGain*singleNoise + bodyGain*bodyVoice;
 noTailMixed=noiseGain*noTailNoise + bodyGain*bodyVoice;
 noBodyMixed=noiseGain*noiseVoice;
 
-// Punch and Drive are identical across the full and controlled ablation paths.
 punchEnv=exp(-t/(.004+.014*(1.0-punchCtl)));
 punchAmt=.42*punchCtl*punchCtl;
 a=dr*dr;
-post(x)=withPunch:withDrive with {
+post(x)=out with {
   emphasized = x*(1.0+.72*punchCtl*punchEnv);
-  withPunch = (1.0-punchAmt)*emphasized + punchAmt*ma.tanh(emphasized*(1.0+5.0*punchCtl))/ma.tanh(1.0+5.0*punchCtl);
-  withDrive = (1.0-a)*withPunch+a*ma.tanh(withPunch*(1.0+10.0*a))/ma.tanh(1.0+10.0*a);
+  shaped = (1.0-punchAmt)*emphasized + punchAmt*ma.tanh(emphasized*(1.0+5.0*punchCtl))/ma.tanh(1.0+5.0*punchCtl);
+  out = (1.0-a)*shaped+a*ma.tanh(shaped*(1.0+10.0*a))/ma.tanh(1.0+10.0*a);
 };
 full=post(mixed);
 singleFull=post(singleMixed);
