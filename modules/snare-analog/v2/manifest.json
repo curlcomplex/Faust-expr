@@ -1,0 +1,21 @@
+{
+ "schema":1,"module_id":"snare-analog","sound_version":"0.2.0-experiment","inputs":0,"outputs":1,
+ "controls":{
+  "pitch_hz":{"min":70,"max":500,"default":180,"unit":"Hz"},
+  "balance":{"min":0,"max":1,"default":0.55,"unit":"equal-power body/noise mix"},
+  "crack":{"min":0,"max":1,"default":0.48,"unit":"attack and clustered excitation"},
+  "decay":{"min":0,"max":1,"default":0.5,"unit":"linked body/noise decay"},
+  "noise_color":{"min":0,"max":1,"default":0.55,"unit":"convex dark/mid/bright noise mix"},
+  "tone":{"min":0,"max":1,"default":0.45,"unit":"second-mode ratio/weight/decay"},
+  "drive":{"min":0,"max":1,"default":0.12,"unit":"saturation blend; zero neutral"},
+  "gate":{"min":0,"max":1,"default":0,"unit":"boolean rising edge"},
+  "velocity":{"min":0,"max":1,"default":1,"unit":"linear amplitude, onset-latched"}
+ },
+ "visible_columns":["balance","crack","decay","noise_color","tone","drive"],
+ "musical_control_order":["pitch_hz","balance","crack","decay","noise_color","tone","drive"],
+ "events":"all pitch/musical controls and velocity latch on onset; gate-off does not choke; no internal polyphony",
+ "source_entry":"snare.dsp","reference_entry":"reference.dsp",
+ "noise":"persistent deterministic PRNG/filter histories; neither reset nor suspended on note-off",
+ "table_lifecycle":"classInit once before audio, then instanceInit per voice; never rewrite shared table during rendering",
+ "status":"prototype pending executed qualification, human and target approval"
+}

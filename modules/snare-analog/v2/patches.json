@@ -1,0 +1,13 @@
+{
+ "status":"authored, not captured hardware presets",
+ "anchors":{
+  "Body":{"pitch_hz":145,"balance":0,"crack":0.12,"decay":0.48,"noise_color":0.3,"tone":0.35,"drive":0.03},
+  "Classic":{"pitch_hz":185,"balance":0.52,"crack":0.45,"decay":0.42,"noise_color":0.5,"tone":0.65,"drive":0.12},
+  "Tight":{"pitch_hz":235,"balance":0.48,"crack":0.78,"decay":0.15,"noise_color":0.65,"tone":0.55,"drive":0.2},
+  "Wire":{"pitch_hz":170,"balance":0.85,"crack":0.4,"decay":0.54,"noise_color":0.82,"tone":0.3,"drive":0.08},
+  "Rim":{"pitch_hz":310,"balance":0.05,"crack":0.85,"decay":0.14,"noise_color":0.6,"tone":0.82,"drive":0.25},
+  "Dust":{"pitch_hz":155,"balance":0.65,"crack":0.3,"decay":0.60,"noise_color":0.15,"tone":0.3,"drive":0.2},
+  "Hard":{"pitch_hz":200,"balance":0.55,"crack":0.82,"decay":0.3,"noise_color":0.7,"tone":0.6,"drive":0.75},
+  "Long":{"pitch_hz":120,"balance":0.72,"crack":0.2,"decay":0.88,"noise_color":0.45,"tone":0.4,"drive":0.15}
+ }
+}

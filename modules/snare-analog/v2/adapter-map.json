@@ -1,0 +1,6 @@
+{
+ "columns":{"P1":"balance","P2":"crack","P3":"decay","P4":"noise_color","P5":"tone","P6":"drive"},
+ "performance":{"pitch_hz":"pitch_hz","velocity":"velocity","gate":"gate"},
+ "absent":["P7","P8"],
+ "meaning":"score translation contract only; actual Tracker native adapter is consumer work"
+}
