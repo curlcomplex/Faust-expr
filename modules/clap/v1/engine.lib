@@ -1,0 +1,69 @@
+// Independent CP-Vintage-inspired clap architecture; not recovered Elektron source.
+import("stdfaust.lib");
+
+pitch = hslider("pitch_hz", 210, 70, 900, .001);
+spacing = hslider("spacing", .44, 0, 1, .001);
+punch = hslider("punch", .42, 0, 1, .001);
+decay = hslider("decay", .50, 0, 1, .001);
+balance = hslider("balance", .42, 0, 1, .001);
+body = hslider("body", .38, 0, 1, .001);
+bodyEnvCtl = hslider("body_env", .46, 0, 1, .001);
+drive = hslider("drive", .10, 0, 1, .001);
+gate = button("gate");
+velocity = hslider("velocity", 1, 0, 1, .001);
+
+hit = gate > gate';
+seen = max(hit) ~ _;
+latched(x) = ba.sAndH(hit,x);
+f0=latched(pitch); sp=latched(spacing); pn=latched(punch); dc=latched(decay);
+bal=latched(balance); bd=latched(body); be=latched(bodyEnvCtl); dr=latched(drive); vel=latched(velocity);
+age=(+(1.0):min(30.0*ma.SR):*(1.0-hit))~_; t=age/ma.SR;
+
+// Four separately windowed clap impulses. SPACING controls separation and window duration;
+// its upper half progressively adds a high-frequency crunch path.
+gap=.0015+.0200*sp*sp;
+clTau=.0007+.0048*(1.0-sp)+.0020*(1.0-pn);
+w(x)=float(x>=0.0)*exp(-max(0.0,x)/clTau);
+clusterEnv=w(t)+.88*w(t-gap)+.70*w(t-2.07*gap)+.52*w(t-3.24*gap);
+
+noise=no.noise;
+dark=noise:fi.highpass(1,450):fi.lowpass(1,4200);
+mid=noise:fi.highpass(1,1100):fi.lowpass(1,9000);
+bright=noise:fi.highpass(1,2600):fi.lowpass(1,16000);
+color=.40*dark+.45*mid+.15*bright;
+crunchAmt=max(0.0,2.0*sp-1.0);
+crunch=(noise:fi.highpass(1,4800):fi.lowpass(1,18500));
+cluster=(1.0-.55*crunchAmt)*color*clusterEnv + .55*crunchAmt*crunch*clusterEnv;
+
+// Diffuse tail remains independent of early sub-attacks.
+tailTau=.022*pow(48.0,dc);
+tailAttack=1.0-exp(-t/.0035);
+tail=tailAttack*exp(-t/tailTau)*(.55*dark+.45*mid);
+noiseVoice=.64*cluster + .44*tail;
+
+// Authored FM body. BODY coordinates ratio/index/feedback-like phase complexity;
+// BODY_ENV controls only its amplitude/modulation falloff.
+phase=os.hs_phasor(1.0,f0,hit);
+theta=2.0*ma.PI*phase;
+ratio=1.20+5.30*bd*bd;
+modPhase=ratio*theta;
+modulator=sin(modPhase + 2.2*bd*bd*sin(.5*theta));
+bodyTau=.010*pow(75.0,be);
+bodyEnvelope=(1.0-exp(-t/.0008))*exp(-t/bodyTau);
+index=.12+4.8*bd*bd;
+bodyVoice=bodyEnvelope*sin(theta + index*bodyEnvelope*modulator);
+
+// Punch emphasizes and compresses only the opening portion.
+punchEnv=exp(-t/(.004+.014*(1.0-pn)));
+mixed=sqrt(max(0.0,1.0-bal))*noiseVoice + sqrt(max(0.0,bal))*bodyVoice;
+punched=mixed*(1.0+.72*pn*punchEnv);
+punchAmt=.42*pn*pn;
+punchShape=(1.0-punchAmt)*punched + punchAmt*ma.tanh(punched*(1.0+5.0*pn))/ma.tanh(1.0+5.0*pn);
+
+a=dr*dr;
+full=(1.0-a)*punchShape+a*ma.tanh(punchShape*(1.0+10.0*a))/ma.tanh(1.0+10.0*a);
+
+singleNoise=.64*(color*w(t))+.44*tail;
+noTailNoise=.64*cluster;
+noBody=sqrt(max(0.0,1.0-bal))*noiseVoice;
+finish(x)=x*.40*vel*seen:fi.dcblockerat(10);

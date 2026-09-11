@@ -1,0 +1,30 @@
+name: Clap full qualification
+on:
+  push:
+    branches: [49-clap-full-batch]
+    paths: ['modules/clap/**','tools/modules/clap_*','tests/test_clap_delivery.py','.github/workflows/clap-full.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+concurrency: {group: 'clap-${{ github.ref }}', cancel-in-progress: true}
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy
+      - run: /usr/bin/python3 -m unittest discover -s tests -p test_clap_delivery.py -v
+      - run: /usr/bin/python3 tools/modules/clap_delivery.py --out build/clap
+      - if: always()
+        run: |
+          mkdir -p build/clap
+          git rev-parse HEAD > build/clap/commit.txt
+          git archive --format=tar HEAD > build/clap/source.tar
+          git diff --check > build/clap/diff-check.txt
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with: {name: 'clap-${{ github.sha }}', path: build/clap/, if-no-files-found: error, retention-days: 7}
