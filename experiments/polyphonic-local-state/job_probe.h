@@ -1,5 +1,6 @@
 #pragma once
 #include <time.h>
+#include <atomic>
 #include <thread>
 #if defined(__APPLE__)
 #include <mach/mach.h>
@@ -8,6 +9,17 @@
 #include <pthread.h>
 #endif
 namespace job_probe {
+// Startup/teardown counters only; the render callback just reads them.
+inline std::atomic<int> joinedWorkgroupWorkers{0};
+inline std::atomic<int> failedWorkgroupJoins{0};
+struct WorkgroupJoinObservation {
+    bool joined;
+    WorkgroupJoinObservation(bool requested,bool success) noexcept : joined(success) {
+        if(joined) joinedWorkgroupWorkers.fetch_add(1,std::memory_order_relaxed);
+        else if(requested) failedWorkgroupJoins.fetch_add(1,std::memory_order_relaxed);
+    }
+    ~WorkgroupJoinObservation(){if(joined)joinedWorkgroupWorkers.fetch_sub(1,std::memory_order_relaxed);}
+};
 inline bool enabled=false;
 inline std::thread::id owner;
 inline double cpuUs() noexcept {

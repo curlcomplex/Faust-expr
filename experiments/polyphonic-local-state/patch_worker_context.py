@@ -67,18 +67,33 @@ NEW=NEW.replace('                    tryToUpgradeCurrentThreadToRealtime (rtOpts
                 '                    tryToUpgradeCurrentThreadToRealtime (workerOptions);')
 NEW=NEW.replace('tryToUpgradeCurrentThreadToRealtime (rtOpts);',
                 'tryToUpgradeCurrentThreadToRealtime (creatorOptions);')
+BUDGET_PREVIOUS=NEW
+NEW=NEW.replace('        for (size_t i = 0; i < numThreads; ++i)',
+    '        const auto* creator = std::getenv ("PS_RT_CREATOR");\n'
+    '        const bool preserveCreator = creator != nullptr && std::string (creator) == "preserve";\n'
+    '        for (size_t i = 0; i < numThreads; ++i)',1)
+NEW=NEW.replace('tryToUpgradeCurrentThreadToRealtime (creatorOptions);',
+                'if (! preserveCreator) tryToUpgradeCurrentThreadToRealtime (creatorOptions);')
 INCLUDE='#include <future> // PR45_WORKER_CONTEXT\n#include <cstdlib> // PR45_WORKER_CONTEXT\n'
 def main(path):
     text=path.read_text()
     if 'PR45_WORKER_CONTEXT' in text:
-        known=NEW if text.count(NEW)==1 else PREVIOUS
+        known=next((v for v in (NEW,BUDGET_PREVIOUS,PREVIOUS) if text.count(v)==1),PREVIOUS)
         assert text.count(known)==1 and text.count(INCLUDE)==1,'unrecognized prior pool patch'
         text=text.replace(known,OLD).replace(INCLUDE,'')
+    # Strip only our exact join-observation hook on an idempotent invocation.
+    join_old = "        workgroup.join (token);"
+    join_new = join_old + "\n        job_probe::WorkgroupJoinObservation joined(bool(workgroup), token.getTokenProvider() != nullptr);"
+    if '#include "job_probe.h" // PR45_JOIN_EVIDENCE\n' in text:
+        text=text.replace('#include "job_probe.h" // PR45_JOIN_EVIDENCE\n','')
+        assert text.count(join_new)==1
+        text=text.replace(join_new,join_old)
     assert blob(text)==PIN,'pinned Tracktion source changed; refusing to patch'
     index=text.index('struct ThreadPoolSemHybrid')
     prefix,suffix=text[:index],text[index:]
     assert suffix.count(OLD)==1
-    patched=INCLUDE+prefix+suffix.replace(OLD,NEW)
+    assert suffix.count(join_old)==1
+    patched='#include "job_probe.h" // PR45_JOIN_EVIDENCE\n'+INCLUDE+prefix+suffix.replace(OLD,NEW).replace(join_old,join_new)
     path.write_text(patched)
     record={'pin':'4536d8a21664fe6ec2aa34b25abc87fa2a0d3b86','original_blob':PIN,'patched_blob':blob(patched),'patched_sha256':hashlib.sha256(patched.encode()).hexdigest()}
     path.with_suffix('.pr45.json').write_text(json.dumps(record,indent=2)+'\n')

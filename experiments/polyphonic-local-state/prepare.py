@@ -49,6 +49,13 @@ def main():
         'if(workerBudget=="startup"){player->setNumThreads(std::size_t(participants-1));player->setNode(std::make_unique<MixNode>(slots,inst,v,grain),48000,maxBlock);}else{player->setNumThreads(0);player->setNode(std::make_unique<MixNode>(slots,inst,v,grain),48000,callbackFrames);player->setNumThreads(std::size_t(participants-1));}')
     native=replace(native,'    if(mode=="export")',
         '    combined::callbackFrames=block;const char* budget=std::getenv("PS_RT_BUDGET");combined::workerBudget=budget?budget:"startup";require(combined::workerBudget=="startup"||combined::workerBudget=="geometry"||combined::workerBudget=="periodic","unknown worker budget");\n    if(mode=="export")')
+    # The device probe must use the same repaired renderer, not a duplicate.
+    native=replace(native,
+        'int grain,bool usePool):e(engine)',
+        'int grain,bool usePool,juce::AudioWorkgroup workgroup={}):e(engine)')
+    native=replace(native,
+        'tg::getPoolCreatorFunction(tg::ThreadPoolStrategy::lightweightSemHybrid));',
+        'tg::getPoolCreatorFunction(tg::ThreadPoolStrategy::lightweightSemHybrid),std::move(workgroup));')
     (HERE/'main.native.cpp').write_text(native)
     pins={'parent':'4c0dc25026e767ec74058e0fef8f4a23a28d8b5a','previous_cpp_sha256':hashlib.sha256((NEXT/'main.generated.cpp').read_bytes()).hexdigest(),
           'adapter_cpp_sha256':hashlib.sha256(source.encode()).hexdigest(),'generator_sha256':hashlib.sha256((HERE/'generate.py').read_bytes()).hexdigest(),
