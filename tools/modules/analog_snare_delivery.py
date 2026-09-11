@@ -46,6 +46,12 @@ def descriptors(x,rate):
  f,p=welch(x,rate,nperseg=min(2048,len(x)),detrend=False,scaling='spectrum');p=np.maximum(p,0);q=p/p.sum()
  return np.array([np.searchsorted(c,.5)/rate,np.searchsorted(c,.9)/rate,np.log10(max(1,(f*q).sum())),q[f<500].sum(),q[(f>=2000)&(f<8000)].sum(),q[f>=8000].sum()])
 
+def phrase_gain(x,target=.12,ceiling=.9):
+ # Explicit native float: NumPy 2 scalar promotion must not break JSON evidence.
+ x=np.asarray(x,float)
+ if not x.size or not np.isfinite(x).all():raise ValueError('invalid audition data')
+ return float(min(ceiling/max(float(abs(x).max()),1e-12),target/max(float(np.sqrt(np.mean(x*x))),1e-12)))
+
 def write_wav(p,x,rate=48000):
  x=np.asarray(x)
  if not x.size or not np.isfinite(x).all() or np.max(abs(x))>=1: raise ValueError('refuse clipping/normalization')
@@ -67,6 +73,7 @@ class Study:
    r=json.loads((self.replay/'report.json').read_text());old=self.replay/label/'generated.hpp'
    self.check(label+':generated-hash',sha(old)==r['builds'][label]['generated_sha256']);shutil.copyfile(old,d/'generated.hpp')
   else:
+   cmd([os.getenv('FAUST','faust'),'-t','600','-e','-I',source.parent,source,'-o',d/'expanded.dsp'])
    cmd([os.getenv('FAUST','faust'),'-t','600','-I',source.parent,*flags,source,'-o',d/'generated.hpp'])
   opts=['-std=c++17','-O2','-ffp-contract=off','-fstack-usage','-I'+str(d)]
   cmd([os.getenv('CXX','c++'),*opts,ROOT/'tools/modules/render.cpp','-o',d/'render'])
@@ -172,12 +179,14 @@ class Study:
   x=self.render('controls','lookup',events=ev,seconds=22);write_wav(self.out/'analog-snare-controls.wav',x);self.report['auditions']['analog-snare-controls.wav']=self.man['musical_control_order']
   pm=json.loads((ROOT/'modules/snare-pm/patches.json').read_text())['anchors'];audio=[]
   for old,new in [('Woody','Classic'),('Crack','Tight'),('Noise','Wire'),('Driven','Hard')]:
-   a=self.render('compare-pm-'+old,'pm',pm[old],self.hit(2400)+[(26400,'velocity',.5)]+self.hit(26400),seconds=1.3)
+   comparison_pitch=self.patches[new]['pitch_hz'];comparison_decay=self.patches[new]['decay']*math.log(32)/math.log(36)
+   pm_patch=pm[old]|{'pitch_hz':comparison_pitch,'decay':comparison_decay}
+   a=self.render('compare-pm-'+old,'pm',pm_patch,self.hit(2400)+[(26400,'velocity',.5)]+self.hit(26400),seconds=1.3)
    b=self.render('compare-analog-'+new,'lookup',self.patches[new],self.hit(2400)+[(26400,'velocity',.5)]+self.hit(26400),seconds=1.3)
-   ga=min(.9/max(abs(a).max(),1e-12),.12/max(np.sqrt(np.mean(a.astype(float)**2)),1e-12));gb=min(.9/max(abs(b).max(),1e-12),.12/max(np.sqrt(np.mean(b.astype(float)**2)),1e-12))
+   ga=phrase_gain(a);gb=phrase_gain(b)
    audio +=[a*ga,np.zeros(6000),b*gb,np.zeros(12000)]
-   self.report.setdefault('pm_comparison_gains',[]).append(dict(pm=old,analog=new,pm_gain=ga,analog_gain=gb))
-  write_wav(self.out/'analog-snare-versus-pm.wav',np.concatenate(audio));self.report['auditions']['analog-snare-versus-pm.wav']='PM then analog, four patch pairs. Whole-phrase RMS target .12, bounded peak .9, recorded gains; no EQ. Reasonable authored counterparts, not exhaustive matching.'
+   self.report.setdefault('pm_comparison_gains',[]).append(dict(pm=old,analog=new,pm_gain=ga,analog_gain=gb,pitch_hz=comparison_pitch,pm_decay=comparison_decay,body_tau_s=.025*32**self.patches[new]['decay']))
+  write_wav(self.out/'analog-snare-versus-pm.wav',np.concatenate(audio));self.report['auditions']['analog-snare-versus-pm.wav']='PM then analog, four patch pairs. Matched pitch, gates, velocity and body decay tau; attack/noise laws differ. Whole-phrase RMS target .12, bounded peak .9, recorded gains; no EQ. Authored counterparts, not exhaustive matching.'
  def reference_study(self):
   # These recordings are DIGITAL SD Basic/Vintage, NOT SD Classic or TR-808.
   if not self.refs or not (self.refs/'manifest.json').exists():
@@ -228,7 +237,7 @@ class Study:
    if p.is_file():
     rel=p.relative_to(ROOT);dest=self.out/'source'/rel;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(p,dest);self.report['source_files'][str(rel)]=sha(p)
   self.report['thresholds']={'lookup_max_sample_error':PARITY_ABS,'envelope_relative_error':ENVELOPE_REL,'envelope_floor':1e-4}
-  (self.out/'report.json').write_text(json.dumps(self.report,indent=2)+'\n');print(json.dumps(dict(passed=self.report['passed'],renders=len(self.report['renders']),checks=len(self.report['checks']),failure=error)))
+  (self.out/'report.json').write_text(json.dumps(self.report,indent=2,allow_nan=False)+'\n');print(json.dumps(dict(passed=self.report['passed'],renders=len(self.report['renders']),checks=len(self.report['checks']),failure=error)))
 
 def main():
  p=argparse.ArgumentParser(description=__doc__);p.add_argument('--out',type=Path,required=True);p.add_argument('--replay',type=Path);p.add_argument('--references',type=Path);a=p.parse_args();s=Study(a.out.resolve(),a.replay.resolve() if a.replay else None,a.references.resolve() if a.references else None);error=None
