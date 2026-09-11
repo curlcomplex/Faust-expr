@@ -1,0 +1,56 @@
+// Independent clap. Explicit direct envelopes and free-running PM operators.
+// V1 retained separately: multiplying a wrapped carrier phase by a noninteger
+// ratio reset its modulator each carrier cycle. No recovered Elektron algorithm.
+import("stdfaust.lib");
+pitch=hslider("pitch_hz",210,70,900,.001);
+spacing=hslider("spacing",.44,0,1,.001);
+punch=hslider("punch",.42,0,1,.001);
+decay=hslider("decay",.50,0,1,.001);
+balance=hslider("balance",.42,0,1,.001);
+body=hslider("body",.38,0,1,.001);
+bodyEnvelopeCtl=hslider("body_env",.46,0,1,.001);
+drive=hslider("drive",.10,0,1,.001);
+gate=button("gate");velocity=hslider("velocity",1,0,1,.001);
+hit=gate>gate'; seen=max(hit)~_; latch(x)=ba.sAndH(hit,x);
+frequencyValue=latch(pitch);spaceValue=latch(spacing);punchValue=latch(punch);decayValue=latch(decay);
+balanceValue=latch(balance);bodyValue=latch(body);bodyDecayValue=latch(bodyEnvelopeCtl);driveValue=latch(drive);velocityValue=latch(velocity);
+age=(+(1.0):min(30.0*ma.SR):*(1.0-hit))~_;t=age/ma.SR;
+gap=.0015+.0200*spaceValue*spaceValue;
+burstTau=.0007+.0048*(1.0-spaceValue)+.0020*(1.0-punchValue);
+burstAttack=.00010+.00035*(1.0-punchValue);
+burst(x)=(x>=0)*(1-exp((0-max(0,x))/burstAttack))*exp((0-max(0,x))/burstTau)*(x<16*burstTau);
+w0=burst(t);w1=burst(t-gap);w2=burst(t-2.07*gap);w3=burst(t-3.24*gap);
+clusterEnvelope=w0+.88*w1+.70*w2+.52*w3;
+tailTau=.022*pow(48.0,decayValue);
+tailEnvelope=(1-exp(-t/.0035))*exp(-t/tailTau)*(t<16*tailTau);
+bodyTau=.010*pow(75.0,bodyDecayValue);
+bodyEnvelope=(1-exp(-t/.0008))*exp(-t/bodyTau)*(t<16*bodyTau);
+noise=no.noise;
+dark=noise:fi.highpass(1,450):fi.lowpass(1,4200);
+mid=noise:fi.highpass(1,1100):fi.lowpass(1,9000);
+bright=noise:fi.highpass(1,2600):fi.lowpass(1,16000);
+crunch=noise:fi.highpass(1,4800):fi.lowpass(1,18500);
+color=.40*dark+.45*mid+.15*bright;
+crunchAmount=max(0,2*spaceValue-1);
+earlyNoise=(1-.55*crunchAmount)*color+.55*crunchAmount*crunch;
+tailNoise=.55*dark+.45*mid;
+phase(hz)=os.hs_phasor(1.0,hz,hit);
+ratio=1.20+5.30*bodyValue*bodyValue;
+carrierPhase=phase(frequencyValue);modulatorPhase=phase(frequencyValue*ratio);subPhase=phase(.5*frequencyValue);
+direct(p)=sin(2*ma.PI*p);
+sampleAt(i)=rdtable(4096,sin((2*ma.PI/4096)*float(ba.time)),i);
+lookup(p)=a+(b-a)*u with {x=(p-floor(p))*4096;i=int(x);u=x-i;a=sampleAt(i&4095);b=sampleAt((i+1)&4095);};
+// Body0 is a clean oscillator. Noninteger ratios retain their own phase.
+bodySignal(osc)=bodyEnvelope*osc(carrierPhase+4.92*bodyValue*bodyValue*bodyEnvelope*mod/(2*ma.PI))
+ with {mod=osc(modulatorPhase+(2.2*bodyValue*bodyValue/(2*ma.PI))*osc(subPhase));};
+noiseVoice(clusterOn,tailOn)=.64*earlyNoise*(w0+clusterOn*(.88*w1+.70*w2+.52*w3))+.44*tailOn*tailNoise*tailEnvelope;
+raw(osc,clusterOn,tailOn,bodyOn)=sqrt(1-balanceValue)*noiseVoice(clusterOn,tailOn)+sqrt(balanceValue)*bodyOn*bodySignal(osc);
+punchEnvelope=exp(-t/(.004+.014*(1-punchValue)));
+post(x)=shaped with {
+ emphasized=x*(1+.72*punchValue*punchEnvelope);
+ p=.42*punchValue*punchValue;a=driveValue*driveValue;
+ initial=(1-p)*emphasized+p*ma.tanh(emphasized*(1+5*punchValue))/ma.tanh(1+5*punchValue);
+ shaped=(1-a)*initial+a*ma.tanh(initial*(1+10*a))/ma.tanh(1+10*a);
+};
+finish(x)=x*.40*velocityValue*seen:fi.dcblockerat(10);
+render(osc,clusterOn,tailOn,bodyOn)=raw(osc,clusterOn,tailOn,bodyOn):post:finish;
