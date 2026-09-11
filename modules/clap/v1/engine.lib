@@ -28,7 +28,6 @@ vel = latched(velocity);
 age = (+(1.0) : min(30.0*ma.SR) : *(1.0-hit)) ~ _;
 t = age / ma.SR;
 
-// 1.5–17 ms between early clap events. The fourth hit is intentionally irregular.
 gap = .0015 + .0155*sp*sp;
 d0 = 0.0;
 d1 = gap;
@@ -38,9 +37,11 @@ clusterTau = .0007 + .0055*(1.0-pu)*(1.0-pu);
 tailTau = .025*pow(70.0, de);
 bodyTau = .012*pow(26.0, de) * (.55 + .75*bo);
 
-burstEnv(d) = (t >= d) * exp(-max(0.0, t-d)/clusterTau);
+// One-sample numeric step avoids toolchain-sensitive boolean expressions in helpers.
+stepAt(d) = min(1.0, max(0.0, (t-d)*ma.SR));
+burstEnv(d) = stepAt(d) * exp(-max(0.0, t-d)/clusterTau);
 tailStart = d3 + .0015;
-tailEnv = (t >= tailStart) * exp(-max(0.0, t-tailStart)/tailTau);
+tailEnv = stepAt(tailStart) * exp(-max(0.0, t-tailStart)/tailTau);
 attackClick = exp(-t/(.00025 + .0012*(1.0-pu)));
 
 n = no.noise;
@@ -49,11 +50,9 @@ mid = n : fi.highpass(1, 900.0) : fi.lowpass(1, 8200.0);
 bright = n : fi.highpass(1, 1800.0) : fi.lowpass(1, 15000.0);
 noiseShape = dark*(1.0-co)*(1.0-co) + mid*(1.0-abs(2.0*co-1.0)) + bright*co*co;
 
-// Shared noise excites four staggered events; different weights avoid machine-gun regularity.
 cluster = noiseShape*(burstEnv(d0) + .86*burstEnv(d1) + .73*burstEnv(d2) + .58*burstEnv(d3));
 diffuse = noiseShape*tailEnv*(.22 + .78*(1.0-pu*.45));
 
-// Optional short tonal body, controlled independently from the noise cluster.
 ph1 = os.hs_phasor(1.0, p0, hit);
 ph2 = os.hs_phasor(1.0, p0*(1.52 + .42*co), hit);
 bodyEnv = (1.0-exp(-t/.00045))*exp(-t/bodyTau);
