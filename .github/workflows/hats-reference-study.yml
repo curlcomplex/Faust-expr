@@ -10,26 +10,40 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - name: Direct-output identified TR-808 reference
+      - name: Identified original TR-808 direct WAVs and manufacturer fallback
         run: |
           mkdir -p build/hats-reference
           python3 - <<'PY'
-          import urllib.request,hashlib,json,pathlib,datetime
+          import urllib.request,urllib.parse,hashlib,json,pathlib,datetime,re
           out=pathlib.Path('build/hats-reference')
-          urls={
-            'page.html':'https://www.synthmania.com/tr-808.htm',
-            '808_open.wav':'https://www.synthmania.com/Roland%20TR-808/Audio/Instrument%20samples/TR-808%20Open%20High%20Hat.wav',
-            '808_closed.wav':'https://www.synthmania.com/Roland%20TR-808/Audio/Instrument%20samples/TR-808%20Closed%20High%20Hat.wav'
-          }
-          manifest={'instrument':'Roland TR-808 serial 209265','source':'Synthmania original direct-output recordings','settings':'Knobs varied in real time, exact values/gain unknown. Not controlled knob calibration.','rights':'Source explicitly permits downloading, editing and sampling. Analysis references only; runtime synth uses no samples.','retrieved_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'files':{}}
-          for name,url in urls.items():
-              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'})
-              with urllib.request.urlopen(req,timeout=45) as r: data=r.read(40_000_001)
+          manifest={'instrument':'Roland TR-808 serial 209265','source':'Synthmania original direct-output recordings','settings':'Knobs varied; exact settings and capture gain unknown.','rights':'Source explicitly permits downloading, editing and sampling. Offline references, no runtime samples.','retrieved_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'files':{},'errors':{}}
+          def get(url):
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36','Accept':'*/*','Accept-Language':'en-US,en;q=0.9'})
+              with urllib.request.urlopen(req,timeout=30) as r: data=r.read(40_000_001)
               if len(data)>40_000_000:raise ValueError('size limit')
-              if name.endswith('.wav') and data[:4]!=b'RIFF':raise ValueError('not WAV: '+name)
-              (out/name).write_bytes(data)
-              manifest['files'][name]={'url':url,'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data)}
+              return data
+          for kind in ('Open','Closed'):
+              name='808_'+kind.lower()+'.wav'
+              for origin in ('https://www.synthmania.com','https://synthmania.com'):
+                  url=origin+'/Roland%20TR-808/Audio/Instrument%20samples/TR-808%20'+kind+'%20High%20Hat.wav'
+                  try:
+                      data=get(url)
+                      if data[:4]!=b'RIFF':raise ValueError('not WAV')
+                      (out/name).write_bytes(data);manifest['files'][name]={'url':url,'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data)};break
+                  except Exception as e:manifest['errors'][url]=str(e)
+          page='https://www.vermona.com/produkte/drums-percussion/produkt/drm1-mkiv-2/'
+          try:
+              data=get(page);(out/'vermona.html').write_bytes(data)
+              links=sorted(set(urllib.parse.urljoin(page,x) for x in re.findall(r'''[^\s"'<>]+\.(?:mp3|wav)''',data.decode('utf-8'),re.I)))
+              for url in links:
+                  if 'hihat' not in url.lower() and 'hihats' not in url.lower():continue
+                  data=get(url);name=pathlib.Path(urllib.parse.urlsplit(url).path).name
+                  (out/name).write_bytes(data);manifest['files'][name]={'url':url,'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data),'instrument':'VERMONA DRM1 MKIV'}
+          except Exception as e:manifest['errors'][page]=str(e)
           (out/'manifest.json').write_text(json.dumps(manifest,indent=2))
+          print(json.dumps(manifest,indent=2))
+          if not manifest['files']:raise ValueError('No reference audio captured')
           PY
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with: {name: 'hats-original-808-reference', path: build/hats-reference/, if-no-files-found: error, retention-days: 7}
