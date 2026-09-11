@@ -1,0 +1,45 @@
+name: Clap full qualification
+on:
+  push:
+    branches: [51-clap-full-batch]
+    paths: ['modules/clap/**','tools/modules/clap_batch.py','tests/test_clap_delivery.py','.github/workflows/clap-full.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: clap-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Install disposable build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy
+      - name: Arithmetic/contracts
+        run: /usr/bin/python3 -m unittest discover -s tests -p test_clap_delivery.py -v
+      - name: Actual Faust qualification, auditions, ablations and timing
+        run: /usr/bin/python3 tools/modules/clap_batch.py --out build/clap
+      - name: Preserve source/compiler evidence
+        if: always()
+        run: |
+          mkdir -p build/clap/evidence
+          git rev-parse HEAD > build/clap/evidence/commit.txt
+          git archive --format=tar HEAD > build/clap/evidence/source.tar
+          faust -v > build/clap/evidence/faust-version.txt
+          c++ --version > build/clap/evidence/cxx-version.txt
+          git diff --check > build/clap/evidence/diff-check.txt
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: clap-${{ github.sha }}
+          path: build/clap/
+          if-no-files-found: error
+          retention-days: 7

@@ -1,0 +1,65 @@
+// Independent electronic clap voice. Behavioral reference: clustered clap triggers + diffuse tail.
+// No proprietary circuit/source extraction.
+import("stdfaust.lib");
+
+pitch = hslider("pitch_hz", 520, 220, 1800, .001);
+spacing = hslider("spacing", .42, 0, 1, .001);
+punch = hslider("punch", .52, 0, 1, .001);
+decay = hslider("decay", .48, 0, 1, .001);
+color = hslider("color", .58, 0, 1, .001);
+body = hslider("body", .24, 0, 1, .001);
+drive = hslider("drive", .12, 0, 1, .001);
+gate = button("gate");
+velocity = hslider("velocity", 1, 0, 1, .001);
+
+hit = gate > gate';
+seen = max(hit) ~ _;
+latched(x) = ba.sAndH(hit, x);
+
+p0 = latched(pitch);
+sp = latched(spacing);
+pu = latched(punch);
+de = latched(decay);
+co = latched(color);
+bo = latched(body);
+dr = latched(drive);
+vel = latched(velocity);
+
+age = (+(1.0) : min(30.0*ma.SR) : *(1.0-hit)) ~ _;
+t = age / ma.SR;
+
+// 1.5–17 ms between early clap events. The fourth hit is intentionally irregular.
+gap = .0015 + .0155*sp*sp;
+d0 = 0.0;
+d1 = gap;
+d2 = gap*2.05;
+d3 = gap*3.35;
+clusterTau = .0007 + .0055*(1.0-pu)*(1.0-pu);
+tailTau = .025*pow(70.0, de);
+bodyTau = .012*pow(26.0, de) * (.55 + .75*bo);
+
+burstEnv(d) = (t >= d) * exp(-max(0.0, t-d)/clusterTau);
+tailStart = d3 + .0015;
+tailEnv = (t >= tailStart) * exp(-max(0.0, t-tailStart)/tailTau);
+attackClick = exp(-t/(.00025 + .0012*(1.0-pu)));
+
+n = no.noise;
+dark = n : fi.highpass(1, 450.0) : fi.lowpass(1, 4300.0);
+mid = n : fi.highpass(1, 900.0) : fi.lowpass(1, 8200.0);
+bright = n : fi.highpass(1, 1800.0) : fi.lowpass(1, 15000.0);
+noiseShape = dark*(1.0-co)*(1.0-co) + mid*(1.0-abs(2.0*co-1.0)) + bright*co*co;
+
+// Shared noise excites four staggered events; different weights avoid machine-gun regularity.
+cluster = noiseShape*(burstEnv(d0) + .86*burstEnv(d1) + .73*burstEnv(d2) + .58*burstEnv(d3));
+diffuse = noiseShape*tailEnv*(.22 + .78*(1.0-pu*.45));
+
+// Optional short tonal body, controlled independently from the noise cluster.
+ph1 = os.hs_phasor(1.0, p0, hit);
+ph2 = os.hs_phasor(1.0, p0*(1.52 + .42*co), hit);
+bodyEnv = (1.0-exp(-t/.00045))*exp(-t/bodyTau);
+tonal = bodyEnv*(.72*sin(2.0*ma.PI*ph1) + .28*sin(2.0*ma.PI*ph2));
+
+raw = (1.0-.42*bo)*(cluster*.19 + diffuse*.23 + attackClick*noiseShape*.035*pu) + tonal*(.25*bo);
+a = dr*dr;
+shaped = (1.0-a)*raw + a*ma.tanh(raw*(1.0+12.0*a))/ma.tanh(1.0+12.0*a);
+process = shaped*.72*vel*seen : fi.dcblockerat(10);
