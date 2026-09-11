@@ -1,0 +1,14 @@
+name: Archived hosted polyphonic experiment - physical runner required
+# The owner requires this experiment to execute on the physical M1 Pro.
+# The private CURLOP workflow polyphonic-physical-fix.yml executes a reviewed
+# immutable public commit through native-build.py and the existing Pueue queue.
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  hosted-disabled:
+    if: ${{ false }}
+    runs-on: macos-15
+    steps:
+      - run: echo 'Hosted execution disabled. Use the private physical-Mac workflow.'
