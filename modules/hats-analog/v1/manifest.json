@@ -22,6 +22,7 @@
   "event_semantics": "A closed trigger does not simply steal the open voice: the shared kernel retains open-envelope state and applies the latched Choke law. A new open trigger clears stale choke state. Synthesis controls latch at onset; Choke is sampled by the closed onset that performs the choke.",
   "reference_family": "Hexinverter/Erica Synths Mutant Hi-Hats; TR-808-derived electro-hat architecture with expanded drive/filter/source/choke behavior. No circuit-recovery or clone claim.",
   "samples": "None in runtime DSP. Reference MP3s are offline listening/analysis evidence only.",
+  "qualification": {"run_id": 34637270955, "head_sha": "a514091199eb3ede4976f487635e909f1423c25e", "actual_renders": 67, "checks": 82, "passed": true},
   "human_approved": false,
   "device_qualified": false
 }
