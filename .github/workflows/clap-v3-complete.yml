@@ -18,57 +18,34 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends faust g++ ffmpeg python3-numpy python3-scipy
-      - name: Capture manufacturer clap reference and provenance
+      - name: Pinned manufacturer clap reference for analysis
         run: |
-          mkdir -p build/clap-v3/references
-          python3 - <<'PY'
-          import urllib.request, urllib.parse, re, pathlib, json, hashlib
-          out=pathlib.Path('build/clap-v3/references')
-          page='https://www.vermona.com/produkte/drums-percussion/produkt/drm1-mkiv-2/'
-          def get(url):
-              req=urllib.request.Request(url,headers={'User-Agent':'ClapSynthesisReferenceStudy/1.0'})
-              with urllib.request.urlopen(req,timeout=40) as r:
-                  data=r.read(30_000_001)
-              if len(data)>30_000_000: raise ValueError('reference exceeds size limit')
-              return data
-          try:
-              data=get(page); (out/'manufacturer.html').write_bytes(data)
-              text=data.decode('utf-8')
-              links=sorted(set(urllib.parse.urljoin(page,x) for x in re.findall(r'''[^\s"'<>]+\.(?:mp3|wav)(?:\?[^\s"'<>]*)?''',text,re.I)))
-              manifest={'page':page,'page_sha256':hashlib.sha256(data).hexdigest(),'media_candidates':links,'files':[], 'rights':'Manufacturer public demonstration; analysis only, not a redistributable sample library; no runtime sampling.', 'settings':'Unknown; not a controlled hardware capture.'}
-              for url in links:
-                  if 'clap' not in url.lower(): continue
-                  if urllib.parse.urlsplit(url).hostname not in ('www.vermona.com','vermona.com'): continue
-                  media=get(url); name=pathlib.Path(urllib.parse.urlsplit(url).path).name
-                  (out/name).write_bytes(media)
-                  manifest['files'].append({'name':name,'url':url,'sha256':hashlib.sha256(media).hexdigest()})
-              (out/'manifest.json').write_text(json.dumps(manifest,indent=2))
-          except Exception as e:
-              (out/'capture-error.txt').write_text(str(e))
-              raise
+          /usr/bin/python3 - <<'PY'
+          import sys,urllib.request,pathlib,json,hashlib,datetime
+          sys.path.insert(0,'tools/modules')
+          from clap_v3_reference_report import URL,HASH
+          out=pathlib.Path('build/clap-v3/references');out.mkdir(parents=True,exist_ok=True)
+          req=urllib.request.Request(URL,headers={'User-Agent':'ClapSynthesisReferenceStudy/1.0'})
+          with urllib.request.urlopen(req,timeout=40) as response:
+              data=response.read(30_000_001)
+          if len(data)>30_000_000 or hashlib.sha256(data).hexdigest()!=HASH:
+              raise ValueError('Reference changed or exceeds size limit')
+          (out/'106_drm1mk4_clap.mp3').write_bytes(data)
+          (out/'manifest.json').write_text(json.dumps({'url':URL,'sha256':HASH,'retrieved_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'rights':'Analysis only. Complete demo removed before artifact upload; only short A/B excerpts retained.','settings':'Unknown manufacturer demonstration, not a controlled hardware capture.'},indent=2))
           PY
-      - name: Actual Faust qualification when source is present
-        if: ${{ hashFiles('tools/modules/clap_v3_delivery.py') != '' }}
+      - name: Actual Faust builds, negative controls and 43 renders
         run: /usr/bin/python3 tools/modules/clap_v3_delivery.py --out build/clap-v3/run
-      - name: Source and compiler for independent offline replay
+      - name: Reference measurements and level-matched listening files
+        run: /usr/bin/python3 tools/modules/clap_v3_reference_report.py --references build/clap-v3/references --render build/clap-v3/run --out build/clap-v3/audition
+      - name: Exact source evidence; remove complete manufacturer recording
         if: always()
         run: |
-          mkdir -p build/clap-v3/toolchain/bin build/clap-v3/toolchain/lib
+          mkdir -p build/clap-v3
+          rm -f build/clap-v3/references/*.mp3 build/clap-v3/audition/_decoded.wav
           git rev-parse HEAD > build/clap-v3/commit.txt
           git archive --format=tar HEAD > build/clap-v3/source.tar
           git diff --check > build/clap-v3/diff-check.txt
-          if command -v faust; then
-            cp /usr/bin/faust build/clap-v3/toolchain/bin/
-            ldd /usr/bin/faust > build/clap-v3/toolchain/ldd.txt
-            ldd /usr/bin/faust | awk '/=> \// {print $3}' | while read p; do
-              case "$(basename "$p")" in libc.so*|libm.so*|libpthread.so*|librt.so*|libdl.so*) continue;; esac
-              cp -L "$p" build/clap-v3/toolchain/lib/
-            done
-            cp -a /usr/share/faust build/clap-v3/toolchain/
-            faust --version > build/clap-v3/toolchain/version.txt
-            tar -czf build/clap-v3/toolchain.tar.gz -C build/clap-v3 toolchain
-            rm -rf build/clap-v3/toolchain
-          fi
+          faust --version > build/clap-v3/faust-version.txt
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with: {name: 'clap-v3-${{ github.sha }}', path: build/clap-v3/, if-no-files-found: error, retention-days: 7}
