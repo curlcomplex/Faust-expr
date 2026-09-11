@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "module_id": "clap",
+  "sound_version": "0.3.0-experiment",
+  "status": "clap-identity-rebuild-pending-musical-approval",
+  "recommended_entry": "clap.dsp",
+  "inputs": 0,
+  "outputs": 1,
+  "precision": "float32",
+  "controls": {
+    "spacing": {"min": 0, "max": 1, "default": 0.40, "unit": "burst separation; gap 4-28ms"},
+    "snap": {"min": 0, "max": 1, "default": 0.62, "unit": "burst sharpness and attack brightness"},
+    "decay": {"min": 0, "max": 1, "default": 0.32, "unit": "noise tail e-fold time 18-450ms"},
+    "tone": {"min": 0, "max": 1, "default": 0.48, "unit": "broad noise formant, not oscillator pitch"},
+    "tail": {"min": 0, "max": 1, "default": 0.35, "unit": "delayed diffuse noise level; zero off"},
+    "drive": {"min": 0, "max": 1, "default": 0.08, "unit": "soft nonlinear saturation; zero bypass"},
+    "pitch_hz": {"min": 70, "max": 900, "default": 210, "unit": "note proxy for noise-formant shift; NOT an audible fundamental"},
+    "velocity": {"min": 0, "max": 1, "default": 1, "unit": "linear amplitude after synthesis"},
+    "gate": {"min": 0, "max": 1, "default": 0, "unit": "rising-edge trigger"}
+  },
+  "tracker_columns": ["spacing", "snap", "decay", "tone", "tail", "drive"],
+  "adapter_map": {"P1": "spacing", "P2": "snap", "P3": "decay", "P4": "tone", "P5": "tail", "P6": "drive"},
+  "event_semantics": "All controls and velocity latch at onset. Note-off does not choke. Noise/filter state persists. Mono per host voice; host owns polyphony/voice stealing.",
+  "migration": "BREAKING sound/ABI revision. Never reinterpret v2 balance/body/body_env/punch values as v3 knobs. Retain v2 for existing project identities; instantiate v3 with its defaults and explicit version. The seven-inside-six Body/Envelope pairing is obsolete for v3. Decay remains column 3.",
+  "samples": "None. Manufacturer references are offline comparison evidence only.",
+  "remaining": ["Felix musical approval", "Tracker adapter implementation", "target-device callback/thermal checks", "auditory retrigger and voice-stealing acceptance"],
+  "human_approved": false,
+  "device_qualified": false
+}
