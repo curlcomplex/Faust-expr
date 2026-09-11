@@ -23,9 +23,11 @@ age=(+(1.0):min(30.0*ma.SR):*(1.0-hit))~_; t=age/ma.SR;
 // its upper half progressively adds a high-frequency crunch path.
 gap=.0015+.0200*sp*sp;
 clTau=.0007+.0048*(1.0-sp)+.0020*(1.0-pn);
-step(x)=min(1.0,max(0.0,x*ma.SR));
-w(x)=step(x)*exp(-max(0.0,x)/clTau);
-clusterEnv=w(t)+.88*w(t-gap)+.70*w(t-2.07*gap)+.52*w(t-3.24*gap);
+d0=max(0.0,t); g0=min(1.0,max(0.0,t*ma.SR)); w0=g0*exp(-d0/clTau);
+x1=t-gap; d1=max(0.0,x1); g1=min(1.0,max(0.0,x1*ma.SR)); w1=g1*exp(-d1/clTau);
+x2=t-2.07*gap; d2=max(0.0,x2); g2=min(1.0,max(0.0,x2*ma.SR)); w2=g2*exp(-d2/clTau);
+x3=t-3.24*gap; d3=max(0.0,x3); g3=min(1.0,max(0.0,x3*ma.SR)); w3=g3*exp(-d3/clTau);
+clusterEnv=w0+.88*w1+.70*w2+.52*w3;
 
 noise=no.noise;
 dark=noise:fi.highpass(1,450):fi.lowpass(1,4200);
@@ -54,7 +56,7 @@ bodyEnvelope=(1.0-exp(-t/.0008))*exp(-t/bodyTau);
 index=.12+4.8*bd*bd;
 bodyVoice=bodyEnvelope*sin(theta + index*bodyEnvelope*modulator);
 
-singleNoise=.64*(color*w(t))+.44*tail;
+singleNoise=.64*(color*w0)+.44*tail;
 noTailNoise=.64*cluster;
 noiseGain=sqrt(max(0.0,1.0-bal));
 bodyGain=sqrt(max(0.0,bal));
