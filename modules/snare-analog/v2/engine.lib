@@ -1,0 +1,46 @@
+// Independent analog-style behavioral instrument; not a recovered circuit.
+import("stdfaust.lib");
+pitch=hslider("pitch_hz",180,70,500,.001);
+balance=hslider("balance",.55,0,1,.001);
+crack=hslider("crack",.48,0,1,.001);
+decay=hslider("decay",.5,0,1,.001);
+noiseColor=hslider("noise_color",.55,0,1,.001);
+tone=hslider("tone",.45,0,1,.001);
+drive=hslider("drive",.12,0,1,.001);
+gate=button("gate");velocity=hslider("velocity",1,0,1,.001);
+hit=gate>gate'; seen=max(hit)~_;
+latch(x)=ba.sAndH(hit,x);
+f0=latch(pitch);bal=latch(balance);cr=latch(crack);de=latch(decay);
+nc=latch(noiseColor);tn=latch(tone);dr=latch(drive);vel=latch(velocity);
+age=(+(1.0):min(30.0*ma.SR):*(1.0-hit))~_;t=age/ma.SR;
+bodyTau=.025*pow(32.0,de);noiseTau=.016*pow(55.0,de)*(.7+.6*bal);
+attackTau=.00015+.0012*(1-cr)*(1-cr);
+bodyEnv=(1-exp(-t/attackTau))*exp(-t/bodyTau)*(t<16*bodyTau);
+modeEnv=(1-exp(-t/attackTau))*exp(-t/(bodyTau*(.55+.30*tn)))*(t<16*bodyTau);
+noiseEnv=(1-exp(-t/.00025))*exp(-t/noiseTau)*(t<16*noiseTau);
+phase(hz)=os.hs_phasor(1.0,hz,hit);
+directSine(p)=sin(2*ma.PI*p);
+// Ordinary interpolated sine lookup, same mathematical waveform, not revoicing.
+// Shared generated table must be initialized before any audio thread uses it.
+sineSample(i)=rdtable(4096,sin((2*ma.PI/4096)*float(ba.time)),i);
+tableSine(p)=a+(b-a)*u with {
+ x=p*4096;i=int(x);u=x-i;
+ a=sineSample(i&4095);b=sineSample((i+1)&4095);
+};
+noise=no.noise;
+dark=noise:fi.highpass(1,350):fi.lowpass(1,3600);
+mid=noise:fi.highpass(1,900):fi.lowpass(1,8200);
+bright=noise:fi.highpass(1,2200):fi.lowpass(1,15000);
+// Convex color mixture; fixed filter state, no coefficient switching on locks.
+colored=((1-nc)*(1-nc)*dark+2*nc*(1-nc)*mid+nc*nc*bright)*sqrt(ma.SR/48000.0);
+// Each sub-excitation starts at zero, including the delayed events.
+burst(x)=(1-exp(-max(0,x)/.00018))*exp(-max(0,x)/(.0007+.003*(1-cr)))*(x>=0);
+raw(osc,tailEnabled,clusterEnabled)=body+tail+impact with {
+ body=sqrt(1-bal)*(bodyEnv*(.82-.34*tn)*osc(phase(f0))
+                  +modeEnv*(.15+.30*tn)*osc(phase(f0*(1.5+.5*tn))));
+ tail=tailEnabled*.65*sqrt(bal)*colored*noiseEnv;
+ impact=.20*cr*cr*(burst(t)*(.55*colored+.45*osc(phase(2400+3200*tn)))
+          +clusterEnabled*(.65*burst(t-.0025)+.35*burst(t-.005))*colored);
+};
+shape(x)=(1-dr*dr)*x+dr*dr*ma.tanh(x*(1+9*dr*dr))/ma.tanh(1+9*dr*dr);
+render(osc,tailEnabled,clusterEnabled)=raw(osc,tailEnabled,clusterEnabled):shape:*(.48*vel*seen):fi.dcblockerat(10);

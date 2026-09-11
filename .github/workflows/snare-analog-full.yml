@@ -2,7 +2,7 @@ name: Analog snare full qualification
 on:
   push:
     branches: [47-analog-snare-full-batch]
-    paths: ['modules/snare-analog/**','tools/modules/snare_analog_batch.py','.github/workflows/snare-analog-full.yml']
+    paths: ['modules/snare-analog/**','tools/modules/analog_snare_*','tests/test_analog_snare_delivery.py','.github/workflows/snare-analog-full.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -12,15 +12,32 @@ concurrency:
 jobs:
   qualify:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 30
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
-      - run: |
+      - name: Disposable build tools
+        run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy
-      - name: Full actual-Faust qualification
-        run: /usr/bin/python3 tools/modules/snare_analog_batch.py --out build/snare-analog
+          sudo apt-get install -y --no-install-recommends faust g++ ffmpeg python3-numpy python3-scipy
+      - name: Independent arithmetic and contracts
+        run: /usr/bin/python3 -m unittest discover -s tests -p test_analog_snare_delivery.py -v
+      - name: Licensed digital-snare comparison context (not analog calibration)
+        run: /usr/bin/python3 tools/modules/fetch_snare_references.py --out build/snare-analog/references
+      - name: Actual Faust generation, renders, musical tests, comparisons and benchmark
+        run: /usr/bin/python3 tools/modules/analog_snare_delivery.py --out build/snare-analog/run --references build/snare-analog/references
+      - name: Preserve source and compiler evidence
+        if: always()
+        run: |
+          mkdir -p build/snare-analog
+          git rev-parse HEAD > build/snare-analog/commit.txt
+          git archive --format=tar HEAD > build/snare-analog/source.tar
+          faust -v > build/snare-analog/faust-version.txt
+          c++ --version > build/snare-analog/cxx-version.txt
+          git diff --check > build/snare-analog/diff-check.txt
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
