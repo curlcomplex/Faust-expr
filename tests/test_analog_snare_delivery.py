@@ -1,4 +1,8 @@
-"""Synthetic arithmetic / boundary tests, separate from actual DSP tests."""
+"""Synthetic arithmetic / boundary tests, separate from actual DSP tests.
+
+This file is intentionally in the full-qualification workflow trigger set so the
+current PR head is exercised after documentation/contract-only changes as well.
+"""
 import sys,json,unittest
 from pathlib import Path
 import numpy as np
