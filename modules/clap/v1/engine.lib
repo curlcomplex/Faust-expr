@@ -45,14 +45,17 @@ darkNoise = noiseSource : fi.highpass(1, 450.0) : fi.lowpass(1, 4300.0);
 midNoise = noiseSource : fi.highpass(1, 900.0) : fi.lowpass(1, 8200.0);
 brightNoise = noiseSource : fi.highpass(1, 1800.0) : fi.lowpass(1, 15000.0);
 noiseShape = darkNoise*(1.0-colorValue)*(1.0-colorValue) + midNoise*(1.0-abs(2.0*colorValue-1.0)) + brightNoise*colorValue*colorValue;
-cluster = noiseShape*(event0 + .86*event1 + .73*event2 + .58*event3);
-diffuse = noiseShape*tailEnv*(.22 + .78*(1.0-punchValue*.45));
 
 phase1 = os.hs_phasor(1.0, pitchValue, hit);
 phase2 = os.hs_phasor(1.0, pitchValue*(1.52 + .42*colorValue), hit);
 bodyEnv = (1.0-exp((0.0-t)/.00045))*exp((0.0-t)/bodyTau);
 tonal = bodyEnv*(.72*sin(2.0*ma.PI*phase1) + .28*sin(2.0*ma.PI*phase2));
-raw = (1.0-.42*bodyValue)*(cluster*.19 + diffuse*.23 + attackClick*noiseShape*.035*punchValue) + tonal*(.25*bodyValue);
+
 driveMix = driveValue*driveValue;
-shaped = (1.0-driveMix)*raw + driveMix*ma.tanh(raw*(1.0+12.0*driveMix))/ma.tanh(1.0+12.0*driveMix);
-process = shaped*.72*velocityValue*seen : fi.dcblockerat(10);
+render(tailEnabled, extraBurstEnabled) = shaped*.72*velocityValue*seen : fi.dcblockerat(10) with {
+  clusterPart = noiseShape*(event0 + extraBurstEnabled*(.86*event1 + .73*event2 + .58*event3));
+  diffusePart = tailEnabled*noiseShape*tailEnv*(.22 + .78*(1.0-punchValue*.45));
+  raw = (1.0-.42*bodyValue)*(clusterPart*.19 + diffusePart*.23 + attackClick*noiseShape*.035*punchValue) + tonal*(.25*bodyValue);
+  shaped = (1.0-driveMix)*raw + driveMix*ma.tanh(raw*(1.0+12.0*driveMix))/ma.tanh(1.0+12.0*driveMix);
+};
+process = render(1.0, 1.0);
