@@ -32,7 +32,7 @@ A closed onset does **not** merely steal the host voice. It arms an explicit att
 
 ## Current qualification
 
-Hosted run `34637270955` at `a514091199eb3ede4976f487635e909f1423c25e` passed **67 actual renders / 82 checks** using the repository's native Faust/C++ renderer.
+Hosted run `34637270955` at `a514091199eb3ede4976f487635e909f1423c25e` passed **67 actual renders / 82 checks** using the repository's native Faust/C++ renderer. The later documentation/manifest commits do not change DSP or renderer source.
 
 Default 48 kHz descriptors:
 - closed t90 ≈ **29.98 ms**, spectral centroid ≈ **10.38 kHz**;
