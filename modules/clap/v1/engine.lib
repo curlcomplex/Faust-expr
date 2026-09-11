@@ -27,13 +27,13 @@ tailTau = .025*pow(70.0, de);
 bodyTau = .012*pow(26.0, de) * (.55 + .75*bo);
 
 // Explicitly unrolled delayed events: one-sample numeric onset then exponential fall.
-e0 = min(1.0,max(0.0,t*ma.SR))*exp(-t/clusterTau);
-e1 = min(1.0,max(0.0,(t-d1)*ma.SR))*exp(-max(0.0,t-d1)/clusterTau);
-e2 = min(1.0,max(0.0,(t-d2)*ma.SR))*exp(-max(0.0,t-d2)/clusterTau);
-e3 = min(1.0,max(0.0,(t-d3)*ma.SR))*exp(-max(0.0,t-d3)/clusterTau);
+e0 = min(1.0,max(0.0,t*ma.SR))*exp((0.0-t)/clusterTau);
+e1 = min(1.0,max(0.0,(t-d1)*ma.SR))*exp((0.0-max(0.0,t-d1))/clusterTau);
+e2 = min(1.0,max(0.0,(t-d2)*ma.SR))*exp((0.0-max(0.0,t-d2))/clusterTau);
+e3 = min(1.0,max(0.0,(t-d3)*ma.SR))*exp((0.0-max(0.0,t-d3))/clusterTau);
 tailStart = d3 + .0015;
-tailEnv = min(1.0,max(0.0,(t-tailStart)*ma.SR))*exp(-max(0.0,t-tailStart)/tailTau);
-attackClick = exp(-t/(.00025 + .0012*(1.0-pu)));
+tailEnv = min(1.0,max(0.0,(t-tailStart)*ma.SR))*exp((0.0-max(0.0,t-tailStart))/tailTau);
+attackClick = exp((0.0-t)/(.00025 + .0012*(1.0-pu)));
 
 n = no.noise;
 dark = n : fi.highpass(1, 450.0) : fi.lowpass(1, 4300.0);
@@ -45,7 +45,7 @@ diffuse = noiseShape*tailEnv*(.22 + .78*(1.0-pu*.45));
 
 ph1 = os.hs_phasor(1.0, p0, hit);
 ph2 = os.hs_phasor(1.0, p0*(1.52 + .42*co), hit);
-bodyEnv = (1.0-exp(-t/.00045))*exp(-t/bodyTau);
+bodyEnv = (1.0-exp((0.0-t)/.00045))*exp((0.0-t)/bodyTau);
 tonal = bodyEnv*(.72*sin(2.0*ma.PI*ph1) + .28*sin(2.0*ma.PI*ph2));
 raw = (1.0-.42*bo)*(cluster*.19 + diffuse*.23 + attackClick*noiseShape*.035*pu) + tonal*(.25*bo);
 a = dr*dr;
