@@ -34,7 +34,8 @@ bright=noise:fi.highpass(1,2200):fi.lowpass(1,15000);
 // Convex color mixture; fixed filter state, no coefficient switching on locks.
 colored=((1-nc)*(1-nc)*dark+2*nc*(1-nc)*mid+nc*nc*bright)*sqrt(ma.SR/48000.0);
 // Each sub-excitation starts at zero, including the delayed events.
-burst(x)=(1-exp(-max(0,x)/.00018))*exp(-max(0,x)/(.0007+.003*(1-cr)))*(x>=0);
+// Explicit subtraction avoids Faust's restricted unary-minus syntax.
+burst(x)=(1-exp((0-max(0,x))/.00018))*exp((0-max(0,x))/(.0007+.003*(1-cr)))*(x>=0);
 raw(osc,tailEnabled,clusterEnabled)=body+tail+impact with {
  body=sqrt(1-bal)*(bodyEnv*(.82-.34*tn)*osc(phase(f0))
                   +modeEnv*(.15+.30*tn)*osc(phase(f0*(1.5+.5*tn))));
