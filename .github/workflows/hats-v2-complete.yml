@@ -1,0 +1,41 @@
+name: Analog Hats v2 measured qualification
+on:
+  push:
+    branches: [53-analog-hats-full-batch]
+    paths: ['modules/hats-analog/v2/**', 'tools/modules/hats_v2*', '.github/workflows/hats-v2-complete.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+concurrency: {group: 'hats-v2-${{ github.ref }}', cancel-in-progress: true}
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Compiler and analysis dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy
+      - name: Syntax and pinned original TR-808 recordings
+        run: |
+          /usr/bin/python3 -m py_compile tools/modules/hats_v2_delivery.py tools/modules/hats_v2_reference.py
+          /usr/bin/python3 tools/modules/hats_v2_reference.py --references build/hats-v2/references --fetch-only
+      - name: Actual Faust scalar, vector, interaction and ablation renders
+        run: /usr/bin/python3 tools/modules/hats_v2_delivery.py --out build/hats-v2/run
+      - name: Measured reference comparison and level-matched auditions
+        run: /usr/bin/python3 tools/modules/hats_v2_reference.py --references build/hats-v2/references --render build/hats-v2/run --out build/hats-v2/audition
+      - name: Exact source evidence and reference redistribution boundary
+        if: always()
+        run: |
+          mkdir -p build/hats-v2
+          rm -f build/hats-v2/references/*.wav
+          git rev-parse HEAD > build/hats-v2/commit.txt
+          git archive --format=tar HEAD > build/hats-v2/source.tar
+          git diff --check > build/hats-v2/diff-check.txt
+          faust --version > build/hats-v2/faust-version.txt
+          g++ --version > build/hats-v2/cxx-version.txt
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with: {name: 'hats-v2-${{ github.sha }}', path: build/hats-v2/, if-no-files-found: error, retention-days: 7}
