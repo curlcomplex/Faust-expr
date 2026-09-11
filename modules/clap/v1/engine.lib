@@ -23,7 +23,8 @@ age=(+(1.0):min(30.0*ma.SR):*(1.0-hit))~_; t=age/ma.SR;
 // its upper half progressively adds a high-frequency crunch path.
 gap=.0015+.0200*sp*sp;
 clTau=.0007+.0048*(1.0-sp)+.0020*(1.0-pn);
-w(x)=(x>=0.0)*exp(-max(0.0,x)/clTau);
+step(x)=min(1.0,max(0.0,x*ma.SR));
+w(x)=step(x)*exp(-max(0.0,x)/clTau);
 clusterEnv=w(t)+.88*w(t-gap)+.70*w(t-2.07*gap)+.52*w(t-3.24*gap);
 
 noise=no.noise;
