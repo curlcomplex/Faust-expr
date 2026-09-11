@@ -37,9 +37,8 @@ clusterTau = .0007 + .0055*(1.0-pu)*(1.0-pu);
 tailTau = .025*pow(70.0, de);
 bodyTau = .012*pow(26.0, de) * (.55 + .75*bo);
 
-// One-sample numeric step avoids toolchain-sensitive boolean expressions in helpers.
-stepAt(d) = min(1.0, max(0.0, (t-d)*ma.SR));
-burstEnv(d) = stepAt(d) * exp(-max(0.0, t-d)/clusterTau);
+stepAt(offset) = min(1.0, max(0.0, (t-offset)*ma.SR));
+burstEnv(offset) = stepAt(offset) * exp(-max(0.0, t-offset)/clusterTau);
 tailStart = d3 + .0015;
 tailEnv = stepAt(tailStart) * exp(-max(0.0, t-tailStart)/tailTau);
 attackClick = exp(-t/(.00025 + .0012*(1.0-pu)));
