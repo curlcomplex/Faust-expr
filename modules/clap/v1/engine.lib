@@ -15,32 +15,24 @@ velocity = hslider("velocity", 1, 0, 1, .001);
 hit = gate > gate';
 seen = max(hit) ~ _;
 latched(x) = ba.sAndH(hit, x);
-
-p0 = latched(pitch);
-sp = latched(spacing);
-pu = latched(punch);
-de = latched(decay);
-co = latched(color);
-bo = latched(body);
-dr = latched(drive);
-vel = latched(velocity);
+p0 = latched(pitch); sp = latched(spacing); pu = latched(punch); de = latched(decay);
+co = latched(color); bo = latched(body); dr = latched(drive); vel = latched(velocity);
 
 age = (+(1.0) : min(30.0*ma.SR) : *(1.0-hit)) ~ _;
 t = age / ma.SR;
-
 gap = .0015 + .0155*sp*sp;
-d0 = 0.0;
-d1 = gap;
-d2 = gap*2.05;
-d3 = gap*3.35;
+d1 = gap; d2 = gap*2.05; d3 = gap*3.35;
 clusterTau = .0007 + .0055*(1.0-pu)*(1.0-pu);
 tailTau = .025*pow(70.0, de);
 bodyTau = .012*pow(26.0, de) * (.55 + .75*bo);
 
-stepAt(offset) = min(1.0, max(0.0, (t-offset)*ma.SR));
-burstEnv(offset) = stepAt(offset) * exp(-max(0.0, t-offset)/clusterTau);
+// Explicitly unrolled delayed events: one-sample numeric onset then exponential fall.
+e0 = min(1.0,max(0.0,t*ma.SR))*exp(-t/clusterTau);
+e1 = min(1.0,max(0.0,(t-d1)*ma.SR))*exp(-max(0.0,t-d1)/clusterTau);
+e2 = min(1.0,max(0.0,(t-d2)*ma.SR))*exp(-max(0.0,t-d2)/clusterTau);
+e3 = min(1.0,max(0.0,(t-d3)*ma.SR))*exp(-max(0.0,t-d3)/clusterTau);
 tailStart = d3 + .0015;
-tailEnv = stepAt(tailStart) * exp(-max(0.0, t-tailStart)/tailTau);
+tailEnv = min(1.0,max(0.0,(t-tailStart)*ma.SR))*exp(-max(0.0,t-tailStart)/tailTau);
 attackClick = exp(-t/(.00025 + .0012*(1.0-pu)));
 
 n = no.noise;
@@ -48,15 +40,13 @@ dark = n : fi.highpass(1, 450.0) : fi.lowpass(1, 4300.0);
 mid = n : fi.highpass(1, 900.0) : fi.lowpass(1, 8200.0);
 bright = n : fi.highpass(1, 1800.0) : fi.lowpass(1, 15000.0);
 noiseShape = dark*(1.0-co)*(1.0-co) + mid*(1.0-abs(2.0*co-1.0)) + bright*co*co;
-
-cluster = noiseShape*(burstEnv(d0) + .86*burstEnv(d1) + .73*burstEnv(d2) + .58*burstEnv(d3));
+cluster = noiseShape*(e0 + .86*e1 + .73*e2 + .58*e3);
 diffuse = noiseShape*tailEnv*(.22 + .78*(1.0-pu*.45));
 
 ph1 = os.hs_phasor(1.0, p0, hit);
 ph2 = os.hs_phasor(1.0, p0*(1.52 + .42*co), hit);
 bodyEnv = (1.0-exp(-t/.00045))*exp(-t/bodyTau);
 tonal = bodyEnv*(.72*sin(2.0*ma.PI*ph1) + .28*sin(2.0*ma.PI*ph2));
-
 raw = (1.0-.42*bo)*(cluster*.19 + diffuse*.23 + attackClick*noiseShape*.035*pu) + tonal*(.25*bo);
 a = dr*dr;
 shaped = (1.0-a)*raw + a*ma.tanh(raw*(1.0+12.0*a))/ma.tanh(1.0+12.0*a);
