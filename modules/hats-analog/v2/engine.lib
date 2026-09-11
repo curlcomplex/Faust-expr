@@ -1,0 +1,64 @@
+// Analog Hats v2: sample-free 808 reference study; independent CH/OH latches.
+import("stdfaust.lib");
+metal = hslider("metal",.96,0,1,.001);
+tone = hslider("tone",.60,0,1,.001);
+decay = hslider("decay",.46,0,1,.001);
+shape = hslider("shape",.30,0,1,.001);
+choke = hslider("choke",.78,0,1,.001);
+drive = hslider("drive",.12,0,1,.001);
+pitch = hslider("pitch_ratio",1,.6,1.7,.001);
+articulation = hslider("articulation",0,0,1,1);
+velocity = hslider("velocity",1,0,1,.001);
+gate = button("gate");
+chokeGate = button("choke_gate");
+hit = gate>gate'; externalChoke=chokeGate>chokeGate';
+closedHit=hit*float(articulation<.5);
+// Explicit simultaneous-event policy: an external choke wins over a new OH.
+openHit=hit*float(articulation>=.5)*(1-externalChoke);
+kill=max(closedHit,externalChoke);
+seen(h)=max(h)~_;
+lat(h,x)=select2(seen(h),x,ba.sAndH(h,x));
+clock(h)=(+(1):min(30*ma.SR):*(1-h))~_;
+// Release progress accumulates; subsequent closed hits cannot resurrect an OH.
+armed=(+(kill):min(1):*(1-openHit))~_;
+strength=ba.sAndH(kill,choke);
+rate=float(strength>0)/(.00025*pow(400,1-strength)*ma.SR);
+progress=(+(armed*rate):min(32):*(1-openHit))~_;
+killGain=exp(-progress)*float(progress<24);
+
+sq(f)=os.polyblep_square(f);
+// A finite envelope: no frozen nonzero exponential after the clock saturates.
+amp(t,hold,tau,attack)=(1-exp(-t/attack))*exp((0-max(0,t-hold))/tau)*min(1,max(0,(hold+12*tau-t)/tau));
+voice(h,isOpen,kg)=dc*.72*v*kg with {
+ m=lat(h,metal);tn=lat(h,tone);d=lat(h,decay);sh=lat(h,shape);dr=lat(h,drive);p=lat(h,pitch);v=lat(h,velocity);
+ t=clock(h)/ma.SR;
+ spread=.04*(sh-.30);
+ s1=sq(205.3*p*(1-spread));s2=sq(304.4*p*(1+.65*spread));
+ s3=sq(369.6*p*(1-1.1*spread));s4=sq(522.7*p*(1+.35*spread));
+ s5=sq(540.5*p*(1+1.25*spread));s6=sq(800*p*(1-.45*spread));
+ summed=(s1+s2+s3+s4+s5+s6)/6;
+ ringed=(s1*s2+s3*s5+s4*s6)/3;
+ ringAmt=max(0,sh-.5)*.8;
+ bank=(1-ringAmt)*summed+ringAmt*ringed;
+ excitation=m*bank+(1-m)*no.noise*.38;
+ // Separate CH and OH filter responses, measured as markedly different on 808.
+ hp=(7800-2200*isOpen)*pow(2,tn-.60);
+ center=(12800-5000*isOpen)*pow(1.8,tn-.60);
+ wide=excitation:fi.highpass(3,min(.38*ma.SR,hp)):fi.lowpass(1,min(.44*ma.SR,18500));
+ focus=excitation:fi.resonbp(min(.38*ma.SR,center),1.0+1.2*isOpen,1):fi.highpass(2,hp*.65);
+ filtered=((.85-.65*isOpen)*wide+(.65+.35*isOpen)*focus):fi.highpass(2,hp*.92);
+ hold=select2(isOpen,.009*pow(10,d),.014+.020*sh);
+ tau=select2(isOpen,.006*pow(10,d),.035*pow(25,d));
+ attack=.00010+.00022*(1-sh);
+ main=amp(t,hold,tau,attack);
+ // The closed tick is more pronounced; OH body has a softer onset contour.
+ tick=amp(t,0,.0018+.0016*(1-sh),attack)*(.04+.14*sh)*(1-.45*isOpen);
+ env=(main+tick)*seen(h);
+ raw=filtered*env;
+ a=dr*dr;
+ saturated=(1-a)*raw+a*ma.tanh((1+12*a)*raw)/(1+2*a);
+ dc=saturated:fi.dcblockerat(20);
+};
+closed=voice(closedHit,0,1);
+opened=voice(openHit,1,killGain);
+full=closed+opened;

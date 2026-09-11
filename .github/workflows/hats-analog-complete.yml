@@ -1,0 +1,72 @@
+name: Analog Hats complete qualification
+on:
+  push:
+    branches: [53-analog-hats-full-batch]
+    paths: ['modules/hats-analog/**','tools/modules/hats_analog_delivery.py','.github/workflows/hats-analog-complete.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+concurrency: {group: 'hats-analog-${{ github.ref }}', cancel-in-progress: true}
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ ffmpeg python3-numpy python3-scipy curl
+      - name: Record Mutant Hi-Hats references; capture audio when host permits
+        continue-on-error: true
+        run: |
+          mkdir -p build/hats-analog/references/full build/hats-analog/reference-excerpts
+          python3 - <<'PY'
+          import hashlib,json,pathlib,subprocess,urllib.request
+          out=pathlib.Path('build/hats-analog/references/full')
+          refs={
+            'choke_modes':'https://www.amazona.de/wp-content/uploads/2023/01/05-Hexinverter-Mutant-Hihats-Unterschied_OFF_EXCLUSIVE_FADE.mp3',
+            'filter_sweep':'https://www.amazona.de/wp-content/uploads/2023/01/06-Hexinverter-Mutant-Hihats-Filter-Sweep.mp3',
+            'external_mod':'https://www.amazona.de/wp-content/uploads/2023/01/07-Hexinverter-Mutant-Hihats-Modulation-External-Input.mp3'}
+          manifest={'source_page':'https://www.amazona.de/test-hexinverter-mutant-bd9-snare-hihats/','manufacturer_page':'https://www.hexinverter.net/mutant-hihats','instrument':'Hexinverter Mutant Hi-Hats','refs':{},'settings':'Reviewer demonstrations; exact knob values/capture gain unknown.','note':'Reference URLs independently verified; some CI IPs receive HTML anti-bot responses instead of MP3.'}
+          for name,url in refs.items():
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0','Referer':manifest['source_page']})
+              with urllib.request.urlopen(req,timeout=60) as r:data=r.read(25_000_001)
+              p=out/(name+'.mp3');p.write_bytes(data)
+              probe=subprocess.run(['ffprobe','-v','error','-show_entries','format=duration','-of','default=nw=1:nk=1',str(p)],capture_output=True,text=True)
+              if probe.returncode: raise ValueError('host did not return valid audio')
+              manifest['refs'][name]={'url':url,'sha256':hashlib.sha256(data).hexdigest(),'duration_seconds':float(probe.stdout.strip()),'captured':True}
+            except Exception as e:
+              manifest['refs'][name]={'url':url,'captured':False,'error':str(e)}
+          pathlib.Path('build/hats-analog/references/manifest.json').write_text(json.dumps(manifest,indent=2))
+          PY
+      - name: Actual Faust qualification and authored range bank
+        run: /usr/bin/python3 tools/modules/hats_analog_delivery.py --out build/hats-analog/run
+      - name: Make short reference excerpts if valid audio was captured
+        if: always()
+        run: |
+          for f in build/hats-analog/references/full/*.mp3; do
+            [ -e "$f" ] || continue
+            if ffprobe -v error "$f" >/dev/null 2>&1; then
+              b=$(basename "$f" .mp3)
+              ffmpeg -v error -y -ss 0 -t 6 -i "$f" -ac 1 -ar 48000 "build/hats-analog/reference-excerpts/${b}.wav"
+            fi
+          done
+          rm -rf build/hats-analog/references/full
+          cat > build/hats-analog/LISTEN.md <<'EOF'
+          # Analog Hats listening
+          Start with `run/Analog_Hats_8_presets.wav`. Each two-second block is Classic, Soft, Crunch, Glass, Dust, LowMetal, Acid, Long. Pattern: CH, CH, OH, then OH→CH choke.
+          Reference URLs and capture status are in `references/manifest.json`. Runtime DSP contains no samples.
+          EOF
+      - name: Source evidence
+        if: always()
+        run: |
+          git rev-parse HEAD > build/hats-analog/commit.txt
+          git archive --format=tar HEAD > build/hats-analog/source.tar
+          git diff --check > build/hats-analog/diff-check.txt
+          faust --version > build/hats-analog/faust-version.txt
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with: {name: 'analog-hats-${{ github.sha }}', path: build/hats-analog/, if-no-files-found: error, retention-days: 7}

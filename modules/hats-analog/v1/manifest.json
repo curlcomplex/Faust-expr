@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "module_id": "hats-analog",
+  "sound_version": "0.1.0-experiment",
+  "status": "audition-candidate",
+  "entry": "hats.dsp",
+  "controls": {
+    "metal": {"min": 0, "max": 1, "default": 0.72, "role": "noise to metallic oscillator/ring cluster blend"},
+    "tone": {"min": 0, "max": 1, "default": 0.58, "role": "highpass and resonant spectral focus"},
+    "decay": {"min": 0, "max": 1, "default": 0.42, "role": "coordinated closed/open decay; visual column 3"},
+    "shape": {"min": 0, "max": 1, "default": 0.52, "role": "oscillator spread/ring complexity plus transient sharpness"},
+    "choke": {"min": 0, "max": 1, "default": 0.70, "role": "open-to-closed interaction from none through fade to hard exclusive"},
+    "drive": {"min": 0, "max": 1, "default": 0.12, "role": "post-envelope saturation"}
+  },
+  "tracker_columns": ["metal", "tone", "decay", "shape", "choke", "drive"],
+  "performance": {
+    "pitch_hz": {"min": 0.60, "max": 1.70, "default": 1.0, "role": "metallic bank frequency multiplier"},
+    "articulation": {"values": {"0": "closed", "1": "open"}},
+    "velocity": {"min": 0, "max": 1, "default": 1},
+    "gate": {"role": "rising-edge trigger"}
+  },
+  "event_semantics": "A closed trigger does not simply steal the open voice: the shared kernel retains open-envelope state and applies the latched Choke law. A new open trigger clears stale choke state. Synthesis controls latch at onset; Choke is sampled by the closed onset that performs the choke.",
+  "reference_family": "Hexinverter/Erica Synths Mutant Hi-Hats; TR-808-derived electro-hat architecture with expanded drive/filter/source/choke behavior. No circuit-recovery or clone claim.",
+  "samples": "None in runtime DSP. Reference MP3s are offline listening/analysis evidence only.",
+  "qualification": {"run_id": 34637270955, "head_sha": "a514091199eb3ede4976f487635e909f1423c25e", "actual_renders": 67, "checks": 82, "passed": true},
+  "human_approved": false,
+  "device_qualified": false
+}

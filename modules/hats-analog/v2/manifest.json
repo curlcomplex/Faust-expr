@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "module_id": "hats-analog",
+  "display_name": "Analog Hats",
+  "sound_version": "0.2.0-experiment",
+  "status": "reference-measured-audition-candidate",
+  "canonical_entry": "hats.dsp",
+  "inputs": 0,
+  "outputs": 1,
+  "diagnostic_entry": "voices.dsp",
+  "diagnostic_outputs": ["closed", "open"],
+  "precision": "float32",
+  "controls": {
+    "metal": {"min": 0, "max": 1, "default": 0.96, "unit": "noise to metallic oscillator-bank blend"},
+    "tone": {"min": 0, "max": 1, "default": 0.60, "unit": "articulation-specific high-pass and broad resonant color"},
+    "decay": {"min": 0, "max": 1, "default": 0.46, "unit": "CH hold 9-90ms and tau 6-60ms; OH tau 35-875ms"},
+    "shape": {"min": 0, "max": 1, "default": 0.30, "unit": "inharmonic spread, transient contour and upper-half ring blend"},
+    "choke": {"min": 0, "max": 1, "default": 0.78, "unit": "0 exactly off; above 0 exponential release tau 0.25ms*400^(1-value)"},
+    "drive": {"min": 0, "max": 1, "default": 0.12, "unit": "authored soft saturation; 0 bypass"},
+    "pitch_ratio": {"min": 0.6, "max": 1.7, "default": 1, "unit": "metallic-bank frequency multiplier, NOT Hz"},
+    "articulation": {"min": 0, "max": 1, "default": 0, "values": {"0": "closed", "1": "open"}},
+    "velocity": {"min": 0, "max": 1, "default": 1, "unit": "independent linear amplitude per articulation"},
+    "gate": {"min": 0, "max": 1, "default": 0, "unit": "rising-edge note trigger"},
+    "choke_gate": {"min": 0, "max": 1, "default": 0, "unit": "rising-edge external open-hat choke, creates no closed hit"}
+  },
+  "tracker_columns": ["metal", "tone", "decay", "shape", "choke", "drive"],
+  "event_semantics": {
+    "synthesis_latching": "Metal/Tone/Decay/Shape/Drive/Pitch/Velocity latch separately on the corresponding CH or OH onset. CH locks never revoice a ringing OH.",
+    "note_off": "No choking or envelope release; both articulations are one-shot.",
+    "choke": "A CH onset or external choke edge samples Choke and starts/updates a monotonic accumulated release. Choke=0 is exact off. A later CH cannot reset release progress. New OH clears prior choke progress.",
+    "priority": "External choke wins if simultaneous with an OH trigger. CH plus external choke still produces the CH.",
+    "persistent_state": "Oscillators, noise and filters keep running; no phase reset at onset. One paired kernel can carry one CH and one OH envelope concurrently.",
+    "host_routing": "Use a paired kernel per intended choke group, or broadcast explicit choke_gate edges to ringing open-hat instances. Independent per-note allocation alone does not implement cross-voice choking.",
+    "host_validation": "Send articulation exactly 0 or 1 and gates exactly 0/1. Apply locks before computing the trigger sample. A computed low sample is required between rising edges. Validate finite/range values in the adapter."
+  },
+  "migration": "Breaking sound/ABI revision: v1 pitch_hz was a ratio despite its label; v2 explicitly calls it pitch_ratio. Do not silently replace v1 project sound identities or reinterpret old presets as v2. Source folder and version must both be pinned.",
+  "reference": "Measured original TR-808 direct-output recordings, Synthmania unit 209265. Mutant Hi-Hats is a control/interaction lead only, not measured hardware parity.",
+  "samples": "No runtime samples, files, network, or external audio dependencies.",
+  "human_approved": false,
+  "device_qualified": false,
+  "remaining": ["Felix listening approval", "consumer adapter and choke routing", "target-device real-time/thermal checks", "same-articulation retrigger and voice-stealing listening", "broader rate/aliasing investigation"]
+}
