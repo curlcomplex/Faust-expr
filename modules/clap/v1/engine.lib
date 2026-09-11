@@ -54,17 +54,26 @@ bodyEnvelope=(1.0-exp(-t/.0008))*exp(-t/bodyTau);
 index=.12+4.8*bd*bd;
 bodyVoice=bodyEnvelope*sin(theta + index*bodyEnvelope*modulator);
 
-// Punch emphasizes and compresses only the opening portion.
-punchEnv=exp(-t/(.004+.014*(1.0-pn)));
-mixed=sqrt(max(0.0,1.0-bal))*noiseVoice + sqrt(max(0.0,bal))*bodyVoice;
-punched=mixed*(1.0+.72*pn*punchEnv);
-punchAmt=.42*pn*pn;
-punchShape=(1.0-punchAmt)*punched + punchAmt*ma.tanh(punched*(1.0+5.0*pn))/ma.tanh(1.0+5.0*pn);
-
-a=dr*dr;
-full=(1.0-a)*punchShape+a*ma.tanh(punchShape*(1.0+10.0*a))/ma.tanh(1.0+10.0*a);
-
 singleNoise=.64*(color*w(t))+.44*tail;
 noTailNoise=.64*cluster;
-noBody=sqrt(max(0.0,1.0-bal))*noiseVoice;
+noiseGain=sqrt(max(0.0,1.0-bal));
+bodyGain=sqrt(max(0.0,bal));
+mixed=noiseGain*noiseVoice + bodyGain*bodyVoice;
+singleMixed=noiseGain*singleNoise + bodyGain*bodyVoice;
+noTailMixed=noiseGain*noTailNoise + bodyGain*bodyVoice;
+noBodyMixed=noiseGain*noiseVoice;
+
+// Punch and Drive are identical across the full and controlled ablation paths.
+punchEnv=exp(-t/(.004+.014*(1.0-pn)));
+punchAmt=.42*pn*pn;
+a=dr*dr;
+post(x)=withPunch:withDrive with {
+  emphasized = x*(1.0+.72*pn*punchEnv);
+  withPunch = (1.0-punchAmt)*emphasized + punchAmt*ma.tanh(emphasized*(1.0+5.0*pn))/ma.tanh(1.0+5.0*pn);
+  withDrive = (1.0-a)*withPunch+a*ma.tanh(withPunch*(1.0+10.0*a))/ma.tanh(1.0+10.0*a);
+};
+full=post(mixed);
+singleFull=post(singleMixed);
+noTailFull=post(noTailMixed);
+noBodyFull=post(noBodyMixed);
 finish(x)=x*.40*vel*seen:fi.dcblockerat(10);
