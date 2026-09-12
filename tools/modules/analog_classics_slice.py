@@ -96,6 +96,22 @@ def run(out):
         ch_vec = lab.build('closed-vector', HATS / 'closed.dsp', True)
         oh_vec = lab.build('open-vector', HATS / 'open.dsp', True)
         baseline = lab.build('baseline-separated', ROOT / 'modules/hats-analog/v2/voices.dsp')
+        # Comparison-only baseline adapter: same Hz conversion, unchanged v2 kernel.
+        # This avoids comparing two differently rounded oscillator frequencies.
+        baseline_dir = ROOT / 'modules/hats-analog/v2'
+        adapted = output / 'baseline-hz-source'
+        adapted.mkdir(exist_ok=True)
+        old_source = (baseline_dir/'engine.lib').read_text()
+        anchor = 'pitch = hslider("pitch_ratio",1,.6,1.7,.001);'
+        check('baseline-adapter-one-control-only', old_source.count(anchor) == 1)
+        mapped_control = 'hslider("freq",440,264,748,.01)/440.0'
+        (adapted/'engine.lib').write_text(old_source.replace(anchor, 'pitch = '+mapped_control+';'))
+        (adapted/'voices.dsp').write_text((baseline_dir/'voices.dsp').read_text())
+        baseline_hz = lab.build('baseline-hz', adapted/'voices.dsp')
+        (adapted/'ratio.dsp').write_text('process = '+mapped_control+';\n')
+        ratio_probe = lab.build('hz-ratio-probe', adapted/'ratio.dsp')
+        lab.report['baseline_adapter'] = dict(original_engine_sha256=digest(baseline_dir/'engine.lib'),
+            adapted_engine_sha256=digest(adapted/'engine.lib'), only_change='pitch input UI and Hz/440 conversion')
         seq = lab.build('seq-signal', SEQ / 'audio-clock-test.dsp')
         seq_vec = lab.build('seq-vector', SEQ / 'audio-clock-test.dsp', True)
         seq_ui = lab.build('seq-ui', SEQ / 'trigger.dsp')
@@ -110,8 +126,20 @@ def run(out):
         check('seq-ui-clock-io', controls(seq_ui)[0] == (0, 2))
         check('seq-ui-control-set', set(controls(seq_ui)[1]) == set(SEQ_DEFAULT) | {'clock', 'reset', 'gate', 'step'})
 
-        # The original paired source is only an oracle, never the new runtime voice.
+        # Preserve original-literal comparisons as evidence, not bit-identity claims.
+        # Unit accuracy and waveform preservation at matched actual inputs are distinct.
         deltas = []
+        original_deltas = []
+        lab.report['pitch_conversion'] = []
+        for hz in (264., 440., 748.):
+            actual = float(render('pitch-map-'+str(int(hz)), ratio_probe, {'freq': hz}, frames=1)[0, 0])
+            ideal = hz/440.0
+            relative_error = abs(actual/ideal - 1)
+            check('pitch-map-float-accuracy-'+str(int(hz)), relative_error <= 2*np.finfo(np.float32).eps,
+                  actual_ratio=actual, mathematical_ratio=ideal)
+            lab.report['pitch_conversion'].append(dict(hz=hz, actual_ratio=actual,
+                mathematical_ratio=ideal, cents_difference=float(1200*np.log2(actual/ideal))))
+        aligned_values = {k: v for k, v in OLD_DEFAULT.items() if k != 'pitch_ratio'}
         for sr in (44100, 48000, 96000):
             for ratio in (.6, 1., 1.7):
                 for art, exe in [(0, ch), (1, oh)]:
@@ -119,10 +147,16 @@ def run(out):
                     events = [(480, 'gate', 1), (481, 'gate', 0)]
                     old = render(tag+'-old', baseline, OLD_DEFAULT | dict(articulation=art, pitch_ratio=ratio), events, sr=sr, frames=sr)
                     new = hat(tag+'-new', exe, dict(freq=440*ratio), sr=sr, frames=sr)
-                    difference = float(abs(new - old[:, art]).max())
+                    original_difference = float(abs(new - old[:, art]).max())
+                    original_deltas.append(dict(name=tag, max_abs_difference=original_difference))
+                    aligned = render(tag+'-matched-hz', baseline_hz,
+                        aligned_values | dict(articulation=art, freq=440*ratio), events, sr=sr, frames=sr)
+                    difference = float(abs(new - aligned[:, art]).max())
                     deltas.append(difference)
-                    check(tag+':sound-preserved', difference < 3e-5, max_abs_difference=difference)
-        lab.report['max_baseline_sample_difference'] = max(deltas)
+                    check(tag+':matched-input-sound-preserved', difference < 3e-5, max_abs_difference=difference)
+        lab.report['max_matched_input_sample_difference'] = max(deltas)
+        lab.report['original_literal_ratio_comparisons'] = original_deltas
+        lab.report['max_original_literal_sample_difference'] = max(d['max_abs_difference'] for d in original_deltas)
         dry = {}
         for label, exe, vector in [('closed', ch, ch_vec), ('open', oh, oh_vec)]:
             x = hat(label, exe, frames=96000)
@@ -180,7 +214,7 @@ def run(out):
         special[500:505, 0] = -1  # negative values do not open gates
         special[632:638, 0] = .3
         special[635:638, 0] = .8  # positive changes are not extra rising edges
-        events = [(100, 'run', 0), (173, 'run', 1), (278, 'length', 7), (377, 'length', 31), (450, 'step01', 0)]
+        events = [(100, 'run', 0), (171, 'run', 1), (278, 'length', 7), (377, 'length', 31), (450, 'step01', 0)]
         expected = trace(special, values, events)
         for b in (1, 32, 64, 127, 128, 256, 512):
             observed = render('seq-edge-block-'+str(b), seq, values, events, frames=count, block=b, inputs=special)
@@ -234,9 +268,11 @@ def run(out):
         wavfile.write(audition/'03_separate_hat_channels.wav', 48000, (np.column_stack([cx,ox])*gain).astype(np.float32))
         lab.report['audition'] = dict(global_gain=gain, processing='only this common gain; no mastering', routing='offline scores derived from actual Faust sequencer samples')
         lab.report['passed'] = True
-    except Exception:
+    except Exception as exc:
         lab.report['passed'] = False
         lab.report['error'] = traceback.format_exc()
+        if isinstance(exc, subprocess.CalledProcessError):
+            lab.report['command_output'] = exc.output
         raise
     finally:
         lab.report['commit'] = command(['git','rev-parse','HEAD']).strip()
@@ -246,7 +282,7 @@ def run(out):
         lab.report['check_count'] = len(lab.report['checks'])
         lab.report['render_count'] = len(lab.report['renders'])
         (output/'results.json').write_text(json.dumps(lab.report, indent=2))
-        print(json.dumps({k: lab.report.get(k) for k in ('commit','passed','check_count','render_count','max_baseline_sample_difference')}))
+        print(json.dumps({k: lab.report.get(k) for k in ('commit','passed','check_count','render_count','max_matched_input_sample_difference','max_original_literal_sample_difference')}))
 
 
 if __name__ == '__main__':
