@@ -1,0 +1,36 @@
+// New 808 comparison candidate, adapted from the compiled lab clustered-noise design.
+// No periodic snare-body oscillator and no samples. Not an accepted hardware clone.
+declare name "analog-classics-808-clap-study";
+declare version "0.2.0-experiment";
+declare category "Drums";
+import("stdfaust.lib");
+spacing=hslider("spacing",.40,0,1,.001);
+tone=hslider("tone",.48,0,1,.001);
+snap=hslider("snap",.62,0,1,.001);
+decay=hslider("decay",.32,0,1,.001);
+tail=hslider("tail",.35,0,1,.001);
+drive=hslider("drive",.08,0,1,.001);
+pitch=hslider("freq[unit:Hz][scale:log][curlop:input]",1500,700,4000,.01);
+gate=button("gate[curlop:input]");velocity=hslider("velocity[curlop:input]",1,0,1,.001);
+hit=gate>gate';seen=max(hit)~_;latch(x)=select2(seen,x,ba.sAndH(hit,x));
+spacingValue=latch(spacing);toneValue=latch(tone);snapValue=latch(snap);decayValue=latch(decay);
+tailValue=latch(tail);driveValue=latch(drive);pitchValue=latch(pitch);velocityValue=latch(velocity);
+age=(+(1.0):min(12.0*ma.SR):*(1.0-hit))~_;t=age/ma.SR;
+gap=.004+.024*spacingValue*spacingValue;last=2.94*gap;
+burstTau=gap*(.17+.20*(1-snapValue));attack=.00012+.00032*(1-snapValue);
+burst(x)=float(x>=0)*(1-exp((0-max(0,x))/attack))*exp((0-max(0,x))/burstTau)*min(1,max(0,(.94*gap-x)/(.15*gap)));
+cluster=.78*burst(t)+.88*burst(t-.97*gap)+.80*burst(t-1.98*gap)+burst(t-last);
+u=max(0,t-last);tau=.018*pow(25,decayValue);
+tailEnv=float(t>=last)*(1-exp(-u/(.001+.002*(1-snapValue))))*exp(-u/tau)*float(u<12*tau);
+fc=min(5500,max(750,pitchValue*pow(3,toneValue-.48)));
+noise=no.noise;
+mid=noise:fi.highpass(2,fc*.42):fi.lowpass(2,min(.40*ma.SR,fc*1.85));
+focus=noise:fi.resonbp(fc,1.1,1);
+air=noise:fi.highpass(2,min(.33*ma.SR,fc*1.25)):fi.lowpass(2,min(.42*ma.SR,8500));
+front=.70*mid+.65*focus+(.06+.22*snapValue)*air;
+back=(noise:de.delay(512,173)):fi.highpass(2,fc*.50):fi.lowpass(2,min(.38*ma.SR,fc*1.55));
+raw=front*cluster+tailValue*back*tailEnv;
+a=driveValue*driveValue;
+shaped=(1-a)*raw+a*ma.tanh((1+5*a)*raw)/(1+1.5*a);
+endFade=min(1,max(0,(12*tau-u)/tau));
+process=(shaped*.65*velocityValue*seen:fi.dcblockerat(20))*endFade;

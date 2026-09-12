@@ -1,0 +1,52 @@
+// Bounded external-clock sequencer. Timing is Faust, not a UI timer.
+import("stdfaust.lib");
+run = hslider("run[col:0][row:0]",1,0,1,1)>0;
+length = int(max(1,min(32,nentry("length[col:1][row:0]",16,1,32,1))));
+s01=checkbox("step01[col:0][row:1]");
+s02=checkbox("step02[col:1][row:1]");
+s03=checkbox("step03[col:2][row:1]");
+s04=checkbox("step04[col:3][row:1]");
+s05=checkbox("step05[col:4][row:1]");
+s06=checkbox("step06[col:5][row:1]");
+s07=checkbox("step07[col:6][row:1]");
+s08=checkbox("step08[col:7][row:1]");
+s09=checkbox("step09[col:8][row:1]");
+s10=checkbox("step10[col:9][row:1]");
+s11=checkbox("step11[col:10][row:1]");
+s12=checkbox("step12[col:11][row:1]");
+s13=checkbox("step13[col:12][row:1]");
+s14=checkbox("step14[col:13][row:1]");
+s15=checkbox("step15[col:14][row:1]");
+s16=checkbox("step16[col:15][row:1]");
+s17=checkbox("step17[col:0][row:2]");
+s18=checkbox("step18[col:1][row:2]");
+s19=checkbox("step19[col:2][row:2]");
+s20=checkbox("step20[col:3][row:2]");
+s21=checkbox("step21[col:4][row:2]");
+s22=checkbox("step22[col:5][row:2]");
+s23=checkbox("step23[col:6][row:2]");
+s24=checkbox("step24[col:7][row:2]");
+s25=checkbox("step25[col:8][row:2]");
+s26=checkbox("step26[col:9][row:2]");
+s27=checkbox("step27[col:10][row:2]");
+s28=checkbox("step28[col:11][row:2]");
+s29=checkbox("step29[col:12][row:2]");
+s30=checkbox("step30[col:13][row:2]");
+s31=checkbox("step31[col:14][row:2]");
+s32=checkbox("step32[col:15][row:2]");
+pattern(i)=(s01,s02,s03,s04,s05,s06,s07,s08,s09,s10,s11,s12,s13,s14,s15,s16,s17,s18,s19,s20,s21,s22,s23,s24,s25,s26,s27,s28,s29,s30,s31,s32):ba.selectn(32,i);
+sequence(clock,reset) = gateOut, stepOut with {
+ c=clock>0; r=reset>0;
+ tick=(c>c')*run;
+ resetEdge=r>r';
+ // Encoded state: 0=armed before first tick; 1..32=last emitted step.
+ // Reset + clock plays step 1. Stop holds state; reset still arms it.
+ // Length edits take effect on the next tick; no extra tick is generated.
+ advance(s)=select2(resetEdge,select2(tick,s,1+(int(s)%length)),int(tick));
+ state=advance~_;
+ index=max(0,int(state)-1);
+ enabled=pattern(index);
+ pulse = tick * enabled;
+ gateOut=pulse <: attach(_,hbargraph("gate[curlop:cvout]",0,1));
+ stepOut=float(state) <: attach(_,hbargraph("step[curlop:meterout][style:numerical]",0,32));
+};

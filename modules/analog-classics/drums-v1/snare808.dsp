@@ -1,0 +1,34 @@
+declare name "analog-classics-808-snare-study";
+declare version "0.1.0-experiment";
+import("stdfaust.lib");
+
+tone = hslider("tone",0.48,0,1,0.001);
+snappy = hslider("snappy",0.62,0,1,0.001);
+decay = hslider("decay",0.42,0,1,0.001);
+noiseColor = hslider("noise_color",0.56,0,1,0.001);
+drive = hslider("drive",0.05,0,1,0.001);
+freq = hslider("freq",180,100,320,0.001);
+velocity = hslider("velocity",1,0,1,0.001);
+gate = button("gate");
+
+hit = gate > gate';
+seen = max(hit) ~ _;
+lat(x) = ba.sAndH(hit,x);
+age = (+(1) : min(20*ma.SR) : *(1-hit)) ~ _;
+t = age/ma.SR;
+vel = lat(velocity);
+f0 = lat(freq);
+bodyTau = 0.045*pow(8,lat(decay));
+noiseTau = 0.025*pow(10,lat(decay));
+phase1 = os.hs_phasor(1,f0,hit);
+phase2 = os.hs_phasor(1,f0*1.83,hit);
+body = (0.72*sin(2*ma.PI*phase1) + 0.28*sin(2*ma.PI*phase2))*exp(-t/bodyTau);
+hp = 900 + 4200*lat(noiseColor);
+lp = min(0.44*ma.SR,6500 + 10000*lat(noiseColor));
+noise = no.noise : fi.highpass(2,hp) : fi.lowpass(1,lp);
+wire = noise*exp(-t/noiseTau);
+attack = exp(-t/0.0018)*sin(2*ma.PI*os.hs_phasor(1,1900+1700*lat(tone),hit));
+raw = (1-lat(snappy))*body + lat(snappy)*0.92*wire + 0.11*attack;
+a = lat(drive)*lat(drive);
+sat = (1-a)*raw + a*ma.tanh((1+9*a)*raw)/(1+1.8*a);
+process = sat*0.52*vel*seen : fi.dcblockerat(15);

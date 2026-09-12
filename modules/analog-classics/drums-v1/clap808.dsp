@@ -1,0 +1,31 @@
+declare name "analog-classics-808-clap-study";
+declare version "0.1.0-experiment";
+import("stdfaust.lib");
+
+spacing = hslider("spacing",0.52,0,1,0.001);
+snap = hslider("snap",0.66,0,1,0.001);
+decay = hslider("decay",0.44,0,1,0.001);
+tone = hslider("tone",0.54,0,1,0.001);
+tail = hslider("tail",0.36,0,1,0.001);
+drive = hslider("drive",0.04,0,1,0.001);
+freq = hslider("freq",1200,700,2400,0.001);
+velocity = hslider("velocity",1,0,1,0.001);
+gate = button("gate");
+
+hit = gate > gate';
+seen = max(hit) ~ _;
+lat(x) = ba.sAndH(hit,x);
+age = (+(1) : min(20*ma.SR) : *(1-hit)) ~ _;
+t = age/ma.SR;
+vel = lat(velocity);
+gap = 0.005 + 0.006*lat(spacing);
+burst(x) = exp(-max(0,t-x)/(0.0011+0.0015*(1-lat(snap))))*float(t>=x)*float(t<x+0.012);
+cluster = burst(0) + 0.90*burst(gap) + 0.78*burst(2*gap) + 0.66*burst(3*gap);
+noise = no.noise : fi.highpass(2,500+900*lat(tone)) : fi.lowpass(1,min(0.44*ma.SR,6500+9500*lat(tone)));
+body = noise*cluster;
+tailEnv = exp(-max(0,t-3*gap)/(0.018*pow(12,lat(decay))))*float(t>=3*gap);
+tailNoise = (no.noise : fi.highpass(2,700+0.35*lat(freq))) * tailEnv * lat(tail);
+raw = 0.46*body + 0.22*tailNoise;
+a = lat(drive)*lat(drive);
+sat = (1-a)*raw + a*ma.tanh((1+12*a)*raw)/(1+2*a);
+process = sat*vel*seen : fi.dcblockerat(20);
