@@ -1,0 +1,25 @@
+// Open303 TB_303-mode filter equations, ported to single-precision Faust.
+// Copyright (c) 2009 Robin Schmidt. MIT; see OPEN303-LICENSE.txt.
+// Source: RobinSchmidt/Open303@313bf0d9ade7c1dcb6b3a74f5ea1780a29d70074
+// Source/DSPCode/rosic_TeeBeeFilter.h and rosic_OnePoleFilter.cpp.
+// Only the selected filter mode is ported, not the complete synth/allocator.
+// Coefficient approximation is used only at cutoff <= SR/8 (wc <= pi/4).
+import("stdfaust.lib");
+filter(cf,res) = (step ~ si.bus(6)) : (!,!,!,!,!,!,_) with {
+  cutoff=max(200,min(ma.SR/8,cf));
+  r=(1-exp(-3*max(0,min(.92,res))))/(1-exp(-3));
+  fx=cutoff/(ma.SR*sqrt(2));
+  b=(.00045522346+6.1922189*fx)/(1+12.358354*fx+4.4156345*fx*fx);
+  kk=fx*(fx*(fx*(fx*(fx*(fx+7198.6997)-5837.7917)-476.47308)+614.95611)+213.87126)+16.998792;
+  k=kk*r;
+  gain=((kk/17-1)*r+1)*(1+r);
+  hpPole=exp(-2*ma.PI*150/ma.SR);
+  step(z1,z2,z3,z4,hx,hy,x)=n1,n2,n3,n4,fb,hp,2*gain*n4 with {
+    fb=k*z4;
+    hp=.5*(1+hpPole)*(fb-hx)+hpPole*hy;
+    n1=z1+2*b*(x-hp-z1+z2);
+    n2=z2+b*(n1-2*z2+z3);
+    n3=z3+b*(n2-2*z3+z4);
+    n4=z4+b*(n3-2*z4);
+  };
+};

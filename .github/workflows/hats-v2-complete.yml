@@ -1,8 +1,8 @@
-name: Analog Hats v2 measured qualification
+name: Analog Classics laboratory qualification
 on:
   push:
-    branches: [53-analog-hats-full-batch, 55-analog-classics-first-slice]
-    paths: ['modules/hats-analog/v2/**', 'tools/modules/hats_v2*', '.github/workflows/hats-v2-complete.yml', 'modules/hats-analog/single-note-v1/**', 'modules/trigger-seq/v1/**', 'modules/analog-classics/**', 'tools/modules/analog_classics_slice.py', 'tools/modules/analog_classics_drums*.py']
+    branches: [53-analog-hats-full-batch, 55-analog-classics-first-slice, 57-acid-bassline-batch]
+    paths: ['modules/hats-analog/**', 'tools/modules/hats_v2*', '.github/workflows/hats-v2-complete.yml', 'modules/trigger-seq/**', 'modules/analog-classics/**', 'modules/acid-voice/**', 'modules/bassline-seq/**', 'tools/modules/analog_classics*', 'tools/modules/acid*', 'tools/modules/render.cpp']
   workflow_dispatch:
 permissions: {contents: read}
 concurrency: {group: 'hats-v2-${{ github.ref }}', cancel-in-progress: true}
@@ -21,23 +21,25 @@ jobs:
       - name: Syntax checks
         run: |
           /usr/bin/python3 -m py_compile tools/modules/hats_v2_delivery.py tools/modules/hats_v2_reference.py
-          if [ -f tools/modules/analog_classics_slice.py ]; then /usr/bin/python3 -m py_compile tools/modules/analog_classics_slice.py; fi
-          if [ -f tools/modules/analog_classics_drums_v2.py ]; then /usr/bin/python3 -m py_compile tools/modules/analog_classics_drums_v2.py; fi
-      - name: Pinned original TR-808 recordings (original reference branch only)
-        if: github.ref_name != '55-analog-classics-first-slice'
+          if [ -f tools/modules/acid_batch.py ]; then /usr/bin/python3 -m py_compile tools/modules/acid_batch.py; fi
+      - name: Original hats hardware reference (original branch only)
+        if: github.ref_name == '53-analog-hats-full-batch'
         run: /usr/bin/python3 tools/modules/hats_v2_reference.py --references build/hats-v2/references --fetch-only
-      - name: Actual Faust scalar, vector, interaction and ablation renders
+      - name: Existing actual Faust hats regression
         run: /usr/bin/python3 tools/modules/hats_v2_delivery.py --out build/hats-v2/run
-      - name: Single-note hats and sample-exact trigger sequencer
-        if: github.ref_name == '55-analog-classics-first-slice'
+      - name: Existing single-note hats and Trigger Seq regression
+        if: github.ref_name != '53-analog-hats-full-batch'
         run: /usr/bin/python3 tools/modules/analog_classics_slice.py --out build/hats-v2/analog-classics
-      - name: Single-note drum quartet and original-808 comparisons
+      - name: Drum quartet and original-808 comparisons (drum branch only)
         if: github.ref_name == '55-analog-classics-first-slice'
         run: /usr/bin/python3 tools/modules/analog_classics_drums_v2.py --out build/hats-v2/analog-classics-drums
-      - name: Measured reference comparison and level-matched auditions
-        if: github.ref_name != '55-analog-classics-first-slice'
+      - name: Acid single-note voice and Bassline Seq batch
+        if: github.ref_name == '57-acid-bassline-batch'
+        run: /usr/bin/python3 tools/modules/acid_batch.py --out build/hats-v2/acid-batch
+      - name: Original hats comparison (original branch only)
+        if: github.ref_name == '53-analog-hats-full-batch'
         run: /usr/bin/python3 tools/modules/hats_v2_reference.py --references build/hats-v2/references --render build/hats-v2/run --out build/hats-v2/audition
-      - name: Exact source evidence and reference redistribution boundary
+      - name: Exact source and compiler evidence
         if: always()
         run: |
           mkdir -p build/hats-v2
@@ -49,4 +51,4 @@ jobs:
           g++ --version > build/hats-v2/cxx-version.txt
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with: {name: 'hats-v2-${{ github.sha }}', path: build/hats-v2/, if-no-files-found: error, retention-days: 7}
+        with: {name: 'analog-classics-${{ github.sha }}', path: build/hats-v2/, if-no-files-found: error, retention-days: 7}
