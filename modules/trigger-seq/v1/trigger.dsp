@@ -1,0 +1,10 @@
+declare name "Trigger Seq";
+declare author "curlcomplex";
+declare category "Control";
+declare version "0.1.0-experiment";
+declare curlop_role "control-source";
+declare description "1–32 externally clocked steps; one-sample gate pulses and separate current-step telemetry.";
+s=library("engine.lib");
+clock=button("clock[curlop:input][col:2][row:0]");
+reset=button("reset[curlop:input][col:3][row:0]");
+process=s.sequence(clock,reset);

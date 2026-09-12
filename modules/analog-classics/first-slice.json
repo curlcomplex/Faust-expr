@@ -1,0 +1,22 @@
+{
+  "id": "analog-classics-first-slice",
+  "version": "0.1.0-experiment",
+  "issue": "https://github.com/curlcomplex/Faust-expr/issues/55",
+  "baseline_commit": "91b051e81e52e290866f0fe09416a8db51556ec2",
+  "sources": {
+    "closed_hat": "modules/hats-analog/single-note-v1/closed.dsp",
+    "open_hat": "modules/hats-analog/single-note-v1/open.dsp",
+    "trigger_seq": "modules/trigger-seq/v1/trigger.dsp"
+  },
+  "note_inputs": {"gate": "binary", "freq": "Hz", "velocity": "linear 0..1"},
+  "hat_pitch_mapping": {"reference_hz": 440, "ratio": "freq / 440", "qualified_hz_range": [264, 748], "fundamental_pitch_claim": false},
+  "hat_control_timing": "metal/tone/decay/shape/drive/freq/velocity latch on onset; choke strength latches on choke edge",
+  "instrument_polyphony": "one note per DSP; allocation, overlap, stealing and cross-voice choke routing belong to consumer",
+  "sequencer_outputs": ["gate: one-sample 0/1 pulse", "step: trailing telemetry, 0 before first tick, then 1..32"],
+  "sequencer_reset": "positive edge arms first step; simultaneous running clock emits first step",
+  "sequencer_stop": "hold position, no output; clocks while stopped still update edge detector",
+  "sequencer_length_edit": "apply modulo on next clock edge, retain previous step telemetry until then",
+  "runtime_samples": [],
+  "source_rights": "Owner-authored laboratory source; no new third-party source imported. Inherited Faust library notices apply. Distribution licence selection remains separate.",
+  "status": {"musical_approval": false, "consumer_integration": false, "release_approved": false}
+}
