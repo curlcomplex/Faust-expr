@@ -47,6 +47,6 @@ sequence(clock,reset) = gateOut, stepOut with {
  index=max(0,int(state)-1);
  enabled=pattern(index);
  pulse = tick * enabled;
- gateOut=attach(pulse,hbargraph("gate[curlop:cvout]",0,1));
- stepOut=attach(float(state),hbargraph("step[curlop:meterout][style:numerical]",0,32));
+ gateOut=pulse <: attach(_,hbargraph("gate[curlop:cvout]",0,1));
+ stepOut=float(state) <: attach(_,hbargraph("step[curlop:meterout][style:numerical]",0,32));
 };
