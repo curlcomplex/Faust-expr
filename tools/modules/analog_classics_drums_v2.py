@@ -30,6 +30,9 @@ def features(x,sr=48000):
     e=np.cumsum(x*x);e/=e[-1]+1e-30
     return dict(peak=float(abs(x).max()),rms=float(np.sqrt(np.mean(x*x))),mean=float(x.mean()),centroid_hz=float(np.sum(f*p)/(p.sum()+1e-30)),t90_ms=float(np.searchsorted(e,.9)*1000/sr),bands=band.tolist())
 class DrumLab(Lab):
+    def check(self,name,ok,**details):
+        # Complete independent cases for diagnosis; run() still fails on any false result.
+        self.report['checks'].append(dict(name=name,passed=bool(ok),**details))
     # Replace only hat-specific score defaults; preserve the existing compiler and renderer.
     def render(self,name,exe,values,events=None,sr=48000,block=128,seconds=2.):
         events=[(round(.01*sr),'gate',1),(round(.01*sr)+1,'gate',0)] if events is None else events
@@ -115,7 +118,11 @@ def run(out):
             edge=r(name+'-corners',exe,d,events=corners,seconds=5);c(name+':bounded-corners',float(abs(edge).max())<4,peak=float(abs(edge).max()))
             for key in keys+['freq']:
                 a=r(name+'-'+key+'-min',exe,d|{key:params[key][0]});b=r(name+'-'+key+'-max',exe,d|{key:params[key][1]})
-                c(name+':effective-'+key,float(np.linalg.norm(a-b)/(np.linalg.norm(a)+1e-20))>.005)
+                whole=float(np.linalg.norm(a-b)/(np.linalg.norm(a)+1e-20))
+                transient=(name,key) in (('kick808','click'),('snare808','tone'))
+                sl=slice(480,1440) if transient else slice(None)
+                relevant=float(np.linalg.norm(a[sl]-b[sl])/(np.linalg.norm(a[sl])+1e-20))
+                c(name+':effective-'+key,relevant>.005,whole_relative_l2=whole,relevant_relative_l2=relevant,window='first20ms' if transient else 'whole2s')
             bank=[]
             for preset,p in PRESETS[name].items():
                 y=r(name+'-preset-'+preset,exe,d|p,seconds=3);wavfile.write(L.out/'audition'/f'{name}_{preset}.wav',48000,y.astype(np.float32));bank.append(y)
@@ -143,6 +150,7 @@ def run(out):
         references(L,rendered)
         L.report['source_sha256']={str(p.relative_to(ROOT)):digest(p) for p in sorted(SRC.glob('*.dsp'))};L.report['driver_sha256']=digest(__file__);L.report['renderer_sha256']=digest(ROOT/'tools/modules/render.cpp')
         L.report['features']={n:features(x[480:]) for n,x in rendered.items()};L.report['passed']=all(t['passed'] for t in L.report['checks'])
+        if not L.report['passed']:raise AssertionError('Failed checks: '+str([t['name'] for t in L.report['checks'] if not t['passed']]))
     except Exception as e:L.report.update(passed=False,error=repr(e),compiler_output=getattr(e,'output',None));raise
     finally:
         (L.out/'results.json').write_text(json.dumps(L.report,indent=2)+'\n')
