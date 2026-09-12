@@ -2,14 +2,14 @@ name: Analog Hats v2 measured qualification
 on:
   push:
     branches: [53-analog-hats-full-batch, 55-analog-classics-first-slice]
-    paths: ['modules/hats-analog/v2/**', 'tools/modules/hats_v2*', '.github/workflows/hats-v2-complete.yml', 'modules/hats-analog/single-note-v1/**', 'modules/trigger-seq/v1/**', 'modules/analog-classics/**', 'tools/modules/analog_classics_slice.py']
+    paths: ['modules/hats-analog/v2/**', 'tools/modules/hats_v2*', '.github/workflows/hats-v2-complete.yml', 'modules/hats-analog/single-note-v1/**', 'modules/trigger-seq/v1/**', 'modules/analog-classics/**', 'tools/modules/analog_classics_slice.py', 'tools/modules/analog_classics_drums.py']
   workflow_dispatch:
 permissions: {contents: read}
 concurrency: {group: 'hats-v2-${{ github.ref }}', cancel-in-progress: true}
 jobs:
   qualify:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 25
     env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -22,6 +22,7 @@ jobs:
         run: |
           /usr/bin/python3 -m py_compile tools/modules/hats_v2_delivery.py tools/modules/hats_v2_reference.py
           if [ -f tools/modules/analog_classics_slice.py ]; then /usr/bin/python3 -m py_compile tools/modules/analog_classics_slice.py; fi
+          if [ -f tools/modules/analog_classics_drums.py ]; then /usr/bin/python3 -m py_compile tools/modules/analog_classics_drums.py; fi
       - name: Pinned original TR-808 recordings (original reference branch only)
         if: github.ref_name != '55-analog-classics-first-slice'
         run: /usr/bin/python3 tools/modules/hats_v2_reference.py --references build/hats-v2/references --fetch-only
@@ -30,6 +31,9 @@ jobs:
       - name: Single-note hats and sample-exact trigger sequencer
         if: github.ref_name == '55-analog-classics-first-slice'
         run: /usr/bin/python3 tools/modules/analog_classics_slice.py --out build/hats-v2/analog-classics
+      - name: Exploratory 808 kick snare clap cymbal quartet
+        if: github.ref_name == '55-analog-classics-first-slice'
+        run: /usr/bin/python3 tools/modules/analog_classics_drums.py --out build/hats-v2/analog-classics-drums
       - name: Measured reference comparison and level-matched auditions
         if: github.ref_name != '55-analog-classics-first-slice'
         run: /usr/bin/python3 tools/modules/hats_v2_reference.py --references build/hats-v2/references --render build/hats-v2/run --out build/hats-v2/audition
