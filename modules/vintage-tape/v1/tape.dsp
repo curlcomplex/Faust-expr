@@ -9,7 +9,8 @@ speed = hslider("speed[unit:ips]",16.35,1.5,150,0.01) : si.smooth(0.999);
 output = hslider("output[unit:dB]",0,-18,18,0.01) : si.smooth(0.999);
 
 db2gain(x) = pow(10,x/20);
-soft(x) = signum(x)*sin(min(abs(x),1.5707963267948966));
+// Equivalent to sign(x)*sin(min(abs(x),pi/2)) without signum ambiguity.
+soft(x) = sin(max(-1.5707963267948966,min(1.5707963267948966,x)));
 scale = ma.SR/44100.0;
 ips = max(1,min(200,speed*1.1));
 iirAmount = min(0.99,(ips/430.0)/scale);
