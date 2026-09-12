@@ -2,7 +2,7 @@ name: Analog Classics laboratory qualification
 on:
   push:
     branches: [53-analog-hats-full-batch, 55-analog-classics-first-slice, 57-acid-bassline-batch, 60-effects-batch, 63-iron-oxide-ensemble]
-    paths: ['modules/hats-analog/**', 'tools/modules/hats_v2*', '.github/workflows/hats-v2-complete.yml', 'modules/trigger-seq/**', 'modules/analog-classics/**', 'modules/acid-voice/**', 'modules/bassline-seq/**', 'modules/vintage-rack-reverb/**', 'modules/tape-echo/**', 'modules/retro-mixer-eq/**', 'modules/vintage-tape/**', 'modules/retro-ensemble/**', 'tools/modules/analog_classics*', 'tools/modules/acid*', 'tools/modules/effects*', 'tools/modules/render.cpp']
+    paths: ['modules/hats-analog/**', 'tools/modules/hats_v2*', '.github/workflows/hats-v2-complete.yml', 'modules/trigger-seq/**', 'modules/analog-classics/**', 'modules/acid-voice/**', 'modules/bassline-seq/**', 'modules/vintage-rack-reverb/**', 'modules/tape-echo/**', 'modules/retro-mixer-eq/**', 'modules/vintage-tape/**', 'modules/retro-ensemble/**', 'tools/modules/analog_classics*', 'tools/modules/acid*', 'tools/modules/effects*', 'tools/modules/airwindows_pair.py', 'tools/modules/render.cpp']
   workflow_dispatch:
 permissions: {contents: read}
 concurrency: {group: 'hats-v2-${{ github.ref }}', cancel-in-progress: true}
@@ -23,6 +23,7 @@ jobs:
           /usr/bin/python3 -m py_compile tools/modules/hats_v2_delivery.py tools/modules/hats_v2_reference.py
           if [ -f tools/modules/acid_batch.py ]; then /usr/bin/python3 -m py_compile tools/modules/acid_batch.py; fi
           if [ -f tools/modules/effects_batch.py ]; then /usr/bin/python3 -m py_compile tools/modules/effects_batch.py; fi
+          if [ -f tools/modules/airwindows_pair.py ]; then /usr/bin/python3 -m py_compile tools/modules/airwindows_pair.py; fi
       - name: Original hats hardware reference (original branch only)
         if: github.ref_name == '53-analog-hats-full-batch'
         run: /usr/bin/python3 tools/modules/hats_v2_reference.py --references build/hats-v2/references --fetch-only
@@ -40,12 +41,9 @@ jobs:
       - name: Vintage rack reverb, tape echo and retro mixer EQ batch
         if: github.ref_name == '60-effects-batch'
         run: /usr/bin/python3 tools/modules/effects_batch.py --out build/hats-v2/effects-batch
-      - name: Iron Oxide tape and Ensemble compile preflight
+      - name: Iron Oxide tape and Ensemble batch
         if: github.ref_name == '63-iron-oxide-ensemble'
-        run: |
-          mkdir -p build/hats-v2/airwindows-pair
-          faust -lang cpp -single -cn VintageTapeDSP modules/vintage-tape/v1/tape.dsp -o build/hats-v2/airwindows-pair/tape.hpp
-          faust -lang cpp -single -cn EnsembleDSP modules/retro-ensemble/v1/ensemble.dsp -o build/hats-v2/airwindows-pair/ensemble.hpp
+        run: /usr/bin/python3 tools/modules/airwindows_pair.py --out build/hats-v2/airwindows-pair
       - name: Original hats comparison (original branch only)
         if: github.ref_name == '53-analog-hats-full-batch'
         run: /usr/bin/python3 tools/modules/hats_v2_reference.py --references build/hats-v2/references --render build/hats-v2/run --out build/hats-v2/audition
