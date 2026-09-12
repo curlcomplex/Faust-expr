@@ -1,0 +1,32 @@
+declare name "analog-classics-808-kick-study";
+declare version "0.1.0-experiment";
+import("stdfaust.lib");
+
+tone = hslider("tone",0.32,0,1,0.001);
+decay = hslider("decay",0.62,0,1,0.001);
+punch = hslider("punch",0.58,0,1,0.001);
+click = hslider("click",0.16,0,1,0.001);
+drive = hslider("drive",0.08,0,1,0.001);
+freq = hslider("freq",52,30,100,0.001);
+velocity = hslider("velocity",1,0,1,0.001);
+gate = button("gate");
+
+hit = gate > gate';
+seen = max(hit) ~ _;
+lat(x) = ba.sAndH(hit,x);
+age = (+(1) : min(30*ma.SR) : *(1-hit)) ~ _;
+t = age/ma.SR;
+f0 = lat(freq);
+vel = lat(velocity);
+tau = 0.08*pow(12,lat(decay));
+sweepTau = 0.004*pow(7,1-lat(punch));
+sweepOct = 1.2 + 2.8*lat(punch);
+f = f0*pow(2,sweepOct*exp(-t/sweepTau));
+phase = os.hs_phasor(1,f,hit);
+sine = sin(2*ma.PI*phase);
+body = sine*(1-exp(-t/0.00045))*exp(-t/tau);
+transient = lat(click)*exp(-t/0.0016)*(0.65*no.noise + 0.35*sin(2*ma.PI*os.hs_phasor(1,3200,hit)));
+colored = (body + 0.12*transient) : fi.lowpass(1,min(0.45*ma.SR,1800 + 7200*lat(tone)));
+a = lat(drive)*lat(drive);
+sat = (1-a)*colored + a*ma.tanh((1+10*a)*colored)/(1+2*a);
+process = sat*0.78*vel*seen : fi.dcblockerat(8);
