@@ -1,0 +1,4 @@
+// Test-patch import adapter: Faust resolves short library names against the
+// entry-point include path, not the directory of a nested engine library.
+// Forward to the canonical attributed filter; never duplicate its equations.
+import("../../acid-voice/v1/teebee.lib");
