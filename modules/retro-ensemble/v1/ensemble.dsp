@@ -23,14 +23,15 @@ tap(i) = de.fdelay4(32768,delaySamples) * active with {
   active = float(n<=voices);
   speedRad = spd/(1+(n/max(2,voices)));
   rateHz = speedRad*ma.SR/TWO_PI;
-  phaseOffset = (3.141592653589793/max(2,voices))*i;
-  mod = os.osc(rateHz)*cos(phaseOffset) + os.osc(rateHz)*sin(phaseOffset)*0.0;
+  // Different n values already give each tap a distinct modulation rate.
+  mod = os.osc(rateHz);
   delaySamples = min(32760,max(1,depth*n + depth*mod));
 };
 
-// A simple derivative-style high-frequency compensation stands in for the
-// oracle's alternating "air" state machine for this first Faust candidate.
-air = _ <: _,(_-_*0 : @(1)) : *(brighten*0.35) : +;
+// First-candidate approximation of Airwindows' alternating "air" compensation:
+// add a controlled first-difference term to replace interpolation high loss.
+derivative = _ <: _,@(1) : -;
+air = _ <: _,(derivative:*(brighten*0.35)) : +;
 wetmono = air <: _,par(i,48,tap(i)) :> _ : /(4*sqrt(max(2,voices)));
 mono = _ <: *(1-mix),(wetmono:*(mix)) :> _;
 process = par(i,2,mono);
