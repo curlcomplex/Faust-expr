@@ -1,0 +1,6 @@
+ac=library("engine.lib");
+freq=hslider("freq[unit:Hz][scale:log][curlop:input]",110,20,4000,.001);
+gate=button("gate[curlop:input]");
+velocity=hslider("velocity[curlop:input]",1,0,1,.001);
+accent=hslider("accent[curlop:input]",0,0,1,.001);
+slide=checkbox("slide[curlop:input]");

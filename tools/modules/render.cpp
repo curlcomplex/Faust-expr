@@ -72,7 +72,8 @@ int main(int argc,char** argv) { try {
     const int rate=int(r), block=int(b), frames=int(total);
     module->init(rate); UI ui; module->buildUserInterface(&ui);
     const int ni=module->getNumInputs(), no=module->getNumOutputs();
-    if (ni<0 || ni>2 || no<1 || no>2 || (ni!=0)!=(argc==8)) throw std::runtime_error("I/O contract");
+    // Eight bounded channels allow typed control-lane probes; not voice allocation.
+    if (ni<0 || ni>8 || no<1 || no>8 || (ni!=0)!=(argc==8)) throw std::runtime_error("I/O contract");
     std::ifstream score(argv[1]); if (!score) throw std::runtime_error("score open failed");
     std::vector<Event> events; std::set<std::pair<int,std::string>> keys;
     std::string line; int previous=-1;

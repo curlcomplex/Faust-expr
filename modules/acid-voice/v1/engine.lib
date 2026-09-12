@@ -1,0 +1,40 @@
+// One persistent note. All note allocation/overlap belongs to the consumer.
+// Original voice mapping around the attributed Open303 filter component.
+import("stdfaust.lib");
+tb=library("teebee.lib");
+cutoff=hslider("cutoff[unit:Hz][scale:log][col:0][row:0]",650,200,4500,1);
+resonance=hslider("resonance[col:1][row:0]",.68,0,.92,.001);
+envMod=hslider("envMod[col:2][row:0]",.62,0,1,.001);
+decay=hslider("decay[unit:s][scale:log][col:0][row:1]",.24,.04,1.2,.001);
+accentAmount=hslider("accentAmount[col:1][row:1]",.65,0,1,.001);
+slideTime=hslider("slideTime[unit:s][col:2][row:1]",.06,0,.3,.001);
+wave=hslider("wave[col:0][row:2]",0,0,1,.001);
+drive=hslider("drive[col:1][row:2]",.12,0,1,.001);
+level=hslider("level[col:2][row:2]",.7,0,1,.001);
+smooth(t,x)=x:si.smooth(exp(-1/(t*ma.SR)));
+state(f,g,v,a,s)=audio,pitch,env,amp,hit,acc with {
+  gate=g>0; hit=gate>gate';
+  target=max(20,min(4000,f));
+  // The incoming slide flag alone owns glide; ordinary notes jump immediately.
+  pole=select2((s>0)*(slideTime>0)*gate*(gate'),0,exp(-1/(max(.000001,slideTime)*ma.SR)));
+  step(previous)=target+pole*(previous-target);
+  pitch=step~_;
+  velocity=ba.sAndH(hit,max(0,min(1,v)));
+  // Accent may change on a tied note, but it does not retrigger the envelope.
+  accentHeld=ba.sAndH(gate,max(0,min(1,a)));
+  acc=smooth(.003,accentHeld);
+  amount=smooth(.005,accentAmount);
+  decaySeconds=smooth(.005,decay);
+  envPole=exp(-1/(ma.SR*max(.015,decaySeconds/(1+1.8*acc*amount))));
+  env=(max(hit):_)~*(envPole);
+  amp= float(gate):si.smooth(select2(gate,exp(-1/(.025*ma.SR)),exp(-1/(.002*ma.SR))));
+  w=smooth(.003,wave);
+  osc=(1-w)*os.polyblep_saw(pitch)+w*os.polyblep_square(pitch);
+  cf=exp(smooth(.005,log(cutoff)))*pow(2,3.5*smooth(.005,envMod)*env+1.3*amount*acc*(.2+env));
+  filtered=(osc:fi.highpass(1,44.486)):tb.filter(cf,smooth(.005,resonance));
+  d=smooth(.005,drive);
+  saturated=ma.tanh((1+8*d)*filtered)/(1+3*d);
+  audio=(saturated:fi.dcblockerat(24.167))*amp*(.3+.7*env)*velocity*(1+.65*amount*acc)*smooth(.005,level)*.55;
+};
+voice(f,g,v,a,s)=state(f,g,v,a,s):(_,!,!,!,!,!);
+diagnostics(f,g,v,a,s)=state(f,g,v,a,s):(!,_,_,_,_,_);

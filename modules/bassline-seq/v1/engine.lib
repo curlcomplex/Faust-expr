@@ -1,0 +1,33 @@
+// Fixed 32-step state; controls are data, never source recompilation.
+import("stdfaust.lib");
+run=hslider("run[col:0][row:0]",1,0,1,1)>0;
+length=int(max(1,min(32,nentry("length[col:1][row:0]",16,1,32,1))));
+transpose=nentry("transpose[unit:semitones][col:2][row:0]",0,-24,24,.01);
+onAt(i)=par(j,32,checkbox("on%j")):ba.selectn(32,i);
+noteAt(i)=par(j,32,nentry("note%j[unit:MIDI]",45,24,84,.01)):ba.selectn(32,i);
+accentAt(i)=par(j,32,checkbox("accent%j")):ba.selectn(32,i);
+slideAt(i)=par(j,32,checkbox("slide%j")):ba.selectn(32,i);
+sequence(clock,reset)=freqOut,gateOut,accentOut,slideOut,stepOut with {
+ c=clock>0; r=reset>0; tick=(c>c')*run; resetEdge=r>r';
+ advance(old)=select2(resetEdge,select2(tick,old,1+(int(old)%length)),int(tick));
+ position=advance~_;
+ activate(old)=run*select2(resetEdge,max(old,tick),tick);
+ active=activate~_;
+ index=max(0,int(position)-1);
+ enabled=ba.sAndH(tick,onAt(index));
+ // Outgoing tie is latched with the current step and previewed next enable.
+ tie=ba.sAndH(tick,onAt(index)*slideAt(index)*onAt(int(position)%length));
+ incoming=ba.sAndH(tick,tie'*(active')*(1-resetEdge))*enabled;
+ noteHit=tick*enabled;
+ seen=max(noteHit)~_;
+ heldFreq=ba.sAndH(noteHit,440*pow(2,(noteAt(index)+transpose-69)/12));
+ target=select2(seen,110,heldFreq);
+ gateValue=active*enabled*max(float(c),tie);
+ accentValue=active*enabled*ba.sAndH(tick,accentAt(index));
+ slideValue=active*incoming;
+ freqOut=target<:_,hbargraph("freq[unit:Hz][curlop:cvout]",0,20000):attach;
+ gateOut=gateValue<:_,hbargraph("gate[curlop:cvout]",0,1):attach;
+ accentOut=accentValue<:_,hbargraph("accent[curlop:cvout]",0,1):attach;
+ slideOut=slideValue<:_,hbargraph("slide[curlop:cvout]",0,1):attach;
+ stepOut=float(position)<:_,hbargraph("step[curlop:meterout][style:numerical]",0,32):attach;
+};
