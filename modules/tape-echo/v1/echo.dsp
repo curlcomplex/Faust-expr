@@ -1,0 +1,30 @@
+declare name "analog-classics-tape-echo";
+declare version "0.1.0-experiment";
+declare description "Multi-head tape-style echo with pitch-swerve, feedback tone loss and wow/flutter";
+import("stdfaust.lib");
+
+time = hslider("time",0.36,0.06,0.78,0.001) : si.smooth(0.9995);
+feedback = hslider("feedback",0.48,0,0.96,0.001) : si.smooth(0.999);
+tone = hslider("tone",0.58,0,1,0.001) : si.smooth(0.999);
+age = hslider("age",0.32,0,1,0.001) : si.smooth(0.999);
+drive = hslider("drive",0.18,0,1,0.001) : si.smooth(0.999);
+head1 = hslider("head1",1,0,1,1);
+head2 = hslider("head2",0.65,0,1,0.05);
+head3 = hslider("head3",0.8,0,1,0.05);
+mix = hslider("mix",0.38,0,1,0.001) : si.smooth(0.999);
+
+MAX = 131072;
+base = time*ma.SR;
+wow = (0.00015 + 0.0035*age)*ma.SR*os.osc(0.18+1.7*age);
+d1 = min(MAX-8,max(4,base*0.50 + wow));
+d2 = min(MAX-8,max(4,base*0.75 - wow*0.63));
+d3 = min(MAX-8,max(4,base + wow*0.31));
+cut = 1800 + 14500*tone*(1-0.55*age);
+fb = feedback*(0.80+0.18*(1-age));
+satgain = 1 + 8*drive;
+sat(x) = ma.tanh(x*satgain)/(1+0.6*drive);
+feedbackPath = fi.lowpass(1,cut) : sat : *(fb);
+mainLoop = (+ ~ (de.fdelay4(MAX,d3) : feedbackPath)) : de.fdelay4(MAX,d3);
+heads = _ <: (de.fdelay4(MAX,d1):*(head1)),(de.fdelay4(MAX,d2):*(head2)),(mainLoop:*(head3)) :> _ : *(0.42);
+mono(x) = x*(1-mix) + (x:heads)*mix;
+process = par(i,2,mono);
