@@ -29,7 +29,7 @@ def controls(exe):
 
 class FxLab(Lab):
  def __init__(self,out):
-  super().__init__(out);self.report.update(version='analog-classics-effects-0.1.0-experiment',human_approved=False,host_integrated=False,hardware_approved=False,presets=PRESETS)
+  super().__init__(out);self.report.update(version='analog-classics-effects-0.1.1-experiment',human_approved=False,host_integrated=False,hardware_approved=False,presets=PRESETS)
  def render_audio(self,name,exe,values,x,sr=48000,block=128,events=None):
   x=np.asarray(x,np.float32);assert x.ndim==2
   score=self.out/(name+'.tsv');rawin=self.out/(name+'-input.f32');raw=self.out/(name+'.f32')
@@ -47,7 +47,7 @@ def impulse(sr,seconds=8):
 
 def program(sr,seconds=10):
  n=round(sr*seconds);t=np.arange(n)/sr;x=np.zeros((n,2),np.float32)
- # dry synthetic test material only: kick-like low sine bursts, short clicks and held bass tone.
+ # Dry synthetic test material only: kick-like low sine bursts, short clicks and held bass tone.
  for beat in np.arange(.25,seconds-.5,.5):
   i=int(beat*sr);m=min(n-i,int(.16*sr));tt=np.arange(m)/sr
   burst=.34*np.sin(2*np.pi*(55+45*np.exp(-tt*28))*tt)*np.exp(-tt*18)
@@ -95,7 +95,10 @@ def run(out):
   l0=r('eq-low-default',exes['eq'],DEFAULTS['eq'],low);l1=r('eq-low-boost',exes['eq'],DEFAULTS['eq']|dict(bass=1),low)
   h0=r('eq-high-default',exes['eq'],DEFAULTS['eq'],high);h1=r('eq-high-boost',exes['eq'],DEFAULTS['eq']|dict(treble=1),high)
   c('eq-bass-effective',np.linalg.norm(l1-l0)/(np.linalg.norm(l0)+1e-20)>.05);c('eq-treble-effective',np.linalg.norm(h1-h0)/(np.linalg.norm(h0)+1e-20)>.05)
-  combo=program(48000,12);a=r('chain-eq',exes['eq'],PRESETS['eq']['Warm']|DEFAULTS['eq'],combo);b=r('chain-echo',exes['echo'],PRESETS['echo']['Classic']|DEFAULTS['echo'],a);d=r('chain-reverb',exes['reverb'],PRESETS['reverb']['Rack']|DEFAULTS['reverb'],b)
+  combo=program(48000,12)
+  a=r('chain-eq',exes['eq'],DEFAULTS['eq']|PRESETS['eq']['Warm'],combo)
+  b=r('chain-echo',exes['echo'],DEFAULTS['echo']|PRESETS['echo']['Classic'],a)
+  d=r('chain-reverb',exes['reverb'],DEFAULTS['reverb']|PRESETS['reverb']['Rack'],b)
   peak=float(abs(d).max());gain=min(1.,.9/(peak+1e-20));wavfile.write(L.out/'audition/00_effects_chain.wav',48000,(d*gain).astype(np.float32));L.report['chain']=dict(raw_peak=peak,audition_gain=gain,order='Retro Mixer EQ -> Tape Echo -> Vintage Rack Reverb',input='deterministic synthetic dry test material')
   L.report['source_sha256']={str(p.relative_to(ROOT)):digest(p) for p in SOURCES.values()};L.report['passed']=all(x['passed'] for x in L.report['checks'])
  except Exception as e:
