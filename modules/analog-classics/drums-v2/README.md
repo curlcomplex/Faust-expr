@@ -1,0 +1,15 @@
+# Analog Classics drum quartet — v2 candidate
+
+Grouped work: #55 / PR56, serving CURLOP#271/#272. Four single-note sources: kick808, snare808, clap808, cymbal808. This is an exploratory 808-inspired collection, not an approved hardware clone. Earlier failed drums-v1 stays intact.
+
+Each source exposes gate, freq (Hz), velocity. One persistent note per DSP; no chord expansion, voice allocator, note pool or cross-instance state. Kick freq is body tuning; snare freq is its lower membrane oscillator; clap freq is a broad noise-formant center before Tone; cymbal freq is a 440-Hz-referenced transpose of an inharmonic bank, not its fundamental. Tested pitch ranges are deliberately bounded in source. Host owns polyphony, stealing and cross-voice choke.
+
+Parameters are onset-latched, including velocity. Before first trigger, coefficient evaluation uses current controls instead of zero-frequency placeholders. Gate falling edges do not truncate these one-shots. Explicit final envelope fades reach zero before their bounded age clocks saturate. Normal oscillator components within a voice are not internal polyphony.
+
+Reuse: v1 kick/snare/cymbal research, hats six-oscillator bank, and the compiled clap/v3 burst/noise architecture. The new clap keeps separate clustered noise onsets and a delayed noise tail, not a pitched snare body. It is a new candidate and does not rename the existing VERMONA-oriented Analog Clap identity. No externally copied source, ROM or audio sample appears in runtime DSP.
+
+Run `python3 tools/modules/analog_classics_drums_v2.py --out build/hats-v2/analog-classics-drums`. It uses existing Lab compilation and tools/modules/render.cpp. Its own per-instrument score path prevents hats-default controls leaking into drums. Tests cover declared controls, finite output, silence, velocity, onset locks, held/repeated gates, tail termination, parameter extremes, supported-rate cases and scalar/vector/block behaviour. These are not host declaration or realtime tests.
+
+Audition folder: 01_four_new_instruments.wav (four 4-second slots: kick/snare/clap/cymbal); individual four-preset banks; 03_six_voice_pattern.wav (120 BPM, four bars plus release tails); stems. The pattern renders actual Faust Trigger Seq outputs and uses their sample offsets to drive persistent independent Faust drums and hats. It does not repeat samples. No reverb/EQ/compression/limiter; only documented common mix headroom gain.
+
+The reference stage fetches Synthmania's identified original TR-808 direct recordings once per instrument, records hashes/offsets and retains only brief excerpts. First detected usable hit is selected without best-match search; unknown knob/gain settings limit conclusions. `02_reference_then_candidate.wav` alternates reference/candidate with documented RMS and headroom gains plus 5ms excerpt-end fades. Measurement failures stay in reference_report.json; a numerical pass does not silently certify reference availability. Initial discovery hashes must be pinned before final evidence reuse. No held-out calibration, new circuit recovery, musical approval, host integration, promotion or merge is implied.
