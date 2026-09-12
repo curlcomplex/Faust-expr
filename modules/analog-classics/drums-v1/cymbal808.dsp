@@ -1,0 +1,38 @@
+declare name "analog-classics-808-cymbal-study";
+declare version "0.1.0-experiment";
+import("stdfaust.lib");
+
+metal = hslider("metal",0.96,0,1,0.001);
+tone = hslider("tone",0.52,0,1,0.001);
+decay = hslider("decay",0.68,0,1,0.001);
+shape = hslider("shape",0.28,0,1,0.001);
+drive = hslider("drive",0.05,0,1,0.001);
+freq = hslider("freq",440,264,748,0.001);
+velocity = hslider("velocity",1,0,1,0.001);
+gate = button("gate");
+
+hit = gate > gate';
+seen = max(hit) ~ _;
+lat(x) = ba.sAndH(hit,x);
+age = (+(1) : min(30*ma.SR) : *(1-hit)) ~ _;
+t = age/ma.SR;
+ratio = lat(freq)/440;
+sq(f) = os.polyblep_square(f);
+s1=sq(205.3*ratio); s2=sq(304.4*ratio); s3=sq(369.6*ratio);
+s4=sq(522.7*ratio); s5=sq(540.5*ratio); s6=sq(800*ratio);
+summed=(s1+s2+s3+s4+s5+s6)/6;
+ringed=(s1*s2+s3*s5+s4*s6)/3;
+bank=(1-0.55*lat(shape))*summed + 0.55*lat(shape)*ringed;
+excitation = lat(metal)*bank + (1-lat(metal))*0.32*no.noise;
+hp = 4300 + 2600*lat(tone);
+center = 6500 + 6500*lat(tone);
+wide = excitation : fi.highpass(3,hp) : fi.lowpass(1,min(0.44*ma.SR,18500));
+focus = excitation : fi.resonbp(min(0.38*ma.SR,center),1.6,1) : fi.highpass(2,hp*0.7);
+filtered = 0.58*wide + 0.72*focus;
+tau1 = 0.09*pow(7,lat(decay));
+tau2 = 0.16*pow(10,lat(decay));
+env = (0.72*exp(-t/tau1) + 0.28*exp(-t/tau2))*(1-exp(-t/0.00018))*seen;
+raw = filtered*env;
+a = lat(drive)*lat(drive);
+sat = (1-a)*raw + a*ma.tanh((1+10*a)*raw)/(1+2*a);
+process = sat*0.42*lat(velocity) : fi.dcblockerat(20);
