@@ -1,0 +1,26 @@
+// Shared single-note utilities. Original lab equations, not a hardware port.
+// No allocation, chord generation, voice stealing or host assumptions.
+import("stdfaust.lib");
+sm(t,x)=x:si.smooth(exp(-1/(max(.00001,t)*ma.SR)));
+clip(lo,hi,x)=min(hi,max(lo,x));
+// Follow pitch while gated; retain the last target during the release tail.
+// Slide is the only glide enable. First notes and zero time hit the exact target.
+pitch(f,g,slide,time)=step~_ with {
+ target=ba.sAndH(g>0,clip(20,8000,f));
+ pole=select2((g>0)*(g'>0)*(slide>0)*(time>0),0,exp(-1/(max(.00001,time)*ma.SR)));
+ step(prev)=target+pole*(prev-target);
+};
+vel(g,v)=ba.sAndH((g>0)>(g'>0),clip(0,1,v));
+// Four trapezoidal one-poles with an algebraically resolved feedback loop.
+// This is an idealized OTA-cascade hypothesis, NOT calibrated IR3109 behavior.
+// y4=G^4*u+S, u=(x-k*S)/(1+k*G^4). Stored states use s_next=2*y-s.
+ota4(cf,res,comp)=(step~si.bus(4)):(!,!,!,!,_) with {
+ g=tan(ma.PI*clip(15,ma.SR*.40,cf)/ma.SR); G=g/(1+g);
+ k=3.85*clip(0,1,res);
+ step(s1,s2,s3,s4,x)=2*y1-s1,2*y2-s2,2*y3-s3,2*y4-s4,y4*(1+comp*k) with {
+  S=(1-G)*(G*G*G*s1+G*G*s2+G*s3+s4);
+  u=(x-k*S)/(1+k*G*G*G*G);
+  y1=G*u+(1-G)*s1; y2=G*y1+(1-G)*s2;
+  y3=G*y2+(1-G)*s3; y4=G*y3+(1-G)*s4;
+ };
+};
