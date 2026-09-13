@@ -1,8 +1,8 @@
 name: Analog Classics laboratory qualification
 on:
   push:
-    branches: [53-analog-hats-full-batch, 55-analog-classics-first-slice, 57-acid-bassline-batch, 60-effects-batch, 63-iron-oxide-ensemble, 62-synth-batch]
-    paths: ['modules/hats-analog/**', 'tools/modules/hats_v2*', '.github/workflows/hats-v2-complete.yml', 'modules/trigger-seq/**', 'modules/analog-classics/**', 'modules/acid-voice/**', 'modules/bassline-seq/**', 'modules/vintage-rack-reverb/**', 'modules/tape-echo/**', 'modules/retro-mixer-eq/**', 'modules/vintage-tape/**', 'modules/retro-ensemble/**', 'modules/mono-101/**', 'modules/juno-106/**', 'modules/minimoog/**', 'tools/modules/analog_classics*', 'tools/modules/acid*', 'tools/modules/effects*', 'tools/modules/airwindows_pair.py', 'tools/modules/synth_batch.py', 'tools/modules/render.cpp']
+    branches: [53-analog-hats-full-batch, 55-analog-classics-first-slice, 57-acid-bassline-batch, 60-effects-batch, 63-iron-oxide-ensemble, 62-synth-batch, 66-606-drums]
+    paths: ['modules/hats-analog/**', 'tools/modules/hats_v2*', '.github/workflows/hats-v2-complete.yml', 'modules/trigger-seq/**', 'modules/analog-classics/**', 'modules/acid-voice/**', 'modules/bassline-seq/**', 'modules/vintage-rack-reverb/**', 'modules/tape-echo/**', 'modules/retro-mixer-eq/**', 'modules/vintage-tape/**', 'modules/retro-ensemble/**', 'modules/mono-101/**', 'modules/juno-106/**', 'modules/minimoog/**', 'tools/modules/analog_classics*', 'tools/modules/acid*', 'tools/modules/effects*', 'tools/modules/airwindows_pair.py', 'tools/modules/synth_batch.py', 'tools/modules/drums606_batch.py', 'modules/drums-606/**', 'tools/modules/render.cpp']
   workflow_dispatch:
 permissions: {contents: read}
 concurrency: {group: 'hats-v2-${{ github.ref }}', cancel-in-progress: true}
@@ -25,9 +25,15 @@ jobs:
           if [ -f tools/modules/effects_batch.py ]; then /usr/bin/python3 -m py_compile tools/modules/effects_batch.py; fi
           if [ -f tools/modules/airwindows_pair.py ]; then /usr/bin/python3 -m py_compile tools/modules/airwindows_pair.py; fi
           if [ -f tools/modules/synth_batch.py ]; then /usr/bin/python3 -m py_compile tools/modules/synth_batch.py; fi
+      - name: 606 driver syntax
+        if: github.ref_name == '66-606-drums'
+        run: /usr/bin/python3 -m py_compile tools/modules/drums606_batch.py
       - name: Original hats hardware reference (original branch only)
         if: github.ref_name == '53-analog-hats-full-batch'
         run: /usr/bin/python3 tools/modules/hats_v2_reference.py --references build/hats-v2/references --fetch-only
+      - name: Seven single-note 606 voices and persistent-pattern qualification
+        if: github.ref_name == '66-606-drums'
+        run: /usr/bin/python3 tools/modules/drums606_batch.py --out build/hats-v2/drums606-batch
       - name: Existing actual Faust hats regression
         run: /usr/bin/python3 tools/modules/hats_v2_delivery.py --out build/hats-v2/run
       - name: Existing single-note hats and Trigger Seq regression
