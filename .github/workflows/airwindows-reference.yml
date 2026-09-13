@@ -1,0 +1,36 @@
+name: Airwindows reference tuning
+on:
+  push:
+    branches: [63-airwindows-reference-pass]
+    paths: ['modules/vintage-tape/**', 'modules/retro-ensemble/**', 'tools/modules/airwindows_reference*', '.github/workflows/airwindows-reference.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+concurrency: {group: 'airwindows-reference-${{ github.ref }}', cancel-in-progress: true}
+jobs:
+  compare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Compiler and analysis dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy
+      - name: Whole-algorithm reference comparison
+        run: |
+          /usr/bin/python3 -m py_compile tools/modules/airwindows_reference_pass.py
+          /usr/bin/python3 tools/modules/airwindows_reference_pass.py --out build/airwindows-reference
+      - name: Existing pair regression
+        run: /usr/bin/python3 tools/modules/airwindows_pair.py --out build/airwindows-reference/legacy-regression
+      - name: Exact source evidence
+        if: always()
+        run: |
+          mkdir -p build/airwindows-reference
+          git rev-parse HEAD > build/airwindows-reference/commit.txt
+          git archive --format=tar HEAD > build/airwindows-reference/source.tar
+          git diff --check > build/airwindows-reference/diff-check.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with: {name: 'airwindows-reference-${{ github.sha }}', path: build/airwindows-reference/, if-no-files-found: error, retention-days: 7}
