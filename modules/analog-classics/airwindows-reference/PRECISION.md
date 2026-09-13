@@ -1,0 +1,11 @@
+# Retained precision findings
+
+At initial reference commit fafec2c5c96828fa7adb45c769ed07e00b3dc257 both effects improved on v1; that test only required improvement, not a close-match gate. Ensemble's single-precision worst two-second mixed-input residual was 0.0425767 relative RMS despite a double residual below 9e-8. Inspection showed the Faust normalizer had canceled the nominal Kahan correction to a literal zero. Arithmetic guards were introduced in 0.2.1, and normal single-precision residual improved to 0.00202307 on the same case.
+
+The stronger run at 335e83c159093b9143d115a4c90f4edd058f813a then failed its unchanged double-precision criterion at Fullness=1, Voices=48, 48kHz. Relative RMS was 0.0001045855 and peak difference 0.00332319. It is a real retained failed comparison, not an infrastructure failure. No tolerance was widened.
+
+Diagnosis: in the original C++ `pow(0.4+(B/12),10)`, B is float, so division rounds to binary32 before the addition promotes to double. Double Faust had evaluated the whole expression in double. A locally compiled, explicitly labelled generated-C++ hypothesis reproducing that intermediate rounding reduced the failing-case relative RMS to 2.45389e-8. The actual Faust 0.2.2 source now explicitly models this control-domain rounding for double builds; the ordinary single build remains native single precision. This tiny coefficient difference can move a read head across an integer boundary in the original discontinuous interpolation correction.
+
+0.2.2 also normalizes test output paths before creating the source mutation so generated-file provenance uses an absolute path. Independent numerical comparison failures are now collected and fail the stage after all diagnostics; non-finite rendering still stops immediately. This avoids hiding downstream evidence behind the first failed comparison.
+
+Remaining numerical limitations are reported rather than removed by alignment or gain fitting. The original effect deliberately has sample-read boundary correction changes. Single-precision phase/offset rounding need not reproduce every double-precision boundary choice. These source revisions are distinct experiments in Git history; v1 remains entirely unchanged. Final results belong to the subsequent exact-commit run, not this diagnosis note.
