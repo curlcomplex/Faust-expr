@@ -15,6 +15,6 @@ level=hslider("level[col:3][row:0]",.75,0,1,.001):u.sm;
 h=gate>gate';
 f=u.lat(h,freq);d=u.lat(h,decay);v=u.lat(h,velocity);a=u.lat(h,accent);
 filtered=no.noise:fi.resonbp(min(.42*ma.SR,f*(.75+.5*tone)),.8,1):fi.highpass(1,max(700,f*.35));
-en=u.env(h,d,.00008);
-raw=filtered*en*(1+.7*grit*ma.tanh(filtered*3));
+ampEnv=u.env(h,d,.00008);
+raw=filtered*ampEnv*(1+.7*grit*ma.tanh(filtered*3));
 process=u.finish(raw,v,a,level,.05+.25*grit);
