@@ -21,7 +21,7 @@ pa=u.lat(h,pitchAmount);pd=u.lat(h,pitchDecay);
 fp=u.pitchEnvelope(h,f,pa*7,pd);
 p=u.phase(h,fp);
 e=u.env(h,d,.060,.00022);
-body=-u.transistorVCA(u.sine(p),e);
+body=0-u.transistorVCA(u.sine(p),e);
 transient=(no.noise:fi.highpass(1,900):fi.lowpass(1,6500))*u.env(h,.025,0,.00008)*attack*.45;
 raw=(body+transient):fi.lowpass(1,min(.43*ma.SR,650*pow(24,tone)));
 process=u.finish(raw,v,a,level,drive);

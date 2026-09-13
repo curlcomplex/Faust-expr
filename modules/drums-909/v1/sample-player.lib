@@ -6,7 +6,9 @@ play(wf,sourceRate,rootHz,gate,freq,velocity,chokeGate)=audio with {
  n=wf:(_,!);k=chokeGate>chokeGate';h=(gate>gate')*(1-k);
  f=u.lat(h,freq);v=u.lat(h,velocity);
  inc=max(.0001,min(16,f/rootHz))*sourceRate/ma.SR;
- pos=(+(inc):min(n+1):*(1-h))~_;
+ // Onset-latched pitch permits exact elapsed-frame addressing: no accumulated
+ // fractional phase drift or extra endpoint sample from repeated additions.
+ pos=min(n+1,u.age(h)*inc);
  valid=u.seen(h)*float(pos<n);
  i=int(min(n-1,max(0,floor(pos))));j=min(n-1,i+1);alpha=pos-floor(pos);
  a=wf,i:rdtable;b=wf,j:rdtable;

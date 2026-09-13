@@ -9,9 +9,9 @@ lat(h,x)=select2(seen(h),x,ba.sAndH(h,x));
 age(h)=(+(1):min(30*ma.SR):*(1-h))~_;
 phase(h,f)=(+(clamp(0,.45*ma.SR,f)/ma.SR):ma.frac:*(1-h))~_;
 // d is the time to -60 dB; very small recursive state is not allowed to linger.
-fall(t,d)=exp(-min(25,6.907755278982137*max(0,t)/max(.0001,d)))*float(t<3.5*d);
+fall(t,d)=exp(0-min(25,6.907755278982137*max(0,t)/max(.0001,d)))*float(t<3.5*d);
 env(h,d,hold,attack)=seen(h)*fall(max(0,t-hold),d)*(1-exp(-t/max(.00001,attack))) with {t=age(h)/ma.SR;};
-pitchEnvelope(h,f,amount,seconds)=f*(1+amount*exp(-min(25,age(h)/(ma.SR*max(.0001,seconds)))));
+pitchEnvelope(h,f,amount,seconds)=f*(1+amount*exp(0-min(25,age(h)/(ma.SR*max(.0001,seconds)))));
 // Formula extracted from SyntheticSnareDrum::DistortedSine.
 snareSine(p)=2*tri/(1+abs(tri)) with {tri=select2(p<.5,1-p,p)*4-1.3;};
 // Formula extracted from SyntheticBassDrum::TransistorVCA.
