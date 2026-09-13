@@ -2,7 +2,7 @@ name: Analog Classics laboratory qualification
 on:
   push:
     branches: [53-analog-hats-full-batch, 55-analog-classics-first-slice, 57-acid-bassline-batch, 60-effects-batch, 63-iron-oxide-ensemble, 62-synth-batch, 66-606-drums, 68-909-drums, 70-808-aux-percussion]
-    paths: ['modules/hats-analog/**', 'tools/modules/hats_v2*', '.github/workflows/hats-v2-complete.yml', 'modules/trigger-seq/**', 'modules/analog-classics/**', 'modules/acid-voice/**', 'modules/bassline-seq/**', 'modules/vintage-rack-reverb/**', 'modules/tape-echo/**', 'modules/retro-mixer-eq/**', 'modules/vintage-tape/**', 'modules/retro-ensemble/**', 'modules/mono-101/**', 'modules/juno-106/**', 'modules/minimoog/**', 'tools/modules/analog_classics*', 'tools/modules/acid*', 'tools/modules/effects*', 'tools/modules/airwindows_pair.py', 'tools/modules/synth_batch.py', 'tools/modules/drums606_batch.py', 'tools/modules/drums909*', 'tools/modules/drums808_aux_batch.py', 'modules/drums-606/**', 'modules/drums-909/**', 'modules/drums-808-aux/**', 'tools/modules/render.cpp']
+    paths: ['modules/hats-analog/**', 'tools/modules/hats_v2*', '.github/workflows/hats-v2-complete.yml', 'modules/trigger-seq/**', 'modules/analog-classics/**', 'modules/acid-voice/**', 'modules/bassline-seq/**', 'modules/vintage-rack-reverb/**', 'modules/tape-echo/**', 'modules/retro-mixer-eq/**', 'modules/vintage-tape/**', 'modules/retro-ensemble/**', 'modules/mono-101/**', 'modules/juno-106/**', 'modules/minimoog/**', 'tools/modules/analog_classics*', 'tools/modules/acid*', 'tools/modules/effects*', 'tools/modules/airwindows_pair.py', 'tools/modules/synth_batch.py', 'tools/modules/drums606_batch.py', 'tools/modules/drums909*', 'tools/modules/drums808_aux_batch.py', 'modules/drums-606/**', 'modules/drums-909/**', 'modules/drums-808-aux/**', 'tools/modules/render.cpp', 'tools/modules/percussion_finish_batch.py']
   workflow_dispatch:
 permissions: {contents: read}
 concurrency: {group: 'hats-v2-${{ github.ref }}', cancel-in-progress: true}
@@ -31,19 +31,22 @@ jobs:
       - name: Original hats hardware reference (original branch only)
         if: github.ref_name == '53-analog-hats-full-batch'
         run: /usr/bin/python3 tools/modules/hats_v2_reference.py --references build/hats-v2/references --fetch-only
-      - name: Seven 909 synthesis voices and diagnostic sample playback
-        if: github.ref_name == '68-909-drums'
-        run: |
-          /usr/bin/python3 -m py_compile tools/modules/drums909_batch.py
-          /usr/bin/python3 tools/modules/drums909_batch.py --out build/hats-v2/drums909-batch
       - name: Consolidated 808 auxiliary percussion batch
         if: github.ref_name == '70-808-aux-percussion'
         run: |
           /usr/bin/python3 -m py_compile tools/modules/drums808_aux_batch.py
           /usr/bin/python3 tools/modules/drums808_aux_batch.py --out build/hats-v2/drums808-aux-batch
+      - name: Seven 909 synthesis voices and diagnostic sample playback
+        if: github.ref_name == '68-909-drums'
+        run: |
+          /usr/bin/python3 -m py_compile tools/modules/drums909_batch.py
+          /usr/bin/python3 tools/modules/drums909_batch.py --out build/hats-v2/drums909-batch
       - name: Seven single-note 606 voices and persistent-pattern qualification
         if: github.ref_name == '66-606-drums'
         run: /usr/bin/python3 tools/modules/drums606_batch.py --out build/hats-v2/drums606-batch
+      - name: Consolidated tom equivalence and final percussion selection
+        if: github.ref_name == '70-808-aux-percussion'
+        run: /usr/bin/python3 tools/modules/percussion_finish_batch.py --out build/hats-v2/percussion-finish
       - name: Existing actual Faust hats regression
         run: /usr/bin/python3 tools/modules/hats_v2_delivery.py --out build/hats-v2/run
       - name: Existing single-note hats and Trigger Seq regression
