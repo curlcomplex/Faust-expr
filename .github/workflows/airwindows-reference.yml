@@ -18,19 +18,23 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy
-      - name: Whole-algorithm reference comparison
+      - name: Whole-algorithm reference and precision qualification
         run: |
-          /usr/bin/python3 -m py_compile tools/modules/airwindows_reference_pass.py
-          /usr/bin/python3 tools/modules/airwindows_reference_pass.py --out build/airwindows-reference
+          /usr/bin/python3 -m py_compile tools/modules/airwindows_reference*.py
+          /usr/bin/python3 tools/modules/airwindows_reference_followup.py --out build/airwindows-reference
       - name: Existing pair regression
         run: /usr/bin/python3 tools/modules/airwindows_pair.py --out build/airwindows-reference/legacy-regression
-      - name: Exact source evidence
+      - name: Exact source evidence and verified review bundle
         if: always()
         run: |
           mkdir -p build/airwindows-reference
           git rev-parse HEAD > build/airwindows-reference/commit.txt
           git archive --format=tar HEAD > build/airwindows-reference/source.tar
           git diff --check > build/airwindows-reference/diff-check.txt
+          /usr/bin/python3 tools/modules/airwindows_reference_package.py --source build/airwindows-reference --out build/airwindows-review
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
-        with: {name: 'airwindows-reference-${{ github.sha }}', path: build/airwindows-reference/, if-no-files-found: error, retention-days: 7}
+        with: {name: 'airwindows-review-${{ github.sha }}', path: build/airwindows-review/, if-no-files-found: error, retention-days: 7}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with: {name: 'airwindows-full-${{ github.sha }}', path: build/airwindows-reference/, if-no-files-found: error, retention-days: 7}

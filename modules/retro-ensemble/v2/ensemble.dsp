@@ -3,7 +3,7 @@
 // Preserve v1. This version targets the original algorithm, including its unusual
 // interpolation and block-boundary control behavior. It is not a Juno chorus.
 declare name "analog-classics-retro-ensemble";
-declare version "0.2.0-reference-candidate";
+declare version "0.2.1-reference-candidate";
 declare license "MIT";
 import("stdfaust.lib");
 voices=hslider("voices",25,2,48,1);
@@ -24,15 +24,21 @@ air=(step~si.bus(3)):(!,!,!,_) with {
   factor=select2(flip,odd0,even0);
   no=(odd0-(odd0-even0)/256)/1.0001;
   ne=(even0-(even0-no)/256)/1.0001;
+  // 'no' and 'ne' are updated memories; factor uses the pre-decay selection.
  };
 };
-// Compensated accumulation limits single-precision long-run phase drift.
-// Inactive heads keep their phase, as in the original selected-taps loop.
+// Guarded compensated accumulation. Without these non-binding guards Faust
+// algebraically cancels (total-p)-y and erases floating-point error correction.
+// The guards sit outside valid state/increment ranges at supported sample rates.
+// Do not remove them without the 20-second phase-drift negative-control test.
+// Inactive heads freeze BOTH phase and compensation, as in the selected-taps loop.
 sweep(active,stepSize)=(step~si.bus(2)):(!,!,_) with {
  step(p,e)=np,ne,p+ma.PI/2 with {
-  y=stepSize-e; total=p+y;
+  y=stepSize-e;
+  total=min(7,p+y);
+  difference=min(1,total-p);
   np=select2(active,p,total-2*ma.PI*float(total>2*ma.PI));
-  ne=select2(active,e,(total-p)-y);
+  ne=select2(active,e,difference-y);
  };
 };
 head(i,x)=active*(a*(1-alpha)+b+c*alpha-((a-b)-(b-c))/50) with {
