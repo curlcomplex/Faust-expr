@@ -1,0 +1,24 @@
+declare name "606 Kick";
+declare version "0.1.0-experiment";
+declare author "curlcomplex";
+declare category "Analog Classics / 606";
+declare description "Single-note 606-inspired candidate; hardware comparison pending; host-owned polyphony.";
+import("stdfaust.lib");
+u=library("drums606.lib");
+gate=button("gate[curlop:input]");
+freq=hslider("freq[unit:Hz][scale:log][curlop:input]",55,25,180,.001);
+velocity=hslider("velocity[curlop:input]",1,0,1,.001);
+accent=hslider("accent[curlop:input]",0,0,1,.001);
+decay=hslider("decay[unit:s][scale:log][col:0][row:0]",0.3,0.04,1.5,.001);
+tone=hslider("tone[col:1][row:0]",.5,0,1,.001):u.sm;
+click=hslider("click[col:2][row:0]",0.18,0,1,.001):u.sm;
+level=hslider("level[col:3][row:0]",.8,0,1,.001):u.sm;
+h=gate>gate';
+f=u.lat(h,freq);d=u.lat(h,decay);v=u.lat(h,velocity);a=u.lat(h,accent);
+// Dual fixed-frequency ringers; not an 808 pitch-swept sine.
+low=h:u.ring(f,d);
+high=h:u.ring(f*2.04,min(.16,d*.43));
+body=(1-.72*tone)*low+(.15+.68*tone)*high;
+tick=(no.noise:fi.highpass(1,2300))*u.env(h,.016,.00016)*click*.16;
+raw=.92*body+tick;
+process=u.finish(raw,v,a,level);

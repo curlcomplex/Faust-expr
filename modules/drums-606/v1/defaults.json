@@ -1,0 +1,9 @@
+{
+  "kick": {"gate":0,"freq":55,"velocity":1,"accent":0,"decay":0.30,"tone":0.5,"click":0.18,"level":0.8},
+  "snare": {"gate":0,"freq":185,"velocity":1,"accent":0,"decay":0.20,"tone":0.5,"snappy":0.65,"level":0.8},
+  "low-tom": {"gate":0,"freq":110,"velocity":1,"accent":0,"decay":0.32,"tone":0.5,"noise":0.22,"level":0.8},
+  "high-tom": {"gate":0,"freq":165,"velocity":1,"accent":0,"decay":0.22,"tone":0.5,"noise":0.16,"level":0.8},
+  "closed-hat": {"gate":0,"freq":440,"velocity":1,"accent":0,"decay":0.075,"tone":0.5,"metalSpread":0.5,"level":0.8},
+  "open-hat": {"gate":0,"freq":440,"velocity":1,"accent":0,"decay":0.45,"tone":0.5,"metalSpread":0.5,"level":0.8,"chokeGate":0},
+  "cymbal": {"gate":0,"freq":440,"velocity":1,"accent":0,"decay":1.20,"tone":0.5,"metalSpread":0.5,"level":0.8}
+}
