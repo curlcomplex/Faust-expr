@@ -4,7 +4,7 @@ declare author "curlcomplex";
 declare category "Analog Classics / 606";
 declare description "Single-note 606-inspired candidate; hardware comparison pending; host-owned polyphony.";
 import("stdfaust.lib");
-u=library("common.lib");
+u=library("drums606.lib");
 gate=button("gate[curlop:input]");
 freq=hslider("freq[unit:Hz][scale:log][curlop:input]",185,90,420,.001);
 velocity=hslider("velocity[curlop:input]",1,0,1,.001);

@@ -101,7 +101,7 @@ def run(out):
     if title=='Classic':audition_defaults[name]=y
    L.wav(name+'_four_presets.wav',np.concatenate(bank))
   # Independent equation check for the new damped-resonator primitive.
-  test=L.out/'ring-test.dsp';test.write_text(f'u=library("{SRC / "common.lib"}");process=u.ring(110,.32);\n')
+  test=L.out/'ring-test.dsp';test.write_text(f'u=library("{SRC / "drums606.lib"}");process=u.ring(110,.32);\n')
   ring=L.build('ring-equation',test)
   for sr in (44100,48000,96000):
    frames=8192;stim=np.zeros((frames,1),np.float32);stim[0]=1
@@ -126,7 +126,7 @@ def run(out):
   # Negative control: source mutation delays the real gate edge by one sample.
   original=(SRC/'kick.dsp').read_text();anchor="h=gate>gate';"
   c('mutation-anchor',original.count(anchor)==1)
-  mutant=L.out/'late-kick.dsp';mutant.write_text(original.replace('library("common.lib")',f'library("{SRC / "common.lib"}")').replace(anchor,"h=(gate>gate')';"))
+  mutant=L.out/'late-kick.dsp';mutant.write_text(original.replace('library("drums606.lib")',f'library("{SRC / "drums606.lib"}")').replace(anchor,"h=(gate>gate')';"))
   traces=[]
   for label,path in [('on-time',SRC/'kick.dsp'),('late',mutant)]:
    trace=L.out/(label+'-trace.dsp');trace.write_text(f'm=library("{path}");process=float(m.h);\n')
