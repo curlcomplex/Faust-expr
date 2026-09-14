@@ -1,0 +1,35 @@
+name: Synth sample-reference spectral probe
+on:
+  push:
+    branches: [82-synth-reference-tuning]
+    paths: ['tools/modules/synth_sample_probe.py', '.github/workflows/synth-sample-probe.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy python3-soundfile
+      - name: Actual sample windows and bounded native preset search
+        run: /usr/bin/python3 tools/modules/synth_sample_probe.py --out build/sample-probe
+      - name: Retain reproducible evidence, no third-party audio
+        if: always()
+        run: |
+          mkdir -p build/sample-probe
+          git rev-parse HEAD > build/sample-probe/commit.txt
+          git archive --format=tar HEAD > build/sample-probe/source.tar
+          find build/sample-probe -name render -type f -delete
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: synth-sample-probe-${{ github.sha }}
+          path: build/sample-probe/
+          retention-days: 14
+          if-no-files-found: error

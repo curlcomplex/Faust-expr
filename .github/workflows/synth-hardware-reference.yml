@@ -1,0 +1,22 @@
+name: Analog Classics synth hardware reference inventory
+on:
+  push:
+    branches: [82-synth-reference-tuning]
+  workflow_dispatch:
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Python dependencies
+        run: python -m pip install --disable-pip-version-check numpy scipy
+      - name: Fetch and analyze references transiently
+        run: python tools/modules/synth_hardware_reference_inventory.py --out synth-reference-inventory
+      - name: Upload descriptors only
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: synth-hardware-reference-${{ github.sha }}
+          path: synth-reference-inventory/
+          retention-days: 14
