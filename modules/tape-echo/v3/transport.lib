@@ -1,0 +1,13 @@
+// Exact sample-domain target-length chase from MIT Airwindows TapeDelay.
+// This is the transport controller, NOT its resizing-buffer audio algorithm.
+// See ../REFERENCE-LICENSE.txt. Starts at length zero, as upstream does.
+import("stdfaust.lib");
+chase(target)=(step~si.bus(2)):(!,!,_) with {
+ step(length,budget)=nextLength,nextBudget,nextLength with {
+  accumulated=budget+abs(length-target);
+  advance=accumulated>9000;
+  direction=int(length<target)-int(length>target);
+  nextLength=length+advance*direction;
+  nextBudget=select2(advance,accumulated,0);
+ };
+};
