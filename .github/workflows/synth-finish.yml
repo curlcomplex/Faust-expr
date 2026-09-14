@@ -1,0 +1,62 @@
+name: Synth hardware reference finishing
+on:
+  push:
+    branches: [82-synth-reference-finish]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: synth-finish-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  reference:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Install numerical tools
+        run: |
+          mkdir -p build/finish
+          sudo apt-get update > build/finish/dependencies.log 2>&1
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy python3-soundfile python3-matplotlib >> build/finish/dependencies.log 2>&1
+      - name: Acquire identified hardware descriptors
+        run: /usr/bin/python3 tools/modules/synth_finish_materials.py --out build/finish/materials
+      - name: Oscillator and Juno hardware comparisons
+        run: /usr/bin/python3 tools/modules/synth_finish_driver.py --out build/finish/comparisons
+      - name: Physical SH-101 and Model-D reference-note comparisons
+        run: /usr/bin/python3 tools/modules/synth_hardware_cases.py --out build/finish/hardware-cases
+      - name: Export single scripts and verify frozen identities and identical audio
+        if: always()
+        run: /usr/bin/python3 tools/modules/synth_script_exports.py --out build/finish/exports
+      - name: Established behavioral suite on selected source versions
+        if: always()
+        run: /usr/bin/python3 tools/modules/synth_selected_qualification.py --out build/finish/selected
+      - name: Full preserved original synth regression
+        if: always()
+        run: /usr/bin/python3 tools/modules/synth_batch.py --out build/finish/legacy
+      - name: Unit tests
+        if: always()
+        run: /usr/bin/python3 -m unittest discover -s tests -v
+      - name: Standard build
+        if: always()
+        run: PATH=/usr/bin:/bin:$PATH bash scripts/build.sh
+      - name: Retain exact source and evidence
+        if: always()
+        run: |
+          mkdir -p build/finish
+          git rev-parse HEAD > build/finish/commit.txt
+          git archive --format=tar HEAD > build/finish/source.tar
+          faust --version > build/finish/faust-version.txt
+          g++ --version > build/finish/cxx-version.txt
+          find build/finish -name render -type f -delete
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: synth-finish-${{ github.sha }}
+          path: build/finish/
+          retention-days: 14
+          if-no-files-found: error
