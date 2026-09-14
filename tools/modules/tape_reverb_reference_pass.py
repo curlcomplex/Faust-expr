@@ -9,7 +9,10 @@ SRC={'echo_v1':ROOT/'modules/tape-echo/v1/echo.dsp','echo_v2':ROOT/'modules/tape
 
 def build_faust(out,name,path):
  d=out/name;d.mkdir(parents=True,exist_ok=True)
- command(['faust','-I',str(path.parent),'-lang','cpp','-single','-cn','ModuleDSP',str(path),'-o',str(d/'generated.hpp')])
+ args=['faust','-I',str(path.parent),'-lang','cpp','-single','-cn','ModuleDSP',str(path),'-o',str(d/'generated.hpp')]
+ try: command(args)
+ except subprocess.CalledProcessError as e:
+  print('FAUST COMPILE FAILED',name,flush=True);print(e.output or '',flush=True);raise
  command(['c++','-std=c++17','-O2','-I'+str(d),str(ROOT/'tools/modules/render.cpp'),'-o',str(d/'render')])
  return d/'render'
 
@@ -69,7 +72,6 @@ def run(out):
  out=Path(out);out.mkdir(parents=True,exist_ok=True);(out/'audition').mkdir(exist_ok=True);rep={'pin':PIN,'checks':[],'sources':{},'descriptors':{},'renders':[]}
  def check(name,ok,**kw):rep['checks'].append({'name':name,'passed':bool(ok),**kw});assert ok,name
  ex={k:build_faust(out,k,p) for k,p in SRC.items()}
- # Exact original software oracles, used according to valid topology boundary.
  up,files=obtain(out,'TapeDelay');rep['sources'].update(files)
  tape_ui='float dryC=1,wetC=.7,delayC=.4,fbC=.35,leanC=.5,depthC=.35;'
  tape_params=('ui->addHorizontalSlider("dry",&dryC,1,0,1,.001);ui->addHorizontalSlider("wet",&wetC,.7,0,1,.001);ui->addHorizontalSlider("delay",&delayC,.4,0,1,.001);ui->addHorizontalSlider("feedback",&fbC,.35,0,1,.001);ui->addHorizontalSlider("leanfat",&leanC,.5,0,1,.001);ui->addHorizontalSlider("depth",&depthC,.35,0,1,.001);','A=dryC;B=wetC;C=delayC;D=fbC;E=leanC;F=depthC;')
@@ -83,18 +85,15 @@ def run(out):
  for label,exe in [('original',mv),('previous',ex['rev_v1']),('revised',ex['rev_v2'])]:
   y,dg=render(exe,out,'reverb-'+label,rv,imp,sr);rep['renders'].append({'name':'reverb-'+label,'diag':dg});rep['descriptors']['reverb-'+label]=descriptor(y,sr);wavfile.write(out/'audition'/f'reverb_{label}.wav',sr,y)
  d0=dist(rep['descriptors']['reverb-previous'],rep['descriptors']['reverb-original']);d1=dist(rep['descriptors']['reverb-revised'],rep['descriptors']['reverb-original']);check('reverb-descriptor-improved',d1<d0,previous=d0,revised=d1)
- # TapeDelay cannot be a whole-output oracle for a three-head echo. Compare the time-change behavior: revised should create a smoother moving-delay transition than v1 while preserving the three-head musical output.
  prog=program(sr,8);ev=[(sr*2,'time',.22),(sr*4,'time',.58),(sr*6,'time',.31)]
  tv={'time':.36,'feedback':.48,'tone':.58,'age':.32,'drive':.18,'head1':1,'head2':.65,'head3':.8,'mix':.38}
  banks=[]
  for label,exe in [('previous',ex['echo_v1']),('revised',ex['echo_v2'])]:
   y,dg=render(exe,out,'echo-'+label,tv,prog,sr,events=ev);rep['renders'].append({'name':'echo-'+label,'diag':dg});rep['descriptors']['echo-'+label]=descriptor(y,sr);wavfile.write(out/'audition'/f'echo_{label}.wav',sr,y);banks.append(y)
- # Native TapeDelay movement oracle, separate controls/topology; included for listening and transition descriptor only.
  td={'dry':.62,'wet':.62,'delay':.36*sr/44000,'feedback':.48/1.3,'leanfat':.34,'depth':.32}
  tdev=[(sr*2,'delay',.22*sr/44000),(sr*4,'delay',.58*sr/44000),(sr*6,'delay',.31*sr/44000)]
  yo,dg=render(tape,out,'tapedelay-original',td,prog,sr,events=tdev);rep['renders'].append({'name':'tapedelay-original','diag':dg});rep['descriptors']['tapedelay-original']=descriptor(yo,sr);wavfile.write(out/'audition'/'tapedelay_original.wav',sr,yo)
  check('echo-revised-finite',np.isfinite(banks[1]).all() and np.max(np.abs(banks[1]))<8,peak=float(np.max(np.abs(banks[1]))))
- # Compile/control contract and multi-head identity must remain.
  ctl=command([str(ex['echo_v2']),'--controls']);check('echo-keeps-three-head-controls',all(k in ctl for k in ('head1','head2','head3','time','feedback','mix')))
  ctl2=command([str(ex['rev_v2']),'--controls']);check('reverb-keeps-five-controls',all(k in ctl2 for k in ('decay','size','tone','character','mix')))
  wavfile.write(out/'audition'/'echo_previous_revised.wav',sr,np.concatenate(banks))
