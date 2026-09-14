@@ -9,7 +9,7 @@ from pathlib import Path
 import argparse, hashlib, io, json, math, os, urllib.request
 import numpy as np
 from scipy.io import wavfile
-from scipy.signal import welch, find_peaks
+from scipy.signal import welch
 from hats_v2_delivery import Lab
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -40,19 +40,18 @@ CAND={
  'cowbell808':('modules/drums-808-aux/v1/cowbell.dsp',None),
 }
 
-# Current classic presets from PR71 manifest/source. Values are explicit to avoid
-# treating labels as hardware claims.
+# Exact retained classic settings from percussion-finish/manifest.json.
 AUX={
- 'lowtom808':('tomconga808',dict(mode=0,pitch_bend=.28,noise=.32,tone=.52,drive=.03,level=.8,freq=90.,decay=.58,velocity=1.,gate=0.)),
- 'midtom808':('tomconga808',dict(mode=0,pitch_bend=.28,noise=.32,tone=.52,drive=.03,level=.8,freq=135.,decay=.48,velocity=1.,gate=0.)),
- 'hitom808':('tomconga808',dict(mode=0,pitch_bend=.28,noise=.32,tone=.52,drive=.03,level=.8,freq=185.,decay=.38,velocity=1.,gate=0.)),
- 'lowconga808':('tomconga808',dict(mode=1,pitch_bend=.28,noise=.0,tone=.52,drive=.03,level=.8,freq=165.,decay=.38,velocity=1.,gate=0.)),
- 'midconga808':('tomconga808',dict(mode=1,pitch_bend=.28,noise=.0,tone=.52,drive=.03,level=.8,freq=230.,decay=.32,velocity=1.,gate=0.)),
- 'hiconga808':('tomconga808',dict(mode=1,pitch_bend=.28,noise=.0,tone=.52,drive=.03,level=.8,freq=340.,decay=.26,velocity=1.,gate=0.)),
- 'rim808':('rimclaves808',dict(mode=0,decay=.35,crack=.55,tone=.5,drive=.03,level=.8,freq=455.,velocity=1.,gate=0.)),
- 'claves808':('rimclaves808',dict(mode=1,decay=.28,crack=.0,tone=.5,drive=.03,level=.8,freq=2500.,velocity=1.,gate=0.)),
- 'maracas808':('maracas808',dict(decay=.35,tone=.52,grit=.15,level=.8,freq=6500.,velocity=1.,gate=0.)),
- 'cowbell808':('cowbell808',dict(ratio=.665,decay=.42,tone=.52,drive=.04,level=.8,freq=540.,velocity=1.,gate=0.)),
+ 'lowtom808':('tomconga808',dict(gate=0,freq=90.,velocity=1.,accent=0.,mode=0.,decay=.36,bend=.22,noise=.16,tone=.5,drive=.05,level=.8)),
+ 'midtom808':('tomconga808',dict(gate=0,freq=140.,velocity=1.,accent=0.,mode=0.,decay=.25,bend=.22,noise=.16,tone=.5,drive=.05,level=.8)),
+ 'hitom808':('tomconga808',dict(gate=0,freq=190.,velocity=1.,accent=0.,mode=0.,decay=.20,bend=.22,noise=.15,tone=.5,drive=.05,level=.8)),
+ 'lowconga808':('tomconga808',dict(gate=0,freq=190.,velocity=1.,accent=0.,mode=1.,decay=.35,bend=.22,noise=0.,tone=.5,drive=.05,level=.8)),
+ 'midconga808':('tomconga808',dict(gate=0,freq=280.,velocity=1.,accent=0.,mode=1.,decay=.17,bend=.22,noise=0.,tone=.5,drive=.05,level=.8)),
+ 'hiconga808':('tomconga808',dict(gate=0,freq=410.,velocity=1.,accent=0.,mode=1.,decay=.145,bend=.22,noise=0.,tone=.5,drive=.05,level=.8)),
+ 'rim808':('rimclaves808',dict(gate=0,freq=455.,velocity=1.,accent=0.,mode=0.,decay=.014,crack=.55,tone=.5,drive=.22,level=.8)),
+ 'claves808':('rimclaves808',dict(gate=0,freq=2500.,velocity=1.,accent=0.,mode=1.,decay=.062,crack=.15,tone=.5,drive=.02,level=.8)),
+ 'maracas808':('maracas808',dict(gate=0,freq=7200.,velocity=1.,accent=0.,decay=.045,tone=.55,grit=.18,level=.75)),
+ 'cowbell808':('cowbell808',dict(gate=0,freq=540.,velocity=1.,accent=0.,ratio=1.48,decay=.42,tone=.55,drive=.08,level=.78)),
 }
 
 def mono(x):
@@ -74,67 +73,52 @@ def desc(x,sr):
     if not len(x) or np.max(np.abs(x))==0:return {'peak':0,'rms':0}
     e=x*x; total=e.sum()+1e-30; cs=np.cumsum(e)/total
     t50=float(np.searchsorted(cs,.5)/sr);t90=float(np.searchsorted(cs,.9)/sr);t99=float(np.searchsorted(cs,.99)/sr)
-    # spectral descriptors over attack and body windows, normalized against level
     def spec(a,b):
         y=x[int(a*sr):min(len(x),int(b*sr))]
         if len(y)<64:return {'centroid':0,'bands':[0]*8}
         f,p=welch(y,sr,nperseg=min(2048,len(y)));s=p.sum()+1e-30
-        bands=[]
         edges=(0,100,250,500,1000,2500,5000,10000,sr/2+1)
-        for lo,hi in zip(edges,edges[1:]):bands.append(float(p[(f>=lo)&(f<hi)].sum()/s))
+        bands=[float(p[(f>=lo)&(f<hi)].sum()/s) for lo,hi in zip(edges,edges[1:])]
         return {'centroid':float((f*p).sum()/s),'bands':bands}
-    # robust low-frequency fundamental estimate in 30..1000 Hz from 30-250ms body
-    y=x[int(.03*sr):min(len(x),int(.25*sr))]
-    f0=0.0
+    y=x[int(.03*sr):min(len(x),int(.25*sr))]; f0=0.0
     if len(y)>256:
         f,p=welch(y,sr,nperseg=min(8192,len(y)));m=(f>=25)&(f<=1200)
         if np.any(m):f0=float(f[m][np.argmax(p[m])])
     return {'peak':float(np.max(np.abs(x))),'rms':float(np.sqrt(np.mean(e))), 't50_s':t50,'t90_s':t90,'t99_s':t99,'f0_peak_hz':f0,'attack':spec(0,.03),'body':spec(.03,.3)}
 
 def distance(a,b):
-    # level-independent descriptor error. Used for diagnosis, not an authenticity percentage.
     terms=[]
     for k,w in [('t50_s',1),('t90_s',1),('t99_s',.5)]:
         if a.get(k,0)>0 and b.get(k,0)>0:terms.append(w*abs(math.log((a[k]+1e-6)/(b[k]+1e-6))))
     if a.get('f0_peak_hz',0)>20 and b.get('f0_peak_hz',0)>20:terms.append(.5*abs(math.log(a['f0_peak_hz']/b['f0_peak_hz'])))
     for section in ('attack','body'):
-        aa=np.array(a.get(section,{}).get('bands',[0]*8));bb=np.array(b.get(section,{}).get('bands',[0]*8));
-        terms.append(float(np.sqrt(np.mean((np.sqrt(aa+1e-12)-np.sqrt(bb+1e-12))**2))))
+        aa=np.array(a.get(section,{}).get('bands',[0]*8));bb=np.array(b.get(section,{}).get('bands',[0]*8));terms.append(float(np.sqrt(np.mean((np.sqrt(aa+1e-12)-np.sqrt(bb+1e-12))**2))))
     return float(np.mean(terms))
 
 def download(path):
-    url=BASE+'/'+path
-    req=urllib.request.Request(url,headers={'User-Agent':'Faust-expr-reference-lab/1.0'})
+    url=BASE+'/'+path;req=urllib.request.Request(url,headers={'User-Agent':'Faust-expr-reference-lab/1.0'})
     with urllib.request.urlopen(req,timeout=30) as r:data=r.read(8_000_001)
     if len(data)>8_000_000:raise RuntimeError('oversize '+path)
     sr,x=wavfile.read(io.BytesIO(data));return url,data,sr,mono(x)
 
 def score_render(L,name,exe,vals,seconds=4):
     rows={(0,k):float(v) for k,v in vals.items()};rows[(441,'gate')]=1.;rows[(442,'gate')]=0.
-    score=L.out/(name+'.tsv');raw=L.out/(name+'.f32')
-    score.write_text(''.join(f'{n}\t{k}\t{v:.9g}\n' for (n,k),v in sorted(rows.items())))
+    score=L.out/(name+'.tsv');raw=L.out/(name+'.f32');score.write_text(''.join(f'{n}\t{k}\t{v:.9g}\n' for (n,k),v in sorted(rows.items())))
     from hats_v2_delivery import command
-    d=json.loads(command([exe,score,raw,OUTRATE,128,round(seconds*OUTRATE),0]));x=np.fromfile(raw,'<f4').reshape(-1,d['channels'])
-    return x[:,0] if x.shape[1]==1 else x.mean(axis=1)
+    d=json.loads(command([exe,score,raw,OUTRATE,128,round(seconds*OUTRATE),0]));x=np.fromfile(raw,'<f4').reshape(-1,d['channels']);return x[:,0] if x.shape[1]==1 else x.mean(axis=1)
 
 def run(out):
     L=Lab(out);out=Path(out);report={'source':{'creator':'Michael Fischer / Technopolis','set':'TR-808 Sound Sample Set 1.0.0 (1994-09-08)','mirror':'fluid-music/open-drums','recording':'TR-808 serial 103852, individual outputs, PCM16/44.1kHz; panel level full; documented knob grid'},'references':{},'current':{},'comparisons':{},'candidate_audio':{},'note':'Descriptor distances are diagnostic only, level-independent and are not authenticity percentages.'}
-    refs={}
     for key,path in REFS.items():
-        url,data,sr,x=download(path); refs[key]=(sr,x);report['references'][key]={'path':path,'url':url,'sha256':hashlib.sha256(data).hexdigest(),'rate':sr,'frames':len(x),'descriptor':desc(x,sr)}
+        url,data,sr,x=download(path);report['references'][key]={'path':path,'url':url,'sha256':hashlib.sha256(data).hexdigest(),'rate':sr,'frames':len(x),'descriptor':desc(x,sr)}
     ex={}
     for key,(path,vals) in CAND.items():
         ex[key]=L.build('fischer-'+key,ROOT/path)
         if vals is not None:
-            y=score_render(L,key,ex[key],vals);report['current'][key]={'descriptor':desc(y,OUTRATE),'source':path,'settings':vals};report['candidate_audio'][key]=hashlib.sha256(y.astype('<f4').tobytes()).hexdigest()
-            report['comparisons'][key]={'descriptor_distance':distance(report['references'][key]['descriptor'],report['current'][key]['descriptor'])}
+            y=score_render(L,key,ex[key],vals);report['current'][key]={'descriptor':desc(y,OUTRATE),'source':path,'settings':vals};report['candidate_audio'][key]=hashlib.sha256(y.astype('<f4').tobytes()).hexdigest();report['comparisons'][key]={'descriptor_distance':distance(report['references'][key]['descriptor'],report['current'][key]['descriptor'])}
     for key,(engine,vals) in AUX.items():
         y=score_render(L,key,ex[engine],vals);report['current'][key]={'descriptor':desc(y,OUTRATE),'source':CAND[engine][0],'settings':vals};report['candidate_audio'][key]=hashlib.sha256(y.astype('<f4').tobytes()).hexdigest();report['comparisons'][key]={'descriptor_distance':distance(report['references'][key]['descriptor'],report['current'][key]['descriptor'])}
-    # Useful hardware-control grids: record variation trajectories so revisions can fit mappings, not just midpoint sounds.
-    grids={'kick808':[f'BD/BD{a}{b}.WAV' for a in ('00','25','50','75','10') for b in ('00','25','50','75','10')],
-           'snare808':[f'SD/SD{a}{b}.WAV' for a in ('00','25','50','75','10') for b in ('00','25','50','75','10')],
-           'cymbal808':[f'CY/CY{a}{b}.WAV' for a in ('00','25','50','75','10') for b in ('00','25','50','75','10')],
-           'open808':[f'OH/OH{x}.WAV' for x in ('00','25','50','75','10')]}
+    grids={'kick808':[f'BD/BD{a}{b}.WAV' for a in ('00','25','50','75','10') for b in ('00','25','50','75','10')], 'snare808':[f'SD/SD{a}{b}.WAV' for a in ('00','25','50','75','10') for b in ('00','25','50','75','10')], 'cymbal808':[f'CY/CY{a}{b}.WAV' for a in ('00','25','50','75','10') for b in ('00','25','50','75','10')], 'open808':[f'OH/OH{x}.WAV' for x in ('00','25','50','75','10')]}
     report['hardware_grids']={}
     for inst,paths in grids.items():
         arr=[]
@@ -143,7 +127,6 @@ def run(out):
                 url,data,sr,x=download(p);arr.append({'path':p,'sha256':hashlib.sha256(data).hexdigest(),'descriptor':desc(x,sr)})
             except Exception as e:arr.append({'path':p,'error':repr(e)})
         report['hardware_grids'][inst]=arr
-    (out/'tr808-fischer-current.json').write_text(json.dumps(report,indent=2)+'\n')
-    print(json.dumps({'reference_files':len(report['references'])+sum(len(v) for v in report['hardware_grids'].values()),'comparisons':report['comparisons']},indent=2))
+    (out/'tr808-fischer-current.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps({'reference_files':len(report['references'])+sum(len(v) for v in report['hardware_grids'].values()),'comparisons':report['comparisons']},indent=2))
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--out',required=True);a=p.parse_args();run(a.out)
