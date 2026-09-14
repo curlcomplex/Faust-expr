@@ -2,28 +2,56 @@ name: Tape echo and vintage reverb reference tuning
 on:
   push:
     branches: [74-tape-delay-mv-reference-pass]
-  pull_request:
-    branches: [73-mackeq-reference-pass]
+    paths:
+      - 'modules/tape-echo/**'
+      - 'modules/vintage-rack-reverb/**'
+      - 'tools/modules/echo_reverb_reference_v3.py'
+      - '.github/workflows/tape-reverb-reference.yml'
+permissions:
+  contents: read
+concurrency:
+  group: tape-reverb-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   compare:
     runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      OPENBLAS_NUM_THREADS: 1
+      OMP_NUM_THREADS: 1
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
       - name: Compiler and analysis dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y faust g++ python3-numpy python3-scipy
-      - name: TapeDelay and MV behavioural qualification
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy
+      - name: Whole MV2 reference and multi-head echo qualification
         run: |
-          python3 tools/modules/tape_reverb_reference_pass.py --out /tmp/tape-reverb-reference
-      - name: Compact evidence
+          /usr/bin/python3 -m py_compile tools/modules/echo_reverb_reference_v3.py
+          /usr/bin/python3 tools/modules/echo_reverb_reference_v3.py --out build/echo-reverb-v3
+      - name: Existing Python regression suite
+        run: /usr/bin/python3 -m unittest discover -s tests -v
+      - name: Exact source and evidence
+        if: always()
         run: |
-          mkdir -p /tmp/review/audition
-          cp /tmp/tape-reverb-reference/results.json /tmp/review/
-          cp /tmp/tape-reverb-reference/audition/*.wav /tmp/review/audition/
-          cp modules/tape-echo/v2/echo.dsp /tmp/review/tape-echo-v2.dsp
-          cp modules/vintage-rack-reverb/v2/reverb.dsp /tmp/review/vintage-rack-reverb-v2.dsp
+          mkdir -p build/echo-reverb-v3
+          git rev-parse HEAD > build/echo-reverb-v3/commit.txt
+          git archive --format=tar HEAD > build/echo-reverb-v3/source.tar
+          faust --version > build/echo-reverb-v3/faust-version.txt
+          g++ --version > build/echo-reverb-v3/cxx-version.txt
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json
+          p=Path('build/echo-reverb-v3')
+          index={str(f.relative_to(p)):hashlib.sha256(f.read_bytes()).hexdigest() for f in p.rglob('*') if f.is_file()}
+          (p/'files.sha256.json').write_text(json.dumps(index,indent=2))
+          PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
         with:
-          name: tape-reverb-reference-${{ github.sha }}
-          path: /tmp/review
+          name: echo-reverb-v3-${{ github.sha }}
+          path: build/echo-reverb-v3/
+          retention-days: 14
+          if-no-files-found: error
