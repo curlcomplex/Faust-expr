@@ -2,7 +2,7 @@ declare name "Analog Classics Juno 60 Voice";
 declare version "0.3.0-coherent-candidate";
 declare description "Independent single-note Juno-60-inspired voice; chorus and host polyphony are external";
 import("stdfaust.lib");
-co=library("../../analog-classics/synth-finish/coherent_dco.lib");
+cdco=library("../../analog-classics/synth-finish/coherent_dco.lib");
 cs=library("../../analog-classics/synth-batch/common.lib");
 
 gate=button("gate[curlop:input]");
@@ -36,7 +36,7 @@ state(f0,g0,v0)=audio,pitchHz,env,hit with {
 
  // Independent DCO/mixer hypothesis informed by Juno hardware/software references,
  // not copied from GPL Hera source. Mixer loading compresses as several sources rise.
- raw=(co.waves(f,width):(_,!,!))*saw + (co.waves(f,width):(!,_,!))*pulse + (co.waves(f,width):(!,!,_))*sub*.72 + no.pink_noise*noise*.10;
+ raw=(cdco.waves(f,width):(_,!,!))*saw + (cdco.waves(f,width):(!,_,!))*pulse + (cdco.waves(f,width):(!,!,_))*sub*.72 + no.pink_noise*noise*.10;
  load=max(.30,saw+pulse+sub+noise);
  mixGain=.46/(.46+.22*max(0,load-.46));
  dco=.40*raw*mixGain;

@@ -50,9 +50,9 @@ def decode(raw):
     return x.mean(axis=1),int(sr)
 
 def expected_delta(original,version):
-    s=original.replace('import("stdfaust.lib");','import("stdfaust.lib");\nco=library("../../analog-classics/synth-finish/coherent_dco.lib");')
+    s=original.replace('import("stdfaust.lib");','import("stdfaust.lib");\ncdco=library("../../analog-classics/synth-finish/coherent_dco.lib");')
     s=re.sub(r'declare version "[^"]+";',f'declare version "0.{version}.0-coherent-candidate";',s)
-    return s.replace('os.polyblep_saw(f)','(co.waves(f,width):(_,!,!))').replace('os.pulsetrain(f,width)','(co.waves(f,width):(!,_,!))').replace('os.polyblep_square(f*.5)','(co.waves(f,width):(!,!,_))')
+    return s.replace('os.polyblep_saw(f)','(cdco.waves(f,width):(_,!,!))').replace('os.pulsetrain(f,width)','(cdco.waves(f,width):(!,_,!))').replace('os.polyblep_square(f*.5)','(cdco.waves(f,width):(!,!,_))')
 
 def run(out):
     L=SynthLab(out);c=L.check;(out/'audition').mkdir(exist_ok=True)
@@ -154,19 +154,14 @@ def run(out):
           (out/('j106-'+version+'-fit.json')).write_text(json.dumps(trials,indent=2))
         L.wav('j106-dry-hardware-excerpt.wav',ref,sr)
         L.report['hardware_comparisons'].append(row);print('J106_FIT',json.dumps(row),flush=True)
-      # Publicly offered links only: no checkout, login or CAPTCHA bypass.
-      for name,url in [('dms','https://www.mediafire.com/?b0v9zou2dvd4qpv'),('minimoog','https://legowelt.wetransfer.com/downloads/f1471b9a8a28ab96a7a8b7b4ee28332020180329170955/1b03c9')]:
-        try:
-          raw,final=fetch(url,limit=5_000_000);text=raw.decode('utf-8','replace');(out/(name+'-download-page.html')).write_text(text)
-          links=re.findall(r'https?://[^\s\"<>]+',text)
-          L.report['extra_sources'][name]=dict(url=final,links=sorted(set(t for t in links if '.zip' in t or 'download' in t))[:30])
-        except Exception as e:L.report['extra_sources'][name]=dict(url=url,error=str(e))
-    except Exception:
+    except Exception as exc:
       L.report['exception']=traceback.format_exc();c('assessment-completed',False);print(L.report['exception'],flush=True)
+      if getattr(exc,'output',None):
+        L.report['subprocess_output']=str(exc.output);print(L.report['subprocess_output'],flush=True)
     L.report['passed']=bool(L.report['checks']) and all(t.get('passed') is True for t in L.report['checks'])
     L.report['failures']=[t['name'] for t in L.report['checks'] if t.get('passed') is not True]
     (out/'results.json').write_text(json.dumps(L.report,indent=2))
-    print('FINISH_ASSESSMENT',json.dumps(dict(passed=L.report['passed'],failures=L.report['failures'],hardware_comparisons=len(L.report['hardware_comparisons']),extra_sources=L.report['extra_sources'])),flush=True)
+    print('FINISH_ASSESSMENT',json.dumps(dict(passed=L.report['passed'],failures=L.report['failures'],hardware_comparisons=len(L.report['hardware_comparisons']))),flush=True)
     return 0 if L.report['passed'] else 1
 
 if __name__=='__main__':

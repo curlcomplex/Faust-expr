@@ -2,7 +2,7 @@ declare name "Analog Classics Juno 106 Voice";
 declare version "0.3.0-coherent-candidate";
 declare description "Single-note Juno-106 candidate with nonlinear four-pole reference VCF; chorus and polyphony external";
 import("stdfaust.lib");
-co=library("../../analog-classics/synth-finish/coherent_dco.lib");
+cdco=library("../../analog-classics/synth-finish/coherent_dco.lib");
 cs=library("common.lib");
 ir=library("ir3109_reference.lib");
 gate=button("gate[curlop:input]");
@@ -29,7 +29,7 @@ state(f0,g0,v0)=audio,pitchHz,env,hit with {
  width=cs.clip(.05,.95,pwm+pwmDepth*os.osc(lfoRate));
  f=cs.clip(10,ma.SR*.20,pitchHz);
  // Retain 106 control balance, but use mixer loading rather than a fixed raw sum.
- raw=(co.waves(f,width):(_,!,!))*saw+(co.waves(f,width):(!,_,!))*pulse+(co.waves(f,width):(!,!,_))*sub*.65+no.pink_noise*noise*.12;
+ raw=(cdco.waves(f,width):(_,!,!))*saw+(cdco.waves(f,width):(!,_,!))*pulse+(cdco.waves(f,width):(!,!,_))*sub*.65+no.pink_noise*noise*.12;
  load=max(.30,saw+pulse+sub+noise); mixGain=.46/(.46+.20*max(0,load-.46)); dco=.42*raw*mixGain;
  env=en.adsr(max(.001,attack),max(.005,decay),sustain,max(.005,release),g0>0);
  fc=cutoff*pow(2,4.5*envAmt*env);

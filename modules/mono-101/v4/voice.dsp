@@ -2,7 +2,7 @@ declare name "Analog Classics Mono 101";
 declare version "0.4.0-coherent-candidate";
 declare description "Single-note SH-101 candidate with nonlinear IR3109-style software oracle; resonance output law still uncalibrated";
 import("stdfaust.lib");
-co=library("../../analog-classics/synth-finish/coherent_dco.lib");
+cdco=library("../../analog-classics/synth-finish/coherent_dco.lib");
 cs=library("common.lib");
 ir=library("ir3109_reference.lib");
 gate=button("gate[curlop:input]");
@@ -30,7 +30,7 @@ level=hslider("level",.65,0,1,.001):cs.sm(.005);
 state(f0,g0,v0,s0)=audio,pitchHz,env,hit with {
  pitchHz=cs.pitch(f0,g0,s0,glideTime); hit=(g0>0)>(g0'>0);
  lfo=os.osc(lfoRate); f=cs.clip(10,ma.SR*.20,pitchHz*pow(2,lfo*lfoPitch/12)); width=cs.clip(.05,.95,pwm+pwmDepth*lfo);
- osc=.48*((co.waves(f,width):(_,!,!))*saw+(co.waves(f,width):(!,_,!))*pulse+(co.waves(f,width):(!,!,_))*sub*.7+no.noise*noise*.15);
+ osc=.48*((cdco.waves(f,width):(_,!,!))*saw+(cdco.waves(f,width):(!,_,!))*pulse+(cdco.waves(f,width):(!,!,_))*sub*.7+no.noise*noise*.15);
  env=en.adsr(max(.001,attack),max(.005,decay),sustain,max(.005,release),g0>0);
  fc=cutoff*pow(2,5*envAmt*env+2*lfoFilter*lfo);
  // Preserve v1's modest resonance-linked output hypothesis while replacing the
