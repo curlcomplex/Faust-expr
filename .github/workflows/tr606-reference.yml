@@ -1,0 +1,54 @@
+name: 606 reference and tuning
+on:
+  push:
+    branches: [606-reference-tuning]
+permissions:
+  contents: read
+concurrency:
+  group: tr606-reference
+  cancel-in-progress: true
+jobs:
+  reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      OPENBLAS_NUM_THREADS: 1
+      OMP_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Compiler and analysis dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy lhasa
+      - name: Frozen 606 reference candidates and lifecycle qualification
+        run: /usr/bin/python3 tools/modules/tr606_reference_qualify.py --out build/tr606
+      - name: Unchanged 606 family regression
+        run: /usr/bin/python3 tools/modules/drums606_batch.py --out build/legacy606
+      - name: Existing unit tests
+        run: /usr/bin/python3 -m unittest discover -s tests -v
+      - name: Retain candidate evidence, never source reference audio
+        if: always()
+        run: |
+          mkdir -p build/tr606
+          if test -f build/legacy606/results.json; then cp build/legacy606/results.json build/tr606/legacy606-results.json; fi
+          git rev-parse HEAD > build/tr606/commit.txt
+          git archive --format=tar HEAD > build/tr606/source.tar
+          faust --version > build/tr606/faust-version.txt
+          g++ --version > build/tr606/cxx-version.txt
+          lscpu > build/tr606/cpu.txt
+          find build/tr606 -name render -type f -delete
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json
+          p=Path('build/tr606')
+          (p/'hashes.json').write_text(json.dumps({str(f.relative_to(p)):hashlib.sha256(f.read_bytes()).hexdigest() for f in p.rglob('*') if f.is_file()},indent=2))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: tr606-reference-${{ github.sha }}
+          path: build/tr606/
+          retention-days: 14
+          if-no-files-found: error
