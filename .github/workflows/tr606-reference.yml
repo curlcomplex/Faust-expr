@@ -21,9 +21,9 @@ jobs:
       - name: Compiler and analysis dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy
-      - name: Reference source inventory and actual retained voices
-        run: /usr/bin/python3 tools/modules/tr606_reference_discovery.py --out build/tr606
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy lhasa
+      - name: Documented dry 606 recordings and actual retained voices
+        run: /usr/bin/python3 tools/modules/tr606_archive_analysis.py --out build/tr606
       - name: Retain candidate evidence, never source reference audio
         if: always()
         run: |
