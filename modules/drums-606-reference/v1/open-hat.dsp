@@ -1,0 +1,23 @@
+declare name "606 Open Hat";
+declare version "0.2.0-reference-candidate";
+declare author "curlcomplex";
+declare category "Analog Classics / 606";
+declare description "One-note 606 open hat. Extended manual decay supports the documented recording; original tempo dependence remains unmodelled. Shared v1 synthesis and host-owned choke routing.";
+import("stdfaust.lib");
+u=library("../../drums-606/v1/drums606.lib");
+gate=button("gate[curlop:input]");
+freq=hslider("freq[unit:Hz][scale:log][curlop:input]",440,220,880,.001);
+velocity=hslider("velocity[curlop:input]",1,0,1,.001);
+accent=hslider("accent[curlop:input]",0,0,1,.001);
+// Existing range retained; only the maximum is extended. Decay is -60dB time, not tau.
+decay=hslider("decay[unit:s][scale:log][col:0][row:0]",2.6,.06,4.0,.001);
+tone=hslider("tone[col:1][row:0]",.5,0,1,.001):u.sm;
+metalSpread=hslider("metalSpread[col:2][row:0]",.5,0,1,.001):u.sm;
+level=hslider("level[col:3][row:0]",.8,0,1,.001):u.sm;
+chokeGate=button("chokeGate[curlop:input]");
+k=chokeGate>chokeGate';h=(gate>gate')*(1-k);
+f=u.lat(h,freq);d=u.lat(h,decay);v=u.lat(h,velocity);a=u.lat(h,accent);
+bank=u.metal(f/440,metalSpread);
+metal=bank:fi.resonbp(min(.38*ma.SR,7100*pow(1.5,tone-.5)),1.8,1):fi.highpass(2,5200*pow(1.5,tone-.5)):fi.lowpass(1,min(.43*ma.SR,17500));
+raw=metal*3.1*u.env(h,d,.00035)*u.chokeGain(h,k);
+process=u.finish(raw,v,a,level);
