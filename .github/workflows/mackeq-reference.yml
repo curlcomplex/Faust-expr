@@ -1,0 +1,36 @@
+name: MackEQ reference tuning
+on:
+  push:
+    branches: [73-mackeq-reference-pass]
+  pull_request:
+    branches: [63-airwindows-reference-pass]
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Compiler and analysis dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq faust g++ python3-numpy python3-scipy
+      - name: Whole MackEQ reference comparison
+        run: |
+          python3 tools/modules/mackeq_reference_pass.py --out "$RUNNER_TEMP/mackeq-reference"
+      - name: Preserve compact evidence
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/mackeq-review"
+          cp "$RUNNER_TEMP/mackeq-reference/results.json" "$RUNNER_TEMP/mackeq-review/" 2>/dev/null || true
+          cp -r "$RUNNER_TEMP/mackeq-reference/audition" "$RUNNER_TEMP/mackeq-review/" 2>/dev/null || true
+          cp -r "$RUNNER_TEMP/mackeq-reference/upstream" "$RUNNER_TEMP/mackeq-review/" 2>/dev/null || true
+          cp modules/retro-mixer-eq/v1/eq.dsp "$RUNNER_TEMP/mackeq-review/eq-v1.dsp"
+          cp modules/retro-mixer-eq/v2/eq.dsp "$RUNNER_TEMP/mackeq-review/eq-v2.dsp"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: mackeq-reference-${{ github.sha }}
+          path: ${{ runner.temp }}/mackeq-review
+          retention-days: 7
