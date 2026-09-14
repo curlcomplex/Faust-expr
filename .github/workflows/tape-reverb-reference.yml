@@ -1,0 +1,29 @@
+name: Tape echo and vintage reverb reference tuning
+on:
+  push:
+    branches: [74-tape-delay-mv-reference-pass]
+  pull_request:
+    branches: [73-mackeq-reference-pass]
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Compiler and analysis dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y faust g++ python3-numpy python3-scipy
+      - name: TapeDelay and MV behavioural qualification
+        run: |
+          python3 tools/modules/tape_reverb_reference_pass.py --out /tmp/tape-reverb-reference
+      - name: Compact evidence
+        run: |
+          mkdir -p /tmp/review/audition
+          cp /tmp/tape-reverb-reference/results.json /tmp/review/
+          cp /tmp/tape-reverb-reference/audition/*.wav /tmp/review/audition/
+          cp modules/tape-echo/v2/echo.dsp /tmp/review/tape-echo-v2.dsp
+          cp modules/vintage-rack-reverb/v2/reverb.dsp /tmp/review/vintage-rack-reverb-v2.dsp
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: tape-reverb-reference-${{ github.sha }}
+          path: /tmp/review
