@@ -1,0 +1,36 @@
+declare name "808 Cymbal";
+declare version "0.3.0-fischer-reference-candidate";
+declare category "Drums";
+declare author "curlcomplex; circuit/reference research includes TapTools by Timothy Place";
+declare description "Single-note 808 cymbal candidate anchored to Fischer unit 103852; six-oscillator metal bank split into strike/ring/body bands with separate decay classes.";
+import("stdfaust.lib");
+metal=hslider("metal",.96,0,1,.001);
+tone=hslider("tone",.50,0,1,.001);
+decay=hslider("decay",.50,0,1,.001);
+shape=hslider("shape",.28,0,1,.001);
+drive=hslider("drive",.03,0,1,.001);
+freq=hslider("freq[unit:Hz][scale:log][curlop:input]",440,264,748,.001);
+velocity=hslider("velocity[curlop:input]",1,0,1,.001);
+gate=button("gate[curlop:input]");
+hit=gate>gate';seen=max(hit)~_;
+lat(x)=select2(seen,x,ba.sAndH(hit,x));
+age=(+(1):min(30*ma.SR):*(1-hit))~_;t=age/ma.SR;
+ratio=lat(freq)/440;sq(f)=os.polyblep_square(f);
+s1=sq(205.3*ratio);s2=sq(304.4*ratio);s3=sq(369.6*ratio);s4=sq(522.7*ratio);s5=sq(540.5*ratio);s6=sq(800*ratio);
+summed=(s1+s2+s3+s4+s5+s6)/6; ringed=(s1*s2+s3*s5+s4*s6)/3;
+bank=(1-.55*lat(shape))*summed+.55*lat(shape)*ringed;
+excitation=lat(metal)*bank+(1-lat(metal))*.28*no.noise;
+// Service-note/TapTools direction: low body around 3.4k, high band around 7.1k with extra ~9k pre-emphasis.
+lo=excitation:fi.resonbp(min(.36*ma.SR,3440),1.15,1):fi.highpass(1,1800);
+hi=excitation:fi.resonbp(min(.39*ma.SR,7100),1.25,1):fi.highpass(1,min(.40*ma.SR,9000));
+// Three envelope classes: fixed strike, decay-controlled ring, fixed body. Tone balances strike vs body.
+att=(1-exp(-t/.0004))*seen;
+strike=hi*att*exp(-t/.15);
+ringTau=.13+.47*lat(decay);
+ring=hi*att*exp(-t/ringTau);
+body=lo*att*exp(-t/.15);
+tn=lat(tone);
+raw=tn*(strike+.60*ring)+(1-tn)*(.45*body+ring);
+a=lat(drive)*lat(drive);sat=(1-a)*raw+a*ma.tanh((1+9*a)*raw)/(1+2*a);
+endTau=max(.15,ringTau);endFade=min(1,max(0,(14*endTau-t)/endTau));
+process=(sat*.82*lat(velocity):fi.dcblockerat(20))*endFade;
