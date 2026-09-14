@@ -1,0 +1,39 @@
+name: Juno60 reference qualification
+
+on:
+  push:
+    branches: [86-juno60-analog-classics]
+  pull_request:
+    branches: [62-synth-batch]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install Faust and analysis dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy
+      - name: Qualify Juno60 candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build/juno60-reference
+          PYTHONPATH=tools/modules PATH=/usr/bin:/bin:$PATH /usr/bin/python3 tools/modules/juno60_reference.py --out build/juno60-reference 2>&1 | tee build/juno60-reference/run.log
+      - name: Preserve evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: juno60-reference-${{ github.sha }}-${{ github.run_attempt }}
+          path: build/juno60-reference/
+          if-no-files-found: error
+          retention-days: 14
