@@ -1,0 +1,40 @@
+// Juno-60 VCF reference component.
+// Adapted from jpcima/Hera Source/VCF/JpcVCF.dsp at commit
+// f6fe5b900f4cf84809686466e0a37de5edf008fd.
+// Original file: Copyright Jean Pierre Cimalando, licensed ISC.
+// Modifications: renamed/public function surface and removed UI/process wrapper.
+declare license "ISC";
+declare author "Jean Pierre Cimalando; CURLOP adaptation";
+
+import("stdfaust.lib");
+
+j60_vcf(f, r) = (+ : cascade) ~ feedback with {
+    cascade = seq(i, 4, poleEntry : tptPole(f));
+    feedback = *(tanhK) : tableTanh : *(-4.0*clip01(r));
+    poleEntry = +(noiseA*no.noise) : *(tanhK) : tableTanh;
+
+    tptPole(fc) = next with {
+        next(x) = y letrec {
+            'y = s+G*(x-s);
+            's = s+G*(x-s)+G*(x-s);
+        };
+        g = clipf(fc)*(ma.PI/ma.SR);
+        G = g/(1.0+g);
+    };
+
+    tanhK = 1.0;
+    noiseA = ba.db2linear(-80.0);
+};
+
+tableTanh(x) = value with {
+    extent = 3.0;
+    points = 128;
+    expr = (ba.time/float(points-1)) : *(2.0*extent) : -(extent) : ma.tanh;
+    read = max(0) : min(points-1) : rdtable(points, expr);
+    pos = x : +(extent) : *((points-1)*0.5/extent);
+    mu = pos-int(pos);
+    value = read(int(pos))+mu*(read(1+int(pos))-read(int(pos)));
+};
+
+clip01(x)=min(1.0,max(0.0,x));
+clipf(x)=min(ma.SR*0.40,max(15.0,x));
