@@ -11,7 +11,7 @@ concurrency:
 jobs:
   reference:
     runs-on: ubuntu-latest
-    timeout-minutes: 18
+    timeout-minutes: 22
     env:
       OPENBLAS_NUM_THREADS: 1
       OMP_NUM_THREADS: 1
@@ -23,10 +23,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy
-      - name: Existing SH101 reference checkpoint
+      - name: Existing SH101 gain checkpoint
         run: /usr/bin/python3 tools/modules/synth_reference_pass.py --out build/synth-reference
       - name: Four-synth behavioral checkpoint
         run: /usr/bin/python3 tools/modules/synth_four_voice_checkpoint.py --out build/four-synth
+      - name: Oracle-informed candidate comparisons
+        run: /usr/bin/python3 tools/modules/synth_oracle_candidates.py --out build/oracle-candidates
       - name: Preserved complete original synth regression
         run: /usr/bin/python3 tools/modules/synth_batch.py --out build/synth-legacy
       - name: Existing unit tests
@@ -34,8 +36,9 @@ jobs:
       - name: Preserve evidence
         if: always()
         run: |
-          mkdir -p build/synth-reference/four-synth
+          mkdir -p build/synth-reference/four-synth build/synth-reference/oracle-candidates
           if test -d build/four-synth; then cp -R build/four-synth/. build/synth-reference/four-synth/; fi
+          if test -d build/oracle-candidates; then cp -R build/oracle-candidates/. build/synth-reference/oracle-candidates/; fi
           if test -f build/synth-legacy/results.json; then cp build/synth-legacy/results.json build/synth-reference/legacy-synth-results.json; fi
           git rev-parse HEAD > build/synth-reference/commit.txt
           git archive --format=tar HEAD > build/synth-reference/source.tar
