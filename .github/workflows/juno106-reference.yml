@@ -1,0 +1,35 @@
+name: Juno106 hardware-reference candidate
+on:
+  push:
+    branches: [82-hardware-listening-redo]
+    paths: ['modules/juno-106/v3/**', 'tools/modules/juno106_reference_check.py', '.github/workflows/juno106-reference.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy > /tmp/dependencies.log
+      - name: Actual Faust build and neutral-mode regression
+        run: /usr/bin/python3 tools/modules/juno106_reference_check.py
+      - name: Source identities
+        if: always()
+        run: |
+          mkdir -p build/juno106-reference
+          git rev-parse HEAD > build/juno106-reference/commit.txt
+          git archive HEAD > build/juno106-reference/source.tar
+          faust --version > build/juno106-reference/faust-version.txt
+          find build/juno106-reference -name render -type f -delete
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: juno106-reference-${{ github.sha }}
+          path: build/juno106-reference/
+          retention-days: 14
