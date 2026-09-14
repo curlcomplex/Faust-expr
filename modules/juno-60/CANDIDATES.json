@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "purpose": "Review identity index; not a shipping manifest or automatic selection",
+  "selected_for_promotion": null,
+  "candidates": [
+    {
+      "id": "juno-60/reference-v1",
+      "path": "modules/juno-60/v1/voice.dsp",
+      "origin_commit": "91f6a9671fa13026e69b62731c1fbdd0a592d23b",
+      "origin_pr": 83,
+      "note": "Original PR83 v1, preferred over PR83 v2 in the earlier limited spectral probe. No new approval implied."
+    },
+    {
+      "id": "juno-60/reference-v2",
+      "path": "modules/juno-60/v2/voice.dsp",
+      "origin_commit": "91f6a9671fa13026e69b62731c1fbdd0a592d23b",
+      "origin_pr": 83,
+      "note": "PR83 nonlinear-filter alternative. Earlier negative results retained."
+    },
+    {
+      "id": "juno-60/pr89-0b98748d",
+      "path": "modules/juno-60/candidates/pr89-0b98748d/voice.dsp",
+      "origin_commit": "0b98748db3f21bb19cf0808b401dca8399645ee7",
+      "origin_path": "modules/juno-60/v1/voice.dsp",
+      "origin_pr": 89,
+      "git_blobs": {
+        "voice.dsp": "466b1ea4dd6e2ebabd9cb16d41d79dccf6182e27",
+        "vcf.lib": "c11929f18f095edc2ed615930e293fdc4bb03690",
+        "ORIGINAL_README.md": "deae9feecd599e493b0e4d7cb36486fbbc622ce0"
+      },
+      "note": "Exact source bytes retained at a collision-free experimental path. The inherited 0.1.0 metadata is historical, NOT the identity of PR83 v1. Any later sound change needs a new identity."
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+// SPDX-License-Identifier: ISC
+// Four-substep adaptation of the D'Angelo/Valimaki ladder integration.
+// Equation references: jpcima/Hera Source/VCF/DangeloVCF.dsp at
+// f6fe5b900f4cf84809686466e0a37de5edf008fd; ddiakopoulos/MoogLadders
+// src/ImprovedModel.h, Git blob e83f5398b6b9e8bd7a123689017efbbaf2be973b.
+// Hera author: Jean Pierre Cimalando. Original reference author: Stefano D'Angelo.
+// Copyright 2012 Stefano D'Angelo <zanga.mail@gmail.com>
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THIS SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+//
+// Changes: explicit voltage/derivative state, four fixed integration substeps,
+// internal-rate coefficient evaluation, and bounded public frequency/resonance.
+// The cubic saturator, thermal scale and 2*r feedback follow the prior candidate.
+// Input/controls are held across substeps. This is numerical substepping, NOT
+// a claim of bandlimited oversampling, alias-free processing or hardware fidelity.
+import("stdfaust.lib");
+
+vcf(fc_, r_) = (stages ~ par(i,8,_)) : (!,!,!,!,!,!,_,!) with {
+    steps = 4;
+    internalRate = float(steps)*ma.SR;
+    fc = min(.45*ma.SR,max(20.0,fc_));
+    r = min(1.0,max(0.0,r_));
+    vt = .312;
+    invThermal = 1.0/(2.0*vt);
+    warp = ma.PI*fc/internalRate;
+    // warp <= .45*pi/4 < 1 throughout the declared frequency domain.
+    g = fc*(4.0*ma.PI*vt)*(1.0-warp)/(1.0+warp);
+    h = .5/internalRate;
+    k = 2.0*r;
+    sig = max(-1.0):min(1.0):cubic with { cubic(x)=x-x*x*x/3.0; };
+
+    // Feedback inputs are eight previous state values; audio is the ninth input.
+    stages = seq(i,steps,step) : (par(i,8,_),!);
+    step(a,da,b,db,c,dc,d,dd,u) = an,dan,bn,dbn,cn,dcn,dn,ddn,u with {
+        dan = -g*(sig((u+k*d)*invThermal)+sig(a*invThermal));
+        an = a+h*(dan+da);
+        dbn = g*(sig(an*invThermal)-sig(b*invThermal));
+        bn = b+h*(dbn+db);
+        dcn = g*(sig(bn*invThermal)-sig(c*invThermal));
+        cn = c+h*(dcn+dc);
+        ddn = g*(sig(cn*invThermal)-sig(d*invThermal));
+        dn = d+h*(ddn+dd);
+    };
+};
