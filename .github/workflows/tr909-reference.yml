@@ -22,12 +22,17 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends faust g++ lhasa python3-numpy python3-scipy
-      - name: Identified hardware recordings and unchanged baseline
-        run: /usr/bin/python3 tools/modules/tr909_reference.py --out build/tr909
+      - name: Frozen hardware anchors and lifecycle checks
+        run: /usr/bin/python3 tools/modules/tr909_qualify.py --out build/tr909
+      - name: Preserved complete 909 regression
+        run: /usr/bin/python3 tools/modules/drums909_batch.py --out build/legacy909
+      - name: Existing unit tests
+        run: /usr/bin/python3 -m unittest discover -s tests -v
       - name: Preserve evidence without hardware WAVs
         if: always()
         run: |
           mkdir -p build/tr909
+          if test -f build/legacy909/results.json; then cp build/legacy909/results.json build/tr909/legacy909-results.json; fi
           git rev-parse HEAD > build/tr909/commit.txt
           git archive --format=tar HEAD > build/tr909/source.tar
           faust --version > build/tr909/faust-version.txt
