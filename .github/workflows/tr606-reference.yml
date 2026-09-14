@@ -22,16 +22,22 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy lhasa
-      - name: Bounded unaccented fit and reserved-accent validation
-        run: /usr/bin/python3 tools/modules/tr606_reference_fit.py --out build/tr606
+      - name: Frozen 606 reference candidates and lifecycle qualification
+        run: /usr/bin/python3 tools/modules/tr606_reference_qualify.py --out build/tr606
+      - name: Unchanged 606 family regression
+        run: /usr/bin/python3 tools/modules/drums606_batch.py --out build/legacy606
+      - name: Existing unit tests
+        run: /usr/bin/python3 -m unittest discover -s tests -v
       - name: Retain candidate evidence, never source reference audio
         if: always()
         run: |
           mkdir -p build/tr606
+          if test -f build/legacy606/results.json; then cp build/legacy606/results.json build/tr606/legacy606-results.json; fi
           git rev-parse HEAD > build/tr606/commit.txt
           git archive --format=tar HEAD > build/tr606/source.tar
           faust --version > build/tr606/faust-version.txt
           g++ --version > build/tr606/cxx-version.txt
+          lscpu > build/tr606/cpu.txt
           find build/tr606 -name render -type f -delete
           /usr/bin/python3 - <<'PY'
           from pathlib import Path
