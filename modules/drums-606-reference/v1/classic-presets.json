@@ -1,0 +1,12 @@
+{
+  "status": "reference candidates; not factory presets or final hardware approval",
+  "hardware_anchor": "Roland Clan raw TR-606 sample archive",
+  "secondary_oracle": "athousanddetails/schwung-6W6; synthesized voices fitted hit-for-hit against real TR-606 recordings",
+  "kick606": {"source":"modules/drums-606/v1/kick.dsp","gate":0,"freq":55,"velocity":1,"accent":0,"decay":0.30,"tone":0.50,"click":0.18,"level":0.80},
+  "snare606": {"source":"modules/drums-606/v1/snare.dsp","gate":0,"freq":192,"velocity":1,"accent":0,"decay":0.14,"tone":0.00,"snappy":0.50,"level":0.80},
+  "lowtom606": {"source":"modules/drums-606/v1/low-tom.dsp","gate":0,"freq":128,"velocity":1,"accent":0,"decay":0.26,"tone":0.50,"noise":0.22,"level":0.80},
+  "hitom606": {"source":"modules/drums-606/v1/high-tom.dsp","gate":0,"freq":205,"velocity":1,"accent":0,"decay":0.20,"tone":0.50,"noise":0.16,"level":0.80},
+  "closed606": {"source":"modules/drums-606/v1/closed-hat.dsp","gate":0,"freq":440,"velocity":1,"accent":0,"decay":0.12,"tone":1.00,"metalSpread":0.50,"level":0.80},
+  "open606": {"source":"modules/drums-606/v1/open-hat.dsp","gate":0,"chokeGate":0,"freq":440,"velocity":1,"accent":0,"decay":2.20,"tone":1.00,"metalSpread":0.50,"level":0.80},
+  "cymbal606": {"source":"modules/drums-606/v1/cymbal.dsp","gate":0,"freq":440,"velocity":1,"accent":0,"decay":0.80,"tone":0.50,"metalSpread":0.50,"level":0.80}
+}

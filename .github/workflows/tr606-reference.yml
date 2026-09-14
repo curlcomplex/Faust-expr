@@ -1,0 +1,37 @@
+name: TR-606 hardware reference pass
+on:
+  push:
+    branches: [77-606-hardware-reference-pass]
+permissions:
+  contents: read
+jobs:
+  analyse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy
+      - name: Hardware comparison
+        run: python3 tools/modules/tr606_reference_pass.py --out build/tr606-reference
+      - name: Revision qualification
+        run: python3 tools/modules/tr606_revision_pass.py --out build/tr606-revision
+      - name: Evidence
+        if: always()
+        run: |
+          mkdir -p build/tr606-review/audition
+          test -f build/tr606-reference/tr606-current.json && cp build/tr606-reference/tr606-current.json build/tr606-review/
+          test -f build/tr606-revision/tr606-revision.json && cp build/tr606-revision/tr606-revision.json build/tr606-review/
+          test -d build/tr606-revision/audition && cp build/tr606-revision/audition/*.wav build/tr606-review/audition/ || true
+          git rev-parse HEAD > build/tr606-review/commit.txt
+          faust --version > build/tr606-review/faust-version.txt
+          sha256sum tools/modules/tr606_reference_pass.py tools/modules/tr606_revision_pass.py > build/tr606-review/files.sha256
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: tr606-reference-${{ github.sha }}
+          path: build/tr606-review/
+          retention-days: 14
