@@ -11,7 +11,7 @@ concurrency:
 jobs:
   reference:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 18
     env:
       OPENBLAS_NUM_THREADS: 1
       OMP_NUM_THREADS: 1
@@ -23,16 +23,19 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy
-      - name: Synth reference checkpoint
+      - name: Existing SH101 reference checkpoint
         run: /usr/bin/python3 tools/modules/synth_reference_pass.py --out build/synth-reference
-      - name: Preserved complete synth regression
+      - name: Four-synth behavioral checkpoint
+        run: /usr/bin/python3 tools/modules/synth_four_voice_checkpoint.py --out build/four-synth
+      - name: Preserved complete original synth regression
         run: /usr/bin/python3 tools/modules/synth_batch.py --out build/synth-legacy
       - name: Existing unit tests
         run: /usr/bin/python3 -m unittest discover -s tests -v
       - name: Preserve evidence
         if: always()
         run: |
-          mkdir -p build/synth-reference
+          mkdir -p build/synth-reference/four-synth
+          if test -d build/four-synth; then cp -R build/four-synth/. build/synth-reference/four-synth/; fi
           if test -f build/synth-legacy/results.json; then cp build/synth-legacy/results.json build/synth-reference/legacy-synth-results.json; fi
           git rev-parse HEAD > build/synth-reference/commit.txt
           git archive --format=tar HEAD > build/synth-reference/source.tar
