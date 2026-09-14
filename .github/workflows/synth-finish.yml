@@ -29,9 +29,12 @@ jobs:
         run: /usr/bin/python3 tools/modules/synth_finish_driver.py --out build/finish/comparisons
       - name: Physical SH-101 and Model-D reference-note comparisons
         run: /usr/bin/python3 tools/modules/synth_hardware_cases.py --out build/finish/hardware-cases
-      - name: Export self-contained Faust scripts and verify identical audio
+      - name: Export single scripts and verify frozen identities and identical audio
         if: always()
         run: /usr/bin/python3 tools/modules/synth_script_exports.py --out build/finish/exports
+      - name: Established behavioral suite on selected source versions
+        if: always()
+        run: /usr/bin/python3 tools/modules/synth_selected_qualification.py --out build/finish/selected
       - name: Full preserved original synth regression
         if: always()
         run: /usr/bin/python3 tools/modules/synth_batch.py --out build/finish/legacy

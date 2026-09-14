@@ -2,34 +2,47 @@
 Review exports are pinned snapshots, not automatic factory promotion.
 """
 from pathlib import Path
-import argparse, json, os, re, tempfile, traceback
+import argparse,json,os,re,tempfile,traceback
 import numpy as np
-from synth_batch import SynthLab, ROOT, COMMON, DEFAULTS, phrase
+from synth_batch import SynthLab,ROOT,COMMON,DEFAULTS,phrase
 from synth_four_voice_checkpoint import DEFAULT as J60_DEFAULT
 from acid_batch import controls
-from hats_v2_delivery import command, digest
+from hats_v2_delivery import command,digest
+from faust_export_metadata import normalize_expanded
 SUBJECTS={
  'Juno-60':('modules/juno-60/v3/voice.dsp',J60_DEFAULT),
  'Juno-106':('modules/juno-106/v3/voice.dsp',DEFAULTS['juno106']),
  'SH-101':('modules/mono-101/v4/voice.dsp',DEFAULTS['mono101']),
- 'Mini':('modules/minimoog/v3/voice.dsp',DEFAULTS['mini']),
+ 'Mini':('modules/minimoog/v1/voice.dsp',DEFAULTS['mini']),
 }
 def run(out):
     lab=SynthLab(out);(out/'scripts').mkdir(exist_ok=True);(out/'audition').mkdir(exist_ok=True);c=lab.check
     manifest=dict(schema=1,commit=os.getenv('GITHUB_SHA','local'),delivery='Single self-contained Faust source per instrument',
-        purpose='Pinned review snapshot; not shipping approval',instrument_freeze_complete=False,
-        hardware_approved=False,owner_approved=False,subjects={})
+      purpose='Pinned review snapshot; not shipping approval',source_review_freeze=True,instrument_release_approved=False,
+      hardware_approved=False,owner_approved=False,subjects={})
     try:
+        freeze=json.loads((ROOT/'modules/analog-classics/synth-finish/REVIEW_FREEZE.json').read_text())
+        for path,expected in freeze['source_sha256'].items():
+            c('freeze:'+path,digest(ROOT/path)==expected)
         for name,(path,base) in SUBJECTS.items():
             src=(ROOT/path).resolve();canonical=lab.build(name+'-canonical',src)
             with tempfile.TemporaryDirectory(prefix='faust-single-script-') as temp:
                 work=Path(temp);wrapper=work/(name+'.dsp');wrapper.write_text('import('+json.dumps(str(src))+');\n')
                 command(['faust','-e','-I',src.parent,'-I',COMMON,wrapper,'-o',work/'expanded.dsp'])
-                expanded=(work/'expanded.dsp').read_text()
+                raw_expanded=(work/'expanded.dsp').read_text()
+                expanded=normalize_expanded(raw_expanded,src.read_text())
+                (out/(name+'-compiler-expanded-original.dsp')).write_text(raw_expanded)
+                dependencies={}
+                for value in re.findall(r'^declare library_path\d+ ("(?:\\.|[^"\\])*");$',raw_expanded,re.M):
+                    dependency=Path(json.loads(value)).resolve()
+                    if dependency.is_file():
+                        try:key=str(dependency.relative_to(ROOT.resolve()))
+                        except ValueError:key='compiler-library/'+dependency.name
+                        if key in dependencies and dependencies[key]!=digest(dependency):raise ValueError('Dependency-name collision')
+                        dependencies[key]=digest(dependency)
                 c(name+':no-external-imports',not re.search(r'\b(?:import|library)\s*\(',expanded))
                 destination=out/'scripts'/(name+'.dsp');destination.write_text(expanded)
                 build=out/(name+'-standalone');build.mkdir(exist_ok=True)
-                # Deliberately no custom include directories: it must load alone.
                 command(['faust','-lang','cpp','-single','-cn','ModuleDSP',destination,'-o',build/'generated.hpp'])
                 command(['c++','-std=c++17','-O2','-ffp-contract=off','-I'+str(build),ROOT/'tools/modules/render.cpp','-o',build/'render'])
                 standalone=build/'render';c(name+':same-controls',controls(canonical)==controls(standalone));maxerr=0.0
@@ -45,7 +58,8 @@ def run(out):
                 lab.wav(name+'-review-phrase.wav',audio)
                 manifest['subjects'][name]=dict(canonical_path=path,canonical_sha256=digest(src),exported_file=name+'.dsp',
                     exported_sha256=digest(destination),audio_sha256=digest(out/'audition'/(name+'-review-phrase.wav')),
-                    expanded_audio_max_error=maxerr,reference_and_listening_status='See exact checkpoint PR; no implicit approval')
+                    transitive_dependency_sha256=dependencies,expanded_audio_max_error=maxerr,
+                    reference_and_listening_status='See REVIEW_FREEZE.json and exact checkpoint PR; no implicit approval')
         c('all-four-script-exports',len(manifest['subjects'])==4)
     except Exception as e:
         lab.report['exception']=traceback.format_exc();c('export-completed',False);print(lab.report['exception'],flush=True)

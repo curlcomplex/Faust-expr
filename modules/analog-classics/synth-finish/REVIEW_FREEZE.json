@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "id": "analog-classics-synth-review-2026-09-14.1",
+  "status": "source-review-freeze",
+  "source_bytes_frozen": true,
+  "release_approved": false,
+  "factory_promotion": false,
+  "full_hardware_calibration": false,
+  "selected_sources": {
+    "Juno-60": "modules/juno-60/v3/voice.dsp",
+    "Juno-106": "modules/juno-106/v3/voice.dsp",
+    "SH-101": "modules/mono-101/v4/voice.dsp",
+    "Mini": "modules/minimoog/v1/voice.dsp"
+  },
+  "source_sha256": {
+    "modules/juno-60/v3/voice.dsp": "5a0da538ca7d58fb5ff1ac5de506e531181b4de9e36538b2afa59c3c2129ccab",
+    "modules/juno-106/v3/voice.dsp": "c84bf47177ef942f5362a1e3f630cd89a794991090e5138f83357624f8d3813d",
+    "modules/mono-101/v4/voice.dsp": "64d8ab4e929ad3a5c3056953d263873f7bc923e33fe8c3ff7f90471ecb7da744",
+    "modules/minimoog/v1/voice.dsp": "442916e387c9688fa0f29cfab832d65929d2a6dca321685c344dbbc105870899",
+    "modules/analog-classics/synth-finish/coherent_dco.lib": "772c81f0e0c76dcaef8e317071d79185dfb83cae00c328e359d71999367743d1",
+    "modules/analog-classics/synth-batch/common.lib": "95ee2dfc592cb68f5a39e0a845e4c8e8c5f5ddf805e05a047a47116b3e3c87b7",
+    "modules/analog-classics/synth-batch/ir3109_reference.lib": "aa78bc132d2759889bcbffa326db10d3276138432905f616a32607e88521c691"
+  },
+  "selection_rationale": {
+    "Roland_voices": "Correct the demonstrated idle-dependent saw/pulse phase mismatch using one free-running oscillator phase, without changing existing filters, mixer gains, presets or envelope controls. Juno-60 begins from PR83 v1, not PR89.",
+    "Mini": "Retain the original stable v1. Bounded real-Model-D saw comparisons do not justify replacing it with the more complex v3. The v3 numerical repair remains a separate experiment."
+  },
+  "rejected_or_unselected": {
+    "juno-60/pr89-0b98748d": "Owner sonic rejection; never selected for this freeze.",
+    "minimoog/v2": "Confirmed high-cutoff held-note collapse; engineering fixture only.",
+    "minimoog/v3": "Numerically repaired, but no demonstrated whole-instrument sonic advantage over v1. Retained as an experiment."
+  },
+  "remaining_limits": [
+    "Reference results are identified component and stable-note comparisons, not complete panel, envelope, gain or multi-unit calibration.",
+    "The Juno-106 dry held note changes timbre over time. A static preset is not a reconstruction of that movement, and its cause is not established.",
+    "SH-101 recordings are physical-hardware MP3 factory-patch examples; capture-chain and exact panel metadata are incomplete. Resonance/output calibration is not established by a shape-only score.",
+    "The selected Mini bass reference contains significant even partials and temporal variation not matched by the isolated-square hypothesis; that failed comparison remains visible.",
+    "Fresh owner listening to the coherent Roland versions and CURLOP runtime qualification remain separate gates."
+  ],
+  "consumer": "CURLOP loads the single Faust script and generates the faceplate. No manual binding or GUI changes. Performance protocol: curlcomplex/CURLOP#313 and PR314.",
+  "change_policy": "Do not edit these frozen source bytes in place. A later sound change creates a new version and a new reviewed freeze identity. Existing saved sound versions remain intact."
+}
