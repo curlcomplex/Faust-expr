@@ -1,0 +1,54 @@
+name: 909 recorded reference tuning
+on:
+  push:
+    branches: [80-909-reference-tuning]
+permissions:
+  contents: read
+concurrency:
+  group: tr909-recorded-reference
+  cancel-in-progress: true
+jobs:
+  reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      OPENBLAS_NUM_THREADS: 1
+      OMP_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ lhasa python3-numpy python3-scipy
+      - name: Frozen hardware anchors and lifecycle checks
+        run: /usr/bin/python3 tools/modules/tr909_qualify.py --out build/tr909
+      - name: Preserved complete 909 regression
+        run: /usr/bin/python3 tools/modules/drums909_batch.py --out build/legacy909
+      - name: Existing unit tests
+        run: /usr/bin/python3 -m unittest discover -s tests -v
+      - name: Preserve evidence without hardware WAVs
+        if: always()
+        run: |
+          mkdir -p build/tr909
+          if test -f build/legacy909/results.json; then cp build/legacy909/results.json build/tr909/legacy909-results.json; fi
+          git rev-parse HEAD > build/tr909/commit.txt
+          git archive --format=tar HEAD > build/tr909/source.tar
+          faust --version > build/tr909/faust-version.txt
+          g++ --version > build/tr909/cxx-version.txt
+          lscpu > build/tr909/cpu.txt
+          find build/tr909 -name render -type f -delete
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json
+          p=Path('build/tr909')
+          (p/'hashes.json').write_text(json.dumps({str(f.relative_to(p)):hashlib.sha256(f.read_bytes()).hexdigest() for f in p.rglob('*') if f.is_file()},indent=2))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: tr909-reference-${{ github.sha }}
+          path: build/tr909/
+          retention-days: 14
+          if-no-files-found: error

@@ -1,0 +1,28 @@
+{
+  "schema":"909-recorded-anchor-selection-v1",
+  "status":"frozen comparison candidates, not installed factory presets or final sound approval",
+  "baseline_commit":"83f35db254d9edc282377bd723dc565e6412e31f",
+  "previous_909_head":"9d19dc235fb309141bfa4e09cb834b4b1c57993b",
+  "reference_archive_sha256":"36bf70b0e49ba330d105ee0b803afcc634736b083bcb41451588936b5ffa9b2a",
+  "reference_hashes":{
+    "BT3A0D7.WAV":"37d999cccfe2ba373adbd9e6e77d4f474086c803ecd67670d8aa6d9afa55c586",
+    "ST3T3S3.WAV":"0e31b60ecd80a9e00c7a7df8dcce092338ef979a5d7efb402fa127718255bb3a",
+    "LT3D3.WAV":"cef9dc2891aa782abccd02cfc0059b14e085bea7de94ec7a3768291c22364cdc",
+    "MT3D3.WAV":"4882684f37e4d9b14a5cd8e614f5a468f38aeecfd13ba79ae9a88781ee1ef6ff",
+    "HT3D3.WAV":"630ea761b8000725d7c8dfe936a03a81775710e6c6bccf1ebbcc23c2721e1be8",
+    "RIM127.WAV":"022ba27ff872b1933e01ac4082151858bb5c69528f0f6b9f8ca98262e341f1d8",
+    "HANDCLP1.WAV":"e5d00e7fbb04ab43fb27921b960765a5ed223f7ec2f3e4cb0a0a5c08560fe281",
+    "RIM63.WAV":"62a5ace55386968dd565b3ea30e331c7e7cebb81125b5b798cda69698a233e1c",
+    "HANDCLP2.WAV":"f4eb3703e1201391a2a1571fc9f32a74b91a839433c6ed439368bee7dde072d1"
+  },
+  "selection_kind":"preset-only; existing source algorithms unchanged; full controls rounded to their declared .001 steps",
+  "selections":{
+    "kick":{"source":"modules/drums-909/v1/kick.dsp","source_sha256":"f445870825cbde6b0ba13e394cebcb0b3970d7a18997246229f34e5edcefb294","reference":"BT3A0D7.WAV","settings":{"gate":0,"freq":44.463,"velocity":1,"accent":0,"decay":0.273,"pitchAmount":0.654,"pitchDecay":0.012,"attack":0.29,"tone":0.685,"drive":0.002,"level":0.85}},
+    "snare":{"source":"modules/drums-909/v1/snare.dsp","source_sha256":"c6fc520a078a65d652318be8d71282d3fc592962c207bfdc0f0af10567fe932a","reference":"ST3T3S3.WAV","settings":{"gate":0,"freq":157.52,"velocity":1,"accent":0,"decay":0.172,"snappy":0.024,"noiseDecay":0.321,"bend":0.373,"tone":0.82,"drive":0.14,"level":0.75}},
+    "low-tom":{"source":"modules/drums-909/v1/tom.dsp","source_sha256":"a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75","reference":"LT3D3.WAV","settings":{"gate":0,"freq":85.362,"velocity":1,"accent":0,"decay":0.688,"bend":0.835,"tone":0.999,"noise":0.465,"drive":0.088,"level":0.8}},
+    "mid-tom":{"source":"modules/drums-909/v1/tom.dsp","source_sha256":"a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75","reference":"MT3D3.WAV","settings":{"gate":0,"freq":104.23,"velocity":1,"accent":0,"decay":0.43,"bend":0.999,"tone":0.998,"noise":0.475,"drive":0.133,"level":0.8}},
+    "high-tom":{"source":"modules/drums-909/v1/tom.dsp","source_sha256":"a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75","reference":"HT3D3.WAV","settings":{"gate":0,"freq":121.363,"velocity":1,"accent":0,"decay":0.43,"bend":0.969,"tone":0.729,"noise":0.6,"drive":0.15,"level":0.8}},
+    "rim":{"source":"modules/drums-909/v1/rim.dsp","source_sha256":"85281a7917d697dee47a1475ca24d2ecc08e53b48daa6f807c91367c4ee2e635","reference":"RIM127.WAV","settings":{"gate":0,"freq":215.652,"velocity":1,"accent":0,"decay":0.074,"tone":0.565,"snap":0.278,"drive":0.194,"level":0.85}},
+    "clap":{"source":"modules/drums-909/v1/clap.dsp","source_sha256":"371ca9aa94d3b12ba1a40243e712283adfc51bd14bf39f5924759d2ef1942194","reference":"HANDCLP1.WAV","settings":{"gate":0,"freq":854.714,"velocity":1,"accent":0,"decay":0.448,"spacing":0.009,"tail":0.499,"tone":0.287,"drive":0.127,"level":0.95}}
+  }
+}
