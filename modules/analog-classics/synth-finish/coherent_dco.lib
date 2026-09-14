@@ -7,14 +7,14 @@ waves(freq,width) = saw,pulse,sub with {
     f=min(ma.SR*.20,max(5.0,freq));
     dt=f/ma.SR;
     halfPhase=os.phasor(1,f*.5);
-    phase=ma.frac(2.0*halfPhase);
+    phase=ma.modulo(2.0*halfPhase,1.0);
     duty=min(.95,max(.05,width));
     saw=2.0*phase-1.0-os.polyblep(dt,phase);
     // Like the former delayed-saw pulsetrain: negative before duty, positive
     // afterwards, with zero mean and a two-unit step. The old delay buffer and
     // its 23.44895-Hz frequency floor are no longer part of this waveform.
     pulse=2.0*float(phase>=duty)+2.0*duty-2.0
-        -os.polyblep(dt,phase)+os.polyblep(dt,ma.frac(phase+1.0-duty));
+        -os.polyblep(dt,phase)+os.polyblep(dt,ma.modulo(phase+1.0-duty,1.0));
     sub=2.0*float(halfPhase>=.5)-1.0
-        -os.polyblep(dt*.5,halfPhase)+os.polyblep(dt*.5,ma.frac(halfPhase+.5));
+        -os.polyblep(dt*.5,halfPhase)+os.polyblep(dt*.5,ma.modulo(halfPhase+.5,1.0));
 };
