@@ -87,10 +87,22 @@ def run(out):
             x=stimulus(48000,3);evs=[(30007,k,0.) for k in pars if k not in ('time',)]+[(70011,k,1.) for k in pars if k not in ('time','feedback',)]
             if name=='echo':evs += [(12007,'time',.12),(95011,'time',.6),(80007,'feedback',.96)]
             y=r(name+'-extreme-live',ex[name]['v3'],pars,x,events=evs);c(name+'-extreme-finite',np.isfinite(y).all() and float(abs(y).max())<8,peak=float(abs(y).max()))
+        # MV2 undersamples above 48 kHz: a one-frame impulse on an unprocessed
+        # phase is intentionally lost by BOTH original and candidate. Keep this
+        # fact explicit instead of mistaking an unexcited network for a bad tail.
+        dropped=np.zeros((96000,2),np.float32);dropped[64]=.3
+        a=r('rv-unsampled-phase-original',orig,RV,dropped,sr=96000)
+        b=r('rv-unsampled-phase-v3',ex['reverb']['v3'],RV,dropped,sr=96000)
+        c('MV2-original-unsampled-impulse-is-silent',not np.any(a))
+        c('MV2-candidate-preserves-unsampled-impulse',np.array_equal(a,b))
         for sr in (44100,96000):
-            x=np.zeros((sr*20,2),np.float32);x[64]=.3
-            y=r('rv-tail-'+str(sr),ex['reverb']['v3'],RV|dict(decay=.7),x,sr=sr)
-            c('rv-tail-decays-'+str(sr),np.linalg.norm(y[-sr:])<np.linalg.norm(y[:sr*4]),tail_rms=float(np.sqrt(np.mean(y[-sr:]**2))))
+            x=np.zeros((sr*20,2),np.float32);x[64:66]=.3
+            p=RV|dict(decay=.7)
+            ref=r('rv-tail-original-'+str(sr),orig,p,x,sr=sr)
+            y=r('rv-tail-'+str(sr),ex['reverb']['v3'],p,x,sr=sr)
+            cmp('MV2-excited-tail-'+str(sr),y,ref,2e-4)
+            early=float(np.linalg.norm(y[:sr*4]));late=float(np.linalg.norm(y[-sr:]))
+            c('rv-tail-decays-'+str(sr),early>1e-5 and late<early,early_energy=early,late_energy=late,tail_rms=float(np.sqrt(np.mean(y[-sr:]**2))))
         probe=L.faust('echo-transport',ROOT/'modules/tape-echo/v3/transport-probe.dsp')
         nativeProbe=L.native('TapeDelay-transport',oracle('TapeDelay',src,probe=True))
         evtd=[(12007,'delay',.2),(40011,'delay',.05),(80013,'delay',.8),(160019,'delay',.36)]

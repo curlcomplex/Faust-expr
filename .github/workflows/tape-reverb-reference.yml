@@ -48,6 +48,14 @@ jobs:
           index={str(f.relative_to(p)):hashlib.sha256(f.read_bytes()).hexdigest() for f in p.rglob('*') if f.is_file()}
           (p/'files.sha256.json').write_text(json.dumps(index,indent=2))
           PY
+          /usr/bin/python3 tools/modules/airwindows_reference_package.py --source build/echo-reverb-v3 --out build/echo-reverb-review
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: echo-reverb-review-${{ github.sha }}
+          path: build/echo-reverb-review/
+          retention-days: 14
+          if-no-files-found: error
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
