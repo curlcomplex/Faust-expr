@@ -1,0 +1,21 @@
+name: TR-606 hardware reference pass
+on:
+  push:
+    branches: [77-606-hardware-reference-pass]
+permissions:
+  contents: read
+jobs:
+  analyse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Source probe
+        run: python3 tools/modules/tr606_reference_pass.py --out build/tr606-reference
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: tr606-reference-${{ github.sha }}
+          path: build/tr606-reference/
+          retention-days: 14
