@@ -21,14 +21,22 @@ jobs:
           persist-credentials: false
       - name: Install Faust and analysis dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy python3-matplotlib python3-soundfile
+          mkdir -p build/recovery
+          sudo apt-get update > build/recovery/dependencies.log 2>&1
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy python3-matplotlib python3-soundfile >> build/recovery/dependencies.log 2>&1
+      - name: Fetch the exact public preservation baseline
+        run: git fetch --no-tags --depth=1 origin 91f6a9671fa13026e69b62731c1fbdd0a592d23b
       - name: Reproduce the preserved Mini v2 held-note defect
         run: /usr/bin/python3 tools/modules/mini_v2_reproduction.py --out build/recovery/mini-v2-reproduction
-      - name: Qualify new recovery candidates when present
-        if: hashFiles('tools/modules/synth_recovery.py') != ''
+      - name: Qualify the recovery candidates
         run: /usr/bin/python3 tools/modules/synth_recovery.py --out build/recovery/qualification
-      - name: Existing unit tests
+      - name: Cross-check equations, preserve all baseline files and render comparisons
+        run: /usr/bin/python3 tools/modules/synth_recovery_verification.py --out build/recovery/verification
+      - name: Complete original synth regression
+        run: |
+          /usr/bin/python3 tools/modules/synth_batch.py --out build/legacy-synth
+          cp build/legacy-synth/results.json build/recovery/legacy-synth-results.json
+      - name: Unit tests including negative recovery guards
         run: /usr/bin/python3 -m unittest discover -s tests -v
       - name: Standard build
         run: PATH=/usr/bin:/bin:$PATH bash scripts/build.sh
@@ -36,21 +44,37 @@ jobs:
         if: always()
         run: |
           mkdir -p build/recovery
+          if test -f build/legacy-synth/results.json; then cp build/legacy-synth/results.json build/recovery/legacy-synth-results.json; fi
           git rev-parse HEAD > build/recovery/commit.txt
           git archive --format=tar HEAD > build/recovery/source.tar
           faust --version > build/recovery/faust-version.txt
           g++ --version > build/recovery/cxx-version.txt
           find build/recovery -name render -type f -delete
+          rm -f build/recovery/verification/component-reference
           python3 - <<'PY'
           from pathlib import Path
-          import hashlib,json
+          import hashlib,json,zipfile
           p=Path('build/recovery')
           (p/'hashes.json').write_text(json.dumps({str(f.relative_to(p)):hashlib.sha256(f.read_bytes()).hexdigest() for f in p.rglob('*') if f.is_file()},indent=2))
+          with zipfile.ZipFile(p/'listening.zip','w',zipfile.ZIP_DEFLATED) as z:
+              for f in p.rglob('*.wav'):
+                  z.write(f,str(f.relative_to(p)))
+              for f in p.rglob('results.json'):
+                  z.write(f,str(f.relative_to(p)))
+              for name in ('commit.txt','hashes.json','faust-version.txt','cxx-version.txt'):
+                  z.write(p/name,name)
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           name: synth-recovery-${{ github.sha }}
           path: build/recovery/
+          retention-days: 14
+          if-no-files-found: error
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: synth-recovery-listening-${{ github.sha }}
+          path: build/recovery/listening.zip
           retention-days: 14
           if-no-files-found: error
