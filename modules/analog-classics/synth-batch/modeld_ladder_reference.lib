@@ -1,0 +1,21 @@
+// SPDX-License-Identifier: ISC
+// Adapted for Analog Classics from jpcima/Hera Source/VCF/DangeloVCF.dsp,
+// commit f6fe5b900f4cf84809686466e0a37de5edf008fd.
+// Original author: Jean Pierre Cimalando; based on D'Angelo & Valimaki (2013)
+// and ddiakopoulos/MoogLadders. ISC licensed reference component.
+import("stdfaust.lib");
+
+// normalized resonance 0..1; no unity-gain compensation.
+vcf(fc_,res)=ladder with {
+  fc=min(ma.SR*.45,max(20,fc_));
+  rr=min(1,max(0,res));
+  ladder=((+:*(v):Sig:ma.neg:s123:s123:s123:s4)~(*(k)));
+  s123=(+:*(g):integ:*(v):Sig)~ma.neg;
+  s4(x)=next(z') letrec { 'z=next(z):*(v):Sig; } with { next(z)=g*(x-z):integ; };
+  integ(x)=(+((x+x')*(0.5/ma.SR)))~_;
+  Sig=max(-1):min(1):cubic with { cubic(x)=x-x*x*x*(1.0/3.0); };
+  g=fc*(4.0*ma.PI*Vt)*((1.0-x)/(1.0+x)) with { x=fc*(ma.PI/ma.SR); };
+  k=2.0*rr;
+  v=1.0/(2.0*Vt);
+  Vt=0.312;
+};
