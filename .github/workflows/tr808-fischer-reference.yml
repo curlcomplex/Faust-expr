@@ -17,18 +17,24 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy
-      - name: Direct-output Fischer analysis
+      - name: Direct-output Fischer current analysis
         run: |
           python3 tools/modules/tr808_fischer_pass.py --out build/tr808-fischer
+      - name: Current-to-revised Fischer qualification
+        run: |
+          python3 tools/modules/tr808_fischer_revision.py --out build/tr808-revision
       - name: Evidence without reference WAV redistribution
         if: always()
         run: |
-          mkdir -p build/tr808-review
+          mkdir -p build/tr808-review/audition
           test -f build/tr808-fischer/tr808-fischer-current.json && cp build/tr808-fischer/tr808-fischer-current.json build/tr808-review/
+          test -f build/tr808-revision/tr808-fischer-revision.json && cp build/tr808-revision/tr808-fischer-revision.json build/tr808-review/
+          test -d build/tr808-revision/audition && cp build/tr808-revision/audition/*.wav build/tr808-review/audition/ || true
+          cp modules/drums-808-reference/v1/*.dsp modules/drums-808-reference/v1/classic-presets.json build/tr808-review/
           git rev-parse HEAD > build/tr808-review/commit.txt
           faust --version > build/tr808-review/faust-version.txt
           g++ --version > build/tr808-review/cxx-version.txt
-          sha256sum tools/modules/tr808_fischer_pass.py > build/tr808-review/files.sha256
+          sha256sum tools/modules/tr808_fischer_pass.py tools/modules/tr808_fischer_revision.py modules/drums-808-reference/v1/* > build/tr808-review/files.sha256
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
