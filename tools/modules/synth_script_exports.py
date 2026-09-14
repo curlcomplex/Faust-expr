@@ -1,5 +1,10 @@
-"""Single-file Faust review delivery with verified expansion/audio parity.
-Review exports are pinned snapshots, not automatic factory promotion.
+"""Single-file Faust delivery without private/repository include paths.
+
+Embed the three original repository helper libraries in scoped environments;
+leave the standard Faust library import intact. Unlike the compiler's -e
+pretty-printer, this preserves the written constant expressions without an
+intermediate float-rounding pass. Require bit-identical actual audio; do not
+relax that requirement to hide a failed expansion. Pinned review only.
 """
 from pathlib import Path
 import argparse,json,os,re,tempfile,traceback
@@ -8,59 +13,70 @@ from synth_batch import SynthLab,ROOT,COMMON,DEFAULTS,phrase
 from synth_four_voice_checkpoint import DEFAULT as J60_DEFAULT
 from acid_batch import controls
 from hats_v2_delivery import command,digest
-from faust_export_metadata import normalize_expanded
 SUBJECTS={
  'Juno-60':('modules/juno-60/v3/voice.dsp',J60_DEFAULT),
  'Juno-106':('modules/juno-106/v3/voice.dsp',DEFAULTS['juno106']),
  'SH-101':('modules/mono-101/v4/voice.dsp',DEFAULTS['mono101']),
  'Mini':('modules/minimoog/v1/voice.dsp',DEFAULTS['mini']),
 }
+LIBRARY=re.compile(r'^(\w+)\s*=\s*library\("([^"\n]+)"\);\s*$',re.M)
+ALLOWED={ROOT/'modules/analog-classics/synth-batch/common.lib',
+         ROOT/'modules/analog-classics/synth-batch/ir3109_reference.lib',
+         ROOT/'modules/analog-classics/synth-finish/coherent_dco.lib'}
+
+def standalone_source(src):
+    embedded={}
+    def replace(match):
+        alias,path=match.groups();dependency=(src.parent/path).resolve()
+        if not dependency.exists():dependency=(COMMON/path).resolve()
+        if dependency not in {p.resolve() for p in ALLOWED}:raise ValueError('Unexpected helper library '+str(dependency))
+        text=dependency.read_text()
+        text=re.sub(r'^import\("stdfaust.lib"\);\s*$', '',text,flags=re.M)
+        if re.search(r'\b(?:import|library)\s*\(',text):raise ValueError('Unexpected nested library dependency')
+        embedded[str(dependency.relative_to(ROOT))]=digest(dependency)
+        return alias+'=environment {\n'+text+'\n};'
+    result=LIBRARY.sub(replace,src.read_text())
+    if re.search(r'\blibrary\s*\(',result):raise ValueError('Repository include remains')
+    if re.findall(r'\bimport\s*\("([^"\n]+)"\)',result)!=['stdfaust.lib']:raise ValueError('Unexpected import set')
+    return result,embedded
+
 def run(out):
     lab=SynthLab(out);(out/'scripts').mkdir(exist_ok=True);(out/'audition').mkdir(exist_ok=True);c=lab.check
-    manifest=dict(schema=1,commit=os.getenv('GITHUB_SHA','local'),delivery='Single self-contained Faust source per instrument',
+    manifest=dict(schema=1,commit=os.getenv('GITHUB_SHA','local'),
+      delivery='One Faust script per instrument; only the standard stdfaust library is external',
       purpose='Pinned review snapshot; not shipping approval',source_review_freeze=True,instrument_release_approved=False,
       hardware_approved=False,owner_approved=False,subjects={})
     try:
         freeze=json.loads((ROOT/'modules/analog-classics/synth-finish/REVIEW_FREEZE.json').read_text())
-        for path,expected in freeze['source_sha256'].items():
-            c('freeze:'+path,digest(ROOT/path)==expected)
+        for path,expected in freeze['source_sha256'].items():c('freeze:'+path,digest(ROOT/path)==expected)
         for name,(path,base) in SUBJECTS.items():
             src=(ROOT/path).resolve();canonical=lab.build(name+'-canonical',src)
-            with tempfile.TemporaryDirectory(prefix='faust-single-script-') as temp:
-                work=Path(temp);wrapper=work/(name+'.dsp');wrapper.write_text('import('+json.dumps(str(src))+');\n')
-                command(['faust','-e','-I',src.parent,'-I',COMMON,wrapper,'-o',work/'expanded.dsp'])
-                raw_expanded=(work/'expanded.dsp').read_text()
-                expanded=normalize_expanded(raw_expanded,src.read_text())
-                (out/(name+'-compiler-expanded-original.dsp')).write_text(raw_expanded)
-                dependencies={}
-                for value in re.findall(r'^declare library_path\d+ ("(?:\\.|[^"\\])*");$',raw_expanded,re.M):
-                    dependency=Path(json.loads(value)).resolve()
-                    if dependency.is_file():
-                        try:key=str(dependency.relative_to(ROOT.resolve()))
-                        except ValueError:key='compiler-library/'+dependency.name
-                        if key in dependencies and dependencies[key]!=digest(dependency):raise ValueError('Dependency-name collision')
-                        dependencies[key]=digest(dependency)
-                c(name+':no-external-imports',not re.search(r'\b(?:import|library)\s*\(',expanded))
-                destination=out/'scripts'/(name+'.dsp');destination.write_text(expanded)
-                build=out/(name+'-standalone');build.mkdir(exist_ok=True)
-                command(['faust','-lang','cpp','-single','-cn','ModuleDSP',destination,'-o',build/'generated.hpp'])
-                command(['c++','-std=c++17','-O2','-ffp-contract=off','-I'+str(build),ROOT/'tools/modules/render.cpp','-o',build/'render'])
-                standalone=build/'render';c(name+':same-controls',controls(canonical)==controls(standalone));maxerr=0.0
-                for sr in (44100,48000,96000):
-                    events=[(round(.1*sr),'gate',1),(round(.5*sr),'cutoff',800),(round(.8*sr),'freq',440),
-                            (round(1.1*sr),'gate',0),(round(1.2*sr),'cutoff',300)]
-                    p=base|{'release':.6}
-                    a=lab.render(name+f'-canonical-{sr}',canonical,p,events,sr=sr,frames=2*sr)
-                    b=lab.render(name+f'-standalone-{sr}',standalone,p,events,sr=sr,frames=2*sr)
-                    err=float(np.max(abs(a-b)));maxerr=max(maxerr,err)
-                    c(name+f':exact-expanded-audio-{sr}',np.array_equal(a,b),max_error=err)
-                audio=lab.render(name+'-review-phrase',standalone,base,phrase(root=220 if name.startswith('Juno') else 110),frames=384000)
-                lab.wav(name+'-review-phrase.wav',audio)
-                manifest['subjects'][name]=dict(canonical_path=path,canonical_sha256=digest(src),exported_file=name+'.dsp',
-                    exported_sha256=digest(destination),audio_sha256=digest(out/'audition'/(name+'-review-phrase.wav')),
-                    transitive_dependency_sha256=dependencies,expanded_audio_max_error=maxerr,
-                    reference_and_listening_status='See REVIEW_FREEZE.json and exact checkpoint PR; no implicit approval')
+            text,embedded=standalone_source(src)
+            destination=out/'scripts'/(name+'.dsp');destination.write_text(text)
+            c(name+':no-repository-imports',not LIBRARY.search(text))
+            build=out/(name+'-standalone');build.mkdir(exist_ok=True)
+            # No repository -I option: the standard Faust library is sufficient.
+            command(['faust','-lang','cpp','-single','-cn','ModuleDSP',destination,'-o',build/'generated.hpp'])
+            command(['c++','-std=c++17','-O2','-ffp-contract=off','-I'+str(build),ROOT/'tools/modules/render.cpp','-o',build/'render'])
+            standalone=build/'render';c(name+':same-controls',controls(canonical)==controls(standalone));maxerr=0.0
+            for sr in (44100,48000,96000):
+                events=[(round(.1*sr),'gate',1),(round(.5*sr),'cutoff',800),(round(.8*sr),'freq',440),
+                        (round(1.1*sr),'gate',0),(round(1.2*sr),'cutoff',300)]
+                p=base|{'release':.6}
+                a=lab.render(name+f'-canonical-{sr}',canonical,p,events,sr=sr,frames=2*sr)
+                b=lab.render(name+f'-standalone-{sr}',standalone,p,events,sr=sr,frames=2*sr)
+                err=float(np.max(abs(a-b)));maxerr=max(maxerr,err)
+                c(name+f':exact-script-audio-{sr}',np.array_equal(a,b),max_error=err)
+            audio=lab.render(name+'-review-phrase',standalone,base,phrase(root=220 if name.startswith('Juno') else 110),frames=384000)
+            lab.wav(name+'-review-phrase.wav',audio)
+            manifest['subjects'][name]=dict(canonical_path=path,canonical_sha256=digest(src),exported_file=name+'.dsp',
+                exported_sha256=digest(destination),audio_sha256=digest(out/'audition'/(name+'-review-phrase.wav')),
+                embedded_repository_library_sha256=embedded,script_audio_max_error=maxerr,
+                reference_and_listening_status='See REVIEW_FREEZE.json and exact checkpoint PR; no implicit approval')
         c('all-four-script-exports',len(manifest['subjects'])==4)
+        libroot=Path('/usr/share/faust')
+        manifest['installed_standard_library_sha256']={str(p.relative_to(libroot)):digest(p) for p in sorted(libroot.rglob('*.lib'))}
+        manifest['faust_version']=command(['faust','--version'])
     except Exception as e:
         lab.report['exception']=traceback.format_exc();c('export-completed',False);print(lab.report['exception'],flush=True)
         if getattr(e,'output',None):print(e.output,flush=True)
