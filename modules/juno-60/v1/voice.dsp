@@ -66,4 +66,5 @@ state(f0,g0,v0)=audio,pitchHz,env with {
 };
 
 voice(f0,g0,v0)=state(f0,g0,v0):(_,!,!);
+diagnostics(f0,g0,v0)=state(f0,g0,v0):(!,_,_);
 process=voice(freq,gate,velocity);
