@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "hardware_approved": false,
+  "human_approved": false,
+  "selected_for_promotion": false,
+  "method": "Actual Faust renders; reference timbre/envelope fit. Before is the existing default on the same inferred score, not a previously matched preset. One capture gain is derived from training and frozen for later notes. No EQ, compression, chorus or per-note correction. MIDI timing/pitch are reconstructed, not original control data.",
+  "rejected": [{"id":"juno-60/pr89-0b98748d","decision":"owner listening rejected","reason":"wobbly/messed-up, substantially worse; engineering passes do not override owner"}],
+  "instruments": {
+    "juno60": {
+      "title":"Juno-60 / A31 Bass 1",
+      "source":"modules/juno-60/v1/voice.dsp",
+      "source_sha256":"a1b0d84ef3b382bc0b54fd26b1e7c678d959137698d1eb6233a3985894fa9284",
+      "duration":1.14,"train":[0.0,0.74],"later_notes":[0.78,1.10],
+      "controls":{"attack":0.004625209137443028,"cutoff":79.77067236452321,"decay":0.6959719432600787,"filterEnv":0.6513436906558214,"freq":220,"gate":0,"hpf":20,"level":0.649999976,"lfoRate":4.5,"noise":0,"pulse":0.8448931902865082,"pwm":0.6906456174571401,"pwmDepth":0,"release":0.03095652090776847,"resonance":0.02508148965115263,"saw":0.19862701391091914,"sub":0.09572776289934562,"sustain":0.28499516619363857,"velocity":1},
+      "source_kernel_changed":false,"actual_search_renders":3326,
+      "limits":"Stereo publisher recording; mono timbre/envelope studied, chorus/capture chain not separately identified. Three notes only; no full-instrument or panel calibration.",
+      "reference":{"id":"juno60-bass1","url":"https://www.synthmania.com/Roland%20Juno-60/Audio/Factory%20presets%20group%201/31%20Bass%201.mp3","source_sha256":"bf802ef6946b705c0123a21a83e259c429f3e15a35d9c43954c045134a35d27d","source_rate":44100,"source_channels":2,"duration_seconds":37.668571428571425,"rights":"Publisher-hosted demonstration: original audio not repackaged; use direct URL."},
+      "score_rate":48000,"notes_frames":[[2352,17861,65.15],[20208,35219,65.10],[37680,52419,77.42]],
+      "measurement":{"before":{"gain":6.6935945879764205,"raw_rms":0.0371327253391686,"train":{"envelope_db":8.423275670763964,"spectral_db":14.66334531682282},"holdout":{"envelope_db":4.7443324947535075,"spectral_db":15.171182384782297}},"after":{"gain":3.0827967612728076,"raw_rms":0.08144620964342432,"train":{"envelope_db":2.798774056639409,"spectral_db":3.827455867426581},"holdout":{"envelope_db":3.229780305558263,"spectral_db":5.055889590541838}}},
+      "playback":{"before_gain":4.4553992335056725,"after_gain":2.0519752349359077,"reference_gain":0.6656213152659145}
+    },
+    "juno106": {
+      "title":"Juno-106 / A47, chorus off",
+      "source":"modules/juno-106/v3/voice.dsp",
+      "source_sha256":"0e01f4d34cbd5cc3abc3f39756b81e7eeef8efdf033a81f13e056cacf5ba25cf",
+      "duration":6.8,"train":[0,2.56],"later_notes":[5.30,6.80],
+      "controls":{"attack":0.002,"cutoff":4383.955984213848,"decay":0.2,"filterEnv":0,"filterLfo":1.6748640776503596,"filterLfoPhase":0.017931973001522005,"freq":220,"gate":0,"hpf":20,"level":0.649999976,"lfoRate":0.38552536909533597,"noise":0,"pulse":0.00858293704309685,"pwm":0.4353931203366448,"pwmDepth":0,"release":0.005,"resonance":0.7361011564016748,"saw":1,"sub":0.0010281823328270538,"sustain":1,"vcaGate":1,"velocity":1},
+      "source_kernel_changed":true,"actual_search_renders":2005,
+      "limits":"Explicitly NO CHORUS in original notes. Later5.30..6.80s not fitted, but same recording, not independent hardware/control validation. Release residual differs; gate slew and triangle depth laws remain model hypotheses.",
+      "reference":{"id":"juno106-sw4","url":"https://files.scene.org/get/mirrors/hornet/music/samples/swjuno2.zip","source_sha256":"52ef99261dd8ae14fdddf58cd0a4024244dcdaa8089f74c55b5b9515378df986","source_rate":44100,"source_channels":1,"duration_seconds":12.075918367346938,"rights":"Chris Gould / Soundwave: Distribute these samples freely; original notes included.","archive_sha256":"b671f055d388d739a65bb4ec0279d3eabd064e729212dda19d93d25fbc69f5f9","archive_member":"JUNO2-4.WAV","chorus_status":"explicitly NO CHORUS","patch":"A47"},
+      "score_rate":48000,
+      "notes_frames":[[1925,6716,261.6625469196918],[12162,16894,261.45126957009415],[22478,27338,261.39130985140883],[32550,37553,261.3487841208539],[42784,47824,261.3210677301537],[53119,58150,261.29256364867433],[63422,68383,261.06734936002994],[73667,78814,261.08270607475765],[84067,89009,261.02792769880693],[94491,99370,260.8605374315975],[104700,109766,260.5465181132735],[114954,120085,260.42591187630507],[125455,130405,261.403773951665],[135528,140551,261.55544647234285],[145761,150892,261.3685195365484],[156348,161216,261.35584400801235],[166561,171599,261.3355800588106],[176800,181786,261.2991327068253],[187317,192229,261.07095671963174],[197375,202416,261.0701310719012],[207887,212761,261.0350943666256],[218206,223017,260.9407166503213],[228613,233406,260.6871477886631],[238672,243721,260.52041807819944],[248981,253978,261.293942382393],[259326,264360,261.4407958864514],[269835,274649,261.4475606611041],[279891,284943,261.3546436035055],[290135,295133,261.340739368586],[300803,305492,261.30909128713853],[311057,315886,261.1616268183455],[321181,326175,261.0668995675304]],
+      "measurement":{"before":{"gain":2.877772623693436,"raw_rms":0.057532830767430196,"train":{"envelope_db":25.011148320218133,"spectral_db":12.302600775596169},"holdout":{"envelope_db":23.988206892987087,"spectral_db":12.424375896237173}},"after":{"gain":3.7440718856332933,"raw_rms":0.03709109307672186,"train":{"envelope_db":7.09092861491603,"spectral_db":3.628592225984645},"holdout":{"envelope_db":8.55606414459738,"spectral_db":5.022803308937076}}},
+      "playback":{"before_gain":2.5899953613240925,"after_gain":3.369664697069964,"reference_gain":0.9},
+      "ablations":{"no-vcf-lfo":{"train_spectral_db":8.00622602157345,"later_spectral_db":8.25195595237167},"env-vca":{"train_spectral_db":4.244214213056825,"later_spectral_db":5.306253367838773,"note":"Gate mode is not unambiguously superior on every metric; ENV mode has a slightly better later combined/envelope loss. The strong supported correction is VCF modulation."}}
+    },
+    "sh101": {
+      "title":"SH-101 / 08 Electric Bass Guitar",
+      "source":"modules/mono-101/v1/voice.dsp",
+      "source_sha256":"a099f9523479246312cd3b6c5ee5347c0067e3fa98e84739b268686044679506",
+      "duration":2.25,"train":[0.07,0.69],"later_notes":[0.74,1.92],
+      "controls":{"attack":0.008188329352084833,"cutoff":137.90130532779963,"decay":0.4702884519777166,"filterEnv":0.5540544385227424,"freq":110,"gate":0,"glideTime":0,"level":0.649999976,"lfoFilter":0,"lfoPitch":0,"lfoRate":5.19999981,"noise":0,"pulse":0.9218974669052156,"pwm":0.6468036863126374,"pwmDepth":0,"release":0.23776040325340575,"resonance":0.1225688768713382,"saw":0.7651806416549589,"slide":0,"sub":0.0036940832451219205,"sustain":0.264467072602146,"velocity":1},
+      "source_kernel_changed":false,"actual_search_renders":3493,
+      "limits":"Mono publisher factory-patch performance; unknown absolute gain/panel/capture details. Seven reconstructed notes, not complete instrument calibration.",
+      "reference":{"id":"sh101-electric-bass","url":"https://www.synthmania.com/Roland%20SH-101/Audio/Factory%20Patches/08%20ELECTRIC%20BASS%20GUITAR.mp3","source_sha256":"75e18e73f0fb59ab153edc65b589ea91b8c8de91915c57f371c44fdec558f570","source_rate":44100,"source_channels":1,"duration_seconds":37.68598639455782,"rights":"Publisher-hosted demonstration: original audio not repackaged; use direct URL."},
+      "score_rate":48000,"notes_frames":[[4752,19488,85.87],[19632,34608,85.90],[34752,49182,102.08],[49536,64320,108.10],[64464,79248,114.48],[79440,93820,114.72],[94080,106189,76.36]],
+      "measurement":{"before":{"gain":6.811023420938257,"raw_rms":0.055679087567259054,"train":{"envelope_db":4.47623627924844,"spectral_db":12.797377933060343},"holdout":{"envelope_db":2.9135094941402357,"spectral_db":13.267376131329137}},"after":{"gain":2.6668279278845293,"raw_rms":0.14951147459001843,"train":{"envelope_db":1.1918707696211412,"spectral_db":2.2921784796914193},"holdout":{"envelope_db":1.4837322493110408,"spectral_db":3.4909816749049356}}},
+      "playback":{"before_gain":2.5486064804756303,"after_gain":0.9978962806713745,"reference_gain":0.3741884769682007}
+    }
+  }
+}

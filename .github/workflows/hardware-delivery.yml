@@ -1,0 +1,39 @@
+name: Frozen hardware listening delivery
+on:
+  push:
+    branches: [82-hardware-listening-redo]
+    paths: ['modules/analog-classics/hardware-listening/**', 'tools/modules/hardware_listening_delivery.py', '.github/workflows/hardware-delivery.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  delivery:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-scipy python3-soundfile > /tmp/dependencies.log
+      - name: Frozen real-reference study renders
+        run: /usr/bin/python3 tools/modules/hardware_listening_delivery.py --out build/hardware-delivery
+      - name: Complete preserved synth regression
+        run: /usr/bin/python3 tools/modules/synth_batch.py --out build/legacy-synth
+      - name: Retain evidence
+        if: always()
+        run: |
+          mkdir -p build/hardware-delivery
+          if test -f build/legacy-synth/results.json; then cp build/legacy-synth/results.json build/hardware-delivery/legacy-results.json; fi
+          git rev-parse HEAD > build/hardware-delivery/commit.txt
+          git archive HEAD > build/hardware-delivery/source.tar
+          faust --version > build/hardware-delivery/faust-version.txt
+          g++ --version > build/hardware-delivery/cxx-version.txt
+          find build/hardware-delivery -name render -type f -delete
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: hardware-listening-delivery-${{ github.sha }}
+          path: build/hardware-delivery/
+          retention-days: 14
