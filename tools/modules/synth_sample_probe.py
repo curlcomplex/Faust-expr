@@ -17,7 +17,7 @@ from hats_v2_delivery import command, digest
 ARCHIVES={
  'j60':dict(url='https://files.scene.org/get/mirrors/hornet/music/samples/aq-j60v1.zip',sha='f04faa458e81d345213faffab6ca7275597f5f1e37719a8bf661a5b2260a8b4c',instrument='juno60'),
  'j106':dict(url='https://files.scene.org/get/mirrors/hornet/music/samples/swjuno2.zip',sha='b671f055d388d739a65bb4ec0279d3eabd064e729212dda19d93d25fbc69f5f9',instrument='juno106'),
- 'sh101':dict(url='https://cdn.mos.musicradar.com/audio/samples/musicradar-roland-sh101-samples.zip',sha=None,instrument='mono101'),
+ 'sh101':dict(url='https://cdn.mos.musicradar.com/audio/samples/musicradar-roland-sh101-samples.zip',sha='949bf42a6af79efdc40bb9d99113ae28ed10f38c2f3b2dc6e6fcbcc18a7cdd45',instrument='mono101'),
 }
 EXTERNAL={
  'mini':{
@@ -46,8 +46,6 @@ def estimate_pitch(x,sr):
  lo=max(2,int(sr/2500)); hi=min(len(y)//3,int(sr/35))
  peaks,_=find_peaks(ac[lo:hi]); peaks=peaks+lo
  if not len(peaks): raise ValueError('no periodicity peak')
- # Prefer the earliest plausible peak among peaks essentially as strong as the best,
- # avoiding octave/subharmonic selection without relaxing the periodicity threshold.
  best=float(np.max(ac[peaks])); valid=peaks[ac[peaks]>=max(.70,.955*best)]
  if not len(valid): raise ValueError('insufficient periodicity')
  k=int(valid[0]); den=ac[k-1]-2*ac[k]+ac[k+1]
@@ -75,7 +73,7 @@ def candidate_windows(raw):
   if b>len(x): continue
   w=x[a:b]
   try:
-   f0,q=estimate_pitch(w); left,ql=estimate_pitch(w[:len(w)//2],sr); right,qr=estimate_pitch(w[len(w)//2:],sr)
+   f0,q=estimate_pitch(w,sr); left,ql=estimate_pitch(w[:len(w)//2],sr); right,qr=estimate_pitch(w[len(w)//2:],sr)
    drift=abs(np.log2(left/right))
    if q<.74 or min(ql,qr)<.68 or drift>.035 or not 35<=f0<=2500: continue
    rows.append((q-.5*drift,a,b,f0,q,left,right,drift,spectrum(w,sr,f0)))
@@ -92,8 +90,6 @@ def select_archive_targets(raw,key,instrument,max_targets=3):
     score,a,b,f0,q,left,right,drift,feat=wins[0]
     candidates.append((score,fn,data,a,b,f0,q,left,right,drift,feat))
   except Exception: pass
- # Prefer high periodicity but keep targets separated in pitch so one patch/note
- # cannot dominate the study.
  selected=[]
  for row in sorted(candidates,key=lambda r:r[0],reverse=True):
   f0=row[5]
@@ -110,7 +106,7 @@ def select_archive_targets(raw,key,instrument,max_targets=3):
 
 def run(out):
  L=SynthLab(out); L.report['presets']={}
- L.report.update(version='sample-spectral-probe-2',commit=os.getenv('GITHUB_SHA','local'),hardware_approved=False,selected_for_promotion=False,reference_results=[],acquisition={},external_references=EXTERNAL,limitations=['Stable-note spectra only; envelopes and absolute levels are not fitted.','Legacy archive panel settings are incomplete; chorus/filter state may be unknown.','Distances are not authenticity percentages.','Automatic selection is frozen only after archive hashes and chosen windows are reported.'])
+ L.report.update(version='sample-spectral-probe-3',commit=os.getenv('GITHUB_SHA','local'),hardware_approved=False,selected_for_promotion=False,reference_results=[],acquisition={},external_references=EXTERNAL,limitations=['Stable-note spectra only; envelopes and absolute levels are not fitted.','Legacy archive panel settings are incomplete; chorus/filter state may be unknown.','Distances are not authenticity percentages.','Automatic selection is frozen only after archive hashes and chosen windows are reported.'])
  (L.out/'audition').mkdir(exist_ok=True); targets=[]
  for key,spec in ARCHIVES.items():
   try:
