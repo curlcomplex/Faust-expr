@@ -16,6 +16,11 @@ waveAt(p,n) = select2(int(n)%2, shaped, sqsin(shaped))*mask with {
 };
 op(freq,phaseMod,wave) = waveAt(frac01(phasor(freq)+phaseMod),wave);
 
+// select2(c, falseValue, trueValue): keep this helper to make the routing
+// conditions readable and to prevent the selector-polarity mistake caught by
+// the first hosted v3 render (algorithms 1/2 and 4/5/6 collapsed).
+choose(c,yes,no) = select2(c,no,yes);
+
 // Yamaha/ymfm algorithms, using O1..O4 in the same order as ymfm:
 // 0 O1>O2>O3>O4
 // 1 (O1+O2)>O3>O4
@@ -28,11 +33,11 @@ op(freq,phaseMod,wave) = waveAt(frac01(phasor(freq)+phaseMod),wave);
 fm4(freq,algorithm,r1,r2,r3,r4,l1,l2,l3,l4,w1,w2,w3,w4) = out with {
     a = int(algorithm);
     o1 = op(freq*r1,0,w1)*l1;
-    m2 = select2((a==1)|(a==2)|(a==7), o1, 0);
+    m2 = choose((a==0)|(a==3)|(a==4)|(a==5)|(a==6), o1, 0);
     o2 = op(freq*r2,m2,w2)*l2;
-    m3 = select2(a==0, o2, select2(a==1,o1+o2,select2(a==2,o2,select2(a==5,o1,0))));
+    m3 = choose(a==0,o2,choose(a==1,o1+o2,choose(a==2,o2,choose(a==5,o1,0))));
     o3 = op(freq*r3,m3,w3)*l3;
-    m4 = select2(a==0,o3,select2(a==1,o3,select2(a==2,o1+o3,select2(a==3,o2+o3,select2(a==4,o3,select2(a==5,o1,0))))));
+    m4 = choose(a==0,o3,choose(a==1,o3,choose(a==2,o1+o3,choose(a==3,o2+o3,choose(a==4,o3,choose(a==5,o1,0))))));
     o4 = op(freq*r4,m4,w4)*l4;
-    out = select2(a<4,o4,select2(a==4,o2+o4,select2(a==5,o2+o3+o4,select2(a==6,o2+o3+o4,o1+o2+o3+o4))));
+    out = choose(a<4,o4,choose(a==4,o2+o4,choose(a==5,o2+o3+o4,choose(a==6,o2+o3+o4,o1+o2+o3+o4))));
 };
