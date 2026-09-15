@@ -2,14 +2,29 @@ name: faustprobe Cranelift qualification
 on:
   pull_request:
     paths:
-      - 'tools/modules/harmonic_qualification.py'
+      - 'tools/modules/harmonic_*.py'
+      - 'tools/modules/faust_analysis.py'
+      - 'tools/modules/render.cpp'
+      - 'tests/fixtures/harmonics/**'
+      - 'tests/test_harmonic_analysis.py'
+      - 'tests/test_faustprobe_qualification.py'
+      - 'modules/FAUSTPROBE_QUALIFICATION.md'
+      - '.github/workflows/faustprobe-qualification.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/modules/harmonic_*.py'
+      - 'tools/modules/faust_analysis.py'
+      - 'tools/modules/render.cpp'
+      - 'tests/fixtures/harmonics/**'
+      - 'tests/test_harmonic_analysis.py'
       - 'tests/test_faustprobe_qualification.py'
       - '.github/workflows/faustprobe-qualification.yml'
   workflow_dispatch:
 permissions:
   contents: read
 concurrency:
-  group: faustprobe-qualification-${{ github.event.pull_request.number || github.ref }}
+  group: faustprobe-hosted-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
   qualify:
@@ -26,46 +41,101 @@ jobs:
       - name: Install qualification dependencies
         run: |
           set -euo pipefail
+          mkdir -p build/faustprobe/evidence
+          git rev-parse HEAD > build/faustprobe/evidence/commit.txt
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends python3-numpy g++ git curl ca-certificates
-      - name: Fetch pinned Faust 2.88 release
+          sudo apt-get install -y --no-install-recommends python3-numpy g++ cmake git curl ca-certificates
+      - name: Fast adapter contracts
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 -m unittest discover -s tests -p test_faustprobe_qualification.py -v 2>&1 | tee build/faustprobe/evidence/contracts.log
+          /usr/bin/python3 -m unittest discover -s tests -p test_harmonic_analysis.py -v 2>&1 | tee build/faustprobe/evidence/harmonic-contracts.log
+      - name: Build verified native Faust reference
         run: |
           set -euo pipefail
           mkdir -p build/faustprobe/toolchain
           curl --fail --location --retry 3 "https://github.com/grame-cncm/faust/releases/download/${FAUST_VERSION}/faust-${FAUST_VERSION}.tar.gz" -o build/faustprobe/faust.tar.gz
           echo "$FAUST_ARCHIVE_SHA256  build/faustprobe/faust.tar.gz" | sha256sum -c -
           tar -xzf build/faustprobe/faust.tar.gz -C build/faustprobe/toolchain --strip-components=1
-          make -C build/faustprobe/toolchain/build cmake BACKENDS=regular.cmake TARGETS=regular.cmake > build/faustprobe/faust-configure.log 2>&1
-          cmake --build build/faustprobe/toolchain/build/faustdir --target faust --parallel 2 > build/faustprobe/faust-build.log 2>&1
-      - name: Build pinned faustprobe Cranelift backend
+          make -C build/faustprobe/toolchain/build cmake BACKENDS=regular.cmake TARGETS=regular.cmake > build/faustprobe/evidence/faust-configure.log 2>&1
+          cmake --build build/faustprobe/toolchain/build/faustdir --target faust --parallel 2 > build/faustprobe/evidence/faust-build.log 2>&1
+      - name: Build pinned faustprobe and record source-to-binary provenance
         run: |
           set -euo pipefail
-          git clone --filter=blob:none https://github.com/grame-cncm/faust-rs.git build/faustprobe/faust-rs
-          git -C build/faustprobe/faust-rs checkout --detach "$FAUST_RS_REVISION"
+          git init build/faustprobe/faust-rs
+          git -C build/faustprobe/faust-rs remote add origin https://github.com/grame-cncm/faust-rs.git
+          git -C build/faustprobe/faust-rs fetch --depth 1 origin "$FAUST_RS_REVISION"
+          git -C build/faustprobe/faust-rs checkout --detach FETCH_HEAD
           test "$(git -C build/faustprobe/faust-rs rev-parse HEAD)" = "$FAUST_RS_REVISION"
-          cargo build --locked --release --manifest-path build/faustprobe/faust-rs/Cargo.toml --bin faustprobe
+          cargo build --locked --release --jobs 2 --manifest-path build/faustprobe/faust-rs/Cargo.toml -p cranelift-ffi --bin faustprobe 2>&1 | tee build/faustprobe/evidence/rust-build.log
           cp build/faustprobe/faust-rs/target/release/faustprobe build/faustprobe/faustprobe
-          sha256sum build/faustprobe/faustprobe | tee build/faustprobe/faustprobe.sha256
-      - name: Execute native and Cranelift parity cases
+          /usr/bin/python3 - <<'PY'
+          import hashlib, json, pathlib, subprocess, os
+          root = pathlib.Path('build/faustprobe')
+          src = root/'faust-rs'
+          binary = (root/'faustprobe').resolve()
+          def command(*args):
+              return subprocess.check_output(args, text=True).strip()
+          def sha(p):
+              return hashlib.sha256(p.read_bytes()).hexdigest()
+          record = {
+              'source_repository': 'https://github.com/grame-cncm/faust-rs',
+              'source_revision': command('git', '-C', str(src), 'rev-parse', 'HEAD'),
+              'source_tree': command('git', '-C', str(src), 'rev-parse', 'HEAD^{tree}'),
+              'source_tracked_clean': not command('git', '-C', str(src), 'status', '--porcelain', '--untracked-files=no'),
+              'cargo_locked': True,
+              'cargo_lock_sha256': sha(src/'Cargo.lock'),
+              'rustc_version': command('rustc', '--version', '--verbose'),
+              'cargo_version': command('cargo', '--version', '--verbose'),
+              'build_command': 'cargo build --locked --release --jobs 2 --manifest-path build/faustprobe/faust-rs/Cargo.toml -p cranelift-ffi --bin faustprobe',
+              'binary_sha256': sha(binary), 'version': command(str(binary), '--version'),
+              'github_sha': os.environ['GITHUB_SHA'], 'github_run_id': os.environ['GITHUB_RUN_ID'],
+              'execution_lane': 'github-hosted',
+              'note': 'Build provenance from this controlled job, not a signed supply-chain attestation.'}
+          assert record['source_revision'] == os.environ['FAUST_RS_REVISION']
+          assert record['source_tracked_clean']
+          (root/'evidence/faustprobe-build.json').write_text(json.dumps(record, indent=2, sort_keys=True)+'\n')
+          PY
+      - name: Execute actual native and Cranelift comparison tests
         env:
           FAUSTPROBE_INTEGRATION: '1'
           FAUSTPROBE: ${{ github.workspace }}/build/faustprobe/faustprobe
-          FAUSTPROBE_REVISION: fbe0e282343cca2980642aa6dc81e2e9681bdc65
+          FAUSTPROBE_BUILD_RECORD: ${{ github.workspace }}/build/faustprobe/evidence/faustprobe-build.json
           FAUST: ${{ github.workspace }}/build/faustprobe/toolchain/build/bin/faust
           FAUST_LIBRARIES: ${{ github.workspace }}/build/faustprobe/toolchain/libraries
           FAUST_ARCHIVE: ${{ github.workspace }}/build/faustprobe/faust.tar.gz
-          FAUSTPROBE_EVIDENCE: ${{ github.workspace }}/build/faustprobe/evidence
+          FAUSTPROBE_EVIDENCE: ${{ github.workspace }}/build/faustprobe/evidence/comparison
         run: |
           set -euo pipefail
-          /usr/bin/python3 -m unittest tests.test_faustprobe_qualification -v 2>&1 | tee build/faustprobe/qualification.log
+          /usr/bin/python3 -m unittest discover -s tests -p test_faustprobe_qualification.py -v 2>&1 | tee build/faustprobe/evidence/qualification.log
+      - name: Exercise public optional comparison CLI
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 tools/modules/harmonic_qualification.py --out build/faustprobe/evidence/cli \
+            --faust build/faustprobe/toolchain/build/bin/faust \
+            --faust-libraries build/faustprobe/toolchain/libraries \
+            --faust-archive build/faustprobe/faust.tar.gz \
+            --faustprobe build/faustprobe/faustprobe --faustprobe-revision "$FAUST_RS_REVISION" \
+            2>&1 | tee build/faustprobe/evidence/cli.log
+          /usr/bin/python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path('build/faustprobe/evidence/cli/qualification.json').read_text())
+          assert r['passed'] and r['complete']
+          assert len(r['renders']) == 72
+          assert r['optional_faustprobe']['status'] == 'executed'
+          assert len(r['optional_faustprobe']['cases']) == 3
+          PY
+      - name: Retain exact source snapshot
+        if: always()
+        run: |
+          mkdir -p build/faustprobe/evidence
+          git archive --format=tar HEAD > build/faustprobe/evidence/source.tar
       - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: faustprobe-qualification-${{ github.sha }}
-          path: |
-            build/faustprobe/evidence/
-            build/faustprobe/qualification.log
-            build/faustprobe/faustprobe.sha256
+          name: faustprobe-qualification-${{ github.sha }}-${{ github.run_attempt }}
+          path: build/faustprobe/evidence/
           retention-days: 14
-          if-no-files-found: warn
+          if-no-files-found: error

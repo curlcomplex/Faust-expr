@@ -209,9 +209,12 @@ class FileAndAdapterTests(unittest.TestCase):
                 (libs/name).write_text('transport test only')
             x = tone().astype('<f4')
             raw = root/'native.f32'
-            x.tofile(raw)
+            np.concatenate([x, x]).tofile(raw)
+            score = root/'native.tsv'
+            score.write_text('0\tshape\t0\n')
             native = {'label': 'transport', 'fixture': 'oscillator', 'params': {'shape': 0},
                       'raw_path': raw.name, 'raw_sha256': ha.sha(raw),
+                      'score_path': score.name, 'score_sha256': ha.sha(score), 'input_sha256': None,
                       'source_sha256': ha.sha(hq.FIXTURES/'oscillator.dsp'),
                       'library_manifest_sha256': hashlib.sha256(json.dumps(hq.common.library_manifest(libs), sort_keys=True).encode()).hexdigest(),
                       'diagnostics': {'rate': RATE, 'block': 256}, 'fundamental_hz': RATE*K/N,
