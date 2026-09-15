@@ -1,43 +1,21 @@
 // OPZ v3 routing checkpoint. Wave construction retained from qualified v2.
 // Routing follows ymfm's OPM/OPN 4-op algorithm table at
 // aaronsgiles/ymfm@81aec25ccbb98f4873a255f7551ac4dadac59b4a.
-// This preserves continuous analytic waveforms and provisional floating
-// modulation depth. Feedback and exact OPZ level/envelope laws remain later work.
+// Feedback and exact OPZ level/envelope laws remain later work.
 import("stdfaust.lib");
+frac01(x)=x-floor(x); phasor(f)=(+(f/ma.SR)~frac01); sqsin(x)=x*abs(x);
+waveAt(p,n)=select2(int(n)%2,shaped,sqsin(shaped))*mask with { phase=frac01(p); base=sin(select2(n>=4,2*ma.PI,4*ma.PI)*phase); shaped=select2(n>=6,base,abs(base)); mask=(n<2)|(phase<0.5); };
+op(freq,pm,w)=waveAt(frac01(phasor(freq)+pm),w);
 
-frac01(x) = x-floor(x);
-phasor(f) = (+(f/ma.SR) ~ frac01);
-sqsin(x) = x*abs(x);
-waveAt(p,n) = select2(int(n)%2, shaped, sqsin(shaped))*mask with {
-    phase = frac01(p);
-    base = sin(select2(n>=4, 2*ma.PI, 4*ma.PI)*phase);
-    shaped = select2(n>=6, base, abs(base));
-    mask = (n<2) | (phase<0.5);
-};
-op(freq,phaseMod,wave) = waveAt(frac01(phasor(freq)+phaseMod),wave);
-
-// select2(c, falseValue, trueValue): keep this helper to make the routing
-// conditions readable and to prevent the selector-polarity mistake caught by
-// the first hosted v3 render (algorithms 1/2 and 4/5/6 collapsed).
-choose(c,yes,no) = select2(c,no,yes);
-
-// Yamaha/ymfm algorithms, using O1..O4 in the same order as ymfm:
-// 0 O1>O2>O3>O4
-// 1 (O1+O2)>O3>O4
-// 2 (O1+(O2>O3))>O4
-// 3 ((O1>O2)+O3)>O4
-// 4 (O1>O2)+(O3>O4)
-// 5 (O1>O2)+(O1>O3)+(O1>O4)
-// 6 (O1>O2)+O3+O4
-// 7 O1+O2+O3+O4
-fm4(freq,algorithm,r1,r2,r3,r4,l1,l2,l3,l4,w1,w2,w3,w4) = out with {
-    a = int(algorithm);
-    o1 = op(freq*r1,0,w1)*l1;
-    m2 = choose((a==0)|(a==3)|(a==4)|(a==5)|(a==6), o1, 0);
-    o2 = op(freq*r2,m2,w2)*l2;
-    m3 = choose(a==0,o2,choose(a==1,o1+o2,choose(a==2,o2,choose(a==5,o1,0))));
-    o3 = op(freq*r3,m3,w3)*l3;
-    m4 = choose(a==0,o3,choose(a==1,o3,choose(a==2,o1+o3,choose(a==3,o2+o3,choose(a==4,o3,choose(a==5,o1,0))))));
-    o4 = op(freq*r4,m4,w4)*l4;
-    out = choose(a<4,o4,choose(a==4,o2+o4,choose(a==5,o2+o3+o4,choose(a==6,o2+o3+o4,o1+o2+o3+o4))));
-};
+// Explicit functions avoid asking Faust to expand all eight complete graphs
+// behind a runtime selector. The first v3 attempt exposed that compile-time
+// cost and is retained in CI history. Runtime algorithm switching is a later
+// host/graph design decision; these functions establish the actual DSP routes.
+alg0(f,r1,r2,r3,r4,l1,l2,l3,l4,w1,w2,w3,w4)=o4 with {o1=op(f*r1,0,w1)*l1;o2=op(f*r2,o1,w2)*l2;o3=op(f*r3,o2,w3)*l3;o4=op(f*r4,o3,w4)*l4;};
+alg1(f,r1,r2,r3,r4,l1,l2,l3,l4,w1,w2,w3,w4)=o4 with {o1=op(f*r1,0,w1)*l1;o2=op(f*r2,0,w2)*l2;o3=op(f*r3,o1+o2,w3)*l3;o4=op(f*r4,o3,w4)*l4;};
+alg2(f,r1,r2,r3,r4,l1,l2,l3,l4,w1,w2,w3,w4)=o4 with {o1=op(f*r1,0,w1)*l1;o2=op(f*r2,0,w2)*l2;o3=op(f*r3,o2,w3)*l3;o4=op(f*r4,o1+o3,w4)*l4;};
+alg3(f,r1,r2,r3,r4,l1,l2,l3,l4,w1,w2,w3,w4)=o4 with {o1=op(f*r1,0,w1)*l1;o2=op(f*r2,o1,w2)*l2;o3=op(f*r3,0,w3)*l3;o4=op(f*r4,o2+o3,w4)*l4;};
+alg4(f,r1,r2,r3,r4,l1,l2,l3,l4,w1,w2,w3,w4)=o2+o4 with {o1=op(f*r1,0,w1)*l1;o2=op(f*r2,o1,w2)*l2;o3=op(f*r3,0,w3)*l3;o4=op(f*r4,o3,w4)*l4;};
+alg5(f,r1,r2,r3,r4,l1,l2,l3,l4,w1,w2,w3,w4)=o2+o3+o4 with {o1=op(f*r1,0,w1)*l1;o2=op(f*r2,o1,w2)*l2;o3=op(f*r3,o1,w3)*l3;o4=op(f*r4,o1,w4)*l4;};
+alg6(f,r1,r2,r3,r4,l1,l2,l3,l4,w1,w2,w3,w4)=o2+o3+o4 with {o1=op(f*r1,0,w1)*l1;o2=op(f*r2,o1,w2)*l2;o3=op(f*r3,0,w3)*l3;o4=op(f*r4,0,w4)*l4;};
+alg7(f,r1,r2,r3,r4,l1,l2,l3,l4,w1,w2,w3,w4)=o1+o2+o3+o4 with {o1=op(f*r1,0,w1)*l1;o2=op(f*r2,0,w2)*l2;o3=op(f*r3,0,w3)*l3;o4=op(f*r4,0,w4)*l4;};
