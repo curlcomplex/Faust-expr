@@ -1,0 +1,21 @@
+name: TX81Z v1 Faust compile
+on:
+  push:
+    paths:
+      - 'modules/tx81z/**'
+      - '.github/workflows/tx81z-v1.yml'
+  pull_request:
+    paths:
+      - 'modules/tx81z/**'
+      - '.github/workflows/tx81z-v1.yml'
+jobs:
+  compile:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends faust
+      - name: Compile TX81Z voice
+        run: |
+          faust -v
+          faust -lang cpp -I modules/tx81z/v1 modules/tx81z/v1/voice.dsp -o /tmp/tx81z.cpp
+          test -s /tmp/tx81z.cpp
