@@ -1,38 +1,34 @@
 import("stdfaust.lib");
 
-// First TX81Z/OPZ Faust core. The eight waveform equations follow the
-// construction in Aaron Giles' BSD-licensed ymfm YM2414/OPZ implementation.
+// First TX81Z/OPZ Faust core. Eight waveform shapes are derived from the
+// documented/ymfm OPZ construction. Keep this source small and compilable;
+// exact OPZ fixed-point/level/frequency laws are qualified separately.
 
-frac(x) = x-int(x);
-phasor(f) = f/ma.SR : (+ : frac) ~ _;
+frac01(x) = x-floor(x);
+phasor(f) = (+(f/ma.SR) ~ frac01);
+sqsin(x) = x*abs(x);
 
-signedSquareSin(x) = (x>=0)*x*x - (x<0)*x*x;
+wave0(p) = sin(2*ma.PI*frac01(p));
+wave1(p) = sqsin(wave0(p));
+wave2(p) = (frac01(p)<0.5)*wave0(p);
+wave3(p) = (frac01(p)<0.5)*wave1(p);
+wave4(p) = (frac01(p)<0.5)*sin(4*ma.PI*frac01(p));
+wave5(p) = sqsin(wave4(p));
+wave6(p) = (frac01(p)<0.5)*sin(4*ma.PI*frac01(p));
+wave7(p) = sqsin(wave6(p));
 
-waveAt(p,n) =
-    (n==0)*s0 + (n==1)*s1 + (n==2)*s2 + (n==3)*s3
-  + (n==4)*s4 + (n==5)*s5 + (n==6)*s6 + (n==7)*s7
-with {
-    q = frac(p);
-    a = sin(2*ma.PI*q);
-    b = sin(4*ma.PI*q);
-    first = q < .5;
-    s0 = a;
-    s1 = signedSquareSin(a);
-    s2 = first*a;
-    s3 = first*signedSquareSin(a);
-    s4 = first*b;
-    s5 = first*signedSquareSin(b);
-    s6 = first*b;
-    s7 = first*signedSquareSin(b);
+waveAt(p,n) = select8(int(n), wave0(p),wave1(p),wave2(p),wave3(p),wave4(p),wave5(p),wave6(p),wave7(p));
+select8(n,a,b,c,d,e,f,g,h) = ba.select2(n>=4, lo, hi) with {
+  lo = ba.select2(n>=2, ba.select2(n>=1,a,b), ba.select2(n>=3,c,d));
+  hi = ba.select2(n>=6, ba.select2(n>=5,e,f), ba.select2(n>=7,g,h));
 };
 
-operator(freq,phaseMod,wave) = waveAt(frac(phasor(freq)+phaseMod),int(wave));
+op(freq,phaseMod,wave) = waveAt(frac01(phasor(freq)+phaseMod),wave);
 
 // Simple serial four-operator path for the first playable checkpoint.
-// Full 8-algorithm routing and hardware level laws follow in the next pass.
 serial4(freq,r2,r3,r4,l2,l3,l4,w1,w2,w3,w4) = o1 with {
-    o4 = operator(freq*r4,0,w4)*l4;
-    o3 = operator(freq*r3,o4,w3)*l3;
-    o2 = operator(freq*r2,o3,w2)*l2;
-    o1 = operator(freq,o2,w1);
+    o4 = op(freq*r4,0,w4)*l4;
+    o3 = op(freq*r3,o4,w3)*l3;
+    o2 = op(freq*r2,o3,w2)*l2;
+    o1 = op(freq,o2,w1);
 };
