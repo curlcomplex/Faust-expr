@@ -1,68 +1,119 @@
-// Thin offline adapter for the pinned MSFA DX7 core used by #96/#112.
-// Compile this file against google/music-synthesizer-for-android at the pinned commit.
-#include <algorithm>
+// Narrow offline adapter for unmodified Google MSFA; no synthesis equations here.
+// The original core is Apache-2.0. See the pinned source archive and license.
+#include <array>
+#include <chrono>
 #include <cmath>
-#include <cstdint>
+#include <cstring>
 #include <fstream>
 #include <iostream>
+#include <limits>
+#include <set>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
 #include "synth.h"
-#include "freqlut.h"
-#include "sin.h"
-#include "exp2.h"
-#include "pitchenv.h"
 #include "controllers.h"
 #include "dx7note.h"
+#include "freqlut.h"
+#include "exp2.h"
+#include "sin.h"
+#include "patch.h"
 
-static void set_op(char* p, int op, int out, int coarse,
-                   int r1=99,int r2=99,int r3=99,int r4=99,
-                   int l1=99,int l2=99,int l3=99,int l4=0) {
-    const int o=op*21;
-    p[o+0]=r1; p[o+1]=r2; p[o+2]=r3; p[o+3]=r4;
-    p[o+4]=l1; p[o+5]=l2; p[o+6]=l3; p[o+7]=l4;
-    p[o+8]=50; p[o+9]=0; p[o+10]=0; p[o+11]=0; p[o+12]=0;
-    p[o+13]=0; p[o+14]=0; p[o+15]=0; p[o+16]=out;
-    p[o+17]=0; p[o+18]=coarse; p[o+19]=0; p[o+20]=7; // neutral DX detune encoding
+struct Event { int frame; std::string name; int value; };
+int integer(const char* text) {
+    std::size_t used = 0;
+    long value = std::stol(text, &used);
+    if (used != std::strlen(text) || value < 0 || value > 10000000)
+        throw std::runtime_error("invalid integer argument");
+    return static_cast<int>(value);
 }
-
-static void make_patch(const std::string& id, char* p) {
-    std::fill(p,p+156,0);
-    for (int op=0;op<6;++op) set_op(p,op,0,1);
-    // Algorithm 5 (zero-based 4): op2 -> op1, with the other pairs silent.
-    p[134]=4; p[135]=0;
-    for(int i=0;i<4;++i){p[126+i]=99; p[130+i]=50;}
-    p[139]=0; p[143]=0;
-    if(id=="DX7-C01") {
-        set_op(p,0,85,1);
-    } else if(id=="DX7-C02") {
-        set_op(p,0,85,1); set_op(p,1,75,2);
-    } else if(id=="DX7-C03") {
-        set_op(p,0,85,1); set_op(p,1,90,2,80,60,50,65,99,70,55,0);
-    } else throw std::runtime_error("unknown case");
-}
-
-int main(int argc,char** argv) try {
-    if(argc!=6) throw std::runtime_error("usage: oracle CASE OUT.f32 RATE FRAMES NOTE_OFF_FRAME");
-    const std::string id=argv[1]; const int rate=std::stoi(argv[3]);
-    const int frames=std::stoi(argv[4]), noteoff=std::stoi(argv[5]);
-    if(rate!=44100 || frames<64 || noteoff<0 || noteoff>=frames || noteoff%64)
-        throw std::runtime_error("H1 oracle requires 44.1 kHz and 64-frame-aligned note-off");
-    Freqlut::init(rate); Exp2::init(); Sin::init(); PitchEnv::init(rate);
-    Controllers ctrls{}; ctrls.values_[kControllerPitch]=0x2000;
-    char patch[156]; make_patch(id,patch);
-    Dx7Note note; note.init(patch,60,127);
-    std::vector<float> out(frames,0.f); bool released=false;
-    for(int n=0;n<frames;n+=64) {
-        if(!released && n>=noteoff){note.keyup(); released=true;}
-        int32_t block[64]{}; note.compute(block,1<<23,0,&ctrls);
-        const int count=std::min(64,frames-n);
-        for(int j=0;j<count;++j) out[n+j]=float(block[j])/float(1<<24);
+int main(int argc, char** argv) try {
+    if (argc != 8) throw std::runtime_error("usage: render packed128 score.tsv output.f32 rate block frames seed");
+    const int rate = integer(argv[4]), block = integer(argv[5]);
+    const int frames = integer(argv[6]), seed = integer(argv[7]);
+    // Original MSFA amplitude envelopes do not rescale their increments with SR.
+    // Do not silently claim a cross-rate hardware comparison from this adapter.
+    if (rate != 44100 || block < 1 || block > 4096 || frames < N || frames % N || seed != 0)
+        throw std::runtime_error("slice supports 44100 Hz, whole 64-frame quanta, seed 0");
+    std::array<char,128> packed{};
+    std::ifstream patchfile(argv[1], std::ios::binary);
+    if (!patchfile.read(packed.data(), packed.size()) || patchfile.peek() != EOF)
+        throw std::runtime_error("patch must have exactly 128 bytes");
+    for (unsigned char b : packed) if (b > 127) throw std::runtime_error("non-7-bit patch");
+    std::array<char,156> patch{};
+    UnpackPatch(packed.data(), patch.data());
+    // This adapter deliberately supports only the baseline's algorithm/state.
+    if (patch[134] != 0 || patch[135] != 0 || patch[136] != 1 || patch[139] != 0 || patch[140] != 0 || patch[144] != 24)
+        throw std::runtime_error("unsupported algorithm/feedback/modulation/transpose");
+    for (int op=0; op<6; ++op) {
+        int o=op*21;
+        for (int k=0; k<11; ++k) if (static_cast<unsigned char>(patch[o+k]) > 99)
+            throw std::runtime_error("invalid operator data");
+        if (patch[o+11] || patch[o+12] || patch[o+13] || patch[o+14] || patch[o+15] || patch[o+17] || patch[o+19] || patch[o+20] != 7)
+            throw std::runtime_error("unsupported operator mode/scaling/detune");
+        if (static_cast<unsigned char>(patch[o+16])>99 || patch[o+18] < 1 || patch[o+18] > 2)
+            throw std::runtime_error("invalid level/coarse ratio");
     }
-    if(!std::all_of(out.begin(),out.end(),[](float x){return std::isfinite(x);}))
-        throw std::runtime_error("nonfinite oracle output");
-    std::ofstream f(argv[2],std::ios::binary); f.write(reinterpret_cast<const char*>(out.data()),out.size()*sizeof(float));
-    if(!f) throw std::runtime_error("write failed");
+    std::ifstream score(argv[2]);
+    if (!score) throw std::runtime_error("cannot open score");
+    std::vector<Event> events;
+    std::set<std::pair<int,std::string>> seen;
+    std::string line;
+    int last=-1, note=-1, velocity=-1, on=-1, off=-1;
+    while (std::getline(score,line)) {
+        std::istringstream row(line); Event e; std::string extra;
+        if (!(row>>e.frame>>e.name>>e.value) || (row>>extra) || e.frame<0 || e.frame>=frames || e.frame<last || !seen.insert({e.frame,e.name}).second)
+            throw std::runtime_error("malformed/duplicate/unordered score event");
+        if (e.name=="note" && e.frame==0 && e.value>=0 && e.value<=127) note=e.value;
+        else if (e.name=="velocity" && e.frame==0 && e.value>=1 && e.value<=127) velocity=e.value;
+        else if (e.name=="gate" && e.frame%N==0 && (e.value==0 || e.value==1)) {
+            if (e.value==1 && on<0 && off<0) on=e.frame;
+            else if (e.value==0 && on>=0 && off<0 && e.frame>on) off=e.frame;
+            else throw std::runtime_error("slice requires one ordered note-on/note-off pair");
+        } else throw std::runtime_error("unsupported event or non-64-aligned gate");
+        events.push_back(e); last=e.frame;
+    }
+    if (note<0 || velocity<0 || on<0 || off<0) throw std::runtime_error("incomplete score");
+    Freqlut::init(rate); Exp2::init(); Sin::init(); PitchEnv::init(rate);
+    Controllers controllers{}; controllers.values_[kControllerPitch]=0x2000;
+    Dx7Note voice{}; // zero initialization includes all feedback/history state
+    std::ofstream output(argv[3], std::ios::binary);
+    if (!output) throw std::runtime_error("cannot open output");
+    alignas(16) std::array<int32_t,N> core{};
+    std::array<float,N> pending{};
+    int cursor=N, generated=0, written=0, calls=0;
+    double computeSeconds=0;
+    bool started=false;
+    // Caller chunking never changes MSFA's internal 64-frame control cadence.
+    while (written<frames) {
+        int budget=std::min(block,frames-written);
+        while (budget>0) {
+            if (cursor==N) {
+                if (generated==on) { voice.init(patch.data(),note,velocity); started=true; }
+                if (generated==off) voice.keyup();
+                core.fill(0); // Dx7Note::compute adds to its destination
+                if (started) {
+                    auto begin=std::chrono::steady_clock::now();
+                    voice.compute(core.data(),1<<23,0,&controllers);
+                    computeSeconds += std::chrono::duration<double>(std::chrono::steady_clock::now()-begin).count();
+                    ++calls;
+                }
+                for(int i=0;i<N;++i) pending[i]=static_cast<float>(core[i]/16777216.0);
+                generated+=N; cursor=0;
+            }
+            int take=std::min(budget,N-cursor);
+            output.write(reinterpret_cast<const char*>(pending.data()+cursor),take*sizeof(float));
+            if(!output) throw std::runtime_error("output write failed");
+            cursor+=take; written+=take; budget-=take;
+        }
+    }
+    std::cout << "{\"frames\":"<<frames<<",\"channels\":1,\"sample_rate\":"<<rate
+              <<",\"host_block\":"<<block<<",\"native_quantum\":"<<N
+              <<",\"compute_calls\":"<<calls<<",\"compute_seconds\":"<<computeSeconds
+              <<",\"gate_on\":"<<on<<",\"gate_off\":"<<off<<",\"note\":"<<note
+              <<",\"velocity\":"<<velocity<<",\"q24_divisor\":16777216,\"unpacked_patch\":[";
+    for(int i=0;i<156;++i) std::cout<<(i?",":"")<<static_cast<int>(static_cast<unsigned char>(patch[i]));
+    std::cout<<"]}\n";
     return 0;
-} catch(const std::exception& e){std::cerr<<e.what()<<"\n"; return 1;}
+} catch(const std::exception& e) { std::cerr<<e.what()<<'\n'; return 1; }

@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "sample_rate": 44100,
+  "frames": 65536,
+  "gate_on": 2048,
+  "gate_off": 32768,
+  "velocity": 100,
+  "cases": [
+    {"id":"DX7-C01","family":"C01","note":57,"carrier_level":80,"modulator_level":0},
+    {"id":"DX7-C02","family":"C02","note":57,"carrier_level":80,"modulator_level":70},
+    {"id":"DX7-C03","family":"C03","note":57,"carrier_level":80,"modulator_level":80}
+  ]
+}
