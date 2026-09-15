@@ -1,0 +1,49 @@
+// Waveform construction adapted from ymfm (BSD-3-Clause).
+// Copyright (c) 2021, Aaron Giles. All rights reserved.
+// See ../YMFM-LICENSE.txt for the complete license.
+// Reference: aaronsgiles/ymfm@81aec25ccbb98f4873a255f7551ac4dadac59b4a
+// src/ymfm_opz.cpp, opz_registers constructor.
+// These are continuous analytic approximations, NOT logarithmic-chip tables.
+// v1 remains frozen. v2 corrects waves 6/7 only: the doubled first-half
+// waveform is rectified. Generic ADSR, gain and phase laws remain provisional.
+import("stdfaust.lib");
+
+// First TX81Z/OPZ Faust core. Eight waveform shapes are derived from the
+// documented/ymfm OPZ construction. Keep this source small and compilable;
+// exact OPZ fixed-point/level/frequency laws are qualified separately.
+
+frac01(x) = x-floor(x);
+phasor(f) = (+(f/ma.SR) ~ frac01);
+sqsin(x) = x*abs(x);
+
+wave0(p) = sin(2*ma.PI*frac01(p));
+wave1(p) = sqsin(wave0(p));
+wave2(p) = (frac01(p)<0.5)*wave0(p);
+wave3(p) = (frac01(p)<0.5)*wave1(p);
+wave4(p) = (frac01(p)<0.5)*sin(4*ma.PI*frac01(p));
+wave5(p) = sqsin(wave4(p));
+wave6(p) = (frac01(p)<0.5)*abs(sin(4*ma.PI*frac01(p)));
+wave7(p) = sqsin(wave6(p));
+
+// Factor the shared sine evaluation before squaring/rectifying. Avoid the
+// exponential expression expansion of eight nested operator alternatives.
+waveAt(p,n) = select2(int(n)%2, shaped, sqsin(shaped))*mask with {
+    phase = frac01(p);
+    base = sin(select2(n>=4, 2*ma.PI, 4*ma.PI)*phase);
+    shaped = select2(n>=6, base, abs(base));
+    mask = (n<2) | (phase<0.5);
+};
+select8(n,a,b,c,d,e,f,g,h) = select2(n>=4, lo, hi) with {
+  lo = select2(n>=2, select2(n>=1,a,b), select2(n>=3,c,d));
+  hi = select2(n>=6, select2(n>=5,e,f), select2(n>=7,g,h));
+};
+
+op(freq,phaseMod,wave) = waveAt(frac01(phasor(freq)+phaseMod),wave);
+
+// Simple serial four-operator path for the first playable checkpoint.
+serial4(freq,r2,r3,r4,l2,l3,l4,w1,w2,w3,w4) = o1 with {
+    o4 = op(freq*r4,0,w4)*l4;
+    o3 = op(freq*r3,o4,w3)*l3;
+    o2 = op(freq*r2,o3,w2)*l2;
+    o1 = op(freq,o2,w1);
+};

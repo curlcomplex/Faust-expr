@@ -1,22 +1,94 @@
-name: TX81Z v1 Faust 2.88 compile
+name: TX81Z waveform and voice qualification (Faust 2.88)
 on:
-  push:
-    paths: ['modules/tx81z/**','.github/workflows/tx81z-v1-faust288.yml']
   pull_request:
-    paths: ['modules/tx81z/**','.github/workflows/tx81z-v1-faust288.yml']
+    paths: ['modules/tx81z/**', 'tools/modules/tx81z_wave_qualification.py', 'tools/modules/ymfm_opz_wave_reference.cpp', 'tests/test_tx81z_wave_qualification.py', '.github/workflows/tx81z-v1-faust288.yml']
+  push:
+    branches: [main]
+    paths: ['modules/tx81z/**', 'tools/modules/tx81z_wave_qualification.py', 'tools/modules/ymfm_opz_wave_reference.cpp', 'tests/test_tx81z_wave_qualification.py', '.github/workflows/tx81z-v1-faust288.yml']
+permissions:
+  contents: read
+concurrency:
+  group: tx81z-wave-hosted-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+defaults:
+  run:
+    shell: bash
 jobs:
-  compile:
+  qualify:
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      EXECUTION_LANE: github-hosted
+      SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-      - name: Build Faust 2.88.0
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Read reviewed main lab without merging instrument history
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: '82926f023410ae8367eec3c5d842edbbe34ab439'
+          path: .reviewed-lab
+          persist-credentials: false
+      - name: Install test dependencies
         run: |
-          git clone --depth 1 --branch 2.88.0 https://github.com/grame-cncm/faust.git /tmp/faust
-          cd /tmp/faust
-          make -j2
-          sudo make install
-      - name: Compile TX81Z voice
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends g++ python3-numpy python3-scipy
+      - name: Preserve exact source and test contracts
         run: |
-          faust -v
-          faust -lang cpp -I modules/tx81z/v1 modules/tx81z/v1/voice.dsp -o /tmp/tx81z.cpp
-          test -s /tmp/tx81z.cpp
+          set -euo pipefail
+          mkdir -p build/tx81z/logs
+          git rev-parse HEAD | tee build/tx81z/source-commit.txt
+          test "$(git rev-parse HEAD)" = "$SOURCE_COMMIT"
+          git archive HEAD | gzip > build/tx81z/source.tar.gz
+          /usr/bin/python3 -m unittest discover -s tests -p test_tx81z_wave_qualification.py -v 2>&1 | tee build/tx81z/logs/contracts.log
+      - name: Fetch complete pinned Faust 2.88 and unchanged ymfm
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 https://github.com/grame-cncm/faust/releases/download/2.88.0/faust-2.88.0.tar.gz -o build/tx81z/faust.tar.gz
+          echo 'e4e175cf236924b5b7d4784cbb8c50cc01e211159e169655dd9e6d8f92b871d9  build/tx81z/faust.tar.gz' | sha256sum -c -
+          mkdir -p build/tx81z/toolchain
+          tar -xzf build/tx81z/faust.tar.gz -C build/tx81z/toolchain --strip-components=1
+          git clone https://github.com/aaronsgiles/ymfm.git build/tx81z/ymfm
+          git -C build/tx81z/ymfm checkout --detach 81aec25ccbb98f4873a255f7551ac4dadac59b4a
+          git -C build/tx81z/ymfm archive HEAD | gzip > build/tx81z/ymfm-source.tar.gz
+      - name: Build pinned compiler
+        run: |
+          set -euo pipefail
+          make -C build/tx81z/toolchain/build cmake BACKENDS=regular.cmake TARGETS=regular.cmake > build/tx81z/logs/configure.log 2>&1
+          cmake --build build/tx81z/toolchain/build/faustdir --target faust --parallel 2 > build/tx81z/logs/compiler-build.log 2>&1
+          cp build/tx81z/toolchain/build/bin/faust build/tx81z/faust-2.88.0
+          tar -czf build/tx81z/libraries.tar.gz -C build/tx81z/toolchain libraries
+      - name: Execute compiled Faust and native ymfm waveform checks and auditions
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 tools/modules/tx81z_wave_qualification.py \
+            --out build/tx81z/results \
+            --faust build/tx81z/toolchain/build/bin/faust \
+            --libraries build/tx81z/toolchain/libraries \
+            --archive build/tx81z/faust.tar.gz \
+            --renderer .reviewed-lab/tools/modules/render.cpp \
+            --ymfm build/tx81z/ymfm 2>&1 | tee build/tx81z/logs/qualification.log
+          /usr/bin/python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('build/tx81z/results/results.json').read_text())
+          assert r['status']=='completed' and r['oracle']['status']=='completed'
+          assert r['checks'] and all(c['passed'] for c in r['checks'])
+          PY
+      - name: Retain actual sources, audio, failures and toolchain evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: tx81z-wave-${{ github.run_id }}
+          path: |
+            build/tx81z/results/
+            build/tx81z/logs/
+            build/tx81z/source-commit.txt
+            build/tx81z/source.tar.gz
+            build/tx81z/ymfm-source.tar.gz
+            build/tx81z/faust-2.88.0
+            build/tx81z/libraries.tar.gz
+          retention-days: 14
+          if-no-files-found: error
