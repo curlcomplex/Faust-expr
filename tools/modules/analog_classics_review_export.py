@@ -114,9 +114,9 @@ def export_one(source, destination, identity):
         replace(r'button\("gate(?!\[curlop:input\])[^"\\]*"', 'button("gate[curlop:input]"')
         replace(r'hslider\("velocity(?!\[curlop:input\])[^"\\]*"', 'hslider("velocity[curlop:input]"')
         expected = {'hslider("pitch_hz"', 'button("gate"', 'hslider("velocity"'}
-        if not expected <= set(adapted) or 'process' not in normalized or 'process' not in before_adaptation:
+        if set(adapted) != expected or 'process' not in normalized or 'process' not in before_adaptation:
             raise AssertionError("adaptation whitelist proof failed")
-        ADAPTATION_EVIDENCE[identity] = {"kind": "ui-address-only", "originalLabels": sorted(set(adapted)), "finalLabels": ["freq[unit:Hz][scale:log][curlop:input]", "gate[curlop:input]", "velocity[curlop:input]"], "expressionInvariant": True}
+        ADAPTATION_EVIDENCE[identity] = {"kind": "ui-address-only", "originalLabels": sorted(set(adapted)), "finalLabels": ["freq[unit:Hz][scale:log][curlop:input]", "gate[curlop:input]", "velocity[curlop:input]"], "onlyUiLabelStringsChanged": True}
         destination.write_text(normalized)
     subprocess.run(["faust", "-lang", "cpp", "-single", str(destination), "-o", str(destination.with_suffix(".hpp"))], check=True, capture_output=True, text=True)
 

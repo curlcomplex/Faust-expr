@@ -29,8 +29,21 @@ class AnalogClassicsReviewExport(unittest.TestCase):
                     self.assertIn("velocity[curlop:input]", controls)
                     self.assertTrue(any(c.startswith("freq[") and "[unit:Hz]" in c and "[curlop:input]" in c for c in controls))
             for identity in ("analog-kick-sharp", "analog-snare", "clap"):
-                self.assertEqual(selected[identity]["metadataAdaptation"]["kind"], "ui-address-only")
+                adaptation = selected[identity]["metadataAdaptation"]
+                self.assertEqual(adaptation["kind"], "ui-address-only")
+                self.assertEqual(adaptation["originalLabels"], ['button("gate"', 'hslider("pitch_hz"', 'hslider("velocity"'])
+                self.assertEqual(adaptation["finalLabels"], ["freq[unit:Hz][scale:log][curlop:input]", "gate[curlop:input]", "velocity[curlop:input]"])
+                self.assertTrue(adaptation["onlyUiLabelStringsChanged"])
                 self.assertTrue(selected[identity]["contractEvidence"]["metadataAdapted"])
+            for identity, entry in selected.items():
+                if identity not in {"analog-kick-sharp", "analog-snare", "clap"}:
+                    self.assertFalse(entry["contractEvidence"]["metadataAdapted"])
+                    self.assertIsInstance(entry["metadataAdaptation"], str)
+            self.assertIn("accent", selected["acid-voice"]["contractEvidence"]["specialEvents"])
+            self.assertIn("accent", selected["606-kick"]["contractEvidence"]["specialEvents"])
+            self.assertIn("chokeGate", selected["606-open-hat"]["contractEvidence"]["specialEvents"])
+            for event in ("clock", "reset", "run"):
+                self.assertIn(event, selected["trigger-seq"]["contractEvidence"]["specialEvents"])
             self.assertIn("modules/juno-60/candidates/pr89-0b98748d/voice.dsp", manifest["rejected_or_unselected"])
             self.assertIn("909 sample-backed voices", manifest["rejected_or_unselected"])
 

@@ -559,7 +559,7 @@
           "gate[curlop:input]",
           "velocity[curlop:input]"
         ],
-        "expressionInvariant": true
+        "onlyUiLabelStringsChanged": true
       },
       "lineageUuid": "7990867b-5a01-571a-81a4-baa0c8766364",
       "contractEvidence": {
@@ -620,7 +620,7 @@
           "gate[curlop:input]",
           "velocity[curlop:input]"
         ],
-        "expressionInvariant": true
+        "onlyUiLabelStringsChanged": true
       },
       "lineageUuid": "7524650e-ccd5-56eb-a9d0-1051c52a811b",
       "contractEvidence": {
@@ -680,7 +680,7 @@
           "gate[curlop:input]",
           "velocity[curlop:input]"
         ],
-        "expressionInvariant": true
+        "onlyUiLabelStringsChanged": true
       },
       "lineageUuid": "069b7db9-171e-5da0-b3e5-3d317183570e",
       "contractEvidence": {
@@ -2500,7 +2500,7 @@
           "gate[curlop:input]",
           "velocity[curlop:input]"
         ],
-        "expressionInvariant": true
+        "onlyUiLabelStringsChanged": true
       },
       "lineageUuid": "7990867b-5a01-571a-81a4-baa0c8766364",
       "contractEvidence": {
@@ -2561,7 +2561,7 @@
           "gate[curlop:input]",
           "velocity[curlop:input]"
         ],
-        "expressionInvariant": true
+        "onlyUiLabelStringsChanged": true
       },
       "lineageUuid": "7524650e-ccd5-56eb-a9d0-1051c52a811b",
       "contractEvidence": {
@@ -2621,7 +2621,7 @@
           "gate[curlop:input]",
           "velocity[curlop:input]"
         ],
-        "expressionInvariant": true
+        "onlyUiLabelStringsChanged": true
       },
       "lineageUuid": "069b7db9-171e-5da0-b3e5-3d317183570e",
       "contractEvidence": {
