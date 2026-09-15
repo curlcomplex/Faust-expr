@@ -18,13 +18,14 @@ PINNED_COMMITS = {
     "909": "7aa75de6394568410d5b114d62b405138e9c9e35",
     "808-aux": "07464333c5eed1e916820a3fec99b69147561cb0",
 }
+PINNED_BRANCHES = {"606": "606-reference-tuning", "909": "80-909-reference-tuning", "808-aux": "75-808-fischer-reference-pass"}
 ADAPTATION_EVIDENCE = {}
 FROZEN_PRESETS = {
- "606-low-tom": {"freq":137.55581,"decay":.29948,"tone":.38612,"noise":.021917,"level":.8},
- "606-high-tom": {"freq":207.57604,"decay":.205787,"tone":.162234,"noise":.102346,"level":.8},
- "909-low-tom": {"freq":85.362,"decay":.688,"bend":.835,"tone":.999,"noise":.465,"drive":.088,"level":.8},
- "909-mid-tom": {"freq":104.23,"decay":.43,"bend":.999,"tone":.998,"noise":.475,"drive":.133,"level":.8},
- "909-high-tom": {"freq":121.363,"decay":.43,"bend":.969,"tone":.729,"noise":.6,"drive":.15,"level":.8},
+ "606-low-tom": {"gate":0,"freq":137.55581,"velocity":1,"accent":0,"decay":.29948,"tone":.38612,"noise":.021917,"level":.8},
+ "606-high-tom": {"gate":0,"freq":207.57604,"velocity":1,"accent":0,"decay":.205787,"tone":.162234,"noise":.102346,"level":.8},
+ "909-low-tom": {"gate":0,"freq":85.362,"velocity":1,"accent":0,"decay":.688,"bend":.835,"tone":.999,"noise":.465,"drive":.088,"level":.8},
+ "909-mid-tom": {"gate":0,"freq":104.23,"velocity":1,"accent":0,"decay":.43,"bend":.999,"tone":.998,"noise":.475,"drive":.133,"level":.8},
+ "909-high-tom": {"gate":0,"freq":121.363,"velocity":1,"accent":0,"decay":.43,"bend":.969,"tone":.729,"noise":.6,"drive":.15,"level":.8},
 }
 SUBJECTS = (
     # Exact synth freeze: do not promote PR89 or Mini v2/v3 by version number.
@@ -127,6 +128,8 @@ def export_one(source, destination, identity):
         destination.write_text(normalized)
     if identity in FROZEN_PRESETS:
         for control, value in FROZEN_PRESETS[identity].items():
+            if control in {"gate", "velocity", "accent"}:
+                continue
             pattern = r'(hslider\("' + re.escape(control) + r'[^"\\]*",\s*)[-+0-9.eEfF]+'
             normalized, count = re.subn(pattern, r'\g<1>' + repr(value) + 'f', normalized)
             if count == 0:
@@ -144,6 +147,7 @@ def provenance(identity, source_root):
 def run(out):
     out = out.resolve(); scripts = out / "scripts"; scripts.mkdir(parents=True, exist_ok=True)
     freeze = json.loads(FREEZE.read_text())
+    compiler_version = subprocess.check_output(["faust", "--version"], text=True).strip()
     entries = []
     for subject in SUBJECTS:
         identity, category, relative, rationale = subject[:4]
@@ -152,7 +156,8 @@ def run(out):
         export_one(source, destination, identity)
         meta = declarations(source.read_text())
         commit = next((sha for prefix, sha in PINNED_COMMITS.items() if identity.startswith(prefix)), subprocess.check_output(["git", "log", "-1", "--format=%H", "--", relative], cwd=source_root, text=True).strip())
-        entries.append({"id": f"analog-classics:{identity}", "identity": identity, "displayName": meta.get("name", identity), "category": category, "version": 1, "soundVersion": meta.get("version", "not-declared"), "source": {"path": f"scripts/{destination.name}", "sha256": digest(destination)}, "upstream": {"commit": commit, "path": relative, "sha256": digest(source)}, "source_commit": commit, "source_path": relative, "source_sha256": digest(source), "export_path": f"scripts/{destination.name}", "export_sha256": digest(destination), "license": meta.get("license", provenance(identity, source_root)), "dependencyProvenance": provenance(identity, source_root), "dependencies": [], "status": "internal-review", "selectionRationale": rationale, "selection_rationale": rationale, "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"})
+        branch = next((name for prefix, name in PINNED_BRANCHES.items() if identity.startswith(prefix)), "82-synth-reference-finish")
+        entries.append({"id": f"analog-classics:{identity}", "identity": identity, "displayName": meta.get("name", identity), "category": category, "version": 1, "soundVersion": meta.get("version", "not-declared"), "source": {"path": f"scripts/{destination.name}", "sha256": digest(destination)}, "upstream": {"branch": branch, "commit": commit, "path": relative, "sha256": digest(source)}, "source_commit": commit, "source_path": relative, "source_sha256": digest(source), "export_path": f"scripts/{destination.name}", "export_sha256": digest(destination), "license": meta.get("license", "UNRESOLVED: see source provenance before external release"), "licenseStatus": "declared" if "license" in meta else "unresolved-internal-review", "dependencyProvenance": provenance(identity, source_root), "dependencies": ["expanded standard Faust libraries; no runtime import remains"], "compiler": {"faustVersion": compiler_version, "exportOptions": ["-e", "-I source-parent", "-I synth-batch", "-I synth-finish"], "compileOptions": ["-lang", "cpp", "-single"]}, "status": "internal-review", "selectionRationale": rationale, "selection_rationale": rationale, "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"})
     for entry in entries:
         entry["lineageUuid"] = str(uuid.uuid5(uuid.NAMESPACE_URL, f"curlcomplex/CURLOP/{entry['id']}"))
         labels = re.findall(r'(?:hslider|button|checkbox)\("([^"]+)"', (out / entry["export_path"]).read_text())
@@ -163,6 +168,10 @@ def run(out):
         entry["metadataAdaptation"] = ADAPTATION_EVIDENCE.get(entry["identity"], "faust expansion and metadata normalization only")
         if entry["identity"] in FROZEN_PRESETS:
             entry["frozenPresetSettings"] = FROZEN_PRESETS[entry["identity"]]
+            entry["adaptedDefaults"] = {k:v for k,v in FROZEN_PRESETS[entry["identity"]].items() if k not in {"gate", "velocity", "accent"}}
+            family, voice = entry["identity"].split("-", 1)
+            entry["displayName"] = family + " " + voice.replace("-", " ").title()
+            entry["displayMetadataAdaptation"] = {"onlyUiMetadataChanged": True, "displayName": entry["displayName"]}
         entry["contractEvidence"] = {"capturedControls": sorted(set(labels)), "canonicalOneNote": entry["category"] != "instrument" or not gaps, "gaps": gaps, "specialEvents": special, "metadataAdapted": entry["identity"] in ADAPTATION_EVIDENCE}
     manifest = {"schema": 1, "identity": "analog-classics-internal-review-2026-09-15.1", "status": "internal-review-only", "base_review_freeze": {"path": str(FREEZE.relative_to(ROOT)), "sha256": digest(FREEZE), "identity": freeze["id"]}, "modules": entries, "selected": entries, "rejected_or_unselected": REJECTED, "contract": {"one_note": "lowercase gate, freq in Hz, velocity; host owns allocation", "distinct_events": "accent, slide, choke, clock, reset and run are never aliases", "outputs": "audio, CV and observations are separately declared", "identity": "stable identity is manifest identity plus version and source digest, never display text or geometry", "sound_change": "exports are metadata/library expansion only; a sonic change requires a new version and review freeze"}, "consumer_limits": ["No CURLOP runtime, UI, project-state, voice-allocation or device acceptance is claimed.", "Effect/modulation entries retain their native I/O rather than being mislabeled one-note instruments."]}
     manifest["schema"] = "curlop-analog-classics-review/v1"
