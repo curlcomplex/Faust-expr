@@ -1,0 +1,71 @@
+name: faustprobe Cranelift qualification
+on:
+  pull_request:
+    paths:
+      - 'tools/modules/harmonic_qualification.py'
+      - 'tests/test_faustprobe_qualification.py'
+      - '.github/workflows/faustprobe-qualification.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: faustprobe-qualification-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      FAUST_RS_REVISION: fbe0e282343cca2980642aa6dc81e2e9681bdc65
+      FAUST_VERSION: '2.88.0'
+      FAUST_ARCHIVE_SHA256: e4e175cf236924b5b7d4784cbb8c50cc01e211159e169655dd9e6d8f92b871d9
+      EXECUTION_LANE: github-hosted
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Install qualification dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends python3-numpy g++ git curl ca-certificates
+      - name: Fetch pinned Faust 2.88 release
+        run: |
+          set -euo pipefail
+          mkdir -p build/faustprobe/toolchain
+          curl --fail --location --retry 3 "https://github.com/grame-cncm/faust/releases/download/${FAUST_VERSION}/faust-${FAUST_VERSION}.tar.gz" -o build/faustprobe/faust.tar.gz
+          echo "$FAUST_ARCHIVE_SHA256  build/faustprobe/faust.tar.gz" | sha256sum -c -
+          tar -xzf build/faustprobe/faust.tar.gz -C build/faustprobe/toolchain --strip-components=1
+          make -C build/faustprobe/toolchain/build cmake BACKENDS=regular.cmake TARGETS=regular.cmake > build/faustprobe/faust-configure.log 2>&1
+          cmake --build build/faustprobe/toolchain/build/faustdir --target faust --parallel 2 > build/faustprobe/faust-build.log 2>&1
+      - name: Build pinned faustprobe Cranelift backend
+        run: |
+          set -euo pipefail
+          git clone --filter=blob:none https://github.com/grame-cncm/faust-rs.git build/faustprobe/faust-rs
+          git -C build/faustprobe/faust-rs checkout --detach "$FAUST_RS_REVISION"
+          test "$(git -C build/faustprobe/faust-rs rev-parse HEAD)" = "$FAUST_RS_REVISION"
+          cargo build --locked --release --manifest-path build/faustprobe/faust-rs/Cargo.toml --bin faustprobe
+          cp build/faustprobe/faust-rs/target/release/faustprobe build/faustprobe/faustprobe
+          sha256sum build/faustprobe/faustprobe | tee build/faustprobe/faustprobe.sha256
+      - name: Execute native and Cranelift parity cases
+        env:
+          FAUSTPROBE_INTEGRATION: '1'
+          FAUSTPROBE: ${{ github.workspace }}/build/faustprobe/faustprobe
+          FAUSTPROBE_REVISION: fbe0e282343cca2980642aa6dc81e2e9681bdc65
+          FAUST: ${{ github.workspace }}/build/faustprobe/toolchain/build/bin/faust
+          FAUST_LIBRARIES: ${{ github.workspace }}/build/faustprobe/toolchain/libraries
+          FAUST_ARCHIVE: ${{ github.workspace }}/build/faustprobe/faust.tar.gz
+          FAUSTPROBE_EVIDENCE: ${{ github.workspace }}/build/faustprobe/evidence
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 -m unittest tests.test_faustprobe_qualification -v 2>&1 | tee build/faustprobe/qualification.log
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: faustprobe-qualification-${{ github.sha }}
+          path: |
+            build/faustprobe/evidence/
+            build/faustprobe/qualification.log
+            build/faustprobe/faustprobe.sha256
+          retention-days: 14
+          if-no-files-found: warn
