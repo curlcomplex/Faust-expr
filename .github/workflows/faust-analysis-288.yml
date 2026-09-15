@@ -16,8 +16,6 @@ jobs:
     timeout-minutes: 15
     env:
       FAUST_VERSION: '2.88.0'
-      # Digest published by the upstream GitHub release API for the complete
-      # faust-2.88.0.tar.gz release asset (asset 553335954).
       FAUST_ARCHIVE_SHA256: 'e4e175cf236924b5b7d4784cbb8c50cc01e211159e169655dd9e6d8f92b871d9'
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -35,6 +33,7 @@ jobs:
             -o build/faust-analysis/faust.tar.gz
           echo "$FAUST_ARCHIVE_SHA256  build/faust-analysis/faust.tar.gz" | sha256sum -c -
           tar -xzf build/faust-analysis/faust.tar.gz -C build/faust-analysis/toolchain --strip-components=1
+          test -f build/faust-analysis/toolchain/libraries/stdfaust.lib
       - name: Build pinned Faust
         run: |
           set -euo pipefail
@@ -51,7 +50,10 @@ jobs:
           (0.1*np.sin(2*np.pi*997*t)).astype('<f4').tofile('build/faust-analysis/sine.f32')
           PY
           /usr/bin/python3 tools/modules/faust_analysis.py build/faust-analysis/sine.f32 --rate 48000 --channels 1 \
-            --faust build/faust-analysis/toolchain/build/bin/faust --out build/faust-analysis/result
+            --faust build/faust-analysis/toolchain/build/bin/faust \
+            --faust-libraries build/faust-analysis/toolchain/libraries \
+            --out build/faust-analysis/result
+          test -s build/faust-analysis/result/analysis.json
       - name: Retain evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
