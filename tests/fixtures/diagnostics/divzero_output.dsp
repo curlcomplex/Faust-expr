@@ -1,2 +1,3 @@
 // Deliberate runtime divide-by-zero with non-finite output.
-process = 1.0 / 0.0;
+// interp-tracer's default zero input exercises the division at runtime.
+process = 1.0 / _;
