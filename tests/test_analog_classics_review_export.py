@@ -10,7 +10,7 @@ class AnalogClassicsReviewExport(unittest.TestCase):
             subprocess.run(["python3", "tools/modules/analog_classics_review_export.py", "--out", str(out)], cwd=ROOT, check=True)
             manifest = json.loads((out / "manifest.json").read_text())
             self.assertEqual(manifest["status"], "internal-review-only")
-            self.assertEqual(len(manifest["selected"]), 20)
+            self.assertEqual(len(manifest["selected"]), 39)
             self.assertEqual(manifest["modules"], manifest["selected"])
             selected = {entry["identity"]: entry for entry in manifest["modules"]}
             self.assertEqual(selected["mini"]["source_path"], "modules/minimoog/v1/voice.dsp")
@@ -24,6 +24,7 @@ class AnalogClassicsReviewExport(unittest.TestCase):
                 self.assertEqual(entry["status"], "internal-review")
                 self.assertEqual(entry["source"]["path"], entry["export_path"])
             self.assertIn("modules/juno-60/candidates/pr89-0b98748d/voice.dsp", manifest["rejected_or_unselected"])
+            self.assertIn("909 sample-backed voices", manifest["rejected_or_unselected"])
 
 if __name__ == "__main__":
     unittest.main()

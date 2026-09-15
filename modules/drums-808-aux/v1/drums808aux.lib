@@ -1,0 +1,19 @@
+// Shared primitives for 808 auxiliary-percussion experiments. Hardware/reference approval pending.
+import("stdfaust.lib");
+clamp(lo,hi,x)=max(lo,min(hi,x));
+sm(x)=x:si.smooth(exp(-1/(.005*ma.SR)));
+seen(h)=max(h)~_;
+lat(h,x)=select2(seen(h),x,ba.sAndH(h,x));
+age(h)=(+(1):min(30*ma.SR):*(1-h))~_;
+phase(h,f)=(+(clamp(0,.45*ma.SR,f)/ma.SR):ma.frac:*(1-h))~_;
+fall(t,d)=exp(0-min(25,6.907755278982137*max(0,t)/max(.0001,d)))*float(t<3.5*d);
+env(h,d,attack)=seen(h)*fall(age(h)/ma.SR,d)*(1-exp(0-(age(h)/ma.SR)/max(.00001,attack)));
+sine(p)=sin(2*ma.PI*p);
+square(p)=select2(p<.5,1,-1);
+finish(x,v,a,l,drive)=((.72*ma.tanh(x*(1+4*drive+.2*a))*v*l*(1+.18*a)):fi.dcblockerat(12));
+// Damped resonator used as a compact bridged-T approximation for the lab candidate.
+ring(f,d)=(step~si.bus(2)):(!,!,_) with {
+ r=exp(0-6.907755278982137/(max(.001,d)*ma.SR)); w=2*ma.PI*clamp(15,.42*ma.SR,f)/ma.SR;
+ c=r*cos(w);s=r*sin(w);
+ step(re,im,x)=rn,inn,rn with {rn=c*re-s*im;inn=s*re+c*im+x;};
+};

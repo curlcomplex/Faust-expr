@@ -1,0 +1,26 @@
+declare name "606 Cymbal";
+declare version "0.2.0-reference-candidate";
+declare author "curlcomplex";
+declare category "Analog Classics / 606";
+declare description "One-note 606 reference candidate with fast strike and quiet long metal tail. Behavioral envelope fit, not a circuit-exact claim; host-owned polyphony.";
+import("stdfaust.lib");
+u=library("../../drums-606/v1/drums606.lib");
+gate=button("gate[curlop:input]");
+freq=hslider("freq[unit:Hz][scale:log][curlop:input]",440,220,880,.001);
+velocity=hslider("velocity[curlop:input]",1,0,1,.001);
+accent=hslider("accent[curlop:input]",0,0,1,.001);
+decay=hslider("decay[unit:s][scale:log][col:0][row:0]",1.8,.12,3.0,.001);
+tone=hslider("tone[col:1][row:0]",.5,0,1,.001):u.sm;
+metalSpread=hslider("metalSpread[col:2][row:0]",.5,0,1,.001):u.sm;
+level=hslider("level[col:3][row:0]",.8,0,1,.001):u.sm;
+h=gate>gate';
+f=u.lat(h,freq);d=u.lat(h,decay);v=u.lat(h,velocity);a=u.lat(h,accent);
+bank=u.metal(f/440,metalSpread);
+low=bank:fi.resonbp(3440,1.5,1):fi.highpass(1,1800);
+high=bank:fi.resonbp(min(.38*ma.SR,7100),1.8,1):fi.highpass(2,5200);
+// The captured cymbal concentrates its initial energy before a quieter long tail.
+// Preserve editable Decay/Tone/Spread; do not add another GUI control for this fit.
+strike=u.env(h,d*.04,.00025);
+ring=u.env(h,d,.00035);
+raw=(low*(1-.8*tone)*strike+high*(.35+.9*tone)*(.90*strike+.10*ring))*2.8;
+process=u.finish(raw,v,a,level);

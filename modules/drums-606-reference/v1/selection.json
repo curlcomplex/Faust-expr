@@ -1,0 +1,48 @@
+{
+  "schema":"606-reference-lab-selection-v1",
+  "status":"reference candidate, not an installed CURLOP pack",
+  "baseline_commit":"8aa548fc1e108553bf6652a7794db4e02c8be0b2",
+  "fit_commit":"65a8b6c154b296e013d9662e37775f19f2b0e05d",
+  "fit_run":34830202983,
+  "fit_artifact":10341582931,
+  "reference_archive_sha256":"8467ac4c3d3e3d1d298e8b5d3bb567a10b4ea3d99e6f37c5010833d6bc8da59a",
+  "reference_hashes":{
+    "606bass.wav":"7e065d8b1963df7e8675fa52e3c7367e60faace58883f9069f60e9fc5e38d000",
+    "606bassacc.wav":"b348e9ad17326d5147b18b6ee1210347911b1f76f358500b63ecfabfbd0f48b6",
+    "606snare.wav":"65d8dd2dcb5a8194351725d7db29bb4c17af2e17ea9cff7a65c6ef7926306a53",
+    "606snareacc.wav":"d3d8aea187a3635d364b04b5544a537c72a3ec341ca95e5764ab06106ea14cc5",
+    "606ltom.wav":"cba7e8a397755c5fda84504c8d171fc4c09961ec0068f4fad0ce54e40909d5e7",
+    "606ltomacc.wav":"3d348104d4252029717d4b9f152f89bd02dead1ca5216b6c3b5023e1c2a17434",
+    "606htom.wav":"4bc145ab702aae12959f7a7971bec357d7e519ecdaf093a46e6553f69d5cfdb0",
+    "606htomacc.wav":"35dfd328d24155a98a16cd641c26c15abe4613c5ed20005a26f04b659fdfa8cf",
+    "606chat.wav":"154ac3fa0ac429488295bd4a72eedcbe9638a271addb5a217334f8209af71950",
+    "606chatacc.wav":"d2c98849c8badc70e9b78e27ed1da54fe9aa7da3aa39192e9a3fd23a19b2cb1f",
+    "606ohat.wav":"5d2809c0fda01fdefc1749474263ec2daabf0f491700f3c116205a941c863d68",
+    "606ohatacc.wav":"e2e58037638e7eb57004e9965b134806b60064314ef3696f8b4e432ebdeb7b7f",
+    "606cymbal.wav":"69205ba4e59af702189da3ed12f3d8d78905e57f062608000991de7e88157883",
+    "606cymbalacc.wav":"0a49f3580ce188315b3bb4e728bc14b948c2bba1100d83db701b4b40bd75f1c9"
+  },
+  "selections":{
+    "kick":{"source":"modules/drums-606/v1/kick.dsp","source_sha256":"9e11406afe0ee0d27bfeb0669e4f9ab1f06369895e046cc9cc55793b7cee7226","settings":{"gate":0,"freq":61.22312,"velocity":1,"accent":0,"decay":0.26436,"tone":0.390777,"click":0.106453,"level":0.8}},
+    "snare":{"source":"modules/drums-606-reference/v1/snare.dsp","source_sha256":"dfcce395df56c62676da40e9522bfa1071e38ce9e656662b7991aef6b731ee7d","settings":{"gate":0,"freq":204.7730523690499,"velocity":1,"accent":0,"decay":0.12357028912255687,"tone":0.5392301927923956,"snappy":0.8990418981127033,"level":0.8}},
+    "low-tom":{"source":"modules/drums-606/v1/tom.dsp","source_sha256":"15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a","settings":{"gate":0,"freq":137.55581,"velocity":1,"accent":0,"decay":0.29948,"tone":0.38612,"noise":0.021917,"level":0.8}},
+    "high-tom":{"source":"modules/drums-606/v1/tom.dsp","source_sha256":"15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a","settings":{"gate":0,"freq":207.57604,"velocity":1,"accent":0,"decay":0.205787,"tone":0.162234,"noise":0.102346,"level":0.8}},
+    "closed-hat":{"source":"modules/drums-606/v1/closed-hat.dsp","source_sha256":"f63cff557b8ace3f7b18d1dafe6dc87fa9cfae6918d9066a6083393fcb552980","settings":{"gate":0,"freq":428.58367,"velocity":1,"accent":0,"decay":0.115452,"tone":0.976658,"metalSpread":0.395506,"level":0.8}},
+    "open-hat":{"source":"modules/drums-606-reference/v1/open-hat.dsp","source_sha256":"d1d47e3f19a36eaf0550a06361c6a46a4f9d7b3d93bf81b256a757cbf9226a07","settings":{"gate":0,"freq":409.13548633783546,"velocity":1,"accent":0,"decay":2.490477537589795,"tone":0.9945644145102603,"metalSpread":0.5878736220236276,"level":0.8,"chokeGate":0}},
+    "cymbal":{"source":"modules/drums-606-reference/v1/cymbal.dsp","source_sha256":"d7a3cbd65f22404a5a4c74db5fbca9653d8d56f71c87de9687e06b1c2de48815","settings":{"gate":0,"freq":414.96727762899513,"velocity":1,"accent":0,"decay":2.27247054841586,"tone":0.9466487932569334,"metalSpread":0.5417051487684459,"level":0.8}}
+  },
+  "baseline_hashes":{
+    "modules/drums-606/v1/README.md":"bd86ea63bc01dd28194ebf96956f4db97aced92bea371456c3b0d2a261dc0850",
+    "modules/drums-606/v1/closed-hat.dsp":"f63cff557b8ace3f7b18d1dafe6dc87fa9cfae6918d9066a6083393fcb552980",
+    "modules/drums-606/v1/cymbal.dsp":"46a082953ded51795af22a5654c4cbf817b27a00d069b110bfcb247eb13670ab",
+    "modules/drums-606/v1/defaults.json":"46e45489a47115ac9cd2e31d718ac1e1a66157218a4fa4ceb502845134a2a717",
+    "modules/drums-606/v1/drums606.lib":"d61f1770de880d68b457d0d9ec15696c688bb6e08a909945cb7566dfc3dea95a",
+    "modules/drums-606/v1/high-tom.dsp":"27a5b7d932f8136265d087d739dbeb61223baca1479da2509527453c9b713612",
+    "modules/drums-606/v1/kick.dsp":"9e11406afe0ee0d27bfeb0669e4f9ab1f06369895e046cc9cc55793b7cee7226",
+    "modules/drums-606/v1/low-tom.dsp":"df0b2daf7ab22537c3f025924765462015fcd062e5292870b2213495ae142774",
+    "modules/drums-606/v1/open-hat.dsp":"8465056c6e8edfedf76212c5ba97156fd5f3cadab0ac9c91f37a82d06888c722",
+    "modules/drums-606/v1/snare.dsp":"e6fd9443370f4f4b5adb40050d31d6a39b887203ab28e59e36769d18dbf3e4fb",
+    "modules/drums-606/v1/tom.dsp":"15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a"
+  },
+  "policy":{"one_tom_engine":true,"polyphony":"host","choke":"host routes to individual OH voices","reference_audio_redistributed":false,"normal_hits":"used to fit","accented_hits":"post-selection validation; same unit/archive, not independent hardware","gui_changed":false,"automatic_project_migration":false,"classic_is_preset":"Select these source/settings pairs; old source defaults are not silently rewritten."}
+}

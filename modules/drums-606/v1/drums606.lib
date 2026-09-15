@@ -1,0 +1,34 @@
+// Original 606-inspired study primitives, not a transistor-level circuit model.
+// Architecture research/provenance: README.md. Host owns all note allocation.
+import("stdfaust.lib");
+clamp(lo,hi,x)=max(lo,min(hi,x));
+sm(x)=x:si.smooth(exp(-1/(.005*ma.SR)));
+seen(h)=max(h)~_;
+lat(h,x)=select2(seen(h),x,ba.sAndH(h,x));
+age(h)=(+(1):min(30*ma.SR):*(1-h))~_;
+tau(seconds)=max(.0001,seconds/6.907755278982137);
+// The internal recursion is explicitly killed below -160dB, not merely hidden.
+decayState(h,seconds)=step~_ with {
+ pole=exp(-1/(tau(seconds)*ma.SR));
+ step(prev)=select2(h,select2(prev>1e-8,0,prev*pole),1);
+};
+// Difference of exponentials gives a finite, soft noise/VCA onset.
+env(h,seconds,attack)=max(0,decayState(h,seconds)-decayState(h,attack*6.907755278982137));
+// A unit impulse excites one persistent damped complex resonator.
+// No pitch envelope: both kick modes stay at their declared frequency.
+ring(f,seconds)=(step~si.bus(2)):(!,!,_) with {
+ r=exp(-1/(tau(seconds)*ma.SR));w=2*ma.PI*clamp(15,.42*ma.SR,f)/ma.SR;
+ c=r*cos(w);s=r*sin(w);
+ step(re,im,x)=rn,inn,rn with {rn=c*re-s*im;inn=s*re+c*im+x;};
+};
+// Free-running 606-specific Schmitt-oscillator frequency hypothesis.
+// Values are calculated nominal circuit values, NOT measured hardware captures.
+metal(p,spread)=sum(i,6,os.polyblep_square(p*(400+(base(i)-400)*(.5+spread))))/6 with {
+ base(i)=(246.416,308.0202,367.00285,418.161,440.403,627.241):ba.selectn(6,i);
+};
+finish(x,v,a,l)=((ma.tanh(x*(1+.24*a))*.8*v*l*(1+.18*a)):fi.dcblockerat(12));
+// Choke has priority on collisions. Later gates explicitly rearm it.
+chokeGain(h,k)=exp(-progress)*float(progress<20) with {
+ armed=(+(k):min(1):*(1-h))~_;
+ progress=(+(armed/(.00065*ma.SR)):min(24):*(1-h))~_;
+};

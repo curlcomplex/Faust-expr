@@ -1,0 +1,2297 @@
+{
+  "schema": 1,
+  "identity": "analog-classics-internal-review-2026-09-15.1",
+  "status": "internal-review-only",
+  "base_review_freeze": {
+    "path": "modules/analog-classics/synth-finish/REVIEW_FREEZE.json",
+    "sha256": "76d0e4e858ee64e870d61fdaa5ce8cc7e8dc576c2726c44db6e13de45613a1af",
+    "identity": "analog-classics-synth-review-2026-09-14.1"
+  },
+  "modules": [
+    {
+      "id": "analog-classics:juno-60",
+      "identity": "juno-60",
+      "displayName": "Analog Classics Juno 60 Voice",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.3.0-coherent-candidate",
+      "source": {
+        "path": "scripts/juno-60.dsp",
+        "sha256": "042ae1cc4122eaef6e8596110e378d547821f580f464732880fadf1deb9141af"
+      },
+      "upstream": {
+        "commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+        "path": "modules/juno-60/v3/voice.dsp",
+        "sha256": "5a0da538ca7d58fb5ff1ac5de506e531181b4de9e36538b2afa59c3c2129ccab"
+      },
+      "source_commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+      "source_path": "modules/juno-60/v3/voice.dsp",
+      "source_sha256": "5a0da538ca7d58fb5ff1ac5de506e531181b4de9e36538b2afa59c3c2129ccab",
+      "export_path": "scripts/juno-60.dsp",
+      "export_sha256": "042ae1cc4122eaef6e8596110e378d547821f580f464732880fadf1deb9141af",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "selected by the hardware/listening freeze; PR89 remains rejected",
+      "selection_rationale": "selected by the hardware/listening freeze; PR89 remains rejected",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:juno-106",
+      "identity": "juno-106",
+      "displayName": "Analog Classics Juno 106 Voice",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.3.0-coherent-candidate",
+      "source": {
+        "path": "scripts/juno-106.dsp",
+        "sha256": "16e7cdca53a9c55f5b790a83e0456070f170407d67bd1a6d4c250dcec8dcfdc1"
+      },
+      "upstream": {
+        "commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+        "path": "modules/juno-106/v3/voice.dsp",
+        "sha256": "c84bf47177ef942f5362a1e3f630cd89a794991090e5138f83357624f8d3813d"
+      },
+      "source_commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+      "source_path": "modules/juno-106/v3/voice.dsp",
+      "source_sha256": "c84bf47177ef942f5362a1e3f630cd89a794991090e5138f83357624f8d3813d",
+      "export_path": "scripts/juno-106.dsp",
+      "export_sha256": "16e7cdca53a9c55f5b790a83e0456070f170407d67bd1a6d4c250dcec8dcfdc1",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "selected coherent-Roland freeze candidate",
+      "selection_rationale": "selected coherent-Roland freeze candidate",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:sh-101",
+      "identity": "sh-101",
+      "displayName": "Analog Classics Mono 101",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.4.0-coherent-candidate",
+      "source": {
+        "path": "scripts/sh-101.dsp",
+        "sha256": "3cce76089d21825a6579c64c1c5dc49878ebe05795c1d787fb8eed5350f2a694"
+      },
+      "upstream": {
+        "commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+        "path": "modules/mono-101/v4/voice.dsp",
+        "sha256": "64d8ab4e929ad3a5c3056953d263873f7bc923e33fe8c3ff7f90471ecb7da744"
+      },
+      "source_commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+      "source_path": "modules/mono-101/v4/voice.dsp",
+      "source_sha256": "64d8ab4e929ad3a5c3056953d263873f7bc923e33fe8c3ff7f90471ecb7da744",
+      "export_path": "scripts/sh-101.dsp",
+      "export_sha256": "3cce76089d21825a6579c64c1c5dc49878ebe05795c1d787fb8eed5350f2a694",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "selected coherent-Roland freeze candidate",
+      "selection_rationale": "selected coherent-Roland freeze candidate",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:mini",
+      "identity": "mini",
+      "displayName": "Analog Classics Mini Voice",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.1-experiment",
+      "source": {
+        "path": "scripts/mini.dsp",
+        "sha256": "eb9f0f1155891ad78c43b2b303c250fbac91f62fd09314a299ff67178c7a5dcc"
+      },
+      "upstream": {
+        "commit": "fd2b7efae4951d014fed3fed3cd01f295a0af21e",
+        "path": "modules/minimoog/v1/voice.dsp",
+        "sha256": "442916e387c9688fa0f29cfab832d65929d2a6dca321685c344dbbc105870899"
+      },
+      "source_commit": "fd2b7efae4951d014fed3fed3cd01f295a0af21e",
+      "source_path": "modules/minimoog/v1/voice.dsp",
+      "source_sha256": "442916e387c9688fa0f29cfab832d65929d2a6dca321685c344dbbc105870899",
+      "export_path": "scripts/mini.dsp",
+      "export_sha256": "eb9f0f1155891ad78c43b2b303c250fbac91f62fd09314a299ff67178c7a5dcc",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "stable v1 retained; v2 collapse and v3 experiment remain unselected",
+      "selection_rationale": "stable v1 retained; v2 collapse and v3 experiment remain unselected",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:808-kick",
+      "identity": "808-kick",
+      "displayName": "analog-classics-808-kick-study",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.2.0-experiment",
+      "source": {
+        "path": "scripts/808-kick.dsp",
+        "sha256": "36cc1c7c82eacf99231a4920e99f392977fd2920367abcfb805ff73d14e16e92"
+      },
+      "upstream": {
+        "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "path": "modules/analog-classics/drums-v2/kick808.dsp",
+        "sha256": "2a8f9579b305623007ac025fba73f2efc8c24a22725d5fafaf1b65616e805613"
+      },
+      "source_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+      "source_path": "modules/analog-classics/drums-v2/kick808.dsp",
+      "source_sha256": "2a8f9579b305623007ac025fba73f2efc8c24a22725d5fafaf1b65616e805613",
+      "export_path": "scripts/808-kick.dsp",
+      "export_sha256": "36cc1c7c82eacf99231a4920e99f392977fd2920367abcfb805ff73d14e16e92",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "v2 replaces preserved exploratory v1",
+      "selection_rationale": "v2 replaces preserved exploratory v1",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:808-snare",
+      "identity": "808-snare",
+      "displayName": "analog-classics-808-snare-study",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.2.0-experiment",
+      "source": {
+        "path": "scripts/808-snare.dsp",
+        "sha256": "2e4db7d4201ba8299e222ec2dc01fa64a4200279448519b8358f906b1c79f60b"
+      },
+      "upstream": {
+        "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "path": "modules/analog-classics/drums-v2/snare808.dsp",
+        "sha256": "7fc1da292e02f7c76d1b47d2f8ec389d619a3ad9f80cb866b65f2b31407be260"
+      },
+      "source_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+      "source_path": "modules/analog-classics/drums-v2/snare808.dsp",
+      "source_sha256": "7fc1da292e02f7c76d1b47d2f8ec389d619a3ad9f80cb866b65f2b31407be260",
+      "export_path": "scripts/808-snare.dsp",
+      "export_sha256": "2e4db7d4201ba8299e222ec2dc01fa64a4200279448519b8358f906b1c79f60b",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "v2 replaces preserved exploratory v1",
+      "selection_rationale": "v2 replaces preserved exploratory v1",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:808-clap",
+      "identity": "808-clap",
+      "displayName": "analog-classics-808-clap-study",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.2.0-experiment",
+      "source": {
+        "path": "scripts/808-clap.dsp",
+        "sha256": "2c835c3f44cae79741078f749a1162a7ea734d5bfbe7446505cf59f004490c7a"
+      },
+      "upstream": {
+        "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "path": "modules/analog-classics/drums-v2/clap808.dsp",
+        "sha256": "a8f0bf3f6469c173f12e1a5c47822b9d0a564badd268cfeaf5165b170f597a78"
+      },
+      "source_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+      "source_path": "modules/analog-classics/drums-v2/clap808.dsp",
+      "source_sha256": "a8f0bf3f6469c173f12e1a5c47822b9d0a564badd268cfeaf5165b170f597a78",
+      "export_path": "scripts/808-clap.dsp",
+      "export_sha256": "2c835c3f44cae79741078f749a1162a7ea734d5bfbe7446505cf59f004490c7a",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "v2 replaces preserved exploratory v1",
+      "selection_rationale": "v2 replaces preserved exploratory v1",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:808-cymbal",
+      "identity": "808-cymbal",
+      "displayName": "analog-classics-808-cymbal-study",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.2.0-experiment",
+      "source": {
+        "path": "scripts/808-cymbal.dsp",
+        "sha256": "a39e81a2977ac4906716f095cf084e3492f838959de1d633a7b631c5a198c714"
+      },
+      "upstream": {
+        "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "path": "modules/analog-classics/drums-v2/cymbal808.dsp",
+        "sha256": "34342d129169f4695fff37a29010dcf816d050dd8ecfc6e6f5b6552f2eec705d"
+      },
+      "source_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+      "source_path": "modules/analog-classics/drums-v2/cymbal808.dsp",
+      "source_sha256": "34342d129169f4695fff37a29010dcf816d050dd8ecfc6e6f5b6552f2eec705d",
+      "export_path": "scripts/808-cymbal.dsp",
+      "export_sha256": "a39e81a2977ac4906716f095cf084e3492f838959de1d633a7b631c5a198c714",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "v2 replaces preserved exploratory v1",
+      "selection_rationale": "v2 replaces preserved exploratory v1",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:analog-hat-closed",
+      "identity": "analog-hat-closed",
+      "displayName": "Analog Closed Hat",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/analog-hat-closed.dsp",
+        "sha256": "2dc40a28a2ae1c007e4354d5472b2c6dd33b520eed3bc66cf90cbc96908b3bdb"
+      },
+      "upstream": {
+        "commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+        "path": "modules/hats-analog/single-note-v1/closed.dsp",
+        "sha256": "1622abc37993a1ce08f3bd550dbb9dc91513658961a707406bc365ba292adeed"
+      },
+      "source_commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+      "source_path": "modules/hats-analog/single-note-v1/closed.dsp",
+      "source_sha256": "1622abc37993a1ce08f3bd550dbb9dc91513658961a707406bc365ba292adeed",
+      "export_path": "scripts/analog-hat-closed.dsp",
+      "export_sha256": "2dc40a28a2ae1c007e4354d5472b2c6dd33b520eed3bc66cf90cbc96908b3bdb",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "explicit v2-derived single-note compatibility facade",
+      "selection_rationale": "explicit v2-derived single-note compatibility facade",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:analog-hat-open",
+      "identity": "analog-hat-open",
+      "displayName": "Analog Open Hat",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/analog-hat-open.dsp",
+        "sha256": "74a298db0b0ea9a0bb5f6f349cd9bd71a5d5c450bb95a8c99c13a407662ddf45"
+      },
+      "upstream": {
+        "commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+        "path": "modules/hats-analog/single-note-v1/open.dsp",
+        "sha256": "9bcc793c683af4c24b34346ee28f62ba66e81de895dbcc928ea65ae8a5af7152"
+      },
+      "source_commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+      "source_path": "modules/hats-analog/single-note-v1/open.dsp",
+      "source_sha256": "9bcc793c683af4c24b34346ee28f62ba66e81de895dbcc928ea65ae8a5af7152",
+      "export_path": "scripts/analog-hat-open.dsp",
+      "export_sha256": "74a298db0b0ea9a0bb5f6f349cd9bd71a5d5c450bb95a8c99c13a407662ddf45",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "explicit v2-derived single-note compatibility facade with local choke",
+      "selection_rationale": "explicit v2-derived single-note compatibility facade with local choke",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:analog-kick-sharp",
+      "identity": "analog-kick-sharp",
+      "displayName": "kick-analog-sharp-optimized",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.2.0-experiment",
+      "source": {
+        "path": "scripts/analog-kick-sharp.dsp",
+        "sha256": "07e228ed526328e17f3ccea031f6951ebd9d1c42db8097202d5a8e134c2957c9"
+      },
+      "upstream": {
+        "commit": "7ed155312580fe5591629beee33ada6a156e8c12",
+        "path": "modules/kick-analog/sharp-02/optimized.dsp",
+        "sha256": "b83178a14247a2c1b7b9d3f1688351c159edb48a90d2dfc4b47759c69851a1ab"
+      },
+      "source_commit": "7ed155312580fe5591629beee33ada6a156e8c12",
+      "source_path": "modules/kick-analog/sharp-02/optimized.dsp",
+      "source_sha256": "b83178a14247a2c1b7b9d3f1688351c159edb48a90d2dfc4b47759c69851a1ab",
+      "export_path": "scripts/analog-kick-sharp.dsp",
+      "export_sha256": "07e228ed526328e17f3ccea031f6951ebd9d1c42db8097202d5a8e134c2957c9",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "same-sound optimized candidate; reference path remains preserved",
+      "selection_rationale": "same-sound optimized candidate; reference path remains preserved",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:analog-snare",
+      "identity": "analog-snare",
+      "displayName": "snare-analog",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.2.0-experiment",
+      "source": {
+        "path": "scripts/analog-snare.dsp",
+        "sha256": "42bb43114fbb8da8231eb09ce4711b04281f4ab9a011dfd0c26a839ffcaf89fc"
+      },
+      "upstream": {
+        "commit": "49403321a0bca76b31f55fa0ffaaf5532518a23f",
+        "path": "modules/snare-analog/v2/snare.dsp",
+        "sha256": "388379d7a2d3b9b6a048304fa185ede6c31a0814237418278815ef29d11035dc"
+      },
+      "source_commit": "49403321a0bca76b31f55fa0ffaaf5532518a23f",
+      "source_path": "modules/snare-analog/v2/snare.dsp",
+      "source_sha256": "388379d7a2d3b9b6a048304fa185ede6c31a0814237418278815ef29d11035dc",
+      "export_path": "scripts/analog-snare.dsp",
+      "export_sha256": "42bb43114fbb8da8231eb09ce4711b04281f4ab9a011dfd0c26a839ffcaf89fc",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "v2 delivery supersedes the root prototype",
+      "selection_rationale": "v2 delivery supersedes the root prototype",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:clap",
+      "identity": "clap",
+      "displayName": "clap",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.3.0-experiment",
+      "source": {
+        "path": "scripts/clap.dsp",
+        "sha256": "24ab483cc054b93581c87dd6da3b30fe96896dd429eb4f1d7d46891940fff112"
+      },
+      "upstream": {
+        "commit": "b126baa4b86ba8edd49dac9b68945ed2497a799e",
+        "path": "modules/clap/v3/clap.dsp",
+        "sha256": "53d55e01f60e0652d38a89495aad5d1961705cfe7cbe7ca145eca91561e106ef"
+      },
+      "source_commit": "b126baa4b86ba8edd49dac9b68945ed2497a799e",
+      "source_path": "modules/clap/v3/clap.dsp",
+      "source_sha256": "53d55e01f60e0652d38a89495aad5d1961705cfe7cbe7ca145eca91561e106ef",
+      "export_path": "scripts/clap.dsp",
+      "export_sha256": "24ab483cc054b93581c87dd6da3b30fe96896dd429eb4f1d7d46891940fff112",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "v3 rebuild selected; v1/v2 rejected identities remain explicit",
+      "selection_rationale": "v3 rebuild selected; v1/v2 rejected identities remain explicit",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:acid-voice",
+      "identity": "acid-voice",
+      "displayName": "Acid Voice",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/acid-voice.dsp",
+        "sha256": "c9181b93cc5f6dbe6e7b5291603082562e1cca9fe40e2002d89a1e84a1ae0579"
+      },
+      "upstream": {
+        "commit": "166acde7bf032b8b87f4835c29703d212a4b0150",
+        "path": "modules/acid-voice/v1/voice.dsp",
+        "sha256": "e00efa47999f621e2ca6f8649da0e541ef9d3bc6d496466eba828e5b55fc6bd7"
+      },
+      "source_commit": "166acde7bf032b8b87f4835c29703d212a4b0150",
+      "source_path": "modules/acid-voice/v1/voice.dsp",
+      "source_sha256": "e00efa47999f621e2ca6f8649da0e541ef9d3bc6d496466eba828e5b55fc6bd7",
+      "export_path": "scripts/acid-voice.dsp",
+      "export_sha256": "c9181b93cc5f6dbe6e7b5291603082562e1cca9fe40e2002d89a1e84a1ae0579",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "current single-note Acid Voice candidate",
+      "selection_rationale": "current single-note Acid Voice candidate",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:trigger-seq",
+      "identity": "trigger-seq",
+      "displayName": "Trigger Seq",
+      "category": "modulation",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/trigger-seq.dsp",
+        "sha256": "881b4843b3699c18511eb1a3df8135402b99201309031516350bdbc09436b8e9"
+      },
+      "upstream": {
+        "commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+        "path": "modules/trigger-seq/v1/trigger.dsp",
+        "sha256": "b3f512b91216feac98791b547fe7d3dfbc71f884dbf6de1dd455b330018ff780"
+      },
+      "source_commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+      "source_path": "modules/trigger-seq/v1/trigger.dsp",
+      "source_sha256": "b3f512b91216feac98791b547fe7d3dfbc71f884dbf6de1dd455b330018ff780",
+      "export_path": "scripts/trigger-seq.dsp",
+      "export_sha256": "881b4843b3699c18511eb1a3df8135402b99201309031516350bdbc09436b8e9",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "external-clock source; CV output and meter observation are distinct",
+      "selection_rationale": "external-clock source; CV output and meter observation are distinct",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:retro-mixer-eq",
+      "identity": "retro-mixer-eq",
+      "displayName": "analog-classics-retro-mixer-eq",
+      "category": "effect",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/retro-mixer-eq.dsp",
+        "sha256": "41fe8fe7aa9cc283dc14a6c1503f1114e6e5a427610158cac15eabd533d74e63"
+      },
+      "upstream": {
+        "commit": "784a4e7c7ae1a81e88b2695fd42f9c20fa5e148e",
+        "path": "modules/retro-mixer-eq/v1/eq.dsp",
+        "sha256": "36704b5c45242579b24aa715518069eced72964508681c86997b4c11ded06dfe"
+      },
+      "source_commit": "784a4e7c7ae1a81e88b2695fd42f9c20fa5e148e",
+      "source_path": "modules/retro-mixer-eq/v1/eq.dsp",
+      "source_sha256": "36704b5c45242579b24aa715518069eced72964508681c86997b4c11ded06dfe",
+      "export_path": "scripts/retro-mixer-eq.dsp",
+      "export_sha256": "41fe8fe7aa9cc283dc14a6c1503f1114e6e5a427610158cac15eabd533d74e63",
+      "license": "MIT",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "current compact mixer-EQ candidate",
+      "selection_rationale": "current compact mixer-EQ candidate",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:tape-echo",
+      "identity": "tape-echo",
+      "displayName": "analog-classics-tape-echo",
+      "category": "effect",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/tape-echo.dsp",
+        "sha256": "23c43c76a938cc44179c8cb33bb2c699c02990477dfd65aad225e1b68b42e62d"
+      },
+      "upstream": {
+        "commit": "c9c00558558fad79faa78ae6e495a4c367eced32",
+        "path": "modules/tape-echo/v1/echo.dsp",
+        "sha256": "9421f35acca21f3741796a36b224d5e9c466f93909765924b9a4488e91316c14"
+      },
+      "source_commit": "c9c00558558fad79faa78ae6e495a4c367eced32",
+      "source_path": "modules/tape-echo/v1/echo.dsp",
+      "source_sha256": "9421f35acca21f3741796a36b224d5e9c466f93909765924b9a4488e91316c14",
+      "export_path": "scripts/tape-echo.dsp",
+      "export_sha256": "23c43c76a938cc44179c8cb33bb2c699c02990477dfd65aad225e1b68b42e62d",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "current multi-head echo candidate",
+      "selection_rationale": "current multi-head echo candidate",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:vintage-rack-reverb",
+      "identity": "vintage-rack-reverb",
+      "displayName": "analog-classics-vintage-rack-reverb",
+      "category": "effect",
+      "version": 1,
+      "soundVersion": "0.1.1-experiment",
+      "source": {
+        "path": "scripts/vintage-rack-reverb.dsp",
+        "sha256": "be69c3725976abe0ea80c02365720ff74f65b6bf79d50c058ab727c264a6a1ec"
+      },
+      "upstream": {
+        "commit": "8581dc9a0e54fecee647f38a156368be35a187f5",
+        "path": "modules/vintage-rack-reverb/v1/reverb.dsp",
+        "sha256": "323e219ee6d052235da8ad94e51ae886f4fbfba2b13e803743495af32305a20f"
+      },
+      "source_commit": "8581dc9a0e54fecee647f38a156368be35a187f5",
+      "source_path": "modules/vintage-rack-reverb/v1/reverb.dsp",
+      "source_sha256": "323e219ee6d052235da8ad94e51ae886f4fbfba2b13e803743495af32305a20f",
+      "export_path": "scripts/vintage-rack-reverb.dsp",
+      "export_sha256": "be69c3725976abe0ea80c02365720ff74f65b6bf79d50c058ab727c264a6a1ec",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "current rack-reverb candidate",
+      "selection_rationale": "current rack-reverb candidate",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:vintage-tape",
+      "identity": "vintage-tape",
+      "displayName": "analog-classics-vintage-tape",
+      "category": "effect",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/vintage-tape.dsp",
+        "sha256": "b0d77ead918639ec8681bd9849f8aafb4e01b7122ee31e2ef84201f23aa70c2c"
+      },
+      "upstream": {
+        "commit": "c2231d7d09688dc6ba2f75a5d8c9fe3b9f5debb4",
+        "path": "modules/vintage-tape/v1/tape.dsp",
+        "sha256": "298ccf1d77f91d95e8cf877634eb5d0843f4fdcf25f4d222f2e3a5c289299d0a"
+      },
+      "source_commit": "c2231d7d09688dc6ba2f75a5d8c9fe3b9f5debb4",
+      "source_path": "modules/vintage-tape/v1/tape.dsp",
+      "source_sha256": "298ccf1d77f91d95e8cf877634eb5d0843f4fdcf25f4d222f2e3a5c289299d0a",
+      "export_path": "scripts/vintage-tape.dsp",
+      "export_sha256": "b0d77ead918639ec8681bd9849f8aafb4e01b7122ee31e2ef84201f23aa70c2c",
+      "license": "MIT-derived; Airwindows IronOxideClassic2 attribution retained in issue #63",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "current tape-colour candidate",
+      "selection_rationale": "current tape-colour candidate",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:retro-ensemble",
+      "identity": "retro-ensemble",
+      "displayName": "analog-classics-retro-ensemble",
+      "category": "effect",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/retro-ensemble.dsp",
+        "sha256": "411c391a6ad14db915074b07f0ea95a04674753977175aa83d8b075c17c28d03"
+      },
+      "upstream": {
+        "commit": "3dd01dac01f94d8cf540e4c082c1978814a831b9",
+        "path": "modules/retro-ensemble/v1/ensemble.dsp",
+        "sha256": "8c719129a2b604a3f69f147233c85fba8cb868c0a3b43a75ac0b726e95025b40"
+      },
+      "source_commit": "3dd01dac01f94d8cf540e4c082c1978814a831b9",
+      "source_path": "modules/retro-ensemble/v1/ensemble.dsp",
+      "source_sha256": "8c719129a2b604a3f69f147233c85fba8cb868c0a3b43a75ac0b726e95025b40",
+      "export_path": "scripts/retro-ensemble.dsp",
+      "export_sha256": "411c391a6ad14db915074b07f0ea95a04674753977175aa83d8b075c17c28d03",
+      "license": "MIT-derived; Airwindows Ensemble attribution retained in issue #63",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "current ensemble candidate",
+      "selection_rationale": "current ensemble candidate",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:bassline-seq",
+      "identity": "bassline-seq",
+      "displayName": "Bassline Seq",
+      "category": "modulation",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/bassline-seq.dsp",
+        "sha256": "6fba57cb5d911f3382dd2bb73dc6a84c920f232f54feb6a96245f3d8a96fa81c"
+      },
+      "upstream": {
+        "commit": "166acde7bf032b8b87f4835c29703d212a4b0150",
+        "path": "modules/bassline-seq/v1/sequence.dsp",
+        "sha256": "06aa0cbbf2b1f1b6ef087dc6044db2eb930b2efb9b88d82512dcbb0d83b01db6"
+      },
+      "source_commit": "166acde7bf032b8b87f4835c29703d212a4b0150",
+      "source_path": "modules/bassline-seq/v1/sequence.dsp",
+      "source_sha256": "06aa0cbbf2b1f1b6ef087dc6044db2eb930b2efb9b88d82512dcbb0d83b01db6",
+      "export_path": "scripts/bassline-seq.dsp",
+      "export_sha256": "6fba57cb5d911f3382dd2bb73dc6a84c920f232f54feb6a96245f3d8a96fa81c",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "current Acid-batch sequencer entry",
+      "selection_rationale": "current Acid-batch sequencer entry",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:606-kick",
+      "identity": "606-kick",
+      "displayName": "606 Kick",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/606-kick.dsp",
+        "sha256": "1cc2a20ddd5e1773af3392963e8d2ed9e609a59bc00f37ca1677e183de5f38cb"
+      },
+      "upstream": {
+        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "path": "modules/drums-606/v1/kick.dsp",
+        "sha256": "9e11406afe0ee0d27bfeb0669e4f9ab1f06369895e046cc9cc55793b7cee7226"
+      },
+      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_path": "modules/drums-606/v1/kick.dsp",
+      "source_sha256": "9e11406afe0ee0d27bfeb0669e4f9ab1f06369895e046cc9cc55793b7cee7226",
+      "export_path": "scripts/606-kick.dsp",
+      "export_sha256": "1cc2a20ddd5e1773af3392963e8d2ed9e609a59bc00f37ca1677e183de5f38cb",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#79 frozen 606 kick selection",
+      "selection_rationale": "#79 frozen 606 kick selection",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:606-snare",
+      "identity": "606-snare",
+      "displayName": "606 Snare",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.2.0-reference-candidate",
+      "source": {
+        "path": "scripts/606-snare.dsp",
+        "sha256": "e7405a55826f4196de0a4cec2c34aa5cf2e71f44793ca8006b1f389f3eec009f"
+      },
+      "upstream": {
+        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "path": "modules/drums-606-reference/v1/snare.dsp",
+        "sha256": "dfcce395df56c62676da40e9522bfa1071e38ce9e656662b7991aef6b731ee7d"
+      },
+      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_path": "modules/drums-606-reference/v1/snare.dsp",
+      "source_sha256": "dfcce395df56c62676da40e9522bfa1071e38ce9e656662b7991aef6b731ee7d",
+      "export_path": "scripts/606-snare.dsp",
+      "export_sha256": "e7405a55826f4196de0a4cec2c34aa5cf2e71f44793ca8006b1f389f3eec009f",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#79 frozen 606 snare selection",
+      "selection_rationale": "#79 frozen 606 snare selection",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:606-low-tom",
+      "identity": "606-low-tom",
+      "displayName": "606 Tom",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/606-low-tom.dsp",
+        "sha256": "86ec59bebb1eb592d47388a4a56e4f588d4c6052bcc0d874725126c500a4bec7"
+      },
+      "upstream": {
+        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "path": "modules/drums-606/v1/tom.dsp",
+        "sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a"
+      },
+      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_path": "modules/drums-606/v1/tom.dsp",
+      "source_sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a",
+      "export_path": "scripts/606-low-tom.dsp",
+      "export_sha256": "86ec59bebb1eb592d47388a4a56e4f588d4c6052bcc0d874725126c500a4bec7",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#79 frozen 606 low-tom preset",
+      "selection_rationale": "#79 frozen 606 low-tom preset",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:606-high-tom",
+      "identity": "606-high-tom",
+      "displayName": "606 Tom",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/606-high-tom.dsp",
+        "sha256": "86ec59bebb1eb592d47388a4a56e4f588d4c6052bcc0d874725126c500a4bec7"
+      },
+      "upstream": {
+        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "path": "modules/drums-606/v1/tom.dsp",
+        "sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a"
+      },
+      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_path": "modules/drums-606/v1/tom.dsp",
+      "source_sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a",
+      "export_path": "scripts/606-high-tom.dsp",
+      "export_sha256": "86ec59bebb1eb592d47388a4a56e4f588d4c6052bcc0d874725126c500a4bec7",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#79 frozen 606 high-tom preset",
+      "selection_rationale": "#79 frozen 606 high-tom preset",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:606-closed-hat",
+      "identity": "606-closed-hat",
+      "displayName": "606 Closed Hat",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/606-closed-hat.dsp",
+        "sha256": "ca55535f6acd3f09a532cab9290d82ad6ad9ab536198dfbe22881b611b4257a6"
+      },
+      "upstream": {
+        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "path": "modules/drums-606/v1/closed-hat.dsp",
+        "sha256": "f63cff557b8ace3f7b18d1dafe6dc87fa9cfae6918d9066a6083393fcb552980"
+      },
+      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_path": "modules/drums-606/v1/closed-hat.dsp",
+      "source_sha256": "f63cff557b8ace3f7b18d1dafe6dc87fa9cfae6918d9066a6083393fcb552980",
+      "export_path": "scripts/606-closed-hat.dsp",
+      "export_sha256": "ca55535f6acd3f09a532cab9290d82ad6ad9ab536198dfbe22881b611b4257a6",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#79 frozen 606 closed-hat selection",
+      "selection_rationale": "#79 frozen 606 closed-hat selection",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:606-open-hat",
+      "identity": "606-open-hat",
+      "displayName": "606 Open Hat",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.2.0-reference-candidate",
+      "source": {
+        "path": "scripts/606-open-hat.dsp",
+        "sha256": "cb271cdc4d1246384969864c26f0bc2aba7a8c89cd3cb2f7912a2454fd2ee6d3"
+      },
+      "upstream": {
+        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "path": "modules/drums-606-reference/v1/open-hat.dsp",
+        "sha256": "d1d47e3f19a36eaf0550a06361c6a46a4f9d7b3d93bf81b256a757cbf9226a07"
+      },
+      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_path": "modules/drums-606-reference/v1/open-hat.dsp",
+      "source_sha256": "d1d47e3f19a36eaf0550a06361c6a46a4f9d7b3d93bf81b256a757cbf9226a07",
+      "export_path": "scripts/606-open-hat.dsp",
+      "export_sha256": "cb271cdc4d1246384969864c26f0bc2aba7a8c89cd3cb2f7912a2454fd2ee6d3",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#79 frozen 606 open-hat/choke selection",
+      "selection_rationale": "#79 frozen 606 open-hat/choke selection",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:606-cymbal",
+      "identity": "606-cymbal",
+      "displayName": "606 Cymbal",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.2.0-reference-candidate",
+      "source": {
+        "path": "scripts/606-cymbal.dsp",
+        "sha256": "1af67fb367d781ab8397dd86662ef1a4f068e78d6c35ae32b7e7ba1ec92b4a9a"
+      },
+      "upstream": {
+        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "path": "modules/drums-606-reference/v1/cymbal.dsp",
+        "sha256": "d7a3cbd65f22404a5a4c74db5fbca9653d8d56f71c87de9687e06b1c2de48815"
+      },
+      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_path": "modules/drums-606-reference/v1/cymbal.dsp",
+      "source_sha256": "d7a3cbd65f22404a5a4c74db5fbca9653d8d56f71c87de9687e06b1c2de48815",
+      "export_path": "scripts/606-cymbal.dsp",
+      "export_sha256": "1af67fb367d781ab8397dd86662ef1a4f068e78d6c35ae32b7e7ba1ec92b4a9a",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#79 frozen 606 cymbal selection",
+      "selection_rationale": "#79 frozen 606 cymbal selection",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:909-kick",
+      "identity": "909-kick",
+      "displayName": "909 Kick",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/909-kick.dsp",
+        "sha256": "4310c614cc4725508a1ff7eea7a2f0f3569c3fa5065a49827afcb792318d8503"
+      },
+      "upstream": {
+        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "path": "modules/drums-909/v1/kick.dsp",
+        "sha256": "f445870825cbde6b0ba13e394cebcb0b3970d7a18997246229f34e5edcefb294"
+      },
+      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_path": "modules/drums-909/v1/kick.dsp",
+      "source_sha256": "f445870825cbde6b0ba13e394cebcb0b3970d7a18997246229f34e5edcefb294",
+      "export_path": "scripts/909-kick.dsp",
+      "export_sha256": "4310c614cc4725508a1ff7eea7a2f0f3569c3fa5065a49827afcb792318d8503",
+      "license": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#81 frozen recorded-anchor selection",
+      "selection_rationale": "#81 frozen recorded-anchor selection",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:909-snare",
+      "identity": "909-snare",
+      "displayName": "909 Snare",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/909-snare.dsp",
+        "sha256": "f367ebf7b2c62bf8df6631e26add0cfb78c6d59ffe6b9e7e7c5b1c1e21cc42b4"
+      },
+      "upstream": {
+        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "path": "modules/drums-909/v1/snare.dsp",
+        "sha256": "c6fc520a078a65d652318be8d71282d3fc592962c207bfdc0f0af10567fe932a"
+      },
+      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_path": "modules/drums-909/v1/snare.dsp",
+      "source_sha256": "c6fc520a078a65d652318be8d71282d3fc592962c207bfdc0f0af10567fe932a",
+      "export_path": "scripts/909-snare.dsp",
+      "export_sha256": "f367ebf7b2c62bf8df6631e26add0cfb78c6d59ffe6b9e7e7c5b1c1e21cc42b4",
+      "license": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#81 frozen recorded-anchor selection",
+      "selection_rationale": "#81 frozen recorded-anchor selection",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:909-low-tom",
+      "identity": "909-low-tom",
+      "displayName": "909 Tom",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/909-low-tom.dsp",
+        "sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6"
+      },
+      "upstream": {
+        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "path": "modules/drums-909/v1/tom.dsp",
+        "sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75"
+      },
+      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_path": "modules/drums-909/v1/tom.dsp",
+      "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
+      "export_path": "scripts/909-low-tom.dsp",
+      "export_sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6",
+      "license": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#81 frozen recorded-anchor preset",
+      "selection_rationale": "#81 frozen recorded-anchor preset",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:909-mid-tom",
+      "identity": "909-mid-tom",
+      "displayName": "909 Tom",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/909-mid-tom.dsp",
+        "sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6"
+      },
+      "upstream": {
+        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "path": "modules/drums-909/v1/tom.dsp",
+        "sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75"
+      },
+      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_path": "modules/drums-909/v1/tom.dsp",
+      "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
+      "export_path": "scripts/909-mid-tom.dsp",
+      "export_sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6",
+      "license": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#81 frozen recorded-anchor preset",
+      "selection_rationale": "#81 frozen recorded-anchor preset",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:909-high-tom",
+      "identity": "909-high-tom",
+      "displayName": "909 Tom",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/909-high-tom.dsp",
+        "sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6"
+      },
+      "upstream": {
+        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "path": "modules/drums-909/v1/tom.dsp",
+        "sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75"
+      },
+      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_path": "modules/drums-909/v1/tom.dsp",
+      "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
+      "export_path": "scripts/909-high-tom.dsp",
+      "export_sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6",
+      "license": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#81 frozen recorded-anchor preset",
+      "selection_rationale": "#81 frozen recorded-anchor preset",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:909-rim",
+      "identity": "909-rim",
+      "displayName": "909 Rim",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/909-rim.dsp",
+        "sha256": "b37e020d3b48036da3e5c572403abdfcc3b1ffd0322722bcff6bc5438c62f808"
+      },
+      "upstream": {
+        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "path": "modules/drums-909/v1/rim.dsp",
+        "sha256": "85281a7917d697dee47a1475ca24d2ecc08e53b48daa6f807c91367c4ee2e635"
+      },
+      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_path": "modules/drums-909/v1/rim.dsp",
+      "source_sha256": "85281a7917d697dee47a1475ca24d2ecc08e53b48daa6f807c91367c4ee2e635",
+      "export_path": "scripts/909-rim.dsp",
+      "export_sha256": "b37e020d3b48036da3e5c572403abdfcc3b1ffd0322722bcff6bc5438c62f808",
+      "license": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#81 frozen recorded-anchor selection",
+      "selection_rationale": "#81 frozen recorded-anchor selection",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:909-clap",
+      "identity": "909-clap",
+      "displayName": "909 Clap",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/909-clap.dsp",
+        "sha256": "8d7f9372d8a9ea0c90f26fdfc2f6be64310d88bb347dc47210c0b3456797a353"
+      },
+      "upstream": {
+        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "path": "modules/drums-909/v1/clap.dsp",
+        "sha256": "371ca9aa94d3b12ba1a40243e712283adfc51bd14bf39f5924759d2ef1942194"
+      },
+      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_path": "modules/drums-909/v1/clap.dsp",
+      "source_sha256": "371ca9aa94d3b12ba1a40243e712283adfc51bd14bf39f5924759d2ef1942194",
+      "export_path": "scripts/909-clap.dsp",
+      "export_sha256": "8d7f9372d8a9ea0c90f26fdfc2f6be64310d88bb347dc47210c0b3456797a353",
+      "license": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#81 frozen recorded-anchor selection",
+      "selection_rationale": "#81 frozen recorded-anchor selection",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:808-aux-tom-conga",
+      "identity": "808-aux-tom-conga",
+      "displayName": "808 Tom/Conga",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/808-aux-tom-conga.dsp",
+        "sha256": "164cb347691328ae0345eda9bcdf97eb8bfdea4857314b4492bb6663b2d89ab9"
+      },
+      "upstream": {
+        "commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+        "path": "modules/drums-808-aux/v1/tom-conga.dsp",
+        "sha256": "34b05cd95d78d4ca55f9cc1b7de8c36d74c748a1422b9e950a30256e2b862b6f"
+      },
+      "source_commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+      "source_path": "modules/drums-808-aux/v1/tom-conga.dsp",
+      "source_sha256": "34b05cd95d78d4ca55f9cc1b7de8c36d74c748a1422b9e950a30256e2b862b6f",
+      "export_path": "scripts/808-aux-tom-conga.dsp",
+      "export_sha256": "164cb347691328ae0345eda9bcdf97eb8bfdea4857314b4492bb6663b2d89ab9",
+      "license": "Authored Faust source; TapTools MIT revision is an oracle only, not copied runtime DSP.",
+      "dependencyProvenance": "Authored Faust source; TapTools MIT revision is an oracle only, not copied runtime DSP.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#76 experimental auxiliary source retained for review",
+      "selection_rationale": "#76 experimental auxiliary source retained for review",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:808-aux-rim-claves",
+      "identity": "808-aux-rim-claves",
+      "displayName": "808 Rim/Claves",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.1-experiment",
+      "source": {
+        "path": "scripts/808-aux-rim-claves.dsp",
+        "sha256": "89b2832c6ccbbd294ab0beddf7d252013e69e8658e0d574947ecf01fe2debade"
+      },
+      "upstream": {
+        "commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+        "path": "modules/drums-808-aux/v2/rim-claves.dsp",
+        "sha256": "913f0dc0f7290128c421fcc418cae55e13aae48dfbb382fede5d7c60b267f60d"
+      },
+      "source_commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+      "source_path": "modules/drums-808-aux/v2/rim-claves.dsp",
+      "source_sha256": "913f0dc0f7290128c421fcc418cae55e13aae48dfbb382fede5d7c60b267f60d",
+      "export_path": "scripts/808-aux-rim-claves.dsp",
+      "export_sha256": "89b2832c6ccbbd294ab0beddf7d252013e69e8658e0d574947ecf01fe2debade",
+      "license": "Authored Faust source; TapTools MIT revision is an oracle only, not copied runtime DSP.",
+      "dependencyProvenance": "Authored Faust source; TapTools MIT revision is an oracle only, not copied runtime DSP.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#76 selected v2 Claves pitch correction",
+      "selection_rationale": "#76 selected v2 Claves pitch correction",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:808-aux-maracas",
+      "identity": "808-aux-maracas",
+      "displayName": "808 Maracas",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/808-aux-maracas.dsp",
+        "sha256": "f9c1cbbebe6d84af99d1032b7480aeaf02c63a827852d017bcb462e884dfe90b"
+      },
+      "upstream": {
+        "commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+        "path": "modules/drums-808-aux/v1/maracas.dsp",
+        "sha256": "f1d241330dde4e2c6bf5f1db608561e3e3eccbc4619693c99b181dc7172c619c"
+      },
+      "source_commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+      "source_path": "modules/drums-808-aux/v1/maracas.dsp",
+      "source_sha256": "f1d241330dde4e2c6bf5f1db608561e3e3eccbc4619693c99b181dc7172c619c",
+      "export_path": "scripts/808-aux-maracas.dsp",
+      "export_sha256": "f9c1cbbebe6d84af99d1032b7480aeaf02c63a827852d017bcb462e884dfe90b",
+      "license": "Authored Faust source; TapTools MIT revision is an oracle only, not copied runtime DSP.",
+      "dependencyProvenance": "Authored Faust source; TapTools MIT revision is an oracle only, not copied runtime DSP.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#76 experimental auxiliary source retained for review",
+      "selection_rationale": "#76 experimental auxiliary source retained for review",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:808-aux-cowbell",
+      "identity": "808-aux-cowbell",
+      "displayName": "808 Cowbell",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/808-aux-cowbell.dsp",
+        "sha256": "aba85471dc75cdd24b512f92abf37dff511fa22273425a771dd818af3ff8f637"
+      },
+      "upstream": {
+        "commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+        "path": "modules/drums-808-aux/v1/cowbell.dsp",
+        "sha256": "7804add2d39ea1f171c3715a22d2f637d52e3760b4663992fb49a5cb36e8dd41"
+      },
+      "source_commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+      "source_path": "modules/drums-808-aux/v1/cowbell.dsp",
+      "source_sha256": "7804add2d39ea1f171c3715a22d2f637d52e3760b4663992fb49a5cb36e8dd41",
+      "export_path": "scripts/808-aux-cowbell.dsp",
+      "export_sha256": "aba85471dc75cdd24b512f92abf37dff511fa22273425a771dd818af3ff8f637",
+      "license": "Authored Faust source; TapTools MIT revision is an oracle only, not copied runtime DSP.",
+      "dependencyProvenance": "Authored Faust source; TapTools MIT revision is an oracle only, not copied runtime DSP.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#76 experimental auxiliary source retained for review",
+      "selection_rationale": "#76 experimental auxiliary source retained for review",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    }
+  ],
+  "selected": [
+    {
+      "id": "analog-classics:juno-60",
+      "identity": "juno-60",
+      "displayName": "Analog Classics Juno 60 Voice",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.3.0-coherent-candidate",
+      "source": {
+        "path": "scripts/juno-60.dsp",
+        "sha256": "042ae1cc4122eaef6e8596110e378d547821f580f464732880fadf1deb9141af"
+      },
+      "upstream": {
+        "commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+        "path": "modules/juno-60/v3/voice.dsp",
+        "sha256": "5a0da538ca7d58fb5ff1ac5de506e531181b4de9e36538b2afa59c3c2129ccab"
+      },
+      "source_commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+      "source_path": "modules/juno-60/v3/voice.dsp",
+      "source_sha256": "5a0da538ca7d58fb5ff1ac5de506e531181b4de9e36538b2afa59c3c2129ccab",
+      "export_path": "scripts/juno-60.dsp",
+      "export_sha256": "042ae1cc4122eaef6e8596110e378d547821f580f464732880fadf1deb9141af",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "selected by the hardware/listening freeze; PR89 remains rejected",
+      "selection_rationale": "selected by the hardware/listening freeze; PR89 remains rejected",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:juno-106",
+      "identity": "juno-106",
+      "displayName": "Analog Classics Juno 106 Voice",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.3.0-coherent-candidate",
+      "source": {
+        "path": "scripts/juno-106.dsp",
+        "sha256": "16e7cdca53a9c55f5b790a83e0456070f170407d67bd1a6d4c250dcec8dcfdc1"
+      },
+      "upstream": {
+        "commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+        "path": "modules/juno-106/v3/voice.dsp",
+        "sha256": "c84bf47177ef942f5362a1e3f630cd89a794991090e5138f83357624f8d3813d"
+      },
+      "source_commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+      "source_path": "modules/juno-106/v3/voice.dsp",
+      "source_sha256": "c84bf47177ef942f5362a1e3f630cd89a794991090e5138f83357624f8d3813d",
+      "export_path": "scripts/juno-106.dsp",
+      "export_sha256": "16e7cdca53a9c55f5b790a83e0456070f170407d67bd1a6d4c250dcec8dcfdc1",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "selected coherent-Roland freeze candidate",
+      "selection_rationale": "selected coherent-Roland freeze candidate",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:sh-101",
+      "identity": "sh-101",
+      "displayName": "Analog Classics Mono 101",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.4.0-coherent-candidate",
+      "source": {
+        "path": "scripts/sh-101.dsp",
+        "sha256": "3cce76089d21825a6579c64c1c5dc49878ebe05795c1d787fb8eed5350f2a694"
+      },
+      "upstream": {
+        "commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+        "path": "modules/mono-101/v4/voice.dsp",
+        "sha256": "64d8ab4e929ad3a5c3056953d263873f7bc923e33fe8c3ff7f90471ecb7da744"
+      },
+      "source_commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+      "source_path": "modules/mono-101/v4/voice.dsp",
+      "source_sha256": "64d8ab4e929ad3a5c3056953d263873f7bc923e33fe8c3ff7f90471ecb7da744",
+      "export_path": "scripts/sh-101.dsp",
+      "export_sha256": "3cce76089d21825a6579c64c1c5dc49878ebe05795c1d787fb8eed5350f2a694",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "selected coherent-Roland freeze candidate",
+      "selection_rationale": "selected coherent-Roland freeze candidate",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:mini",
+      "identity": "mini",
+      "displayName": "Analog Classics Mini Voice",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.1-experiment",
+      "source": {
+        "path": "scripts/mini.dsp",
+        "sha256": "eb9f0f1155891ad78c43b2b303c250fbac91f62fd09314a299ff67178c7a5dcc"
+      },
+      "upstream": {
+        "commit": "fd2b7efae4951d014fed3fed3cd01f295a0af21e",
+        "path": "modules/minimoog/v1/voice.dsp",
+        "sha256": "442916e387c9688fa0f29cfab832d65929d2a6dca321685c344dbbc105870899"
+      },
+      "source_commit": "fd2b7efae4951d014fed3fed3cd01f295a0af21e",
+      "source_path": "modules/minimoog/v1/voice.dsp",
+      "source_sha256": "442916e387c9688fa0f29cfab832d65929d2a6dca321685c344dbbc105870899",
+      "export_path": "scripts/mini.dsp",
+      "export_sha256": "eb9f0f1155891ad78c43b2b303c250fbac91f62fd09314a299ff67178c7a5dcc",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "stable v1 retained; v2 collapse and v3 experiment remain unselected",
+      "selection_rationale": "stable v1 retained; v2 collapse and v3 experiment remain unselected",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:808-kick",
+      "identity": "808-kick",
+      "displayName": "analog-classics-808-kick-study",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.2.0-experiment",
+      "source": {
+        "path": "scripts/808-kick.dsp",
+        "sha256": "36cc1c7c82eacf99231a4920e99f392977fd2920367abcfb805ff73d14e16e92"
+      },
+      "upstream": {
+        "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "path": "modules/analog-classics/drums-v2/kick808.dsp",
+        "sha256": "2a8f9579b305623007ac025fba73f2efc8c24a22725d5fafaf1b65616e805613"
+      },
+      "source_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+      "source_path": "modules/analog-classics/drums-v2/kick808.dsp",
+      "source_sha256": "2a8f9579b305623007ac025fba73f2efc8c24a22725d5fafaf1b65616e805613",
+      "export_path": "scripts/808-kick.dsp",
+      "export_sha256": "36cc1c7c82eacf99231a4920e99f392977fd2920367abcfb805ff73d14e16e92",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "v2 replaces preserved exploratory v1",
+      "selection_rationale": "v2 replaces preserved exploratory v1",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:808-snare",
+      "identity": "808-snare",
+      "displayName": "analog-classics-808-snare-study",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.2.0-experiment",
+      "source": {
+        "path": "scripts/808-snare.dsp",
+        "sha256": "2e4db7d4201ba8299e222ec2dc01fa64a4200279448519b8358f906b1c79f60b"
+      },
+      "upstream": {
+        "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "path": "modules/analog-classics/drums-v2/snare808.dsp",
+        "sha256": "7fc1da292e02f7c76d1b47d2f8ec389d619a3ad9f80cb866b65f2b31407be260"
+      },
+      "source_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+      "source_path": "modules/analog-classics/drums-v2/snare808.dsp",
+      "source_sha256": "7fc1da292e02f7c76d1b47d2f8ec389d619a3ad9f80cb866b65f2b31407be260",
+      "export_path": "scripts/808-snare.dsp",
+      "export_sha256": "2e4db7d4201ba8299e222ec2dc01fa64a4200279448519b8358f906b1c79f60b",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "v2 replaces preserved exploratory v1",
+      "selection_rationale": "v2 replaces preserved exploratory v1",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:808-clap",
+      "identity": "808-clap",
+      "displayName": "analog-classics-808-clap-study",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.2.0-experiment",
+      "source": {
+        "path": "scripts/808-clap.dsp",
+        "sha256": "2c835c3f44cae79741078f749a1162a7ea734d5bfbe7446505cf59f004490c7a"
+      },
+      "upstream": {
+        "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "path": "modules/analog-classics/drums-v2/clap808.dsp",
+        "sha256": "a8f0bf3f6469c173f12e1a5c47822b9d0a564badd268cfeaf5165b170f597a78"
+      },
+      "source_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+      "source_path": "modules/analog-classics/drums-v2/clap808.dsp",
+      "source_sha256": "a8f0bf3f6469c173f12e1a5c47822b9d0a564badd268cfeaf5165b170f597a78",
+      "export_path": "scripts/808-clap.dsp",
+      "export_sha256": "2c835c3f44cae79741078f749a1162a7ea734d5bfbe7446505cf59f004490c7a",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "v2 replaces preserved exploratory v1",
+      "selection_rationale": "v2 replaces preserved exploratory v1",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:808-cymbal",
+      "identity": "808-cymbal",
+      "displayName": "analog-classics-808-cymbal-study",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.2.0-experiment",
+      "source": {
+        "path": "scripts/808-cymbal.dsp",
+        "sha256": "a39e81a2977ac4906716f095cf084e3492f838959de1d633a7b631c5a198c714"
+      },
+      "upstream": {
+        "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "path": "modules/analog-classics/drums-v2/cymbal808.dsp",
+        "sha256": "34342d129169f4695fff37a29010dcf816d050dd8ecfc6e6f5b6552f2eec705d"
+      },
+      "source_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+      "source_path": "modules/analog-classics/drums-v2/cymbal808.dsp",
+      "source_sha256": "34342d129169f4695fff37a29010dcf816d050dd8ecfc6e6f5b6552f2eec705d",
+      "export_path": "scripts/808-cymbal.dsp",
+      "export_sha256": "a39e81a2977ac4906716f095cf084e3492f838959de1d633a7b631c5a198c714",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "v2 replaces preserved exploratory v1",
+      "selection_rationale": "v2 replaces preserved exploratory v1",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:analog-hat-closed",
+      "identity": "analog-hat-closed",
+      "displayName": "Analog Closed Hat",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/analog-hat-closed.dsp",
+        "sha256": "2dc40a28a2ae1c007e4354d5472b2c6dd33b520eed3bc66cf90cbc96908b3bdb"
+      },
+      "upstream": {
+        "commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+        "path": "modules/hats-analog/single-note-v1/closed.dsp",
+        "sha256": "1622abc37993a1ce08f3bd550dbb9dc91513658961a707406bc365ba292adeed"
+      },
+      "source_commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+      "source_path": "modules/hats-analog/single-note-v1/closed.dsp",
+      "source_sha256": "1622abc37993a1ce08f3bd550dbb9dc91513658961a707406bc365ba292adeed",
+      "export_path": "scripts/analog-hat-closed.dsp",
+      "export_sha256": "2dc40a28a2ae1c007e4354d5472b2c6dd33b520eed3bc66cf90cbc96908b3bdb",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "explicit v2-derived single-note compatibility facade",
+      "selection_rationale": "explicit v2-derived single-note compatibility facade",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:analog-hat-open",
+      "identity": "analog-hat-open",
+      "displayName": "Analog Open Hat",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/analog-hat-open.dsp",
+        "sha256": "74a298db0b0ea9a0bb5f6f349cd9bd71a5d5c450bb95a8c99c13a407662ddf45"
+      },
+      "upstream": {
+        "commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+        "path": "modules/hats-analog/single-note-v1/open.dsp",
+        "sha256": "9bcc793c683af4c24b34346ee28f62ba66e81de895dbcc928ea65ae8a5af7152"
+      },
+      "source_commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+      "source_path": "modules/hats-analog/single-note-v1/open.dsp",
+      "source_sha256": "9bcc793c683af4c24b34346ee28f62ba66e81de895dbcc928ea65ae8a5af7152",
+      "export_path": "scripts/analog-hat-open.dsp",
+      "export_sha256": "74a298db0b0ea9a0bb5f6f349cd9bd71a5d5c450bb95a8c99c13a407662ddf45",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "explicit v2-derived single-note compatibility facade with local choke",
+      "selection_rationale": "explicit v2-derived single-note compatibility facade with local choke",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:analog-kick-sharp",
+      "identity": "analog-kick-sharp",
+      "displayName": "kick-analog-sharp-optimized",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.2.0-experiment",
+      "source": {
+        "path": "scripts/analog-kick-sharp.dsp",
+        "sha256": "07e228ed526328e17f3ccea031f6951ebd9d1c42db8097202d5a8e134c2957c9"
+      },
+      "upstream": {
+        "commit": "7ed155312580fe5591629beee33ada6a156e8c12",
+        "path": "modules/kick-analog/sharp-02/optimized.dsp",
+        "sha256": "b83178a14247a2c1b7b9d3f1688351c159edb48a90d2dfc4b47759c69851a1ab"
+      },
+      "source_commit": "7ed155312580fe5591629beee33ada6a156e8c12",
+      "source_path": "modules/kick-analog/sharp-02/optimized.dsp",
+      "source_sha256": "b83178a14247a2c1b7b9d3f1688351c159edb48a90d2dfc4b47759c69851a1ab",
+      "export_path": "scripts/analog-kick-sharp.dsp",
+      "export_sha256": "07e228ed526328e17f3ccea031f6951ebd9d1c42db8097202d5a8e134c2957c9",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "same-sound optimized candidate; reference path remains preserved",
+      "selection_rationale": "same-sound optimized candidate; reference path remains preserved",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:analog-snare",
+      "identity": "analog-snare",
+      "displayName": "snare-analog",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.2.0-experiment",
+      "source": {
+        "path": "scripts/analog-snare.dsp",
+        "sha256": "42bb43114fbb8da8231eb09ce4711b04281f4ab9a011dfd0c26a839ffcaf89fc"
+      },
+      "upstream": {
+        "commit": "49403321a0bca76b31f55fa0ffaaf5532518a23f",
+        "path": "modules/snare-analog/v2/snare.dsp",
+        "sha256": "388379d7a2d3b9b6a048304fa185ede6c31a0814237418278815ef29d11035dc"
+      },
+      "source_commit": "49403321a0bca76b31f55fa0ffaaf5532518a23f",
+      "source_path": "modules/snare-analog/v2/snare.dsp",
+      "source_sha256": "388379d7a2d3b9b6a048304fa185ede6c31a0814237418278815ef29d11035dc",
+      "export_path": "scripts/analog-snare.dsp",
+      "export_sha256": "42bb43114fbb8da8231eb09ce4711b04281f4ab9a011dfd0c26a839ffcaf89fc",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "v2 delivery supersedes the root prototype",
+      "selection_rationale": "v2 delivery supersedes the root prototype",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:clap",
+      "identity": "clap",
+      "displayName": "clap",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.3.0-experiment",
+      "source": {
+        "path": "scripts/clap.dsp",
+        "sha256": "24ab483cc054b93581c87dd6da3b30fe96896dd429eb4f1d7d46891940fff112"
+      },
+      "upstream": {
+        "commit": "b126baa4b86ba8edd49dac9b68945ed2497a799e",
+        "path": "modules/clap/v3/clap.dsp",
+        "sha256": "53d55e01f60e0652d38a89495aad5d1961705cfe7cbe7ca145eca91561e106ef"
+      },
+      "source_commit": "b126baa4b86ba8edd49dac9b68945ed2497a799e",
+      "source_path": "modules/clap/v3/clap.dsp",
+      "source_sha256": "53d55e01f60e0652d38a89495aad5d1961705cfe7cbe7ca145eca91561e106ef",
+      "export_path": "scripts/clap.dsp",
+      "export_sha256": "24ab483cc054b93581c87dd6da3b30fe96896dd429eb4f1d7d46891940fff112",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "v3 rebuild selected; v1/v2 rejected identities remain explicit",
+      "selection_rationale": "v3 rebuild selected; v1/v2 rejected identities remain explicit",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:acid-voice",
+      "identity": "acid-voice",
+      "displayName": "Acid Voice",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/acid-voice.dsp",
+        "sha256": "c9181b93cc5f6dbe6e7b5291603082562e1cca9fe40e2002d89a1e84a1ae0579"
+      },
+      "upstream": {
+        "commit": "166acde7bf032b8b87f4835c29703d212a4b0150",
+        "path": "modules/acid-voice/v1/voice.dsp",
+        "sha256": "e00efa47999f621e2ca6f8649da0e541ef9d3bc6d496466eba828e5b55fc6bd7"
+      },
+      "source_commit": "166acde7bf032b8b87f4835c29703d212a4b0150",
+      "source_path": "modules/acid-voice/v1/voice.dsp",
+      "source_sha256": "e00efa47999f621e2ca6f8649da0e541ef9d3bc6d496466eba828e5b55fc6bd7",
+      "export_path": "scripts/acid-voice.dsp",
+      "export_sha256": "c9181b93cc5f6dbe6e7b5291603082562e1cca9fe40e2002d89a1e84a1ae0579",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "current single-note Acid Voice candidate",
+      "selection_rationale": "current single-note Acid Voice candidate",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:trigger-seq",
+      "identity": "trigger-seq",
+      "displayName": "Trigger Seq",
+      "category": "modulation",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/trigger-seq.dsp",
+        "sha256": "881b4843b3699c18511eb1a3df8135402b99201309031516350bdbc09436b8e9"
+      },
+      "upstream": {
+        "commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+        "path": "modules/trigger-seq/v1/trigger.dsp",
+        "sha256": "b3f512b91216feac98791b547fe7d3dfbc71f884dbf6de1dd455b330018ff780"
+      },
+      "source_commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+      "source_path": "modules/trigger-seq/v1/trigger.dsp",
+      "source_sha256": "b3f512b91216feac98791b547fe7d3dfbc71f884dbf6de1dd455b330018ff780",
+      "export_path": "scripts/trigger-seq.dsp",
+      "export_sha256": "881b4843b3699c18511eb1a3df8135402b99201309031516350bdbc09436b8e9",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "external-clock source; CV output and meter observation are distinct",
+      "selection_rationale": "external-clock source; CV output and meter observation are distinct",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:retro-mixer-eq",
+      "identity": "retro-mixer-eq",
+      "displayName": "analog-classics-retro-mixer-eq",
+      "category": "effect",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/retro-mixer-eq.dsp",
+        "sha256": "41fe8fe7aa9cc283dc14a6c1503f1114e6e5a427610158cac15eabd533d74e63"
+      },
+      "upstream": {
+        "commit": "784a4e7c7ae1a81e88b2695fd42f9c20fa5e148e",
+        "path": "modules/retro-mixer-eq/v1/eq.dsp",
+        "sha256": "36704b5c45242579b24aa715518069eced72964508681c86997b4c11ded06dfe"
+      },
+      "source_commit": "784a4e7c7ae1a81e88b2695fd42f9c20fa5e148e",
+      "source_path": "modules/retro-mixer-eq/v1/eq.dsp",
+      "source_sha256": "36704b5c45242579b24aa715518069eced72964508681c86997b4c11ded06dfe",
+      "export_path": "scripts/retro-mixer-eq.dsp",
+      "export_sha256": "41fe8fe7aa9cc283dc14a6c1503f1114e6e5a427610158cac15eabd533d74e63",
+      "license": "MIT",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "current compact mixer-EQ candidate",
+      "selection_rationale": "current compact mixer-EQ candidate",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:tape-echo",
+      "identity": "tape-echo",
+      "displayName": "analog-classics-tape-echo",
+      "category": "effect",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/tape-echo.dsp",
+        "sha256": "23c43c76a938cc44179c8cb33bb2c699c02990477dfd65aad225e1b68b42e62d"
+      },
+      "upstream": {
+        "commit": "c9c00558558fad79faa78ae6e495a4c367eced32",
+        "path": "modules/tape-echo/v1/echo.dsp",
+        "sha256": "9421f35acca21f3741796a36b224d5e9c466f93909765924b9a4488e91316c14"
+      },
+      "source_commit": "c9c00558558fad79faa78ae6e495a4c367eced32",
+      "source_path": "modules/tape-echo/v1/echo.dsp",
+      "source_sha256": "9421f35acca21f3741796a36b224d5e9c466f93909765924b9a4488e91316c14",
+      "export_path": "scripts/tape-echo.dsp",
+      "export_sha256": "23c43c76a938cc44179c8cb33bb2c699c02990477dfd65aad225e1b68b42e62d",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "current multi-head echo candidate",
+      "selection_rationale": "current multi-head echo candidate",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:vintage-rack-reverb",
+      "identity": "vintage-rack-reverb",
+      "displayName": "analog-classics-vintage-rack-reverb",
+      "category": "effect",
+      "version": 1,
+      "soundVersion": "0.1.1-experiment",
+      "source": {
+        "path": "scripts/vintage-rack-reverb.dsp",
+        "sha256": "be69c3725976abe0ea80c02365720ff74f65b6bf79d50c058ab727c264a6a1ec"
+      },
+      "upstream": {
+        "commit": "8581dc9a0e54fecee647f38a156368be35a187f5",
+        "path": "modules/vintage-rack-reverb/v1/reverb.dsp",
+        "sha256": "323e219ee6d052235da8ad94e51ae886f4fbfba2b13e803743495af32305a20f"
+      },
+      "source_commit": "8581dc9a0e54fecee647f38a156368be35a187f5",
+      "source_path": "modules/vintage-rack-reverb/v1/reverb.dsp",
+      "source_sha256": "323e219ee6d052235da8ad94e51ae886f4fbfba2b13e803743495af32305a20f",
+      "export_path": "scripts/vintage-rack-reverb.dsp",
+      "export_sha256": "be69c3725976abe0ea80c02365720ff74f65b6bf79d50c058ab727c264a6a1ec",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "current rack-reverb candidate",
+      "selection_rationale": "current rack-reverb candidate",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:vintage-tape",
+      "identity": "vintage-tape",
+      "displayName": "analog-classics-vintage-tape",
+      "category": "effect",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/vintage-tape.dsp",
+        "sha256": "b0d77ead918639ec8681bd9849f8aafb4e01b7122ee31e2ef84201f23aa70c2c"
+      },
+      "upstream": {
+        "commit": "c2231d7d09688dc6ba2f75a5d8c9fe3b9f5debb4",
+        "path": "modules/vintage-tape/v1/tape.dsp",
+        "sha256": "298ccf1d77f91d95e8cf877634eb5d0843f4fdcf25f4d222f2e3a5c289299d0a"
+      },
+      "source_commit": "c2231d7d09688dc6ba2f75a5d8c9fe3b9f5debb4",
+      "source_path": "modules/vintage-tape/v1/tape.dsp",
+      "source_sha256": "298ccf1d77f91d95e8cf877634eb5d0843f4fdcf25f4d222f2e3a5c289299d0a",
+      "export_path": "scripts/vintage-tape.dsp",
+      "export_sha256": "b0d77ead918639ec8681bd9849f8aafb4e01b7122ee31e2ef84201f23aa70c2c",
+      "license": "MIT-derived; Airwindows IronOxideClassic2 attribution retained in issue #63",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "current tape-colour candidate",
+      "selection_rationale": "current tape-colour candidate",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:retro-ensemble",
+      "identity": "retro-ensemble",
+      "displayName": "analog-classics-retro-ensemble",
+      "category": "effect",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/retro-ensemble.dsp",
+        "sha256": "411c391a6ad14db915074b07f0ea95a04674753977175aa83d8b075c17c28d03"
+      },
+      "upstream": {
+        "commit": "3dd01dac01f94d8cf540e4c082c1978814a831b9",
+        "path": "modules/retro-ensemble/v1/ensemble.dsp",
+        "sha256": "8c719129a2b604a3f69f147233c85fba8cb868c0a3b43a75ac0b726e95025b40"
+      },
+      "source_commit": "3dd01dac01f94d8cf540e4c082c1978814a831b9",
+      "source_path": "modules/retro-ensemble/v1/ensemble.dsp",
+      "source_sha256": "8c719129a2b604a3f69f147233c85fba8cb868c0a3b43a75ac0b726e95025b40",
+      "export_path": "scripts/retro-ensemble.dsp",
+      "export_sha256": "411c391a6ad14db915074b07f0ea95a04674753977175aa83d8b075c17c28d03",
+      "license": "MIT-derived; Airwindows Ensemble attribution retained in issue #63",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "current ensemble candidate",
+      "selection_rationale": "current ensemble candidate",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:bassline-seq",
+      "identity": "bassline-seq",
+      "displayName": "Bassline Seq",
+      "category": "modulation",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/bassline-seq.dsp",
+        "sha256": "6fba57cb5d911f3382dd2bb73dc6a84c920f232f54feb6a96245f3d8a96fa81c"
+      },
+      "upstream": {
+        "commit": "166acde7bf032b8b87f4835c29703d212a4b0150",
+        "path": "modules/bassline-seq/v1/sequence.dsp",
+        "sha256": "06aa0cbbf2b1f1b6ef087dc6044db2eb930b2efb9b88d82512dcbb0d83b01db6"
+      },
+      "source_commit": "166acde7bf032b8b87f4835c29703d212a4b0150",
+      "source_path": "modules/bassline-seq/v1/sequence.dsp",
+      "source_sha256": "06aa0cbbf2b1f1b6ef087dc6044db2eb930b2efb9b88d82512dcbb0d83b01db6",
+      "export_path": "scripts/bassline-seq.dsp",
+      "export_sha256": "6fba57cb5d911f3382dd2bb73dc6a84c920f232f54feb6a96245f3d8a96fa81c",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "current Acid-batch sequencer entry",
+      "selection_rationale": "current Acid-batch sequencer entry",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:606-kick",
+      "identity": "606-kick",
+      "displayName": "606 Kick",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/606-kick.dsp",
+        "sha256": "1cc2a20ddd5e1773af3392963e8d2ed9e609a59bc00f37ca1677e183de5f38cb"
+      },
+      "upstream": {
+        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "path": "modules/drums-606/v1/kick.dsp",
+        "sha256": "9e11406afe0ee0d27bfeb0669e4f9ab1f06369895e046cc9cc55793b7cee7226"
+      },
+      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_path": "modules/drums-606/v1/kick.dsp",
+      "source_sha256": "9e11406afe0ee0d27bfeb0669e4f9ab1f06369895e046cc9cc55793b7cee7226",
+      "export_path": "scripts/606-kick.dsp",
+      "export_sha256": "1cc2a20ddd5e1773af3392963e8d2ed9e609a59bc00f37ca1677e183de5f38cb",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#79 frozen 606 kick selection",
+      "selection_rationale": "#79 frozen 606 kick selection",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:606-snare",
+      "identity": "606-snare",
+      "displayName": "606 Snare",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.2.0-reference-candidate",
+      "source": {
+        "path": "scripts/606-snare.dsp",
+        "sha256": "e7405a55826f4196de0a4cec2c34aa5cf2e71f44793ca8006b1f389f3eec009f"
+      },
+      "upstream": {
+        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "path": "modules/drums-606-reference/v1/snare.dsp",
+        "sha256": "dfcce395df56c62676da40e9522bfa1071e38ce9e656662b7991aef6b731ee7d"
+      },
+      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_path": "modules/drums-606-reference/v1/snare.dsp",
+      "source_sha256": "dfcce395df56c62676da40e9522bfa1071e38ce9e656662b7991aef6b731ee7d",
+      "export_path": "scripts/606-snare.dsp",
+      "export_sha256": "e7405a55826f4196de0a4cec2c34aa5cf2e71f44793ca8006b1f389f3eec009f",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#79 frozen 606 snare selection",
+      "selection_rationale": "#79 frozen 606 snare selection",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:606-low-tom",
+      "identity": "606-low-tom",
+      "displayName": "606 Tom",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/606-low-tom.dsp",
+        "sha256": "86ec59bebb1eb592d47388a4a56e4f588d4c6052bcc0d874725126c500a4bec7"
+      },
+      "upstream": {
+        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "path": "modules/drums-606/v1/tom.dsp",
+        "sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a"
+      },
+      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_path": "modules/drums-606/v1/tom.dsp",
+      "source_sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a",
+      "export_path": "scripts/606-low-tom.dsp",
+      "export_sha256": "86ec59bebb1eb592d47388a4a56e4f588d4c6052bcc0d874725126c500a4bec7",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#79 frozen 606 low-tom preset",
+      "selection_rationale": "#79 frozen 606 low-tom preset",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:606-high-tom",
+      "identity": "606-high-tom",
+      "displayName": "606 Tom",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/606-high-tom.dsp",
+        "sha256": "86ec59bebb1eb592d47388a4a56e4f588d4c6052bcc0d874725126c500a4bec7"
+      },
+      "upstream": {
+        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "path": "modules/drums-606/v1/tom.dsp",
+        "sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a"
+      },
+      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_path": "modules/drums-606/v1/tom.dsp",
+      "source_sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a",
+      "export_path": "scripts/606-high-tom.dsp",
+      "export_sha256": "86ec59bebb1eb592d47388a4a56e4f588d4c6052bcc0d874725126c500a4bec7",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#79 frozen 606 high-tom preset",
+      "selection_rationale": "#79 frozen 606 high-tom preset",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:606-closed-hat",
+      "identity": "606-closed-hat",
+      "displayName": "606 Closed Hat",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/606-closed-hat.dsp",
+        "sha256": "ca55535f6acd3f09a532cab9290d82ad6ad9ab536198dfbe22881b611b4257a6"
+      },
+      "upstream": {
+        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "path": "modules/drums-606/v1/closed-hat.dsp",
+        "sha256": "f63cff557b8ace3f7b18d1dafe6dc87fa9cfae6918d9066a6083393fcb552980"
+      },
+      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_path": "modules/drums-606/v1/closed-hat.dsp",
+      "source_sha256": "f63cff557b8ace3f7b18d1dafe6dc87fa9cfae6918d9066a6083393fcb552980",
+      "export_path": "scripts/606-closed-hat.dsp",
+      "export_sha256": "ca55535f6acd3f09a532cab9290d82ad6ad9ab536198dfbe22881b611b4257a6",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#79 frozen 606 closed-hat selection",
+      "selection_rationale": "#79 frozen 606 closed-hat selection",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:606-open-hat",
+      "identity": "606-open-hat",
+      "displayName": "606 Open Hat",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.2.0-reference-candidate",
+      "source": {
+        "path": "scripts/606-open-hat.dsp",
+        "sha256": "cb271cdc4d1246384969864c26f0bc2aba7a8c89cd3cb2f7912a2454fd2ee6d3"
+      },
+      "upstream": {
+        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "path": "modules/drums-606-reference/v1/open-hat.dsp",
+        "sha256": "d1d47e3f19a36eaf0550a06361c6a46a4f9d7b3d93bf81b256a757cbf9226a07"
+      },
+      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_path": "modules/drums-606-reference/v1/open-hat.dsp",
+      "source_sha256": "d1d47e3f19a36eaf0550a06361c6a46a4f9d7b3d93bf81b256a757cbf9226a07",
+      "export_path": "scripts/606-open-hat.dsp",
+      "export_sha256": "cb271cdc4d1246384969864c26f0bc2aba7a8c89cd3cb2f7912a2454fd2ee6d3",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#79 frozen 606 open-hat/choke selection",
+      "selection_rationale": "#79 frozen 606 open-hat/choke selection",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:606-cymbal",
+      "identity": "606-cymbal",
+      "displayName": "606 Cymbal",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.2.0-reference-candidate",
+      "source": {
+        "path": "scripts/606-cymbal.dsp",
+        "sha256": "1af67fb367d781ab8397dd86662ef1a4f068e78d6c35ae32b7e7ba1ec92b4a9a"
+      },
+      "upstream": {
+        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "path": "modules/drums-606-reference/v1/cymbal.dsp",
+        "sha256": "d7a3cbd65f22404a5a4c74db5fbca9653d8d56f71c87de9687e06b1c2de48815"
+      },
+      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_path": "modules/drums-606-reference/v1/cymbal.dsp",
+      "source_sha256": "d7a3cbd65f22404a5a4c74db5fbca9653d8d56f71c87de9687e06b1c2de48815",
+      "export_path": "scripts/606-cymbal.dsp",
+      "export_sha256": "1af67fb367d781ab8397dd86662ef1a4f068e78d6c35ae32b7e7ba1ec92b4a9a",
+      "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#79 frozen 606 cymbal selection",
+      "selection_rationale": "#79 frozen 606 cymbal selection",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:909-kick",
+      "identity": "909-kick",
+      "displayName": "909 Kick",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/909-kick.dsp",
+        "sha256": "4310c614cc4725508a1ff7eea7a2f0f3569c3fa5065a49827afcb792318d8503"
+      },
+      "upstream": {
+        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "path": "modules/drums-909/v1/kick.dsp",
+        "sha256": "f445870825cbde6b0ba13e394cebcb0b3970d7a18997246229f34e5edcefb294"
+      },
+      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_path": "modules/drums-909/v1/kick.dsp",
+      "source_sha256": "f445870825cbde6b0ba13e394cebcb0b3970d7a18997246229f34e5edcefb294",
+      "export_path": "scripts/909-kick.dsp",
+      "export_sha256": "4310c614cc4725508a1ff7eea7a2f0f3569c3fa5065a49827afcb792318d8503",
+      "license": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#81 frozen recorded-anchor selection",
+      "selection_rationale": "#81 frozen recorded-anchor selection",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:909-snare",
+      "identity": "909-snare",
+      "displayName": "909 Snare",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/909-snare.dsp",
+        "sha256": "f367ebf7b2c62bf8df6631e26add0cfb78c6d59ffe6b9e7e7c5b1c1e21cc42b4"
+      },
+      "upstream": {
+        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "path": "modules/drums-909/v1/snare.dsp",
+        "sha256": "c6fc520a078a65d652318be8d71282d3fc592962c207bfdc0f0af10567fe932a"
+      },
+      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_path": "modules/drums-909/v1/snare.dsp",
+      "source_sha256": "c6fc520a078a65d652318be8d71282d3fc592962c207bfdc0f0af10567fe932a",
+      "export_path": "scripts/909-snare.dsp",
+      "export_sha256": "f367ebf7b2c62bf8df6631e26add0cfb78c6d59ffe6b9e7e7c5b1c1e21cc42b4",
+      "license": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#81 frozen recorded-anchor selection",
+      "selection_rationale": "#81 frozen recorded-anchor selection",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:909-low-tom",
+      "identity": "909-low-tom",
+      "displayName": "909 Tom",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/909-low-tom.dsp",
+        "sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6"
+      },
+      "upstream": {
+        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "path": "modules/drums-909/v1/tom.dsp",
+        "sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75"
+      },
+      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_path": "modules/drums-909/v1/tom.dsp",
+      "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
+      "export_path": "scripts/909-low-tom.dsp",
+      "export_sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6",
+      "license": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#81 frozen recorded-anchor preset",
+      "selection_rationale": "#81 frozen recorded-anchor preset",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:909-mid-tom",
+      "identity": "909-mid-tom",
+      "displayName": "909 Tom",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/909-mid-tom.dsp",
+        "sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6"
+      },
+      "upstream": {
+        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "path": "modules/drums-909/v1/tom.dsp",
+        "sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75"
+      },
+      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_path": "modules/drums-909/v1/tom.dsp",
+      "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
+      "export_path": "scripts/909-mid-tom.dsp",
+      "export_sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6",
+      "license": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#81 frozen recorded-anchor preset",
+      "selection_rationale": "#81 frozen recorded-anchor preset",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:909-high-tom",
+      "identity": "909-high-tom",
+      "displayName": "909 Tom",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/909-high-tom.dsp",
+        "sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6"
+      },
+      "upstream": {
+        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "path": "modules/drums-909/v1/tom.dsp",
+        "sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75"
+      },
+      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_path": "modules/drums-909/v1/tom.dsp",
+      "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
+      "export_path": "scripts/909-high-tom.dsp",
+      "export_sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6",
+      "license": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#81 frozen recorded-anchor preset",
+      "selection_rationale": "#81 frozen recorded-anchor preset",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:909-rim",
+      "identity": "909-rim",
+      "displayName": "909 Rim",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/909-rim.dsp",
+        "sha256": "b37e020d3b48036da3e5c572403abdfcc3b1ffd0322722bcff6bc5438c62f808"
+      },
+      "upstream": {
+        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "path": "modules/drums-909/v1/rim.dsp",
+        "sha256": "85281a7917d697dee47a1475ca24d2ecc08e53b48daa6f807c91367c4ee2e635"
+      },
+      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_path": "modules/drums-909/v1/rim.dsp",
+      "source_sha256": "85281a7917d697dee47a1475ca24d2ecc08e53b48daa6f807c91367c4ee2e635",
+      "export_path": "scripts/909-rim.dsp",
+      "export_sha256": "b37e020d3b48036da3e5c572403abdfcc3b1ffd0322722bcff6bc5438c62f808",
+      "license": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#81 frozen recorded-anchor selection",
+      "selection_rationale": "#81 frozen recorded-anchor selection",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:909-clap",
+      "identity": "909-clap",
+      "displayName": "909 Clap",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/909-clap.dsp",
+        "sha256": "8d7f9372d8a9ea0c90f26fdfc2f6be64310d88bb347dc47210c0b3456797a353"
+      },
+      "upstream": {
+        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "path": "modules/drums-909/v1/clap.dsp",
+        "sha256": "371ca9aa94d3b12ba1a40243e712283adfc51bd14bf39f5924759d2ef1942194"
+      },
+      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_path": "modules/drums-909/v1/clap.dsp",
+      "source_sha256": "371ca9aa94d3b12ba1a40243e712283adfc51bd14bf39f5924759d2ef1942194",
+      "export_path": "scripts/909-clap.dsp",
+      "export_sha256": "8d7f9372d8a9ea0c90f26fdfc2f6be64310d88bb347dc47210c0b3456797a353",
+      "license": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#81 frozen recorded-anchor selection",
+      "selection_rationale": "#81 frozen recorded-anchor selection",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:808-aux-tom-conga",
+      "identity": "808-aux-tom-conga",
+      "displayName": "808 Tom/Conga",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/808-aux-tom-conga.dsp",
+        "sha256": "164cb347691328ae0345eda9bcdf97eb8bfdea4857314b4492bb6663b2d89ab9"
+      },
+      "upstream": {
+        "commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+        "path": "modules/drums-808-aux/v1/tom-conga.dsp",
+        "sha256": "34b05cd95d78d4ca55f9cc1b7de8c36d74c748a1422b9e950a30256e2b862b6f"
+      },
+      "source_commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+      "source_path": "modules/drums-808-aux/v1/tom-conga.dsp",
+      "source_sha256": "34b05cd95d78d4ca55f9cc1b7de8c36d74c748a1422b9e950a30256e2b862b6f",
+      "export_path": "scripts/808-aux-tom-conga.dsp",
+      "export_sha256": "164cb347691328ae0345eda9bcdf97eb8bfdea4857314b4492bb6663b2d89ab9",
+      "license": "Authored Faust source; TapTools MIT revision is an oracle only, not copied runtime DSP.",
+      "dependencyProvenance": "Authored Faust source; TapTools MIT revision is an oracle only, not copied runtime DSP.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#76 experimental auxiliary source retained for review",
+      "selection_rationale": "#76 experimental auxiliary source retained for review",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:808-aux-rim-claves",
+      "identity": "808-aux-rim-claves",
+      "displayName": "808 Rim/Claves",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.1-experiment",
+      "source": {
+        "path": "scripts/808-aux-rim-claves.dsp",
+        "sha256": "89b2832c6ccbbd294ab0beddf7d252013e69e8658e0d574947ecf01fe2debade"
+      },
+      "upstream": {
+        "commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+        "path": "modules/drums-808-aux/v2/rim-claves.dsp",
+        "sha256": "913f0dc0f7290128c421fcc418cae55e13aae48dfbb382fede5d7c60b267f60d"
+      },
+      "source_commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+      "source_path": "modules/drums-808-aux/v2/rim-claves.dsp",
+      "source_sha256": "913f0dc0f7290128c421fcc418cae55e13aae48dfbb382fede5d7c60b267f60d",
+      "export_path": "scripts/808-aux-rim-claves.dsp",
+      "export_sha256": "89b2832c6ccbbd294ab0beddf7d252013e69e8658e0d574947ecf01fe2debade",
+      "license": "Authored Faust source; TapTools MIT revision is an oracle only, not copied runtime DSP.",
+      "dependencyProvenance": "Authored Faust source; TapTools MIT revision is an oracle only, not copied runtime DSP.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#76 selected v2 Claves pitch correction",
+      "selection_rationale": "#76 selected v2 Claves pitch correction",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:808-aux-maracas",
+      "identity": "808-aux-maracas",
+      "displayName": "808 Maracas",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/808-aux-maracas.dsp",
+        "sha256": "f9c1cbbebe6d84af99d1032b7480aeaf02c63a827852d017bcb462e884dfe90b"
+      },
+      "upstream": {
+        "commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+        "path": "modules/drums-808-aux/v1/maracas.dsp",
+        "sha256": "f1d241330dde4e2c6bf5f1db608561e3e3eccbc4619693c99b181dc7172c619c"
+      },
+      "source_commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+      "source_path": "modules/drums-808-aux/v1/maracas.dsp",
+      "source_sha256": "f1d241330dde4e2c6bf5f1db608561e3e3eccbc4619693c99b181dc7172c619c",
+      "export_path": "scripts/808-aux-maracas.dsp",
+      "export_sha256": "f9c1cbbebe6d84af99d1032b7480aeaf02c63a827852d017bcb462e884dfe90b",
+      "license": "Authored Faust source; TapTools MIT revision is an oracle only, not copied runtime DSP.",
+      "dependencyProvenance": "Authored Faust source; TapTools MIT revision is an oracle only, not copied runtime DSP.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#76 experimental auxiliary source retained for review",
+      "selection_rationale": "#76 experimental auxiliary source retained for review",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    },
+    {
+      "id": "analog-classics:808-aux-cowbell",
+      "identity": "808-aux-cowbell",
+      "displayName": "808 Cowbell",
+      "category": "instrument",
+      "version": 1,
+      "soundVersion": "0.1.0-experiment",
+      "source": {
+        "path": "scripts/808-aux-cowbell.dsp",
+        "sha256": "aba85471dc75cdd24b512f92abf37dff511fa22273425a771dd818af3ff8f637"
+      },
+      "upstream": {
+        "commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+        "path": "modules/drums-808-aux/v1/cowbell.dsp",
+        "sha256": "7804add2d39ea1f171c3715a22d2f637d52e3760b4663992fb49a5cb36e8dd41"
+      },
+      "source_commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+      "source_path": "modules/drums-808-aux/v1/cowbell.dsp",
+      "source_sha256": "7804add2d39ea1f171c3715a22d2f637d52e3760b4663992fb49a5cb36e8dd41",
+      "export_path": "scripts/808-aux-cowbell.dsp",
+      "export_sha256": "aba85471dc75cdd24b512f92abf37dff511fa22273425a771dd818af3ff8f637",
+      "license": "Authored Faust source; TapTools MIT revision is an oracle only, not copied runtime DSP.",
+      "dependencyProvenance": "Authored Faust source; TapTools MIT revision is an oracle only, not copied runtime DSP.",
+      "dependencies": [],
+      "status": "internal-review",
+      "selectionRationale": "#76 experimental auxiliary source retained for review",
+      "selection_rationale": "#76 experimental auxiliary source retained for review",
+      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"
+    }
+  ],
+  "rejected_or_unselected": {
+    "modules/juno-60/candidates/pr89-0b98748d/voice.dsp": "owner sonic rejection recorded in PR89/PR90 reconciliation",
+    "modules/minimoog/v2/voice.dsp": "high-cutoff held-note collapse; engineering fixture only",
+    "modules/minimoog/v3/voice.dsp": "numerically repaired experiment without demonstrated whole-instrument advantage",
+    "modules/analog-classics/drums-v1": "exploratory v1 drum studies retained, not selected",
+    "modules/hats-analog/v1": "superseded paired-hat baseline retained as negative control",
+    "modules/clap/v1": "superseded clap identity",
+    "modules/clap/v2": "rejected pitched-body clap identity",
+    "909 sample-backed voices": "asset/rights pending; diagnostic sample fixture is not a portable instrument"
+  },
+  "contract": {
+    "one_note": "lowercase gate, freq in Hz, velocity; host owns allocation",
+    "distinct_events": "accent, slide, choke, clock, reset and run are never aliases",
+    "outputs": "audio, CV and observations are separately declared",
+    "identity": "stable identity is manifest identity plus version and source digest, never display text or geometry",
+    "sound_change": "exports are metadata/library expansion only; a sonic change requires a new version and review freeze"
+  },
+  "consumer_limits": [
+    "No CURLOP runtime, UI, project-state, voice-allocation or device acceptance is claimed.",
+    "Effect/modulation entries retain their declared I/O rather than being mislabeled one-note instruments."
+  ]
+}

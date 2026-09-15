@@ -1,0 +1,22 @@
+declare name "606 High Tom";
+declare version "0.1.0-experiment";
+declare author "curlcomplex";
+declare category "Analog Classics / 606";
+declare description "Single-note 606-inspired candidate; hardware comparison pending; host-owned polyphony.";
+import("stdfaust.lib");
+u=library("drums606.lib");
+gate=button("gate[curlop:input]");
+freq=hslider("freq[unit:Hz][scale:log][curlop:input]",165,60,500,.001);
+velocity=hslider("velocity[curlop:input]",1,0,1,.001);
+accent=hslider("accent[curlop:input]",0,0,1,.001);
+decay=hslider("decay[unit:s][scale:log][col:0][row:0]",0.22,0.025,1.4,.001);
+tone=hslider("tone[col:1][row:0]",.5,0,1,.001):u.sm;
+noise=hslider("noise[col:2][row:0]",0.16,0,1,.001):u.sm;
+level=hslider("level[col:3][row:0]",.8,0,1,.001):u.sm;
+h=gate>gate';
+f=u.lat(h,freq);d=u.lat(h,decay);v=u.lat(h,velocity);a=u.lat(h,accent);
+body=h:u.ring(f,d);
+// Low-passed decaying noise is the 606-style tom "reverb", not an effect.
+room=no.noise:fi.lowpass(2,350*pow(8,tone)):fi.highpass(1,100);
+raw=.84*body+1.35*noise*room*u.env(h,d*1.5,.0018);
+process=u.finish(raw,v,a,level);
