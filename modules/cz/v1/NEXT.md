@@ -1,0 +1,1 @@
+After compile/audio checkpoint: follow issue #98 order — static DCW/reference comparisons first, then dynamic DCW and Casio multistage DCO/DCW/DCA envelopes, then single-line modulation, then dual-line behavior. Do not jump directly to a generic macro synth or claim VoiceOfFaust equations are a hardware oracle.
