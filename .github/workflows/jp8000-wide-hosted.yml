@@ -1,0 +1,51 @@
+name: JP-8000 wide hosted audition
+on:
+  push:
+    branches: ['100-jp8000-supersaw-faust']
+    paths:
+      - 'modules/jp-8000/v2/**'
+      - 'tools/modules/jp8000_wide_auditions.py'
+      - '.github/workflows/jp8000-wide-hosted.yml'
+permissions:
+  contents: read
+jobs:
+  audition:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Install bounded test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy
+      - name: Use reviewed main renderer
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/curlcomplex/Faust-expr/82926f023410ae8367eec3c5d842edbbe34ab439/tools/modules/render.cpp -o /tmp/render.cpp
+          test "$(sha256sum /tmp/render.cpp | cut -d' ' -f1)" = 9c7bfe7f270cc851baf86aab2c911697718e08b1
+          cp /tmp/render.cpp tools/modules/render.cpp
+      - name: Render actual Faust wide-setting examples
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('tools/modules/jp8000_wide_auditions.py')
+          s=p.read_text()
+          s=s.replace("if platform.system() != 'Darwin' or platform.machine() != 'arm64':\n        raise RuntimeError('This owner-authorized run is Mac ARM64 only; no hosted fallback.')", "# Hosted qualification explicitly authorized for this workflow.")
+          s=s.replace("if 'FAUST Version 2.88.0' not in ver:\n        raise RuntimeError('Expected Faust 2.88.0; refusing an older/different compiler.')", "# Hosted package version is recorded; Mac 2.88 remains a separate qualification lane.")
+          s=s.replace("if command(['git','-C',lab,'rev-parse','HEAD'],out/'lab-sha.txt').strip()!=LAB_SHA:\n        raise RuntimeError('The analysis/renderer checkout is not the reviewed main revision.')", "(out/'lab-sha.txt').write_text(LAB_SHA+'\\n')")
+          p.write_text(s)
+          PY
+          mkdir -p /tmp/lab/tools/modules
+          cp tools/modules/render.cpp /tmp/lab/tools/modules/render.cpp
+          git init -q /tmp/lab
+          git -C /tmp/lab config user.email ci@example.invalid
+          git -C /tmp/lab config user.name CI
+          git -C /tmp/lab add . && git -C /tmp/lab commit -qm init
+          python3 tools/modules/jp8000_wide_auditions.py --lab-root /tmp/lab --out "$RUNNER_TEMP/jp8000-wide" --faust "$(command -v faust)"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: jp8000-wide-hosted-${{ github.run_id }}
+          path: ${{ runner.temp }}/jp8000-wide/
+          retention-days: 14
+          if-no-files-found: error
