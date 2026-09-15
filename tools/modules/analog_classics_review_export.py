@@ -13,6 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from faust_export_metadata import normalize_expanded
 
 FREEZE = ROOT / "modules/analog-classics/synth-finish/REVIEW_FREEZE.json"
+DRUMS_909_SELECTION = ROOT / "modules/drums-909-reference/v1/selection.json"
 SOURCE_TREE_BRANCH = "issue-118-analog-classics-review"
 SOURCE_TREE_COMMIT = "149d14b9902167d595f30df1321a2de15c51afd6"
 DEPENDENCY_FIXES = (
@@ -30,9 +31,11 @@ EXPORT_EVIDENCE = {}
 FROZEN_PRESETS = {
  "606-low-tom": {"gate":0,"freq":137.55581,"velocity":1,"accent":0,"decay":.29948,"tone":.38612,"noise":.021917,"level":.8},
  "606-high-tom": {"gate":0,"freq":207.57604,"velocity":1,"accent":0,"decay":.205787,"tone":.162234,"noise":.102346,"level":.8},
- "909-low-tom": {"gate":0,"freq":85.362,"velocity":1,"accent":0,"decay":.688,"bend":.835,"tone":.999,"noise":.465,"drive":.088,"level":.8},
- "909-mid-tom": {"gate":0,"freq":104.23,"velocity":1,"accent":0,"decay":.43,"bend":.999,"tone":.998,"noise":.475,"drive":.133,"level":.8},
- "909-high-tom": {"gate":0,"freq":121.363,"velocity":1,"accent":0,"decay":.43,"bend":.969,"tone":.729,"noise":.6,"drive":.15,"level":.8},
+}
+SUPERSEDED_IDENTITIES = {
+    "analog-classics:909-low-tom": {"replacement": "analog-classics:909-tom", "preset": "low-tom", "status": "superseded-preset-wrapper"},
+    "analog-classics:909-mid-tom": {"replacement": "analog-classics:909-tom", "preset": "mid-tom", "status": "superseded-preset-wrapper"},
+    "analog-classics:909-high-tom": {"replacement": "analog-classics:909-tom", "preset": "high-tom", "status": "superseded-preset-wrapper"},
 }
 SUBJECTS = (
     # Exact synth freeze: do not promote PR89 or Mini v2/v3 by version number.
@@ -68,9 +71,7 @@ SUBJECTS = (
     ("606-cymbal", "instrument", "modules/drums-606-reference/v1/cymbal.dsp", "#79 frozen 606 cymbal selection", "work/source-606"),
     ("909-kick", "instrument", "modules/drums-909/v1/kick.dsp", "#81 frozen recorded-anchor selection", "work/source-909"),
     ("909-snare", "instrument", "modules/drums-909/v1/snare.dsp", "#81 frozen recorded-anchor selection", "work/source-909"),
-    ("909-low-tom", "instrument", "modules/drums-909/v1/tom.dsp", "#81 frozen recorded-anchor preset", "work/source-909"),
-    ("909-mid-tom", "instrument", "modules/drums-909/v1/tom.dsp", "#81 frozen recorded-anchor preset", "work/source-909"),
-    ("909-high-tom", "instrument", "modules/drums-909/v1/tom.dsp", "#81 frozen recorded-anchor preset", "work/source-909"),
+    ("909-tom", "instrument", "modules/drums-909/v1/tom.dsp", "one canonical 909 Tom instrument; low/mid/high remain named recorded-anchor presets", "work/source-909"),
     ("909-rim", "instrument", "modules/drums-909/v1/rim.dsp", "#81 frozen recorded-anchor selection", "work/source-909"),
     ("909-clap", "instrument", "modules/drums-909/v1/clap.dsp", "#81 frozen recorded-anchor selection", "work/source-909"),
     ("808-aux-tom-conga", "instrument", "modules/drums-808-aux/v1/tom-conga.dsp", "#76 experimental auxiliary source retained for review", "work/source-808-aux"),
@@ -103,6 +104,12 @@ def declarations(text):
             key, value = line[8:].split(' "', 1)
             result[key] = value.rsplit('";', 1)[0]
     return result
+
+def control_defaults(text):
+    defaults = {label.split("[", 1)[0]: 0 for label in re.findall(r'(?:button|checkbox)\("([^"]+)"', text)}
+    for label, value in re.findall(r'hslider\("([^"]+)",\s*([-+0-9.eEfF]+)', text):
+        defaults[label.split("[", 1)[0]] = float(value.rstrip("fF"))
+    return defaults
 
 def build_runner(source, folder, include_dirs=()):
     folder.mkdir(parents=True, exist_ok=True)
@@ -211,7 +218,7 @@ def export_one(source, destination, identity, compiler_version):
     bars = re.findall(r'(?:hbargraph|vbargraph)\("([^"]+)"', normalized)
     imports = dependency_provenance(source, include_dirs, compiler_version)
     output_roles = [{"label":label,"role":"cv" if "[curlop:cvout]" in label else "observation" if "[curlop:meterout]" in label else "bargraph-unclassified"} for label in bars]
-    evidence = {"compiledIo":{"audioInputs":channels[0],"signalOutputs":channels[1]},"namedOutputs":output_roles,"imports":imports}
+    evidence = {"compiledIo":{"audioInputs":channels[0],"signalOutputs":channels[1]},"namedOutputs":output_roles,"imports":imports,"controlDefaults":control_defaults(normalized)}
     if identity in ADAPTATION_EVIDENCE:
         evidence["renderedEquivalence"] = rendered_equivalence(identity, before_adaptation, destination)
     EXPORT_EVIDENCE[identity] = evidence
@@ -226,7 +233,10 @@ def provenance(identity, source_root):
 
 def run(out):
     out = out.resolve(); scripts = out / "scripts"; scripts.mkdir(parents=True, exist_ok=True)
+    for superseded in SUPERSEDED_IDENTITIES:
+        (scripts / f"{superseded.split(':', 1)[1]}.dsp").unlink(missing_ok=True)
     freeze = json.loads(FREEZE.read_text())
+    drums_909 = json.loads(DRUMS_909_SELECTION.read_text())["selections"]
     compiler_version = subprocess.check_output(["faust", "--version"], text=True).splitlines()[0]
     cxx_version = subprocess.check_output([os.getenv("CXX", "c++"), "--version"], text=True).splitlines()[0]
     entries = []
@@ -268,8 +278,11 @@ def run(out):
             family, voice = entry["identity"].split("-", 1)
             entry["displayName"] = family + " " + voice.replace("-", " ").title()
             entry["displayMetadataAdaptation"] = {"onlyUiMetadataChanged": True, "displayName": entry["displayName"]}
+        if entry["identity"] == "909-tom":
+            entry["canonicalDefaultState"] = {"kind": "source-defaults", "settings": EXPORT_EVIDENCE[entry["identity"]]["controlDefaults"]}
+            entry["namedPresets"] = [{"name": preset.replace("-", " ").title(), "presetId": preset, "status": "frozen-reference-anchor", "reference": drums_909[preset]["reference"], "settings": drums_909[preset]["settings"]} for preset in ("low-tom", "mid-tom", "high-tom")]
         entry["contractEvidence"] = {"capturedControls": sorted(set(labels)), "canonicalOneNote": entry["category"] != "instrument" or not gaps, "gaps": gaps, "specialEvents": special, "metadataAdapted": entry["identity"] in ADAPTATION_EVIDENCE}
-    manifest = {"schema": 1, "identity": "analog-classics-internal-review-2026-09-15.1", "status": "internal-review-only", "sourceTree": {"branch": SOURCE_TREE_BRANCH, "commit": SOURCE_TREE_COMMIT, "contract": "Every recorded source and repository-library dependency hash is the blob at this exact commit; file-level lineage commits are informational only.", "dependencyFixes": DEPENDENCY_FIXES}, "base_review_freeze": {"path": str(FREEZE.relative_to(ROOT)), "sha256": digest(FREEZE), "identity": freeze["id"]}, "modules": entries, "selected": entries, "rejected_or_unselected": REJECTED, "contract": {"one_note": "lowercase gate, freq in Hz, velocity; host owns allocation", "distinct_events": "accent, slide, choke, clock, reset and run are never aliases", "outputs": "audio, CV and observations are separately declared", "identity": "stable identity is manifest identity plus version and source digest, never display text or geometry", "sound_change": "exports are metadata/library expansion only; a sonic change requires a new version and review freeze"}, "consumer_limits": ["No CURLOP runtime, UI, project-state, voice-allocation or device acceptance is claimed.", "Effect/modulation entries retain their native I/O rather than being mislabeled one-note instruments."]}
+    manifest = {"schema": 1, "identity": "analog-classics-internal-review-2026-09-15.2", "status": "internal-review-only", "sourceTree": {"branch": SOURCE_TREE_BRANCH, "commit": SOURCE_TREE_COMMIT, "contract": "Every recorded source and repository-library dependency hash is the blob at this exact commit; file-level lineage commits are informational only.", "dependencyFixes": DEPENDENCY_FIXES}, "base_review_freeze": {"path": str(FREEZE.relative_to(ROOT)), "sha256": digest(FREEZE), "identity": freeze["id"]}, "modules": entries, "selected": entries, "supersededIdentities": SUPERSEDED_IDENTITIES, "rejected_or_unselected": REJECTED, "contract": {"one_note": "lowercase gate, freq in Hz, velocity; host owns allocation", "distinct_events": "accent, slide, choke, clock, reset and run are never aliases", "outputs": "audio, CV and observations are separately declared", "identity": "stable identity is manifest identity plus version and source digest, never display text or geometry", "sound_change": "exports are metadata/library expansion only; a sonic change requires a new version and review freeze"}, "consumer_limits": ["No CURLOP runtime, UI, project-state, voice-allocation or device acceptance is claimed.", "Effect/modulation entries retain their native I/O rather than being mislabeled one-note instruments."]}
     manifest["schema"] = "curlop-analog-classics-review/v1"
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
 

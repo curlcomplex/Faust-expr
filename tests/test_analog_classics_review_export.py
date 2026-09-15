@@ -11,13 +11,14 @@ class AnalogClassicsReviewExport(unittest.TestCase):
             manifest = json.loads((out / "manifest.json").read_text())
             self.assertEqual(manifest["status"], "internal-review-only")
             self.assertEqual(manifest["schema"], "curlop-analog-classics-review/v1")
+            self.assertEqual(manifest["identity"], "analog-classics-internal-review-2026-09-15.2")
             source_tree = manifest["sourceTree"]
             self.assertEqual(source_tree["branch"], "issue-118-analog-classics-review")
             self.assertRegex(source_tree["commit"], r"^[0-9a-f]{40}$")
             self.assertIn("file-level lineage commits are informational only", source_tree["contract"])
             for dependency_fix in source_tree["dependencyFixes"]:
                 subprocess.run(["git", "merge-base", "--is-ancestor", dependency_fix["commit"], source_tree["commit"]], cwd=ROOT, check=True)
-            self.assertEqual(len(manifest["selected"]), 39)
+            self.assertEqual(len(manifest["selected"]), 37)
             self.assertEqual(manifest["modules"], manifest["selected"])
             selected = {entry["identity"]: entry for entry in manifest["modules"]}
             self.assertEqual(selected["mini"]["source_path"], "modules/minimoog/v1/voice.dsp")
@@ -106,7 +107,7 @@ class AnalogClassicsReviewExport(unittest.TestCase):
                 "606": json.loads((ROOT / "modules/drums-606-reference/v1/selection.json").read_text())["selections"],
                 "909": json.loads((ROOT / "modules/drums-909-reference/v1/selection.json").read_text())["selections"],
             }
-            tom_ids = ("606-low-tom", "606-high-tom", "909-low-tom", "909-mid-tom", "909-high-tom")
+            tom_ids = ("606-low-tom", "606-high-tom")
             for identity in tom_ids:
                 family, voice = identity.split("-", 1)
                 settings = selections[family][voice]["settings"]
@@ -115,6 +116,20 @@ class AnalogClassicsReviewExport(unittest.TestCase):
                 self.assertEqual(selected[identity]["displayName"], family + " " + voice.replace("-", " ").title())
                 self.assertTrue(selected[identity]["displayMetadataAdaptation"]["onlyUiMetadataChanged"])
             self.assertEqual(len({selected[identity]["source"]["sha256"] for identity in tom_ids}), len(tom_ids))
+            tom_909 = selected["909-tom"]
+            self.assertEqual(tom_909["displayName"], "909 Tom")
+            self.assertEqual(tom_909["source_path"], "modules/drums-909/v1/tom.dsp")
+            self.assertEqual(tom_909["canonicalDefaultState"], {"kind": "source-defaults", "settings": {"gate": 0, "freq": 105.0, "velocity": 1.0, "accent": 0.0, "decay": 0.55, "bend": 0.28, "tone": 0.5, "noise": 0.1, "drive": 0.08, "level": 0.8}})
+            expected_909_presets = selections["909"]
+            self.assertEqual([preset["presetId"] for preset in tom_909["namedPresets"]], ["low-tom", "mid-tom", "high-tom"])
+            for preset in tom_909["namedPresets"]:
+                self.assertEqual(preset["settings"], expected_909_presets[preset["presetId"]]["settings"])
+                self.assertEqual(preset["reference"], expected_909_presets[preset["presetId"]]["reference"])
+            for preset_id in ("low-tom", "mid-tom", "high-tom"):
+                old_identity = f"analog-classics:909-{preset_id}"
+                self.assertNotIn(f"909-{preset_id}", selected)
+                self.assertEqual(manifest["supersededIdentities"][old_identity], {"replacement": "analog-classics:909-tom", "preset": preset_id, "status": "superseded-preset-wrapper"})
+                self.assertFalse((out / "scripts" / f"909-{preset_id}.dsp").exists())
             self.assertIn("modules/juno-60/candidates/pr89-0b98748d/voice.dsp", manifest["rejected_or_unselected"])
             self.assertIn("909 sample-backed voices", manifest["rejected_or_unselected"])
 

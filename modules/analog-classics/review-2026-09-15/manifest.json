@@ -1,6 +1,6 @@
 {
   "schema": "curlop-analog-classics-review/v1",
-  "identity": "analog-classics-internal-review-2026-09-15.1",
+  "identity": "analog-classics-internal-review-2026-09-15.2",
   "status": "internal-review-only",
   "sourceTree": {
     "branch": "issue-118-analog-classics-review",
@@ -3311,15 +3311,15 @@
       }
     },
     {
-      "id": "analog-classics:909-low-tom",
-      "identity": "909-low-tom",
-      "displayName": "909 Low Tom",
+      "id": "analog-classics:909-tom",
+      "identity": "909-tom",
+      "displayName": "909 Tom",
       "category": "instrument",
       "version": 1,
       "soundVersion": "0.1.0-experiment",
       "source": {
-        "path": "scripts/909-low-tom.dsp",
-        "sha256": "fdd9373eee17b9c2745ee7e3d02c12b10d54169f1d85ff2fd430437cb814d151"
+        "path": "scripts/909-tom.dsp",
+        "sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -3336,8 +3336,8 @@
       "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-909/v1/tom.dsp",
       "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
-      "export_path": "scripts/909-low-tom.dsp",
-      "export_sha256": "fdd9373eee17b9c2745ee7e3d02c12b10d54169f1d85ff2fd430437cb814d151",
+      "export_path": "scripts/909-tom.dsp",
+      "export_sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6",
       "license": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseIdentifier": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseStatus": "mixed-reviewed",
@@ -3381,292 +3381,86 @@
         ]
       },
       "status": "internal-review",
-      "selectionRationale": "#81 frozen recorded-anchor preset",
-      "selection_rationale": "#81 frozen recorded-anchor preset",
+      "selectionRationale": "one canonical 909 Tom instrument; low/mid/high remain named recorded-anchor presets",
+      "selection_rationale": "one canonical 909 Tom instrument; low/mid/high remain named recorded-anchor presets",
       "metadataAdaptation": "faust expansion and metadata normalization only",
-      "lineageUuid": "f018492d-28e2-5016-94af-435aee7c3475",
+      "lineageUuid": "eebdc653-f54b-5507-8d8f-fc9fd6e765f5",
       "outputEvidence": {
         "audioInputs": 0,
         "signalOutputs": 1,
         "namedOutputs": []
       },
-      "frozenPresetSettings": {
-        "gate": 0,
-        "freq": 85.362,
-        "velocity": 1,
-        "accent": 0,
-        "decay": 0.688,
-        "bend": 0.835,
-        "tone": 0.999,
-        "noise": 0.465,
-        "drive": 0.088,
-        "level": 0.8
-      },
-      "adaptedDefaults": {
-        "freq": 85.362,
-        "decay": 0.688,
-        "bend": 0.835,
-        "tone": 0.999,
-        "noise": 0.465,
-        "drive": 0.088,
-        "level": 0.8
-      },
-      "displayMetadataAdaptation": {
-        "onlyUiMetadataChanged": true,
-        "displayName": "909 Low Tom"
-      },
-      "contractEvidence": {
-        "capturedControls": [
-          "accent[curlop:input]",
-          "bend[col:1][row:0]",
-          "decay[unit:s][col:0][row:0]",
-          "drive[col:0][row:1]",
-          "freq[unit:Hz][scale:log][curlop:input]",
-          "gate[curlop:input]",
-          "level[col:1][row:1]",
-          "noise[col:3][row:0]",
-          "tone[col:2][row:0]",
-          "velocity[curlop:input]"
-        ],
-        "canonicalOneNote": true,
-        "gaps": [],
-        "specialEvents": [
-          "accent"
-        ],
-        "metadataAdapted": false
-      }
-    },
-    {
-      "id": "analog-classics:909-mid-tom",
-      "identity": "909-mid-tom",
-      "displayName": "909 Mid Tom",
-      "category": "instrument",
-      "version": 1,
-      "soundVersion": "0.1.0-experiment",
-      "source": {
-        "path": "scripts/909-mid-tom.dsp",
-        "sha256": "c84e713f0af05c5796dc1ef68e6fe7eedadbf36e8f25638677f10cb40e7188d9"
-      },
-      "upstream": {
-        "branch": "issue-118-analog-classics-review",
-        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
-        "path": "modules/drums-909/v1/tom.dsp",
-        "sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
-        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
-        "lineage": {
-          "branch": "80-909-reference-tuning",
-          "commit": "7aa75de6394568410d5b114d62b405138e9c9e35"
+      "canonicalDefaultState": {
+        "kind": "source-defaults",
+        "settings": {
+          "gate": 0,
+          "freq": 105.0,
+          "bend": 0.28,
+          "decay": 0.55,
+          "tone": 0.5,
+          "noise": 0.1,
+          "drive": 0.08,
+          "accent": 0.0,
+          "velocity": 1.0,
+          "level": 0.8
         }
       },
-      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
-      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
-      "source_path": "modules/drums-909/v1/tom.dsp",
-      "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
-      "export_path": "scripts/909-mid-tom.dsp",
-      "export_sha256": "c84e713f0af05c5796dc1ef68e6fe7eedadbf36e8f25638677f10cb40e7188d9",
-      "license": "NOASSERTION (module); MIT (identified Plaits formulas)",
-      "licenseIdentifier": "NOASSERTION (module); MIT (identified Plaits formulas)",
-      "licenseStatus": "mixed-reviewed",
-      "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
-      "dependencies": [
+      "namedPresets": [
         {
-          "kind": "repository-library",
-          "path": "modules/drums-909/v1/drums909.lib",
-          "sha256": "42e21c6dca506299a74516d9901e242c32ead92ba9c1a66d81d16d49bb9d87ea",
-          "referencedAs": "library"
+          "name": "Low Tom",
+          "presetId": "low-tom",
+          "status": "frozen-reference-anchor",
+          "reference": "LT3D3.WAV",
+          "settings": {
+            "gate": 0,
+            "freq": 85.362,
+            "velocity": 1,
+            "accent": 0,
+            "decay": 0.688,
+            "bend": 0.835,
+            "tone": 0.999,
+            "noise": 0.465,
+            "drive": 0.088,
+            "level": 0.8
+          }
         },
         {
-          "kind": "standard-library",
-          "name": "stdfaust.lib",
-          "compilerVersion": "FAUST Version 2.85.9"
-        }
-      ],
-      "compiler": {
-        "faustVersion": "FAUST Version 2.85.9",
-        "cxxVersion": "Apple clang version 16.0.0 (clang-1600.0.26.6)",
-        "exportOptions": [
-          "-e",
-          "-I",
-          "<source-parent>",
-          "-I",
-          "modules/analog-classics/synth-batch",
-          "-I",
-          "modules/analog-classics/synth-finish"
-        ],
-        "compileOptions": [
-          "-lang",
-          "cpp",
-          "-single",
-          "-cn",
-          "ModuleDSP"
-        ],
-        "runnerCompileOptions": [
-          "-std=c++17",
-          "-O2",
-          "-ffp-contract=off"
-        ]
-      },
-      "status": "internal-review",
-      "selectionRationale": "#81 frozen recorded-anchor preset",
-      "selection_rationale": "#81 frozen recorded-anchor preset",
-      "metadataAdaptation": "faust expansion and metadata normalization only",
-      "lineageUuid": "c31f0667-a394-57af-8127-40a6ed2cc9c1",
-      "outputEvidence": {
-        "audioInputs": 0,
-        "signalOutputs": 1,
-        "namedOutputs": []
-      },
-      "frozenPresetSettings": {
-        "gate": 0,
-        "freq": 104.23,
-        "velocity": 1,
-        "accent": 0,
-        "decay": 0.43,
-        "bend": 0.999,
-        "tone": 0.998,
-        "noise": 0.475,
-        "drive": 0.133,
-        "level": 0.8
-      },
-      "adaptedDefaults": {
-        "freq": 104.23,
-        "decay": 0.43,
-        "bend": 0.999,
-        "tone": 0.998,
-        "noise": 0.475,
-        "drive": 0.133,
-        "level": 0.8
-      },
-      "displayMetadataAdaptation": {
-        "onlyUiMetadataChanged": true,
-        "displayName": "909 Mid Tom"
-      },
-      "contractEvidence": {
-        "capturedControls": [
-          "accent[curlop:input]",
-          "bend[col:1][row:0]",
-          "decay[unit:s][col:0][row:0]",
-          "drive[col:0][row:1]",
-          "freq[unit:Hz][scale:log][curlop:input]",
-          "gate[curlop:input]",
-          "level[col:1][row:1]",
-          "noise[col:3][row:0]",
-          "tone[col:2][row:0]",
-          "velocity[curlop:input]"
-        ],
-        "canonicalOneNote": true,
-        "gaps": [],
-        "specialEvents": [
-          "accent"
-        ],
-        "metadataAdapted": false
-      }
-    },
-    {
-      "id": "analog-classics:909-high-tom",
-      "identity": "909-high-tom",
-      "displayName": "909 High Tom",
-      "category": "instrument",
-      "version": 1,
-      "soundVersion": "0.1.0-experiment",
-      "source": {
-        "path": "scripts/909-high-tom.dsp",
-        "sha256": "97af60317c1e71cec257009637fb7544fe4a6d2946388e927026a15b0736019f"
-      },
-      "upstream": {
-        "branch": "issue-118-analog-classics-review",
-        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
-        "path": "modules/drums-909/v1/tom.dsp",
-        "sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
-        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
-        "lineage": {
-          "branch": "80-909-reference-tuning",
-          "commit": "7aa75de6394568410d5b114d62b405138e9c9e35"
-        }
-      },
-      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
-      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
-      "source_path": "modules/drums-909/v1/tom.dsp",
-      "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
-      "export_path": "scripts/909-high-tom.dsp",
-      "export_sha256": "97af60317c1e71cec257009637fb7544fe4a6d2946388e927026a15b0736019f",
-      "license": "NOASSERTION (module); MIT (identified Plaits formulas)",
-      "licenseIdentifier": "NOASSERTION (module); MIT (identified Plaits formulas)",
-      "licenseStatus": "mixed-reviewed",
-      "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
-      "dependencies": [
-        {
-          "kind": "repository-library",
-          "path": "modules/drums-909/v1/drums909.lib",
-          "sha256": "42e21c6dca506299a74516d9901e242c32ead92ba9c1a66d81d16d49bb9d87ea",
-          "referencedAs": "library"
+          "name": "Mid Tom",
+          "presetId": "mid-tom",
+          "status": "frozen-reference-anchor",
+          "reference": "MT3D3.WAV",
+          "settings": {
+            "gate": 0,
+            "freq": 104.23,
+            "velocity": 1,
+            "accent": 0,
+            "decay": 0.43,
+            "bend": 0.999,
+            "tone": 0.998,
+            "noise": 0.475,
+            "drive": 0.133,
+            "level": 0.8
+          }
         },
         {
-          "kind": "standard-library",
-          "name": "stdfaust.lib",
-          "compilerVersion": "FAUST Version 2.85.9"
+          "name": "High Tom",
+          "presetId": "high-tom",
+          "status": "frozen-reference-anchor",
+          "reference": "HT3D3.WAV",
+          "settings": {
+            "gate": 0,
+            "freq": 121.363,
+            "velocity": 1,
+            "accent": 0,
+            "decay": 0.43,
+            "bend": 0.969,
+            "tone": 0.729,
+            "noise": 0.6,
+            "drive": 0.15,
+            "level": 0.8
+          }
         }
       ],
-      "compiler": {
-        "faustVersion": "FAUST Version 2.85.9",
-        "cxxVersion": "Apple clang version 16.0.0 (clang-1600.0.26.6)",
-        "exportOptions": [
-          "-e",
-          "-I",
-          "<source-parent>",
-          "-I",
-          "modules/analog-classics/synth-batch",
-          "-I",
-          "modules/analog-classics/synth-finish"
-        ],
-        "compileOptions": [
-          "-lang",
-          "cpp",
-          "-single",
-          "-cn",
-          "ModuleDSP"
-        ],
-        "runnerCompileOptions": [
-          "-std=c++17",
-          "-O2",
-          "-ffp-contract=off"
-        ]
-      },
-      "status": "internal-review",
-      "selectionRationale": "#81 frozen recorded-anchor preset",
-      "selection_rationale": "#81 frozen recorded-anchor preset",
-      "metadataAdaptation": "faust expansion and metadata normalization only",
-      "lineageUuid": "4285d738-abd3-5b06-bb21-dacd1a2cc2ff",
-      "outputEvidence": {
-        "audioInputs": 0,
-        "signalOutputs": 1,
-        "namedOutputs": []
-      },
-      "frozenPresetSettings": {
-        "gate": 0,
-        "freq": 121.363,
-        "velocity": 1,
-        "accent": 0,
-        "decay": 0.43,
-        "bend": 0.969,
-        "tone": 0.729,
-        "noise": 0.6,
-        "drive": 0.15,
-        "level": 0.8
-      },
-      "adaptedDefaults": {
-        "freq": 121.363,
-        "decay": 0.43,
-        "bend": 0.969,
-        "tone": 0.729,
-        "noise": 0.6,
-        "drive": 0.15,
-        "level": 0.8
-      },
-      "displayMetadataAdaptation": {
-        "onlyUiMetadataChanged": true,
-        "displayName": "909 High Tom"
-      },
       "contractEvidence": {
         "capturedControls": [
           "accent[curlop:input]",
@@ -7581,15 +7375,15 @@
       }
     },
     {
-      "id": "analog-classics:909-low-tom",
-      "identity": "909-low-tom",
-      "displayName": "909 Low Tom",
+      "id": "analog-classics:909-tom",
+      "identity": "909-tom",
+      "displayName": "909 Tom",
       "category": "instrument",
       "version": 1,
       "soundVersion": "0.1.0-experiment",
       "source": {
-        "path": "scripts/909-low-tom.dsp",
-        "sha256": "fdd9373eee17b9c2745ee7e3d02c12b10d54169f1d85ff2fd430437cb814d151"
+        "path": "scripts/909-tom.dsp",
+        "sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -7606,8 +7400,8 @@
       "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-909/v1/tom.dsp",
       "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
-      "export_path": "scripts/909-low-tom.dsp",
-      "export_sha256": "fdd9373eee17b9c2745ee7e3d02c12b10d54169f1d85ff2fd430437cb814d151",
+      "export_path": "scripts/909-tom.dsp",
+      "export_sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6",
       "license": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseIdentifier": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseStatus": "mixed-reviewed",
@@ -7651,292 +7445,86 @@
         ]
       },
       "status": "internal-review",
-      "selectionRationale": "#81 frozen recorded-anchor preset",
-      "selection_rationale": "#81 frozen recorded-anchor preset",
+      "selectionRationale": "one canonical 909 Tom instrument; low/mid/high remain named recorded-anchor presets",
+      "selection_rationale": "one canonical 909 Tom instrument; low/mid/high remain named recorded-anchor presets",
       "metadataAdaptation": "faust expansion and metadata normalization only",
-      "lineageUuid": "f018492d-28e2-5016-94af-435aee7c3475",
+      "lineageUuid": "eebdc653-f54b-5507-8d8f-fc9fd6e765f5",
       "outputEvidence": {
         "audioInputs": 0,
         "signalOutputs": 1,
         "namedOutputs": []
       },
-      "frozenPresetSettings": {
-        "gate": 0,
-        "freq": 85.362,
-        "velocity": 1,
-        "accent": 0,
-        "decay": 0.688,
-        "bend": 0.835,
-        "tone": 0.999,
-        "noise": 0.465,
-        "drive": 0.088,
-        "level": 0.8
-      },
-      "adaptedDefaults": {
-        "freq": 85.362,
-        "decay": 0.688,
-        "bend": 0.835,
-        "tone": 0.999,
-        "noise": 0.465,
-        "drive": 0.088,
-        "level": 0.8
-      },
-      "displayMetadataAdaptation": {
-        "onlyUiMetadataChanged": true,
-        "displayName": "909 Low Tom"
-      },
-      "contractEvidence": {
-        "capturedControls": [
-          "accent[curlop:input]",
-          "bend[col:1][row:0]",
-          "decay[unit:s][col:0][row:0]",
-          "drive[col:0][row:1]",
-          "freq[unit:Hz][scale:log][curlop:input]",
-          "gate[curlop:input]",
-          "level[col:1][row:1]",
-          "noise[col:3][row:0]",
-          "tone[col:2][row:0]",
-          "velocity[curlop:input]"
-        ],
-        "canonicalOneNote": true,
-        "gaps": [],
-        "specialEvents": [
-          "accent"
-        ],
-        "metadataAdapted": false
-      }
-    },
-    {
-      "id": "analog-classics:909-mid-tom",
-      "identity": "909-mid-tom",
-      "displayName": "909 Mid Tom",
-      "category": "instrument",
-      "version": 1,
-      "soundVersion": "0.1.0-experiment",
-      "source": {
-        "path": "scripts/909-mid-tom.dsp",
-        "sha256": "c84e713f0af05c5796dc1ef68e6fe7eedadbf36e8f25638677f10cb40e7188d9"
-      },
-      "upstream": {
-        "branch": "issue-118-analog-classics-review",
-        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
-        "path": "modules/drums-909/v1/tom.dsp",
-        "sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
-        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
-        "lineage": {
-          "branch": "80-909-reference-tuning",
-          "commit": "7aa75de6394568410d5b114d62b405138e9c9e35"
+      "canonicalDefaultState": {
+        "kind": "source-defaults",
+        "settings": {
+          "gate": 0,
+          "freq": 105.0,
+          "bend": 0.28,
+          "decay": 0.55,
+          "tone": 0.5,
+          "noise": 0.1,
+          "drive": 0.08,
+          "accent": 0.0,
+          "velocity": 1.0,
+          "level": 0.8
         }
       },
-      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
-      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
-      "source_path": "modules/drums-909/v1/tom.dsp",
-      "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
-      "export_path": "scripts/909-mid-tom.dsp",
-      "export_sha256": "c84e713f0af05c5796dc1ef68e6fe7eedadbf36e8f25638677f10cb40e7188d9",
-      "license": "NOASSERTION (module); MIT (identified Plaits formulas)",
-      "licenseIdentifier": "NOASSERTION (module); MIT (identified Plaits formulas)",
-      "licenseStatus": "mixed-reviewed",
-      "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
-      "dependencies": [
+      "namedPresets": [
         {
-          "kind": "repository-library",
-          "path": "modules/drums-909/v1/drums909.lib",
-          "sha256": "42e21c6dca506299a74516d9901e242c32ead92ba9c1a66d81d16d49bb9d87ea",
-          "referencedAs": "library"
+          "name": "Low Tom",
+          "presetId": "low-tom",
+          "status": "frozen-reference-anchor",
+          "reference": "LT3D3.WAV",
+          "settings": {
+            "gate": 0,
+            "freq": 85.362,
+            "velocity": 1,
+            "accent": 0,
+            "decay": 0.688,
+            "bend": 0.835,
+            "tone": 0.999,
+            "noise": 0.465,
+            "drive": 0.088,
+            "level": 0.8
+          }
         },
         {
-          "kind": "standard-library",
-          "name": "stdfaust.lib",
-          "compilerVersion": "FAUST Version 2.85.9"
-        }
-      ],
-      "compiler": {
-        "faustVersion": "FAUST Version 2.85.9",
-        "cxxVersion": "Apple clang version 16.0.0 (clang-1600.0.26.6)",
-        "exportOptions": [
-          "-e",
-          "-I",
-          "<source-parent>",
-          "-I",
-          "modules/analog-classics/synth-batch",
-          "-I",
-          "modules/analog-classics/synth-finish"
-        ],
-        "compileOptions": [
-          "-lang",
-          "cpp",
-          "-single",
-          "-cn",
-          "ModuleDSP"
-        ],
-        "runnerCompileOptions": [
-          "-std=c++17",
-          "-O2",
-          "-ffp-contract=off"
-        ]
-      },
-      "status": "internal-review",
-      "selectionRationale": "#81 frozen recorded-anchor preset",
-      "selection_rationale": "#81 frozen recorded-anchor preset",
-      "metadataAdaptation": "faust expansion and metadata normalization only",
-      "lineageUuid": "c31f0667-a394-57af-8127-40a6ed2cc9c1",
-      "outputEvidence": {
-        "audioInputs": 0,
-        "signalOutputs": 1,
-        "namedOutputs": []
-      },
-      "frozenPresetSettings": {
-        "gate": 0,
-        "freq": 104.23,
-        "velocity": 1,
-        "accent": 0,
-        "decay": 0.43,
-        "bend": 0.999,
-        "tone": 0.998,
-        "noise": 0.475,
-        "drive": 0.133,
-        "level": 0.8
-      },
-      "adaptedDefaults": {
-        "freq": 104.23,
-        "decay": 0.43,
-        "bend": 0.999,
-        "tone": 0.998,
-        "noise": 0.475,
-        "drive": 0.133,
-        "level": 0.8
-      },
-      "displayMetadataAdaptation": {
-        "onlyUiMetadataChanged": true,
-        "displayName": "909 Mid Tom"
-      },
-      "contractEvidence": {
-        "capturedControls": [
-          "accent[curlop:input]",
-          "bend[col:1][row:0]",
-          "decay[unit:s][col:0][row:0]",
-          "drive[col:0][row:1]",
-          "freq[unit:Hz][scale:log][curlop:input]",
-          "gate[curlop:input]",
-          "level[col:1][row:1]",
-          "noise[col:3][row:0]",
-          "tone[col:2][row:0]",
-          "velocity[curlop:input]"
-        ],
-        "canonicalOneNote": true,
-        "gaps": [],
-        "specialEvents": [
-          "accent"
-        ],
-        "metadataAdapted": false
-      }
-    },
-    {
-      "id": "analog-classics:909-high-tom",
-      "identity": "909-high-tom",
-      "displayName": "909 High Tom",
-      "category": "instrument",
-      "version": 1,
-      "soundVersion": "0.1.0-experiment",
-      "source": {
-        "path": "scripts/909-high-tom.dsp",
-        "sha256": "97af60317c1e71cec257009637fb7544fe4a6d2946388e927026a15b0736019f"
-      },
-      "upstream": {
-        "branch": "issue-118-analog-classics-review",
-        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
-        "path": "modules/drums-909/v1/tom.dsp",
-        "sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
-        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
-        "lineage": {
-          "branch": "80-909-reference-tuning",
-          "commit": "7aa75de6394568410d5b114d62b405138e9c9e35"
-        }
-      },
-      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
-      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
-      "source_path": "modules/drums-909/v1/tom.dsp",
-      "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
-      "export_path": "scripts/909-high-tom.dsp",
-      "export_sha256": "97af60317c1e71cec257009637fb7544fe4a6d2946388e927026a15b0736019f",
-      "license": "NOASSERTION (module); MIT (identified Plaits formulas)",
-      "licenseIdentifier": "NOASSERTION (module); MIT (identified Plaits formulas)",
-      "licenseStatus": "mixed-reviewed",
-      "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
-      "dependencies": [
-        {
-          "kind": "repository-library",
-          "path": "modules/drums-909/v1/drums909.lib",
-          "sha256": "42e21c6dca506299a74516d9901e242c32ead92ba9c1a66d81d16d49bb9d87ea",
-          "referencedAs": "library"
+          "name": "Mid Tom",
+          "presetId": "mid-tom",
+          "status": "frozen-reference-anchor",
+          "reference": "MT3D3.WAV",
+          "settings": {
+            "gate": 0,
+            "freq": 104.23,
+            "velocity": 1,
+            "accent": 0,
+            "decay": 0.43,
+            "bend": 0.999,
+            "tone": 0.998,
+            "noise": 0.475,
+            "drive": 0.133,
+            "level": 0.8
+          }
         },
         {
-          "kind": "standard-library",
-          "name": "stdfaust.lib",
-          "compilerVersion": "FAUST Version 2.85.9"
+          "name": "High Tom",
+          "presetId": "high-tom",
+          "status": "frozen-reference-anchor",
+          "reference": "HT3D3.WAV",
+          "settings": {
+            "gate": 0,
+            "freq": 121.363,
+            "velocity": 1,
+            "accent": 0,
+            "decay": 0.43,
+            "bend": 0.969,
+            "tone": 0.729,
+            "noise": 0.6,
+            "drive": 0.15,
+            "level": 0.8
+          }
         }
       ],
-      "compiler": {
-        "faustVersion": "FAUST Version 2.85.9",
-        "cxxVersion": "Apple clang version 16.0.0 (clang-1600.0.26.6)",
-        "exportOptions": [
-          "-e",
-          "-I",
-          "<source-parent>",
-          "-I",
-          "modules/analog-classics/synth-batch",
-          "-I",
-          "modules/analog-classics/synth-finish"
-        ],
-        "compileOptions": [
-          "-lang",
-          "cpp",
-          "-single",
-          "-cn",
-          "ModuleDSP"
-        ],
-        "runnerCompileOptions": [
-          "-std=c++17",
-          "-O2",
-          "-ffp-contract=off"
-        ]
-      },
-      "status": "internal-review",
-      "selectionRationale": "#81 frozen recorded-anchor preset",
-      "selection_rationale": "#81 frozen recorded-anchor preset",
-      "metadataAdaptation": "faust expansion and metadata normalization only",
-      "lineageUuid": "4285d738-abd3-5b06-bb21-dacd1a2cc2ff",
-      "outputEvidence": {
-        "audioInputs": 0,
-        "signalOutputs": 1,
-        "namedOutputs": []
-      },
-      "frozenPresetSettings": {
-        "gate": 0,
-        "freq": 121.363,
-        "velocity": 1,
-        "accent": 0,
-        "decay": 0.43,
-        "bend": 0.969,
-        "tone": 0.729,
-        "noise": 0.6,
-        "drive": 0.15,
-        "level": 0.8
-      },
-      "adaptedDefaults": {
-        "freq": 121.363,
-        "decay": 0.43,
-        "bend": 0.969,
-        "tone": 0.729,
-        "noise": 0.6,
-        "drive": 0.15,
-        "level": 0.8
-      },
-      "displayMetadataAdaptation": {
-        "onlyUiMetadataChanged": true,
-        "displayName": "909 High Tom"
-      },
       "contractEvidence": {
         "capturedControls": [
           "accent[curlop:input]",
@@ -8562,6 +8150,23 @@
       }
     }
   ],
+  "supersededIdentities": {
+    "analog-classics:909-low-tom": {
+      "replacement": "analog-classics:909-tom",
+      "preset": "low-tom",
+      "status": "superseded-preset-wrapper"
+    },
+    "analog-classics:909-mid-tom": {
+      "replacement": "analog-classics:909-tom",
+      "preset": "mid-tom",
+      "status": "superseded-preset-wrapper"
+    },
+    "analog-classics:909-high-tom": {
+      "replacement": "analog-classics:909-tom",
+      "preset": "high-tom",
+      "status": "superseded-preset-wrapper"
+    }
+  },
   "rejected_or_unselected": {
     "modules/juno-60/candidates/pr89-0b98748d/voice.dsp": "owner sonic rejection recorded in PR89/PR90 reconciliation",
     "modules/minimoog/v2/voice.dsp": "high-cutoff held-note collapse; engineering fixture only",
