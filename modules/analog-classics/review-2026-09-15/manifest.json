@@ -1301,7 +1301,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/606-low-tom.dsp",
-        "sha256": "86ec59bebb1eb592d47388a4a56e4f588d4c6052bcc0d874725126c500a4bec7"
+        "sha256": "a9483a3d1c14547bd41c87f5a1c1e18cb8257cfc0475afbd503ec0973842fa4a"
       },
       "upstream": {
         "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
@@ -1312,7 +1312,7 @@
       "source_path": "modules/drums-606/v1/tom.dsp",
       "source_sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a",
       "export_path": "scripts/606-low-tom.dsp",
-      "export_sha256": "86ec59bebb1eb592d47388a4a56e4f588d4c6052bcc0d874725126c500a4bec7",
+      "export_sha256": "a9483a3d1c14547bd41c87f5a1c1e18cb8257cfc0475afbd503ec0973842fa4a",
       "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
       "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
       "dependencies": [],
@@ -1321,6 +1321,13 @@
       "selection_rationale": "#79 frozen 606 low-tom preset",
       "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "8398af1c-bccc-5366-9c0c-138a95bf2897",
+      "frozenPresetSettings": {
+        "freq": 137.55581,
+        "decay": 0.29948,
+        "tone": 0.38612,
+        "noise": 0.021917,
+        "level": 0.8
+      },
       "contractEvidence": {
         "capturedControls": [
           "accent[curlop:input]",
@@ -1349,7 +1356,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/606-high-tom.dsp",
-        "sha256": "86ec59bebb1eb592d47388a4a56e4f588d4c6052bcc0d874725126c500a4bec7"
+        "sha256": "369b67266e25944619e62b4a59193738a3b51fae5698e615764164faa0b05ab2"
       },
       "upstream": {
         "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
@@ -1360,7 +1367,7 @@
       "source_path": "modules/drums-606/v1/tom.dsp",
       "source_sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a",
       "export_path": "scripts/606-high-tom.dsp",
-      "export_sha256": "86ec59bebb1eb592d47388a4a56e4f588d4c6052bcc0d874725126c500a4bec7",
+      "export_sha256": "369b67266e25944619e62b4a59193738a3b51fae5698e615764164faa0b05ab2",
       "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
       "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
       "dependencies": [],
@@ -1369,6 +1376,13 @@
       "selection_rationale": "#79 frozen 606 high-tom preset",
       "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "b85417b2-4be1-5b92-aeb1-ca696b58dfcb",
+      "frozenPresetSettings": {
+        "freq": 207.57604,
+        "decay": 0.205787,
+        "tone": 0.162234,
+        "noise": 0.102346,
+        "level": 0.8
+      },
       "contractEvidence": {
         "capturedControls": [
           "accent[curlop:input]",
@@ -1645,7 +1659,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/909-low-tom.dsp",
-        "sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6"
+        "sha256": "fdd9373eee17b9c2745ee7e3d02c12b10d54169f1d85ff2fd430437cb814d151"
       },
       "upstream": {
         "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
@@ -1656,7 +1670,7 @@
       "source_path": "modules/drums-909/v1/tom.dsp",
       "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
       "export_path": "scripts/909-low-tom.dsp",
-      "export_sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6",
+      "export_sha256": "fdd9373eee17b9c2745ee7e3d02c12b10d54169f1d85ff2fd430437cb814d151",
       "license": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
       "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
       "dependencies": [],
@@ -1665,6 +1679,15 @@
       "selection_rationale": "#81 frozen recorded-anchor preset",
       "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "f018492d-28e2-5016-94af-435aee7c3475",
+      "frozenPresetSettings": {
+        "freq": 85.362,
+        "decay": 0.688,
+        "bend": 0.835,
+        "tone": 0.999,
+        "noise": 0.465,
+        "drive": 0.088,
+        "level": 0.8
+      },
       "contractEvidence": {
         "capturedControls": [
           "accent[curlop:input]",
@@ -1695,7 +1718,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/909-mid-tom.dsp",
-        "sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6"
+        "sha256": "c84e713f0af05c5796dc1ef68e6fe7eedadbf36e8f25638677f10cb40e7188d9"
       },
       "upstream": {
         "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
@@ -1706,7 +1729,7 @@
       "source_path": "modules/drums-909/v1/tom.dsp",
       "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
       "export_path": "scripts/909-mid-tom.dsp",
-      "export_sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6",
+      "export_sha256": "c84e713f0af05c5796dc1ef68e6fe7eedadbf36e8f25638677f10cb40e7188d9",
       "license": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
       "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
       "dependencies": [],
@@ -1715,6 +1738,15 @@
       "selection_rationale": "#81 frozen recorded-anchor preset",
       "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "c31f0667-a394-57af-8127-40a6ed2cc9c1",
+      "frozenPresetSettings": {
+        "freq": 104.23,
+        "decay": 0.43,
+        "bend": 0.999,
+        "tone": 0.998,
+        "noise": 0.475,
+        "drive": 0.133,
+        "level": 0.8
+      },
       "contractEvidence": {
         "capturedControls": [
           "accent[curlop:input]",
@@ -1745,7 +1777,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/909-high-tom.dsp",
-        "sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6"
+        "sha256": "97af60317c1e71cec257009637fb7544fe4a6d2946388e927026a15b0736019f"
       },
       "upstream": {
         "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
@@ -1756,7 +1788,7 @@
       "source_path": "modules/drums-909/v1/tom.dsp",
       "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
       "export_path": "scripts/909-high-tom.dsp",
-      "export_sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6",
+      "export_sha256": "97af60317c1e71cec257009637fb7544fe4a6d2946388e927026a15b0736019f",
       "license": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
       "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
       "dependencies": [],
@@ -1765,6 +1797,15 @@
       "selection_rationale": "#81 frozen recorded-anchor preset",
       "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "4285d738-abd3-5b06-bb21-dacd1a2cc2ff",
+      "frozenPresetSettings": {
+        "freq": 121.363,
+        "decay": 0.43,
+        "bend": 0.969,
+        "tone": 0.729,
+        "noise": 0.6,
+        "drive": 0.15,
+        "level": 0.8
+      },
       "contractEvidence": {
         "capturedControls": [
           "accent[curlop:input]",
@@ -3378,7 +3419,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/606-low-tom.dsp",
-        "sha256": "86ec59bebb1eb592d47388a4a56e4f588d4c6052bcc0d874725126c500a4bec7"
+        "sha256": "a9483a3d1c14547bd41c87f5a1c1e18cb8257cfc0475afbd503ec0973842fa4a"
       },
       "upstream": {
         "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
@@ -3389,7 +3430,7 @@
       "source_path": "modules/drums-606/v1/tom.dsp",
       "source_sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a",
       "export_path": "scripts/606-low-tom.dsp",
-      "export_sha256": "86ec59bebb1eb592d47388a4a56e4f588d4c6052bcc0d874725126c500a4bec7",
+      "export_sha256": "a9483a3d1c14547bd41c87f5a1c1e18cb8257cfc0475afbd503ec0973842fa4a",
       "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
       "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
       "dependencies": [],
@@ -3398,6 +3439,13 @@
       "selection_rationale": "#79 frozen 606 low-tom preset",
       "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "8398af1c-bccc-5366-9c0c-138a95bf2897",
+      "frozenPresetSettings": {
+        "freq": 137.55581,
+        "decay": 0.29948,
+        "tone": 0.38612,
+        "noise": 0.021917,
+        "level": 0.8
+      },
       "contractEvidence": {
         "capturedControls": [
           "accent[curlop:input]",
@@ -3426,7 +3474,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/606-high-tom.dsp",
-        "sha256": "86ec59bebb1eb592d47388a4a56e4f588d4c6052bcc0d874725126c500a4bec7"
+        "sha256": "369b67266e25944619e62b4a59193738a3b51fae5698e615764164faa0b05ab2"
       },
       "upstream": {
         "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
@@ -3437,7 +3485,7 @@
       "source_path": "modules/drums-606/v1/tom.dsp",
       "source_sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a",
       "export_path": "scripts/606-high-tom.dsp",
-      "export_sha256": "86ec59bebb1eb592d47388a4a56e4f588d4c6052bcc0d874725126c500a4bec7",
+      "export_sha256": "369b67266e25944619e62b4a59193738a3b51fae5698e615764164faa0b05ab2",
       "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
       "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
       "dependencies": [],
@@ -3446,6 +3494,13 @@
       "selection_rationale": "#79 frozen 606 high-tom preset",
       "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "b85417b2-4be1-5b92-aeb1-ca696b58dfcb",
+      "frozenPresetSettings": {
+        "freq": 207.57604,
+        "decay": 0.205787,
+        "tone": 0.162234,
+        "noise": 0.102346,
+        "level": 0.8
+      },
       "contractEvidence": {
         "capturedControls": [
           "accent[curlop:input]",
@@ -3722,7 +3777,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/909-low-tom.dsp",
-        "sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6"
+        "sha256": "fdd9373eee17b9c2745ee7e3d02c12b10d54169f1d85ff2fd430437cb814d151"
       },
       "upstream": {
         "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
@@ -3733,7 +3788,7 @@
       "source_path": "modules/drums-909/v1/tom.dsp",
       "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
       "export_path": "scripts/909-low-tom.dsp",
-      "export_sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6",
+      "export_sha256": "fdd9373eee17b9c2745ee7e3d02c12b10d54169f1d85ff2fd430437cb814d151",
       "license": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
       "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
       "dependencies": [],
@@ -3742,6 +3797,15 @@
       "selection_rationale": "#81 frozen recorded-anchor preset",
       "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "f018492d-28e2-5016-94af-435aee7c3475",
+      "frozenPresetSettings": {
+        "freq": 85.362,
+        "decay": 0.688,
+        "bend": 0.835,
+        "tone": 0.999,
+        "noise": 0.465,
+        "drive": 0.088,
+        "level": 0.8
+      },
       "contractEvidence": {
         "capturedControls": [
           "accent[curlop:input]",
@@ -3772,7 +3836,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/909-mid-tom.dsp",
-        "sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6"
+        "sha256": "c84e713f0af05c5796dc1ef68e6fe7eedadbf36e8f25638677f10cb40e7188d9"
       },
       "upstream": {
         "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
@@ -3783,7 +3847,7 @@
       "source_path": "modules/drums-909/v1/tom.dsp",
       "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
       "export_path": "scripts/909-mid-tom.dsp",
-      "export_sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6",
+      "export_sha256": "c84e713f0af05c5796dc1ef68e6fe7eedadbf36e8f25638677f10cb40e7188d9",
       "license": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
       "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
       "dependencies": [],
@@ -3792,6 +3856,15 @@
       "selection_rationale": "#81 frozen recorded-anchor preset",
       "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "c31f0667-a394-57af-8127-40a6ed2cc9c1",
+      "frozenPresetSettings": {
+        "freq": 104.23,
+        "decay": 0.43,
+        "bend": 0.999,
+        "tone": 0.998,
+        "noise": 0.475,
+        "drive": 0.133,
+        "level": 0.8
+      },
       "contractEvidence": {
         "capturedControls": [
           "accent[curlop:input]",
@@ -3822,7 +3895,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/909-high-tom.dsp",
-        "sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6"
+        "sha256": "97af60317c1e71cec257009637fb7544fe4a6d2946388e927026a15b0736019f"
       },
       "upstream": {
         "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
@@ -3833,7 +3906,7 @@
       "source_path": "modules/drums-909/v1/tom.dsp",
       "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
       "export_path": "scripts/909-high-tom.dsp",
-      "export_sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6",
+      "export_sha256": "97af60317c1e71cec257009637fb7544fe4a6d2946388e927026a15b0736019f",
       "license": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
       "dependencyProvenance": "Authored assembly; retained MIT notice for two extracted Mutable Instruments Plaits arithmetic functions (LICENSES.md).",
       "dependencies": [],
@@ -3842,6 +3915,15 @@
       "selection_rationale": "#81 frozen recorded-anchor preset",
       "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "4285d738-abd3-5b06-bb21-dacd1a2cc2ff",
+      "frozenPresetSettings": {
+        "freq": 121.363,
+        "decay": 0.43,
+        "bend": 0.969,
+        "tone": 0.729,
+        "noise": 0.6,
+        "drive": 0.15,
+        "level": 0.8
+      },
       "contractEvidence": {
         "capturedControls": [
           "accent[curlop:input]",

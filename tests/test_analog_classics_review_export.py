@@ -45,6 +45,8 @@ class AnalogClassicsReviewExport(unittest.TestCase):
             self.assertIn("chokeGate", selected["606-open-hat"]["contractEvidence"]["specialEvents"])
             for event in ("clock", "reset", "run"):
                 self.assertIn(event, selected["trigger-seq"]["contractEvidence"]["specialEvents"])
+            self.assertNotEqual(selected["606-low-tom"]["source"]["sha256"], selected["606-high-tom"]["source"]["sha256"])
+            self.assertEqual(selected["909-mid-tom"]["frozenPresetSettings"]["freq"], 104.23)
             self.assertIn("modules/juno-60/candidates/pr89-0b98748d/voice.dsp", manifest["rejected_or_unselected"])
             self.assertIn("909 sample-backed voices", manifest["rejected_or_unselected"])
 

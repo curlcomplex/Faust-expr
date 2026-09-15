@@ -19,6 +19,13 @@ PINNED_COMMITS = {
     "808-aux": "07464333c5eed1e916820a3fec99b69147561cb0",
 }
 ADAPTATION_EVIDENCE = {}
+FROZEN_PRESETS = {
+ "606-low-tom": {"freq":137.55581,"decay":.29948,"tone":.38612,"noise":.021917,"level":.8},
+ "606-high-tom": {"freq":207.57604,"decay":.205787,"tone":.162234,"noise":.102346,"level":.8},
+ "909-low-tom": {"freq":85.362,"decay":.688,"bend":.835,"tone":.999,"noise":.465,"drive":.088,"level":.8},
+ "909-mid-tom": {"freq":104.23,"decay":.43,"bend":.999,"tone":.998,"noise":.475,"drive":.133,"level":.8},
+ "909-high-tom": {"freq":121.363,"decay":.43,"bend":.969,"tone":.729,"noise":.6,"drive":.15,"level":.8},
+}
 SUBJECTS = (
     # Exact synth freeze: do not promote PR89 or Mini v2/v3 by version number.
     ("juno-60", "instrument", "modules/juno-60/v3/voice.dsp", "selected by the hardware/listening freeze; PR89 remains rejected"),
@@ -118,6 +125,13 @@ def export_one(source, destination, identity):
             raise AssertionError("adaptation whitelist proof failed")
         ADAPTATION_EVIDENCE[identity] = {"kind": "ui-address-only", "originalLabels": sorted(set(adapted)), "finalLabels": ["freq[unit:Hz][scale:log][curlop:input]", "gate[curlop:input]", "velocity[curlop:input]"], "onlyUiLabelStringsChanged": True}
         destination.write_text(normalized)
+    if identity in FROZEN_PRESETS:
+        for control, value in FROZEN_PRESETS[identity].items():
+            pattern = r'(hslider\("' + re.escape(control) + r'[^"\\]*",\s*)[-+0-9.eEfF]+'
+            normalized, count = re.subn(pattern, r'\g<1>' + repr(value) + 'f', normalized)
+            if count == 0:
+                raise AssertionError(f"missing frozen preset control {identity}:{control}")
+        destination.write_text(normalized)
     subprocess.run(["faust", "-lang", "cpp", "-single", str(destination), "-o", str(destination.with_suffix(".hpp"))], check=True, capture_output=True, text=True)
 
 def provenance(identity, source_root):
@@ -147,6 +161,8 @@ def run(out):
         gaps = [] if entry["category"] != "instrument" or (required <= set(labels) and has_freq) else ["missing canonical tagged one-note input"]
         special = sorted({label.split("[", 1)[0] for label in labels} & {"accent", "slide", "chokeGate", "clock", "reset", "run"})
         entry["metadataAdaptation"] = ADAPTATION_EVIDENCE.get(entry["identity"], "faust expansion and metadata normalization only")
+        if entry["identity"] in FROZEN_PRESETS:
+            entry["frozenPresetSettings"] = FROZEN_PRESETS[entry["identity"]]
         entry["contractEvidence"] = {"capturedControls": sorted(set(labels)), "canonicalOneNote": entry["category"] != "instrument" or not gaps, "gaps": gaps, "specialEvents": special, "metadataAdapted": entry["identity"] in ADAPTATION_EVIDENCE}
     manifest = {"schema": 1, "identity": "analog-classics-internal-review-2026-09-15.1", "status": "internal-review-only", "base_review_freeze": {"path": str(FREEZE.relative_to(ROOT)), "sha256": digest(FREEZE), "identity": freeze["id"]}, "modules": entries, "selected": entries, "rejected_or_unselected": REJECTED, "contract": {"one_note": "lowercase gate, freq in Hz, velocity; host owns allocation", "distinct_events": "accent, slide, choke, clock, reset and run are never aliases", "outputs": "audio, CV and observations are separately declared", "identity": "stable identity is manifest identity plus version and source digest, never display text or geometry", "sound_change": "exports are metadata/library expansion only; a sonic change requires a new version and review freeze"}, "consumer_limits": ["No CURLOP runtime, UI, project-state, voice-allocation or device acceptance is claimed.", "Effect/modulation entries retain their native I/O rather than being mislabeled one-note instruments."]}
     manifest["schema"] = "curlop-analog-classics-review/v1"
