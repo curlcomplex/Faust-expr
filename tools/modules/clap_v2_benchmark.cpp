@@ -16,7 +16,7 @@ int main(int argc,char**argv){try{
  constexpr int voices=4,iterations=2400,warmup=256;
  std::vector<std::unique_ptr<ModuleDSP>>dsps;std::vector<std::unique_ptr<UI>>uis;
  ModuleDSP::classInit(48000);
- for(int v=0;v<voices;++v){dsps.push_back(std::make_unique<ModuleDSP>());dsps.back()->instanceInit(48000);uis.push_back(std::make_unique<UI>());dsps.back()->buildUserInterface(uis.back().get());
+ for(int v=0;v<voices;++v){dsps.push_back(std::make_unique<ModuleDSP>());dsps.back()->instanceInit(48000);uis.push_back(std::make_unique<UI>());dsps.back()->buildUserInterface(uis.back().get());uis.back()->finishCleanBenchmark();
  uis.back()->set("pitch_hz",150.f+v*70.f);uis.back()->set("balance",.55f);uis.back()->set("spacing",.7f);uis.back()->set("body",.65f);uis.back()->set("body_env",.6f);uis.back()->set("decay",.7f);uis.back()->set("drive",.55f);}
  std::vector<float>output(block),timings;timings.reserve(iterations);float*ptr=output.data();double checksum=0;
  for(int j=-warmup;j<iterations;++j){for(auto&ui:uis)ui->set("gate",j%13==0?1.f:0.f);allocationGuard=true;const auto start=std::chrono::steady_clock::now();

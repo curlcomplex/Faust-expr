@@ -27,7 +27,7 @@ int main(int argc, char** argv) { try {
         dsps.push_back(std::make_unique<ModuleDSP>());
         dsps.back()->init(48000);
         uis.push_back(std::make_unique<UI>());
-        dsps.back()->buildUserInterface(uis.back().get());
+        dsps.back()->buildUserInterface(uis.back().get());uis.back()->finishCleanBenchmark();
         uis.back()->set("pitch_hz", 41.0f+v*31.0f);
         uis.back()->set("wave", float(v*2+4));
         uis.back()->set("drive", .7f);

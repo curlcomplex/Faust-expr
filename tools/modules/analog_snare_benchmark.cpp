@@ -22,7 +22,7 @@ int main(int argc,char** argv) { try {
  ModuleDSP::classInit(48000);
  for(int v=0;v<voices;++v) {
   dsps.push_back(std::make_unique<ModuleDSP>());dsps.back()->instanceInit(48000);
-  uis.push_back(std::make_unique<UI>());dsps.back()->buildUserInterface(uis.back().get());
+  uis.push_back(std::make_unique<UI>());dsps.back()->buildUserInterface(uis.back().get());uis.back()->finishCleanBenchmark();
   uis.back()->set("pitch_hz",105.0f+v*80.0f);uis.back()->set("balance",.65f);
   uis.back()->set("crack",.8f);uis.back()->set("decay",.7f);uis.back()->set("drive",.6f);
  }

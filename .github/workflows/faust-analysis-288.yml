@@ -11,6 +11,7 @@ on:
       - 'tools/modules/probe_lab.py'
       - 'tools/modules/render.cpp'
       - 'tools/modules/lab.py'
+      - 'tools/modules/*benchmark.cpp'
       - 'tools/modules/fit_api.cpp'
       - 'tools/modules/color_fit_api.cpp'
       - 'modules/PROBE_CAPTURE.md'
@@ -25,6 +26,7 @@ on:
       - 'tools/modules/probe_lab.py'
       - 'tools/modules/render.cpp'
       - 'tools/modules/lab.py'
+      - 'tools/modules/*benchmark.cpp'
       - 'tools/modules/fit_api.cpp'
       - 'tools/modules/color_fit_api.cpp'
       - 'modules/PROBE_CAPTURE.md'
@@ -123,7 +125,7 @@ jobs:
         if: always()
         run: |
           mkdir -p build/faust-analysis/evidence
-          git archive --format=tar HEAD tools/modules/faust_analysis.py tools/modules/faust_analysis_meter.dsp tools/modules/faust_analysis_runner.cpp tests/test_faust_analysis.py tests/test_render_probes.py tests/fixtures/probes tests/fixtures/probe_debug.dsp tools/modules/probe_lab.py tools/modules/render.cpp tools/modules/lab.py tools/modules/fit_api.cpp tools/modules/color_fit_api.cpp modules/PROBE_CAPTURE.md .github/workflows/faust-analysis-288.yml > build/faust-analysis/evidence/source.tar
+          git archive --format=tar HEAD tools/modules/faust_analysis.py tools/modules/faust_analysis_meter.dsp tools/modules/faust_analysis_runner.cpp tests/test_faust_analysis.py tests/test_render_probes.py tests/fixtures/probes tests/fixtures/probe_debug.dsp tools/modules/probe_lab.py tools/modules/render.cpp tools/modules/lab.py tools/modules/fit_api.cpp tools/modules/color_fit_api.cpp modules/PROBE_CAPTURE.md 'tools/modules/*benchmark.cpp' .github/workflows/faust-analysis-288.yml > build/faust-analysis/evidence/source.tar
       - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

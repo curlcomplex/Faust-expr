@@ -20,7 +20,7 @@ int main(int argc,char** argv){try{
  auto prep=std::chrono::steady_clock::now();ModuleDSP::classInit(48000);
  double classInitUs=std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now()-prep).count()/1000.;
  std::vector<std::unique_ptr<ModuleDSP>> dsps;std::vector<std::unique_ptr<UI>> uis;
- for(int i=0;i<voices;++i){dsps.push_back(std::make_unique<ModuleDSP>());dsps.back()->instanceInit(48000);uis.push_back(std::make_unique<UI>());dsps.back()->buildUserInterface(uis.back().get());
+ for(int i=0;i<voices;++i){dsps.push_back(std::make_unique<ModuleDSP>());dsps.back()->instanceInit(48000);uis.push_back(std::make_unique<UI>());dsps.back()->buildUserInterface(uis.back().get());uis.back()->finishCleanBenchmark();
   uis.back()->set("pitch_hz",55.0f*std::pow(2.0f,i*7.0f/12));uis.back()->set("stack",float(stack));uis.back()->set("morph",.9f);uis.back()->set("shape",.8f);uis.back()->set("detune",.7f);uis.back()->set("drive",.7f);}
  std::vector<float> l(b),r(b),d;float* p[]={l.data(),r.data()};d.reserve(count);double checksum=0;
  for(int j=-warm;j<count;++j){for(auto&u:uis)u->set("gate",j%17?1.f:0.f);allocationGuard=true;auto t=std::chrono::steady_clock::now();

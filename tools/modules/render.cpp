@@ -167,6 +167,11 @@ public:
     }
     void set(const std::string& name, float x) { validate(name,x); *control(name).p = x; }
     std::string controlPath(const std::string& name) const { return control(name).zone.path; }
+    void finishCleanBenchmark() {
+        if (!finished) finish();
+        if (diagnosticBuild || probeCount)
+            throw std::runtime_error("benchmark rejects diagnostic builds and active probes");
+    }
     size_t probe_count() const { return probeCount; }
     const std::vector<Zone>& meter_catalog() const { return meters; }
     std::vector<float> meter_values() const {

@@ -7,6 +7,7 @@ import importlib.util
 import ctypes
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import sys
@@ -64,7 +65,7 @@ int main(int argc,char** argv) {
         ui.openVerticalBox("Meter"); ui.addHorizontalBargraph("gain",&m,-1,1); ui.declare(&m,"probe","8"); ui.closeBox();
         ui.finish(); assert(ui.zones.size()==1); ui.set("gain",.7f); assert(a==.7f && m==2.5f);
         rejects([&]{ui.set("/Meter/gain",.1f);}); rejects([&]{ui.set("probe:8",.1f);});
-        rejects([&]{ui.set("gain",2.f);});
+        rejects([&]{ui.set("gain",2.f);}); rejects([&]{ui.finishCleanBenchmark();});
     } else if(test=="duplicate-id") {
         ui.declare(&m,"probe","1"); ui.addHorizontalBargraph("one",&m,-1,1);
         ui.declare(&n,"probe","1"); ui.addHorizontalBargraph("two",&n,-1,1);
@@ -84,7 +85,7 @@ int main(int argc,char** argv) {
     } else if(test=="json-escaping") {
         ui.openHorizontalBox("spaces / %");
         ui.addHorizontalSlider("quoted\"\t\n\\",&a,.5f,0,1,.01f); ui.closeBox();
-        ui.finish(); ui.json(std::cout,0,1);
+        ui.finishCleanBenchmark(); ui.json(std::cout,0,1);
     } else return 3;
 }
 '''
@@ -352,6 +353,49 @@ class RealFaustProbes(unittest.TestCase):
                 if not diagnostic:
                     expected=np.zeros(64,np.float32);expected[:16 if fn=='color_render' else 1]=.5
                     np.testing.assert_array_equal(output,expected)
+
+
+    def test_all_existing_benchmark_wrappers_finalize_and_refuse_diagnostics(self):
+        # Exercise wrapper compatibility, NOT actual instrument or device performance.
+        # A tiny actual-Faust gated fixture carries the union of required controls.
+        wrappers=sorted((ROOT/'tools/modules').glob('*benchmark.cpp'))
+        wrappers=[p for p in wrappers if '#include "render.cpp"' in p.read_text()]
+        self.assertEqual(len(wrappers),10)
+        names=set()
+        for wrapper in wrappers:
+            names.update(re.findall(r'->set\("([^"\n]+)"',wrapper.read_text()))
+        names.discard('gate')
+        declarations=['gate=button("gate");']
+        declarations += [f'c{i}=hslider("{name}",.5,0,10000,.01);' for i,name in enumerate(sorted(names))]
+        signal='attach(gate*.25,'+'+'.join(f'c{i}' for i in range(len(names)))+')'
+        records=[]
+        for channels in (1,2):
+            folder=self.evidence/f'benchmark-wrapper-{channels}'
+            folder.mkdir(exist_ok=True)
+            source=folder/'fixture.dsp'
+            source.write_text('\n'.join(declarations)+f'\nprocess={signal}'+(' <: _,_;' if channels==2 else ';')+'\n')
+            lab_module.run([self.lab.faust,'-lang','cpp','-single','-cn','ModuleDSP',str(source),'-o',str(folder/'generated.hpp')])
+            for wrapper in wrappers:
+                if (wrapper.name.startswith('morph_')) != (channels==2): continue
+                for diagnostic in (False,True):
+                    binary=folder/(wrapper.stem+('-diagnostic' if diagnostic else '-clean'))
+                    flags=['-DFAUST_EXPR_DIAGNOSTIC=1'] if diagnostic else []
+                    lab_module.run([self.lab.cpp,'-std=c++17','-O2',*flags,'-I'+str(folder),str(wrapper),'-o',str(binary)])
+                    result=subprocess.run([str(binary),'16'],capture_output=True,text=True,timeout=15)
+                    if diagnostic:
+                        self.assertNotEqual(result.returncode,0)
+                        self.assertIn('benchmark rejects diagnostic',result.stderr)
+                        self.assertFalse(result.stdout.strip())
+                    else:
+                        self.assertEqual(result.returncode,0,result.stderr)
+                        stats=json.loads(result.stdout)
+                        self.assertTrue(np.isfinite(stats['checksum']))
+                    records.append({'wrapper':wrapper.name,'diagnostic':diagnostic,
+                                    'expected_rejection':diagnostic,'exit_code':result.returncode,
+                                    'wrapper_sha256':analysis.sha(wrapper)})
+        (self.evidence/'benchmark-wrapper-checks.json').write_text(json.dumps({
+            'scope':'control/guard compatibility on a tiny actual-Faust fixture, NOT instrument performance',
+            'checks':records},indent=2)+'\n')
 
 
 if __name__=='__main__': unittest.main()

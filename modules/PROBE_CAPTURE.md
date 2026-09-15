@@ -38,6 +38,10 @@ capture is off. They cannot quietly populate a clean performance timing column.
 and source/generated/native/UI hashes, and rejects vector diagnostic builds.
 `ProbeLab.build()` rejects active probes on its clean path. The fitting adapters also
 reject tagged probes and diagnostic binaries (`-6`); clean fitting remains intact.
+All ten existing benchmark wrappers finalize UI through `finishCleanBenchmark()`;
+that shared guard rejects diagnostic builds or active probes before any timing loop.
+Compatibility tests compile and execute each wrapper with a tiny actual-Faust
+fixture in both modes; those numbers are not instrument-performance evidence.
 The existing script-export qualification uses the normal runner and therefore
 cannot successfully qualify a probed binary as a clean export. This is a guard
 within this lab's paths, not a sandbox for arbitrary external Faust compilers.

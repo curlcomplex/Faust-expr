@@ -27,7 +27,7 @@ int main(int argc, char** argv) { try {
         dsps.push_back(std::make_unique<ModuleDSP>());
         dsps.back()->init(48000);
         uis.push_back(std::make_unique<UI>());
-        dsps.back()->buildUserInterface(uis.back().get());
+        dsps.back()->buildUserInterface(uis.back().get());uis.back()->finishCleanBenchmark();
         uis.back()->set("pitch_hz", 105.0f + v*80.0f);
         uis.back()->set("shape", .85f);
         uis.back()->set("contour", .8f);
