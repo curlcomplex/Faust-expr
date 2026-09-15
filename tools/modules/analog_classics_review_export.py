@@ -90,6 +90,10 @@ def export_one(source, destination):
     raw = subprocess.run(command, text=True, capture_output=True)
     if raw.returncode:
         raise RuntimeError(raw.stderr or raw.stdout)
+    # A legacy source can request a compiler JSON sidecar through its metadata.
+    # It is not part of the portable review script and must not perturb its hash.
+    destination.with_suffix(destination.suffix + ".json").unlink(missing_ok=True)
+    destination.with_suffix(destination.suffix + ".xml").unlink(missing_ok=True)
     expanded = destination.read_text()
     normalized = normalize_expanded(expanded, source.read_text())
     destination.write_text(normalized)
