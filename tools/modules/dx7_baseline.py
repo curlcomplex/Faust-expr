@@ -27,7 +27,7 @@ ROOT = lab.ROOT
 BRIEF = ROOT / 'modules/dx7/baseline-01'
 FAUSTLIBS = '271228a08981fa10b07732f0861421d1e20d4022'
 MSFA = 'f67d41d313b7dc85f6fb99e79e515cc9d208cfff'
-ADAPTER_VERSION = 'dx7-baseline-01.3'
+ADAPTER_VERSION = 'dx7-baseline-01.4'
 # C++17 cmath imports std::min/max into the legacy core's unqualified lookup.
 # C++11 avoids that collision; stddef.h supplies its omitted size_t declaration.
 # These are build-compatibility flags, not upstream source or DSP modifications.
@@ -251,7 +251,9 @@ def execute(out):
         def render_faust(c,d,program,label,block=128,rate=44100):
             hz=440*2**((c['note']-69)/12)
             score=d/(label+'.tsv'); raw=d/(label+'.f32')
-            score.write_text(f"0\tfreq\t{hz:.12g}\n0\tvelocity\t{suite['velocity']/127:.12g}\n{suite['gate_on']}\tgate\t1\n{suite['gate_off']}\tgate\t0\n")
+            # Velocity sensitivity is explicitly zero in these diagnostics.
+            # Faust eliminates the unused slider; do not invent a gain to retain it.
+            score.write_text(f"0\tfreq\t{hz:.12g}\n{suite['gate_on']}\tgate\t1\n{suite['gate_off']}\tgate\t0\n")
             cmd=[str(program),str(score),str(raw),str(rate),str(block),str(suite['frames']),'0']
             diag=json.loads(lab.run(cmd))
             x=np.fromfile(raw,dtype='<f4')
@@ -278,6 +280,10 @@ def execute(out):
             program=worker.build(c['id'],source)
             expanded=(out/'faust-builds'/c['id']/'expanded.dsp').read_text()
             check(c['id']+':pinned-dx7-import',str(libraries/'dx7/operator.lib') in expanded and str(libraries/'dx7/env.lib') in expanded)
+            controls=lab.run([str(program),'--controls'])
+            (d/'faust-controls.tsv').write_text(controls)
+            names={row.split('\t')[0] for row in controls.splitlines()[1:]}
+            check(c['id']+':compiled-controls',names=={'freq','gate'},velocity='optimized out: sensitivity is zero')
             a=render_faust(c,d,program,'faust'); b=render_msfa(c,d,'msfa')
             check(c['id']+':faust-cold-repeat',np.array_equal(a,render_faust(c,d,program,'faust-repeat')))
             check(c['id']+':msfa-cold-repeat',np.array_equal(b,render_msfa(c,d,'msfa-repeat')))
@@ -297,11 +303,20 @@ def execute(out):
                 lab.wav(audit/(c['id']+'-MSFA-then-Faust.wav'),audition,44100)
                 plot_case(audit/(c['id']+'-envelope.png'),a,b,suite,c['id'])
         report['builds']=worker.builds
-        # Infrastructure negative controls compare an engine with its own output,
-        # so a pre-existing Faust/MSFA mismatch cannot make a broken test pass.
+        # Negative controls test the actual comparison functions on rendered audio,
+        # independently of any pre-existing difference between Faust and MSFA.
         base=arrays['C01-n57-l80'][0]
+        report['negative_controls']={}
         for name,x in [('gain',base*.5),('delay',np.concatenate([np.zeros(64),base[:-64]])),('mute',np.zeros_like(base))]:
-            check('negative-control:'+name,float(np.max(np.abs(base-x)))>1e-4,expected_rejection=True)
+            diag=compare(x,base,suite,'C02')
+            report['negative_controls'][name]=diag
+            if name=='gain':
+                detected=abs(diag['steady_faust_over_msfa_db']+6.020599913)<1e-5
+            elif name=='delay':
+                detected=diag['faust']['onset_frame']-diag['msfa_core']['onset_frame']==64
+            else:
+                detected=diag['faust']['peak']==0 and diag['raw_residual_rms']>1e-4
+            check('negative-control:'+name,detected,expected_rejection=True)
         # Changes in real native patch bytes must change the actual oracle output.
         check('oracle:output-level-observable',np.max(np.abs(arrays['C01-n57-l60'][1]-arrays['C01-n57-l99'][1]))>.01)
         check('oracle:modulator-observable',np.max(np.abs(arrays['C02-m50'][1]-arrays['C02-m90'][1]))>.01)
