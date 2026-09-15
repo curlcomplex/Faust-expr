@@ -10,14 +10,14 @@ input = _;
 truePeak = an.true_peak(input);
 truePeakHold = max(truePeak) ~ _;
 
-// Loudness analyzers are intentionally exposed as separate signals. In
-// particular, Faust's integrated loudness is a streaming approximation and
-// must not be reported as an exact offline two-pass result.
+// The loudness APIs take a compile-time channel count. This kernel is mono;
+// multichannel files are deliberately analyzed as independent channel kernels
+// by the host so this value is always 1.
 process = input <: (
     _,
     truePeak,
     truePeakHold,
-    an.loudness_momentary,
-    an.loudness_shortterm,
-    an.loudness_integrated
+    an.loudness_momentary(1),
+    an.loudness_shortterm(1),
+    an.loudness_integrated(1)
 );
