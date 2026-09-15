@@ -4,6 +4,10 @@ on:
     branches: [main]
     paths:
       - 'tools/modules/faust_analysis*'
+      - 'tools/modules/faust_spectral_descriptors.dsp'
+      - 'tools/modules/spectral_trace.py'
+      - 'tests/test_spectral_trace.py'
+      - 'modules/SPECTRAL_TRACES.md'
       - 'tests/test_faust_analysis.py'
       - 'tests/test_render_probes.py'
       - 'tests/fixtures/probes/**'
@@ -19,6 +23,10 @@ on:
   pull_request:
     paths:
       - 'tools/modules/faust_analysis*'
+      - 'tools/modules/faust_spectral_descriptors.dsp'
+      - 'tools/modules/spectral_trace.py'
+      - 'tests/test_spectral_trace.py'
+      - 'modules/SPECTRAL_TRACES.md'
       - 'tests/test_faust_analysis.py'
       - 'tests/test_render_probes.py'
       - 'tests/fixtures/probes/**'
@@ -38,6 +46,9 @@ permissions:
 concurrency:
   group: faust-analysis-hosted-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+defaults:
+  run:
+    shell: bash
 jobs:
   analysis:
     runs-on: ubuntu-24.04
@@ -63,6 +74,18 @@ jobs:
         run: |
           set -euo pipefail
           /usr/bin/python3 -m unittest discover -s tests -p test_render_probes.py -v 2>&1 | tee build/faust-analysis/evidence/probe-contracts.log
+      - name: Verify logged test failures propagate
+        run: |
+          set -euo pipefail
+          if ( /usr/bin/python3 -c 'raise SystemExit(7)' 2>&1 | tee build/faust-analysis/evidence/expected-failure.log ); then
+            echo 'ERROR: logging pipeline swallowed a failing test'
+            exit 1
+          fi
+          echo 'Nonzero test exit is correctly propagated'
+      - name: Spectral input and report contracts
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 -m unittest discover -s tests -p test_spectral_trace.py -v 2>&1 | tee build/faust-analysis/evidence/spectral-contracts.log
       - name: Fetch complete pinned Faust release
         run: |
           set -euo pipefail
@@ -121,11 +144,21 @@ jobs:
         run: |
           set -euo pipefail
           /usr/bin/python3 -m unittest discover -s tests -p test_render_probes.py -v 2>&1 | tee build/faust-analysis/evidence/probe-qualification.log
+      - name: Real spectral descriptor and trace qualification
+        env:
+          SPECTRAL_TRACE_INTEGRATION: '1'
+          FAUST: ${{ github.workspace }}/build/faust-analysis/toolchain/build/bin/faust
+          FAUST_LIBRARIES: ${{ github.workspace }}/build/faust-analysis/toolchain/libraries
+          FAUST_ARCHIVE: ${{ github.workspace }}/build/faust-analysis/faust.tar.gz
+          SPECTRAL_TRACE_EVIDENCE: ${{ github.workspace }}/build/faust-analysis/evidence/spectral
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 -m unittest discover -s tests -p test_spectral_trace.py -v 2>&1 | tee build/faust-analysis/evidence/spectral-qualification.log
       - name: Retain compact reproducible evidence
         if: always()
         run: |
           mkdir -p build/faust-analysis/evidence
-          git archive --format=tar HEAD tools/modules/faust_analysis.py tools/modules/faust_analysis_meter.dsp tools/modules/faust_analysis_runner.cpp tests/test_faust_analysis.py tests/test_render_probes.py tests/fixtures/probes tests/fixtures/probe_debug.dsp tools/modules/probe_lab.py tools/modules/render.cpp tools/modules/lab.py tools/modules/fit_api.cpp tools/modules/color_fit_api.cpp modules/PROBE_CAPTURE.md 'tools/modules/*benchmark.cpp' .github/workflows/faust-analysis-288.yml > build/faust-analysis/evidence/source.tar
+          git archive --format=tar HEAD tools/modules/spectral_trace.py tools/modules/faust_spectral_descriptors.dsp tests/test_spectral_trace.py modules/SPECTRAL_TRACES.md tools/modules/faust_analysis.py tools/modules/faust_analysis_meter.dsp tools/modules/faust_analysis_runner.cpp tests/test_faust_analysis.py tests/test_render_probes.py tests/fixtures/probes tests/fixtures/probe_debug.dsp tools/modules/probe_lab.py tools/modules/render.cpp tools/modules/lab.py tools/modules/fit_api.cpp tools/modules/color_fit_api.cpp modules/PROBE_CAPTURE.md 'tools/modules/*benchmark.cpp' .github/workflows/faust-analysis-288.yml > build/faust-analysis/evidence/source.tar
       - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
