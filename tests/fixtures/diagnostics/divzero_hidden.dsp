@@ -1,4 +1,3 @@
-// Deliberate runtime divide-by-zero whose final output is clamped finite.
-// interp-tracer must surface the internal fault rather than relying on output NaN/Inf.
-x = 1.0 / 0.0;
-process = min(x, 1.0);
+// Runtime division survives code generation; final native output stays finite.
+// Unlike 1/0, this is not a compile-time error masquerading as a runtime test.
+process(x) = min(abs(1.0 / x), 1.0);

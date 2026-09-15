@@ -1,3 +1,2 @@
-// Deliberate runtime divide-by-zero with non-finite output.
-// interp-tracer's default zero input exercises the division at runtime.
+// The impulse profile reaches a runtime zero denominator after its first sample.
 process = 1.0 / _;
