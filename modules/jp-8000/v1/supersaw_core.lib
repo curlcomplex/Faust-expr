@@ -1,39 +1,32 @@
 import("stdfaust.lib");
 
-// JP-8000 Supersaw first Faust port.
-// Detune distribution follows the reverse-engineered TC170C140 table used by
-// house-of-houses/ubersaw. This v1 intentionally keeps oscillator arithmetic
-// floating-point while the 24-bit wrap path is ported separately.
+// JP-8000 Supersaw source. Detune distribution and 24-bit phase-wrap behavior
+// follow the reverse-engineered TC170C140 path documented by the MIT
+// house-of-houses/ubersaw implementation. The source intentionally remains a
+// standalone reusable component.
 
 clip01(x) = min(1.0,max(0.0,x));
+detuneCurve(x) = ((((((((((10028.7312891634*x - 50818.8652045924)*x + 111363.4808729368)*x - 138150.6761080548)*x + 106649.6679158292)*x - 53046.9642751875)*x + 17019.9518580080)*x - 3425.0836591318)*x + 404.2703938388)*x - 24.1878824391)*x + 0.6717417634)*x + 0.0030115596;
 
-detuneCurve(x) = ((((((((((10028.7312891634*x
- - 50818.8652045924)*x
- + 111363.4808729368)*x
- - 138150.6761080548)*x
- + 106649.6679158292)*x
- - 53046.9642751875)*x
- + 17019.9518580080)*x
- - 3425.0836591318)*x
- + 404.2703938388)*x
- - 24.1878824391)*x
- + 0.6717417634)*x
- + 0.0030115596;
+// Signed 24-bit wrap represented exactly in Faust integer arithmetic.
+wrap24(x) = ((x + 8388608) % 16777216) - 8388608;
+phase24(inc) = +(inc) ~ wrap24;
+phaseInc(freq) = int(freq/ma.SR*16777216.0);
 
-ratio(st) = pow(2.0,st/12.0);
-voice(f,st,g) = os.sawtooth(f*ratio(st))*g;
+saw24(freq,detuneTable,amount) = float(phase24(wrap24(phaseInc(freq)+voiceDetune)))/8388608.0 with {
+    pitchXDetune = int(float(phaseInc(freq))*amount*0.00529);
+    voiceDetune = int(float(detuneTable*pitchXDetune)/128.0);
+};
 
-// Reverse-engineered asymmetric spread table normalized by 1440.
 supersaw(freq,detune,mix) =
-    voice(freq, 0.0, 1.0)
-  + voice(freq, ( 128.0/1440.0)*d, side)
-  + voice(freq, (-128.0/1440.0)*d, side)
-  + voice(freq, ( 816.0/1440.0)*d, side)
-  + voice(freq, (-824.0/1440.0)*d, side)
-  + voice(freq, (1408.0/1440.0)*d, side)
-  + voice(freq,(-1440.0/1440.0)*d, side)
+    saw24(freq,0,shaped)
+  + saw24(freq,128,shaped)*side
+  + saw24(freq,-128,shaped)*side
+  + saw24(freq,816,shaped)*side
+  + saw24(freq,-824,shaped)*side
+  + saw24(freq,1408,shaped)*side
+  + saw24(freq,-1440,shaped)*side
 with {
     shaped = detuneCurve(clip01(detune));
-    d = shaped; // full control corresponds to approximately one semitone outer spread
     side = clip01(mix)*clip01(mix);
 };
