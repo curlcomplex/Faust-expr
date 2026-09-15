@@ -1,0 +1,2 @@
+# CZ v1
+First reusable phase-distortion source checkpoint for #98. Equations adapted from `magnetophon/VoiceOfFaust` `followerOscillators.lib`, which credits Mike Moser-Booth for the CZ oscillators and Bart Brouns for the Faust port. VoiceOfFaust is GPL-3.0; preserve that boundary. This is not yet a complete CZ voice or a hardware-fidelity claim. Next: actual Faust 2.88 compile/audio, static DCW reference comparison, then follow #98's dynamic DCW -> multistage DCO/DCW/DCA -> line modulation -> dual-line order.
