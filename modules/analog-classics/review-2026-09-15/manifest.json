@@ -39,28 +39,29 @@
       "lineageUuid": "1c3f39df-0a90-5fdb-9a97-15928050c9ae",
       "contractEvidence": {
         "capturedControls": [
-          "attack",
-          "cutoff",
-          "decay",
+          "attack[unit:s][scale:log]",
+          "cutoff[unit:Hz][scale:log]",
+          "decay[unit:s][scale:log]",
           "filterEnv",
-          "freq",
-          "gate",
-          "hpf",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "hpf[unit:Hz][scale:log]",
           "level",
-          "lfoRate",
+          "lfoRate[unit:Hz][scale:log]",
           "noise",
           "pulse",
           "pwm",
           "pwmDepth",
-          "release",
+          "release[unit:s][scale:log]",
           "resonance",
           "saw",
           "sub",
           "sustain",
-          "velocity"
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -94,28 +95,29 @@
       "lineageUuid": "761c2665-8381-57cd-91a2-83f69c196d22",
       "contractEvidence": {
         "capturedControls": [
-          "attack",
-          "cutoff",
-          "decay",
+          "attack[unit:s][scale:log]",
+          "cutoff[unit:Hz][scale:log]",
+          "decay[unit:s][scale:log]",
           "filterEnv",
-          "freq",
-          "gate",
-          "hpf",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "hpf[unit:Hz][scale:log]",
           "level",
-          "lfoRate",
+          "lfoRate[unit:Hz][scale:log]",
           "noise",
           "pulse",
           "pwm",
           "pwmDepth",
-          "release",
+          "release[unit:s][scale:log]",
           "resonance",
           "saw",
           "sub",
           "sustain",
-          "velocity"
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -149,30 +151,31 @@
       "lineageUuid": "a19e8424-cdaf-5038-aceb-d44364a4c613",
       "contractEvidence": {
         "capturedControls": [
-          "attack",
-          "cutoff",
-          "decay",
+          "attack[unit:s][scale:log]",
+          "cutoff[unit:Hz][scale:log]",
+          "decay[unit:s][scale:log]",
           "filterEnv",
-          "freq",
-          "gate",
-          "glideTime",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "glideTime[unit:s]",
           "level",
           "lfoFilter",
-          "lfoPitch",
-          "lfoRate",
+          "lfoPitch[unit:st]",
+          "lfoRate[unit:Hz][scale:log]",
           "noise",
           "pulse",
           "pwm",
           "pwmDepth",
-          "release",
+          "release[unit:s][scale:log]",
           "resonance",
           "saw",
           "sub",
           "sustain",
-          "velocity"
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -206,29 +209,30 @@
       "lineageUuid": "61ac5885-8777-5daf-8674-8eacebfc407f",
       "contractEvidence": {
         "capturedControls": [
-          "attack",
+          "attack[unit:s][scale:log]",
           "contour",
-          "cutoff",
-          "decay",
-          "detune2",
-          "detune3",
+          "cutoff[unit:Hz][scale:log]",
+          "decay[unit:s][scale:log]",
+          "detune2[unit:st]",
+          "detune3[unit:st]",
           "drive",
           "emphasis",
-          "filterDecay",
-          "freq",
-          "gate",
-          "glideTime",
+          "filterDecay[unit:s][scale:log]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "glideTime[unit:s]",
           "level",
           "noise",
           "osc1",
           "osc2",
           "osc3",
-          "release",
+          "release[unit:s][scale:log]",
           "sustain",
-          "velocity"
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -265,14 +269,15 @@
           "click",
           "decay",
           "drive",
-          "freq",
-          "gate",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
           "punch",
           "tone",
-          "velocity"
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -308,15 +313,16 @@
         "capturedControls": [
           "decay",
           "drive",
-          "freq",
-          "gate",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
           "noise_color",
           "snappy",
           "tone",
-          "velocity"
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -352,16 +358,17 @@
         "capturedControls": [
           "decay",
           "drive",
-          "freq",
-          "gate",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
           "snap",
           "spacing",
           "tail",
           "tone",
-          "velocity"
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -397,15 +404,16 @@
         "capturedControls": [
           "decay",
           "drive",
-          "freq",
-          "gate",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
           "metal",
           "shape",
           "tone",
-          "velocity"
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -439,17 +447,18 @@
       "lineageUuid": "bb246d43-e4e4-5553-a53f-0021e3f7beca",
       "contractEvidence": {
         "capturedControls": [
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "metal",
-          "shape",
-          "tone",
-          "velocity"
+          "decay[col:2][row:0]",
+          "drive[col:1][row:1]",
+          "freq[unit:Hz][scale:log][curlop:input][tooltip:440 Hz selects the reference metal bank]",
+          "gate[curlop:input]",
+          "metal[col:0][row:0]",
+          "shape[col:0][row:1]",
+          "tone[col:1][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -483,19 +492,20 @@
       "lineageUuid": "ed34bb6d-2371-5ade-9153-a45795aa0af4",
       "contractEvidence": {
         "capturedControls": [
-          "choke",
-          "chokeGate",
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "metal",
-          "shape",
-          "tone",
-          "velocity"
+          "chokeGate[curlop:input][tooltip:Choke this voice; the host routes cross-voice events]",
+          "choke[col:2][row:1]",
+          "decay[col:2][row:0]",
+          "drive[col:1][row:1]",
+          "freq[unit:Hz][scale:log][curlop:input][tooltip:440 Hz selects the reference metal bank]",
+          "gate[curlop:input]",
+          "metal[col:0][row:0]",
+          "shape[col:0][row:1]",
+          "tone[col:1][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -532,16 +542,17 @@
           "click",
           "decay",
           "drive",
-          "freq",
-          "gate",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
           "hold",
           "sweep",
           "sweep_time",
-          "velocity",
+          "velocity[curlop:input]",
           "wave"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": true
       }
     },
     {
@@ -579,14 +590,15 @@
           "crack",
           "decay",
           "drive",
-          "freq",
-          "gate",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
           "noise_color",
           "tone",
-          "velocity"
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": true
       }
     },
     {
@@ -622,16 +634,17 @@
         "capturedControls": [
           "decay",
           "drive",
-          "freq",
-          "gate",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
           "snap",
           "spacing",
           "tail",
           "tone",
-          "velocity"
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": true
       }
     },
     {
@@ -665,22 +678,23 @@
       "lineageUuid": "e0485774-ac2b-574a-9c49-ec0b104ae52e",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "accentAmount",
-          "cutoff",
-          "decay",
-          "drive",
-          "envMod",
-          "freq",
-          "gate",
-          "level",
-          "resonance",
-          "slideTime",
-          "velocity",
-          "wave"
+          "accentAmount[col:1][row:1]",
+          "accent[curlop:input]",
+          "cutoff[unit:Hz][scale:log][col:0][row:0]",
+          "decay[unit:s][scale:log][col:0][row:1]",
+          "drive[col:1][row:2]",
+          "envMod[col:2][row:0]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:2][row:2]",
+          "resonance[col:1][row:0]",
+          "slideTime[unit:s][col:2][row:1]",
+          "velocity[curlop:input]",
+          "wave[col:0][row:2]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -714,12 +728,13 @@
       "lineageUuid": "cdb3eb4d-4b8b-5e1c-9983-a8f22ae498d0",
       "contractEvidence": {
         "capturedControls": [
-          "clock",
-          "reset",
-          "run"
+          "clock[curlop:input][col:2][row:0]",
+          "reset[curlop:input][col:3][row:0]",
+          "run[col:0][row:0]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -760,7 +775,8 @@
           "treble"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -805,7 +821,8 @@
           "tone"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -846,7 +863,8 @@
           "tone"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -880,12 +898,13 @@
       "lineageUuid": "04f9b100-006f-5350-84a3-aeb8d2d1d915",
       "contractEvidence": {
         "capturedControls": [
-          "input",
-          "output",
-          "speed"
+          "input[unit:dB]",
+          "output[unit:dB]",
+          "speed[unit:ips]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -925,7 +944,8 @@
           "voices"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -959,12 +979,13 @@
       "lineageUuid": "2de5e547-d6d7-52db-bf3c-de1e16fc7c24",
       "contractEvidence": {
         "capturedControls": [
-          "clock",
-          "reset",
-          "run"
+          "clock[curlop:input]",
+          "reset[curlop:input]",
+          "run[col:0][row:0]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -998,17 +1019,18 @@
       "lineageUuid": "0ec3f6b5-c31f-5037-a470-65699bacdc2a",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "click",
-          "decay",
-          "freq",
-          "gate",
-          "level",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "click[col:2][row:0]",
+          "decay[unit:s][scale:log][col:0][row:0]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:3][row:0]",
+          "tone[col:1][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -1042,17 +1064,18 @@
       "lineageUuid": "240a8edb-d52f-5708-8ac0-fb57825f44e6",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "decay",
-          "freq",
-          "gate",
-          "level",
-          "snappy",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "decay[unit:s][scale:log][col:0][row:0]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:3][row:0]",
+          "snappy[col:2][row:0]",
+          "tone[col:1][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -1086,17 +1109,18 @@
       "lineageUuid": "8398af1c-bccc-5366-9c0c-138a95bf2897",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "decay",
-          "freq",
-          "gate",
-          "level",
-          "noise",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "decay[unit:s][scale:log][col:0][row:0]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:3][row:0]",
+          "noise[col:2][row:0]",
+          "tone[col:1][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -1130,17 +1154,18 @@
       "lineageUuid": "b85417b2-4be1-5b92-aeb1-ca696b58dfcb",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "decay",
-          "freq",
-          "gate",
-          "level",
-          "noise",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "decay[unit:s][scale:log][col:0][row:0]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:3][row:0]",
+          "noise[col:2][row:0]",
+          "tone[col:1][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -1174,17 +1199,18 @@
       "lineageUuid": "425aab9f-e570-5f7f-9f1c-2d1054d1df1b",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "decay",
-          "freq",
-          "gate",
-          "level",
-          "metalSpread",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "decay[unit:s][scale:log][col:0][row:0]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:3][row:0]",
+          "metalSpread[col:2][row:0]",
+          "tone[col:1][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -1218,18 +1244,19 @@
       "lineageUuid": "3250fac3-e336-5c3d-9530-c492681132ce",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "chokeGate",
-          "decay",
-          "freq",
-          "gate",
-          "level",
-          "metalSpread",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "chokeGate[curlop:input]",
+          "decay[unit:s][scale:log][col:0][row:0]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:3][row:0]",
+          "metalSpread[col:2][row:0]",
+          "tone[col:1][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -1263,17 +1290,18 @@
       "lineageUuid": "d88ea414-140a-582e-9f74-708e18f13210",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "decay",
-          "freq",
-          "gate",
-          "level",
-          "metalSpread",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "decay[unit:s][scale:log][col:0][row:0]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:3][row:0]",
+          "metalSpread[col:2][row:0]",
+          "tone[col:1][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -1307,20 +1335,21 @@
       "lineageUuid": "d20bbd5b-8f48-537b-a4ae-414a6dd68c3b",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "attack",
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "level",
-          "pitchAmount",
-          "pitchDecay",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "attack[col:3][row:0]",
+          "decay[unit:s][col:0][row:0]",
+          "drive[col:1][row:1]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:2][row:1]",
+          "pitchAmount[col:1][row:0]",
+          "pitchDecay[unit:s][col:2][row:0]",
+          "tone[col:0][row:1]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -1354,20 +1383,21 @@
       "lineageUuid": "dd6faa9e-1e71-5697-8f8f-99b9b3e53225",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "bend",
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "level",
-          "noiseDecay",
-          "snappy",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "bend[col:3][row:0]",
+          "decay[unit:s][col:0][row:0]",
+          "drive[col:1][row:1]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:2][row:1]",
+          "noiseDecay[unit:s][col:2][row:0]",
+          "snappy[col:1][row:0]",
+          "tone[col:0][row:1]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -1401,19 +1431,20 @@
       "lineageUuid": "f018492d-28e2-5016-94af-435aee7c3475",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "bend",
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "level",
-          "noise",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "bend[col:1][row:0]",
+          "decay[unit:s][col:0][row:0]",
+          "drive[col:0][row:1]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:1][row:1]",
+          "noise[col:3][row:0]",
+          "tone[col:2][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -1447,19 +1478,20 @@
       "lineageUuid": "c31f0667-a394-57af-8127-40a6ed2cc9c1",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "bend",
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "level",
-          "noise",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "bend[col:1][row:0]",
+          "decay[unit:s][col:0][row:0]",
+          "drive[col:0][row:1]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:1][row:1]",
+          "noise[col:3][row:0]",
+          "tone[col:2][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -1493,19 +1525,20 @@
       "lineageUuid": "4285d738-abd3-5b06-bb21-dacd1a2cc2ff",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "bend",
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "level",
-          "noise",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "bend[col:1][row:0]",
+          "decay[unit:s][col:0][row:0]",
+          "drive[col:0][row:1]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:1][row:1]",
+          "noise[col:3][row:0]",
+          "tone[col:2][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -1539,18 +1572,19 @@
       "lineageUuid": "3f40927c-bd6c-52c4-8f6a-0423f8231387",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "level",
-          "snap",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "decay[unit:s][col:0][row:0]",
+          "drive[col:3][row:0]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:0][row:1]",
+          "snap[col:2][row:0]",
+          "tone[col:1][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -1584,19 +1618,20 @@
       "lineageUuid": "aac7644a-bedf-5252-b8b2-ad0fd9177eae",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "level",
-          "spacing",
-          "tail",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "decay[unit:s][col:0][row:0]",
+          "drive[col:0][row:1]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:1][row:1]",
+          "spacing[unit:s][col:1][row:0]",
+          "tail[col:2][row:0]",
+          "tone[col:3][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -1630,20 +1665,21 @@
       "lineageUuid": "77c0ae78-0bdf-520f-9a8d-b228f7923b2f",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "bend",
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "level",
-          "mode",
-          "noise",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "bend[col:2][row:0]",
+          "decay[unit:s][scale:log][col:1][row:0]",
+          "drive[col:1][row:1]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:2][row:1]",
+          "mode[col:0][row:0]",
+          "noise[col:3][row:0]",
+          "tone[col:0][row:1]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -1677,19 +1713,20 @@
       "lineageUuid": "6b628dee-1c35-5c48-97d6-4f9d874e65b7",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "crack",
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "level",
-          "mode",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "crack[col:2][row:0]",
+          "decay[unit:s][scale:log][col:1][row:0]",
+          "drive[col:0][row:1]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:1][row:1]",
+          "mode[col:0][row:0]",
+          "tone[col:3][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -1723,17 +1760,18 @@
       "lineageUuid": "3e94ef70-37b0-5b6b-8b59-b940e89614a9",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "decay",
-          "freq",
-          "gate",
-          "grit",
-          "level",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "decay[unit:s][scale:log][col:0][row:0]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "grit[col:2][row:0]",
+          "level[col:3][row:0]",
+          "tone[col:1][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -1767,18 +1805,19 @@
       "lineageUuid": "00c9385c-6c4c-575a-8ca8-b62c8649dd68",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "level",
-          "ratio",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "decay[unit:s][scale:log][col:1][row:0]",
+          "drive[col:3][row:0]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:0][row:1]",
+          "ratio[col:0][row:0]",
+          "tone[col:2][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     }
   ],
@@ -1814,28 +1853,29 @@
       "lineageUuid": "1c3f39df-0a90-5fdb-9a97-15928050c9ae",
       "contractEvidence": {
         "capturedControls": [
-          "attack",
-          "cutoff",
-          "decay",
+          "attack[unit:s][scale:log]",
+          "cutoff[unit:Hz][scale:log]",
+          "decay[unit:s][scale:log]",
           "filterEnv",
-          "freq",
-          "gate",
-          "hpf",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "hpf[unit:Hz][scale:log]",
           "level",
-          "lfoRate",
+          "lfoRate[unit:Hz][scale:log]",
           "noise",
           "pulse",
           "pwm",
           "pwmDepth",
-          "release",
+          "release[unit:s][scale:log]",
           "resonance",
           "saw",
           "sub",
           "sustain",
-          "velocity"
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -1869,28 +1909,29 @@
       "lineageUuid": "761c2665-8381-57cd-91a2-83f69c196d22",
       "contractEvidence": {
         "capturedControls": [
-          "attack",
-          "cutoff",
-          "decay",
+          "attack[unit:s][scale:log]",
+          "cutoff[unit:Hz][scale:log]",
+          "decay[unit:s][scale:log]",
           "filterEnv",
-          "freq",
-          "gate",
-          "hpf",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "hpf[unit:Hz][scale:log]",
           "level",
-          "lfoRate",
+          "lfoRate[unit:Hz][scale:log]",
           "noise",
           "pulse",
           "pwm",
           "pwmDepth",
-          "release",
+          "release[unit:s][scale:log]",
           "resonance",
           "saw",
           "sub",
           "sustain",
-          "velocity"
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -1924,30 +1965,31 @@
       "lineageUuid": "a19e8424-cdaf-5038-aceb-d44364a4c613",
       "contractEvidence": {
         "capturedControls": [
-          "attack",
-          "cutoff",
-          "decay",
+          "attack[unit:s][scale:log]",
+          "cutoff[unit:Hz][scale:log]",
+          "decay[unit:s][scale:log]",
           "filterEnv",
-          "freq",
-          "gate",
-          "glideTime",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "glideTime[unit:s]",
           "level",
           "lfoFilter",
-          "lfoPitch",
-          "lfoRate",
+          "lfoPitch[unit:st]",
+          "lfoRate[unit:Hz][scale:log]",
           "noise",
           "pulse",
           "pwm",
           "pwmDepth",
-          "release",
+          "release[unit:s][scale:log]",
           "resonance",
           "saw",
           "sub",
           "sustain",
-          "velocity"
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -1981,29 +2023,30 @@
       "lineageUuid": "61ac5885-8777-5daf-8674-8eacebfc407f",
       "contractEvidence": {
         "capturedControls": [
-          "attack",
+          "attack[unit:s][scale:log]",
           "contour",
-          "cutoff",
-          "decay",
-          "detune2",
-          "detune3",
+          "cutoff[unit:Hz][scale:log]",
+          "decay[unit:s][scale:log]",
+          "detune2[unit:st]",
+          "detune3[unit:st]",
           "drive",
           "emphasis",
-          "filterDecay",
-          "freq",
-          "gate",
-          "glideTime",
+          "filterDecay[unit:s][scale:log]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "glideTime[unit:s]",
           "level",
           "noise",
           "osc1",
           "osc2",
           "osc3",
-          "release",
+          "release[unit:s][scale:log]",
           "sustain",
-          "velocity"
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -2040,14 +2083,15 @@
           "click",
           "decay",
           "drive",
-          "freq",
-          "gate",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
           "punch",
           "tone",
-          "velocity"
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -2083,15 +2127,16 @@
         "capturedControls": [
           "decay",
           "drive",
-          "freq",
-          "gate",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
           "noise_color",
           "snappy",
           "tone",
-          "velocity"
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -2127,16 +2172,17 @@
         "capturedControls": [
           "decay",
           "drive",
-          "freq",
-          "gate",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
           "snap",
           "spacing",
           "tail",
           "tone",
-          "velocity"
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -2172,15 +2218,16 @@
         "capturedControls": [
           "decay",
           "drive",
-          "freq",
-          "gate",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
           "metal",
           "shape",
           "tone",
-          "velocity"
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -2214,17 +2261,18 @@
       "lineageUuid": "bb246d43-e4e4-5553-a53f-0021e3f7beca",
       "contractEvidence": {
         "capturedControls": [
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "metal",
-          "shape",
-          "tone",
-          "velocity"
+          "decay[col:2][row:0]",
+          "drive[col:1][row:1]",
+          "freq[unit:Hz][scale:log][curlop:input][tooltip:440 Hz selects the reference metal bank]",
+          "gate[curlop:input]",
+          "metal[col:0][row:0]",
+          "shape[col:0][row:1]",
+          "tone[col:1][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -2258,19 +2306,20 @@
       "lineageUuid": "ed34bb6d-2371-5ade-9153-a45795aa0af4",
       "contractEvidence": {
         "capturedControls": [
-          "choke",
-          "chokeGate",
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "metal",
-          "shape",
-          "tone",
-          "velocity"
+          "chokeGate[curlop:input][tooltip:Choke this voice; the host routes cross-voice events]",
+          "choke[col:2][row:1]",
+          "decay[col:2][row:0]",
+          "drive[col:1][row:1]",
+          "freq[unit:Hz][scale:log][curlop:input][tooltip:440 Hz selects the reference metal bank]",
+          "gate[curlop:input]",
+          "metal[col:0][row:0]",
+          "shape[col:0][row:1]",
+          "tone[col:1][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -2307,16 +2356,17 @@
           "click",
           "decay",
           "drive",
-          "freq",
-          "gate",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
           "hold",
           "sweep",
           "sweep_time",
-          "velocity",
+          "velocity[curlop:input]",
           "wave"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": true
       }
     },
     {
@@ -2354,14 +2404,15 @@
           "crack",
           "decay",
           "drive",
-          "freq",
-          "gate",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
           "noise_color",
           "tone",
-          "velocity"
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": true
       }
     },
     {
@@ -2397,16 +2448,17 @@
         "capturedControls": [
           "decay",
           "drive",
-          "freq",
-          "gate",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
           "snap",
           "spacing",
           "tail",
           "tone",
-          "velocity"
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": true
       }
     },
     {
@@ -2440,22 +2492,23 @@
       "lineageUuid": "e0485774-ac2b-574a-9c49-ec0b104ae52e",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "accentAmount",
-          "cutoff",
-          "decay",
-          "drive",
-          "envMod",
-          "freq",
-          "gate",
-          "level",
-          "resonance",
-          "slideTime",
-          "velocity",
-          "wave"
+          "accentAmount[col:1][row:1]",
+          "accent[curlop:input]",
+          "cutoff[unit:Hz][scale:log][col:0][row:0]",
+          "decay[unit:s][scale:log][col:0][row:1]",
+          "drive[col:1][row:2]",
+          "envMod[col:2][row:0]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:2][row:2]",
+          "resonance[col:1][row:0]",
+          "slideTime[unit:s][col:2][row:1]",
+          "velocity[curlop:input]",
+          "wave[col:0][row:2]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -2489,12 +2542,13 @@
       "lineageUuid": "cdb3eb4d-4b8b-5e1c-9983-a8f22ae498d0",
       "contractEvidence": {
         "capturedControls": [
-          "clock",
-          "reset",
-          "run"
+          "clock[curlop:input][col:2][row:0]",
+          "reset[curlop:input][col:3][row:0]",
+          "run[col:0][row:0]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -2535,7 +2589,8 @@
           "treble"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -2580,7 +2635,8 @@
           "tone"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -2621,7 +2677,8 @@
           "tone"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -2655,12 +2712,13 @@
       "lineageUuid": "04f9b100-006f-5350-84a3-aeb8d2d1d915",
       "contractEvidence": {
         "capturedControls": [
-          "input",
-          "output",
-          "speed"
+          "input[unit:dB]",
+          "output[unit:dB]",
+          "speed[unit:ips]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -2700,7 +2758,8 @@
           "voices"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -2734,12 +2793,13 @@
       "lineageUuid": "2de5e547-d6d7-52db-bf3c-de1e16fc7c24",
       "contractEvidence": {
         "capturedControls": [
-          "clock",
-          "reset",
-          "run"
+          "clock[curlop:input]",
+          "reset[curlop:input]",
+          "run[col:0][row:0]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -2773,17 +2833,18 @@
       "lineageUuid": "0ec3f6b5-c31f-5037-a470-65699bacdc2a",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "click",
-          "decay",
-          "freq",
-          "gate",
-          "level",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "click[col:2][row:0]",
+          "decay[unit:s][scale:log][col:0][row:0]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:3][row:0]",
+          "tone[col:1][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -2817,17 +2878,18 @@
       "lineageUuid": "240a8edb-d52f-5708-8ac0-fb57825f44e6",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "decay",
-          "freq",
-          "gate",
-          "level",
-          "snappy",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "decay[unit:s][scale:log][col:0][row:0]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:3][row:0]",
+          "snappy[col:2][row:0]",
+          "tone[col:1][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -2861,17 +2923,18 @@
       "lineageUuid": "8398af1c-bccc-5366-9c0c-138a95bf2897",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "decay",
-          "freq",
-          "gate",
-          "level",
-          "noise",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "decay[unit:s][scale:log][col:0][row:0]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:3][row:0]",
+          "noise[col:2][row:0]",
+          "tone[col:1][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -2905,17 +2968,18 @@
       "lineageUuid": "b85417b2-4be1-5b92-aeb1-ca696b58dfcb",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "decay",
-          "freq",
-          "gate",
-          "level",
-          "noise",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "decay[unit:s][scale:log][col:0][row:0]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:3][row:0]",
+          "noise[col:2][row:0]",
+          "tone[col:1][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -2949,17 +3013,18 @@
       "lineageUuid": "425aab9f-e570-5f7f-9f1c-2d1054d1df1b",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "decay",
-          "freq",
-          "gate",
-          "level",
-          "metalSpread",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "decay[unit:s][scale:log][col:0][row:0]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:3][row:0]",
+          "metalSpread[col:2][row:0]",
+          "tone[col:1][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -2993,18 +3058,19 @@
       "lineageUuid": "3250fac3-e336-5c3d-9530-c492681132ce",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "chokeGate",
-          "decay",
-          "freq",
-          "gate",
-          "level",
-          "metalSpread",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "chokeGate[curlop:input]",
+          "decay[unit:s][scale:log][col:0][row:0]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:3][row:0]",
+          "metalSpread[col:2][row:0]",
+          "tone[col:1][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -3038,17 +3104,18 @@
       "lineageUuid": "d88ea414-140a-582e-9f74-708e18f13210",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "decay",
-          "freq",
-          "gate",
-          "level",
-          "metalSpread",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "decay[unit:s][scale:log][col:0][row:0]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:3][row:0]",
+          "metalSpread[col:2][row:0]",
+          "tone[col:1][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -3082,20 +3149,21 @@
       "lineageUuid": "d20bbd5b-8f48-537b-a4ae-414a6dd68c3b",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "attack",
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "level",
-          "pitchAmount",
-          "pitchDecay",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "attack[col:3][row:0]",
+          "decay[unit:s][col:0][row:0]",
+          "drive[col:1][row:1]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:2][row:1]",
+          "pitchAmount[col:1][row:0]",
+          "pitchDecay[unit:s][col:2][row:0]",
+          "tone[col:0][row:1]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -3129,20 +3197,21 @@
       "lineageUuid": "dd6faa9e-1e71-5697-8f8f-99b9b3e53225",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "bend",
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "level",
-          "noiseDecay",
-          "snappy",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "bend[col:3][row:0]",
+          "decay[unit:s][col:0][row:0]",
+          "drive[col:1][row:1]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:2][row:1]",
+          "noiseDecay[unit:s][col:2][row:0]",
+          "snappy[col:1][row:0]",
+          "tone[col:0][row:1]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -3176,19 +3245,20 @@
       "lineageUuid": "f018492d-28e2-5016-94af-435aee7c3475",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "bend",
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "level",
-          "noise",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "bend[col:1][row:0]",
+          "decay[unit:s][col:0][row:0]",
+          "drive[col:0][row:1]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:1][row:1]",
+          "noise[col:3][row:0]",
+          "tone[col:2][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -3222,19 +3292,20 @@
       "lineageUuid": "c31f0667-a394-57af-8127-40a6ed2cc9c1",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "bend",
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "level",
-          "noise",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "bend[col:1][row:0]",
+          "decay[unit:s][col:0][row:0]",
+          "drive[col:0][row:1]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:1][row:1]",
+          "noise[col:3][row:0]",
+          "tone[col:2][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -3268,19 +3339,20 @@
       "lineageUuid": "4285d738-abd3-5b06-bb21-dacd1a2cc2ff",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "bend",
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "level",
-          "noise",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "bend[col:1][row:0]",
+          "decay[unit:s][col:0][row:0]",
+          "drive[col:0][row:1]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:1][row:1]",
+          "noise[col:3][row:0]",
+          "tone[col:2][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -3314,18 +3386,19 @@
       "lineageUuid": "3f40927c-bd6c-52c4-8f6a-0423f8231387",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "level",
-          "snap",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "decay[unit:s][col:0][row:0]",
+          "drive[col:3][row:0]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:0][row:1]",
+          "snap[col:2][row:0]",
+          "tone[col:1][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -3359,19 +3432,20 @@
       "lineageUuid": "aac7644a-bedf-5252-b8b2-ad0fd9177eae",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "level",
-          "spacing",
-          "tail",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "decay[unit:s][col:0][row:0]",
+          "drive[col:0][row:1]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:1][row:1]",
+          "spacing[unit:s][col:1][row:0]",
+          "tail[col:2][row:0]",
+          "tone[col:3][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -3405,20 +3479,21 @@
       "lineageUuid": "77c0ae78-0bdf-520f-9a8d-b228f7923b2f",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "bend",
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "level",
-          "mode",
-          "noise",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "bend[col:2][row:0]",
+          "decay[unit:s][scale:log][col:1][row:0]",
+          "drive[col:1][row:1]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:2][row:1]",
+          "mode[col:0][row:0]",
+          "noise[col:3][row:0]",
+          "tone[col:0][row:1]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -3452,19 +3527,20 @@
       "lineageUuid": "6b628dee-1c35-5c48-97d6-4f9d874e65b7",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "crack",
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "level",
-          "mode",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "crack[col:2][row:0]",
+          "decay[unit:s][scale:log][col:1][row:0]",
+          "drive[col:0][row:1]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:1][row:1]",
+          "mode[col:0][row:0]",
+          "tone[col:3][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -3498,17 +3574,18 @@
       "lineageUuid": "3e94ef70-37b0-5b6b-8b59-b940e89614a9",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "decay",
-          "freq",
-          "gate",
-          "grit",
-          "level",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "decay[unit:s][scale:log][col:0][row:0]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "grit[col:2][row:0]",
+          "level[col:3][row:0]",
+          "tone[col:1][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     },
     {
@@ -3542,18 +3619,19 @@
       "lineageUuid": "00c9385c-6c4c-575a-8ca8-b62c8649dd68",
       "contractEvidence": {
         "capturedControls": [
-          "accent",
-          "decay",
-          "drive",
-          "freq",
-          "gate",
-          "level",
-          "ratio",
-          "tone",
-          "velocity"
+          "accent[curlop:input]",
+          "decay[unit:s][scale:log][col:1][row:0]",
+          "drive[col:3][row:0]",
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "level[col:0][row:1]",
+          "ratio[col:0][row:0]",
+          "tone[col:2][row:0]",
+          "velocity[curlop:input]"
         ],
         "canonicalOneNote": true,
-        "gaps": []
+        "gaps": [],
+        "metadataAdapted": false
       }
     }
   ],

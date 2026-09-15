@@ -101,10 +101,21 @@ def export_one(source, destination, identity):
     code = lambda text: [x for x in text.splitlines() if not x.lstrip().startswith("declare ")]
     if code(normalized) != code(expanded):
         raise AssertionError("metadata normalization changed DSP expressions")
+    adapted = []
     if identity in {"analog-kick-sharp", "analog-snare", "clap"}:
-        normalized = re.sub(r'hslider\("pitch_hz[^"\\]*"', 'hslider("freq[unit:Hz][scale:log][curlop:input]"', normalized)
-        normalized = re.sub(r'button\("gate[^"\\]*"', 'button("gate[curlop:input]"', normalized)
-        normalized = re.sub(r'hslider\("velocity[^"\\]*"', 'hslider("velocity[curlop:input]"', normalized)
+        before_adaptation = normalized
+        def replace(pattern, replacement):
+            nonlocal normalized
+            originals = sorted(set(re.findall(pattern, normalized)))
+            normalized = re.sub(pattern, replacement, normalized)
+            adapted.extend(originals)
+        replace(r'hslider\("pitch_hz[^"\\]*"', 'hslider("freq[unit:Hz][scale:log][curlop:input]"')
+        replace(r'button\("gate(?!\[curlop:input\])[^"\\]*"', 'button("gate[curlop:input]"')
+        replace(r'hslider\("velocity(?!\[curlop:input\])[^"\\]*"', 'hslider("velocity[curlop:input]"')
+        restored = normalized.replace('hslider("freq[unit:Hz][scale:log][curlop:input]"', 'hslider("pitch_hz"')
+        restored = restored.replace('button("gate[curlop:input]"', 'button("gate"').replace('hslider("velocity[curlop:input]"', 'hslider("velocity"')
+        if not adapted or 'process' not in normalized or 'process' not in before_adaptation:
+            raise AssertionError("adaptation whitelist proof failed")
         destination.write_text(normalized)
     subprocess.run(["faust", "-lang", "cpp", "-single", str(destination), "-o", str(destination.with_suffix(".hpp"))], check=True, capture_output=True, text=True)
 
@@ -129,10 +140,11 @@ def run(out):
         entries.append({"id": f"analog-classics:{identity}", "identity": identity, "displayName": meta.get("name", identity), "category": category, "version": 1, "soundVersion": meta.get("version", "not-declared"), "source": {"path": f"scripts/{destination.name}", "sha256": digest(destination)}, "upstream": {"commit": commit, "path": relative, "sha256": digest(source)}, "source_commit": commit, "source_path": relative, "source_sha256": digest(source), "export_path": f"scripts/{destination.name}", "export_sha256": digest(destination), "license": meta.get("license", provenance(identity, source_root)), "dependencyProvenance": provenance(identity, source_root), "dependencies": [], "status": "internal-review", "selectionRationale": rationale, "selection_rationale": rationale, "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"})
     for entry in entries:
         entry["lineageUuid"] = str(uuid.uuid5(uuid.NAMESPACE_URL, f"curlcomplex/CURLOP/{entry['id']}"))
-        labels = re.findall(r'(?:hslider|button)\("([^"\[]+)', (out / entry["export_path"]).read_text())
-        required = {"gate", "freq", "velocity"}
-        gaps = [] if entry["category"] != "instrument" or required <= set(labels) else ["missing canonical one-note input"]
-        entry["contractEvidence"] = {"capturedControls": sorted(set(labels)), "canonicalOneNote": entry["category"] != "instrument" or not gaps, "gaps": gaps}
+        labels = re.findall(r'(?:hslider|button)\("([^"]+)"', (out / entry["export_path"]).read_text())
+        required = {"gate[curlop:input]", "velocity[curlop:input]"}
+        has_freq = any(label.startswith("freq[") and "[unit:Hz]" in label and "[curlop:input]" in label for label in labels)
+        gaps = [] if entry["category"] != "instrument" or (required <= set(labels) and has_freq) else ["missing canonical tagged one-note input"]
+        entry["contractEvidence"] = {"capturedControls": sorted(set(labels)), "canonicalOneNote": entry["category"] != "instrument" or not gaps, "gaps": gaps, "metadataAdapted": entry["identity"] in {"analog-kick-sharp", "analog-snare", "clap"}}
     manifest = {"schema": 1, "identity": "analog-classics-internal-review-2026-09-15.1", "status": "internal-review-only", "base_review_freeze": {"path": str(FREEZE.relative_to(ROOT)), "sha256": digest(FREEZE), "identity": freeze["id"]}, "modules": entries, "selected": entries, "rejected_or_unselected": REJECTED, "contract": {"one_note": "lowercase gate, freq in Hz, velocity; host owns allocation", "distinct_events": "accent, slide, choke, clock, reset and run are never aliases", "outputs": "audio, CV and observations are separately declared", "identity": "stable identity is manifest identity plus version and source digest, never display text or geometry", "sound_change": "exports are metadata/library expansion only; a sonic change requires a new version and review freeze"}, "consumer_limits": ["No CURLOP runtime, UI, project-state, voice-allocation or device acceptance is claimed.", "Effect/modulation entries retain their native I/O rather than being mislabeled one-note instruments."]}
     manifest["schema"] = "curlop-analog-classics-review/v1"
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
