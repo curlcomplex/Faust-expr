@@ -1,0 +1,69 @@
+name: DX7 H1 software-oracle baseline
+on:
+  pull_request:
+    paths:
+      - 'modules/dx7-reference-slice/**'
+      - 'tools/modules/dx7_*'
+      - '.github/workflows/dx7-h1.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: dx7-h1-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  dx7-h1:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      FAUST_VERSION: '2.88.0'
+      FAUST_ARCHIVE_SHA256: 'e4e175cf236924b5b7d4784cbb8c50cc01e211159e169655dd9e6d8f92b871d9'
+      EXECUTION_LANE: github-hosted
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Install bounded build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends python3-numpy g++ ffmpeg curl ca-certificates
+      - name: Fetch and verify complete Faust 2.88.0 release
+        run: |
+          set -euo pipefail
+          mkdir -p build/dx7-h1/toolchain build/dx7-h1/evidence
+          curl --fail --location --retry 3 \
+            "https://github.com/grame-cncm/faust/releases/download/${FAUST_VERSION}/faust-${FAUST_VERSION}.tar.gz" \
+            -o build/dx7-h1/faust.tar.gz
+          echo "$FAUST_ARCHIVE_SHA256  build/dx7-h1/faust.tar.gz" | sha256sum -c -
+          tar -xzf build/dx7-h1/faust.tar.gz -C build/dx7-h1/toolchain --strip-components=1
+          test -f build/dx7-h1/toolchain/libraries/dx7/operator.lib
+      - name: Build pinned Faust compiler
+        run: |
+          set -euo pipefail
+          make -C build/dx7-h1/toolchain/build cmake BACKENDS=regular.cmake TARGETS=regular.cmake > build/dx7-h1/evidence/configure.log 2>&1
+          cmake --build build/dx7-h1/toolchain/build/faustdir --target faust --parallel 2 > build/dx7-h1/evidence/compiler-build.log 2>&1
+          build/dx7-h1/toolchain/build/bin/faust --version | tee build/dx7-h1/evidence/faust-version.txt
+          grep -Fx "FAUST Version $FAUST_VERSION" build/dx7-h1/evidence/faust-version.txt
+      - name: Execute C01-C03 baseline against pinned MSFA
+        run: |
+          set -euo pipefail
+          python3 tools/modules/dx7_slice1.py \
+            --out build/dx7-h1/evidence/slice \
+            --faust build/dx7-h1/toolchain/build/bin/faust \
+            --faust-libraries build/dx7-h1/toolchain/libraries \
+            --faust-archive build/dx7-h1/faust.tar.gz \
+            2>&1 | tee build/dx7-h1/evidence/run.log
+      - name: Existing repository regression tests
+        run: python3 -m unittest discover -s tests -v 2>&1 | tee build/dx7-h1/evidence/regression.log
+      - name: Retain source identity
+        if: always()
+        run: |
+          git rev-parse HEAD > build/dx7-h1/evidence/commit.txt
+          git archive --format=tar HEAD modules/dx7-reference-slice tools/modules/dx7_slice1.py tools/modules/dx7_msfa_oracle.cpp .github/workflows/dx7-h1.yml > build/dx7-h1/evidence/source.tar
+      - name: Upload comparison evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: dx7-h1-${{ github.sha }}-${{ github.run_attempt }}
+          path: build/dx7-h1/evidence/
+          retention-days: 14
+          if-no-files-found: error
