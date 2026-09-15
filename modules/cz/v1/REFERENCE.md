@@ -1,0 +1,1 @@
+Primary code reference for this checkpoint: `magnetophon/VoiceOfFaust/lib/followerOscillators.lib`, CZ oscillator section (`CZsquare`, `CZsinepulse`, `CZrestrap`), inspected 2026-09-15. Secondary architecture/hardware references remain in issue #98. This checkpoint ports only the first two source equations; it does not claim complete Casio CZ hardware emulation.
