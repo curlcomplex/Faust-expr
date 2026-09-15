@@ -1,0 +1,193 @@
+name: Faust 2.88 analysis qualification
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/modules/faust_analysis*'
+      - 'tools/modules/faust_spectral_descriptors.dsp'
+      - 'tools/modules/spectral_trace.py'
+      - 'tools/modules/harmonic_analysis.py'
+      - 'tools/modules/harmonic_qualification.py'
+      - 'tests/test_harmonic_analysis.py'
+      - 'tests/fixtures/harmonics/**'
+      - 'modules/HARMONIC_QUALIFICATION.md'
+      - 'tests/test_spectral_trace.py'
+      - 'modules/SPECTRAL_TRACES.md'
+      - 'tests/test_faust_analysis.py'
+      - 'tests/test_render_probes.py'
+      - 'tests/fixtures/probes/**'
+      - 'tests/fixtures/probe_debug.dsp'
+      - 'tools/modules/probe_lab.py'
+      - 'tools/modules/render.cpp'
+      - 'tools/modules/lab.py'
+      - 'tools/modules/*benchmark.cpp'
+      - 'tools/modules/fit_api.cpp'
+      - 'tools/modules/color_fit_api.cpp'
+      - 'modules/PROBE_CAPTURE.md'
+      - '.github/workflows/faust-analysis-288.yml'
+  pull_request:
+    paths:
+      - 'tools/modules/faust_analysis*'
+      - 'tools/modules/faust_spectral_descriptors.dsp'
+      - 'tools/modules/spectral_trace.py'
+      - 'tools/modules/harmonic_analysis.py'
+      - 'tools/modules/harmonic_qualification.py'
+      - 'tests/test_harmonic_analysis.py'
+      - 'tests/fixtures/harmonics/**'
+      - 'modules/HARMONIC_QUALIFICATION.md'
+      - 'tests/test_spectral_trace.py'
+      - 'modules/SPECTRAL_TRACES.md'
+      - 'tests/test_faust_analysis.py'
+      - 'tests/test_render_probes.py'
+      - 'tests/fixtures/probes/**'
+      - 'tests/fixtures/probe_debug.dsp'
+      - 'tools/modules/probe_lab.py'
+      - 'tools/modules/render.cpp'
+      - 'tools/modules/lab.py'
+      - 'tools/modules/*benchmark.cpp'
+      - 'tools/modules/fit_api.cpp'
+      - 'tools/modules/color_fit_api.cpp'
+      - 'modules/PROBE_CAPTURE.md'
+      - 'modules/FAUST_ANALYSIS.md'
+      - '.github/workflows/faust-analysis-288.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: faust-analysis-hosted-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+defaults:
+  run:
+    shell: bash
+jobs:
+  analysis:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      FAUST_VERSION: '2.88.0'
+      FAUST_ARCHIVE_SHA256: 'e4e175cf236924b5b7d4784cbb8c50cc01e211159e169655dd9e6d8f92b871d9'
+      EXECUTION_LANE: github-hosted
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Install analysis dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends python3-numpy python3-scipy ffmpeg g++
+      - name: Fast input and provenance contracts
+        run: |
+          set -euo pipefail
+          mkdir -p build/faust-analysis/evidence
+          git rev-parse HEAD > build/faust-analysis/evidence/commit.txt
+          /usr/bin/python3 -m unittest discover -s tests -p test_faust_analysis.py -v 2>&1 | tee build/faust-analysis/evidence/contracts.log
+      - name: Native probe UI contracts (no Faust DSP claim)
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 -m unittest discover -s tests -p test_render_probes.py -v 2>&1 | tee build/faust-analysis/evidence/probe-contracts.log
+      - name: Verify logged test failures propagate
+        run: |
+          set -euo pipefail
+          if ( /usr/bin/python3 -c 'raise SystemExit(7)' 2>&1 | tee build/faust-analysis/evidence/expected-failure.log ); then
+            echo 'ERROR: logging pipeline swallowed a failing test'
+            exit 1
+          fi
+          echo 'Nonzero test exit is correctly propagated'
+      - name: Spectral input and report contracts
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 -m unittest discover -s tests -p test_spectral_trace.py -v 2>&1 | tee build/faust-analysis/evidence/spectral-contracts.log
+      - name: Harmonic measurement contracts
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 -m unittest discover -s tests -p test_harmonic_analysis.py -v 2>&1 | tee build/faust-analysis/evidence/harmonic-contracts.log
+      - name: Fetch complete pinned Faust release
+        run: |
+          set -euo pipefail
+          mkdir -p build/faust-analysis/toolchain
+          curl --fail --location --retry 3 \
+            "https://github.com/grame-cncm/faust/releases/download/${FAUST_VERSION}/faust-${FAUST_VERSION}.tar.gz" \
+            -o build/faust-analysis/faust.tar.gz
+          echo "$FAUST_ARCHIVE_SHA256  build/faust-analysis/faust.tar.gz" | sha256sum -c -
+          tar -xzf build/faust-analysis/faust.tar.gz -C build/faust-analysis/toolchain --strip-components=1
+          test -f build/faust-analysis/toolchain/libraries/stdfaust.lib
+      - name: Build pinned Faust
+        run: |
+          set -euo pipefail
+          make -C build/faust-analysis/toolchain/build cmake BACKENDS=regular.cmake TARGETS=regular.cmake > build/faust-analysis/evidence/configure.log 2>&1
+          cmake --build build/faust-analysis/toolchain/build/faustdir --target faust --parallel 2 > build/faust-analysis/evidence/compiler-build.log 2>&1
+          build/faust-analysis/toolchain/build/bin/faust --version | tee build/faust-analysis/evidence/faust-version.txt
+          grep -Fx "FAUST Version $FAUST_VERSION" build/faust-analysis/evidence/faust-version.txt
+      - name: Real Faust and native measurement qualification
+        env:
+          FAUST_ANALYSIS_INTEGRATION: '1'
+          FAUST: ${{ github.workspace }}/build/faust-analysis/toolchain/build/bin/faust
+          FAUST_LIBRARIES: ${{ github.workspace }}/build/faust-analysis/toolchain/libraries
+          FAUST_ARCHIVE: ${{ github.workspace }}/build/faust-analysis/faust.tar.gz
+          FAUST_ANALYSIS_EVIDENCE: ${{ github.workspace }}/build/faust-analysis/evidence/qualification
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 -m unittest discover -s tests -p test_faust_analysis.py -v 2>&1 | tee build/faust-analysis/evidence/qualification.log
+      - name: Exercise public CLI on existing raw fixture
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 - <<'PY'
+          import numpy as np
+          r=48000; t=np.arange(r*5)/r
+          (0.1*np.sin(2*np.pi*997*t)).astype('<f4').tofile('build/faust-analysis/sine.f32')
+          PY
+          /usr/bin/python3 tools/modules/faust_analysis.py build/faust-analysis/sine.f32 --rate 48000 --channels 1 \
+            --faust build/faust-analysis/toolchain/build/bin/faust \
+            --faust-libraries build/faust-analysis/toolchain/libraries \
+            --faust-archive build/faust-analysis/faust.tar.gz \
+            --out build/faust-analysis/evidence/cli > build/faust-analysis/evidence/cli.log 2>&1
+          /usr/bin/python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('build/faust-analysis/evidence/cli/analysis.json').read_text())
+          assert r['provenance']['release_archive_verified']
+          assert abs(r['channels'][0]['rms'] - 0.1 / 2**0.5) < 1e-7
+          print('CLI report, verified libraries and numerical RMS: PASS')
+          PY
+      - name: Real debug.lib probe and renderer qualification
+        env:
+          FAUST_PROBE_INTEGRATION: '1'
+          FAUST: ${{ github.workspace }}/build/faust-analysis/toolchain/build/bin/faust
+          FAUST_LIBRARIES: ${{ github.workspace }}/build/faust-analysis/toolchain/libraries
+          FAUST_ARCHIVE: ${{ github.workspace }}/build/faust-analysis/faust.tar.gz
+          FAUST_PROBE_EVIDENCE: ${{ github.workspace }}/build/faust-analysis/evidence/probes
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 -m unittest discover -s tests -p test_render_probes.py -v 2>&1 | tee build/faust-analysis/evidence/probe-qualification.log
+      - name: Real spectral descriptor and trace qualification
+        env:
+          SPECTRAL_TRACE_INTEGRATION: '1'
+          FAUST: ${{ github.workspace }}/build/faust-analysis/toolchain/build/bin/faust
+          FAUST_LIBRARIES: ${{ github.workspace }}/build/faust-analysis/toolchain/libraries
+          FAUST_ARCHIVE: ${{ github.workspace }}/build/faust-analysis/faust.tar.gz
+          SPECTRAL_TRACE_EVIDENCE: ${{ github.workspace }}/build/faust-analysis/evidence/spectral
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 -m unittest discover -s tests -p test_spectral_trace.py -v 2>&1 | tee build/faust-analysis/evidence/spectral-qualification.log
+      - name: Real harmonic and aliasing qualification
+        env:
+          HARMONIC_INTEGRATION: '1'
+          FAUST: ${{ github.workspace }}/build/faust-analysis/toolchain/build/bin/faust
+          FAUST_LIBRARIES: ${{ github.workspace }}/build/faust-analysis/toolchain/libraries
+          FAUST_ARCHIVE: ${{ github.workspace }}/build/faust-analysis/faust.tar.gz
+          HARMONIC_EVIDENCE: ${{ github.workspace }}/build/faust-analysis/evidence/harmonics
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 -m unittest discover -s tests -p test_harmonic_analysis.py -v 2>&1 | tee build/faust-analysis/evidence/harmonic-qualification.log
+      - name: Retain compact reproducible evidence
+        if: always()
+        run: |
+          mkdir -p build/faust-analysis/evidence
+          git archive --format=tar HEAD tools/modules/harmonic_analysis.py tools/modules/harmonic_qualification.py tests/test_harmonic_analysis.py tests/fixtures/harmonics modules/HARMONIC_QUALIFICATION.md tools/modules/spectral_trace.py tools/modules/faust_spectral_descriptors.dsp tests/test_spectral_trace.py modules/SPECTRAL_TRACES.md tools/modules/faust_analysis.py tools/modules/faust_analysis_meter.dsp tools/modules/faust_analysis_runner.cpp tests/test_faust_analysis.py tests/test_render_probes.py tests/fixtures/probes tests/fixtures/probe_debug.dsp tools/modules/probe_lab.py tools/modules/render.cpp tools/modules/lab.py tools/modules/fit_api.cpp tools/modules/color_fit_api.cpp modules/PROBE_CAPTURE.md 'tools/modules/*benchmark.cpp' .github/workflows/faust-analysis-288.yml > build/faust-analysis/evidence/source.tar
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: faust-analysis-288-${{ github.sha }}-${{ github.run_attempt }}
+          path: build/faust-analysis/evidence/
+          retention-days: 14
+          if-no-files-found: error
