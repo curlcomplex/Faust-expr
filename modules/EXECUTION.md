@@ -45,3 +45,27 @@ After explicit approval and the switch, validate a clean authenticated fetch and
 Local compute has no current GitHub per-minute self-hosted charge; electricity and machine maintenance remain local costs. Large audio uploads, caches, Git LFS or package storage are not made unlimited by self-hosting. Keep raw bulk audio locally/private with backups and hashes in Git. Upload small reports and selected auditions with short retention. A budget alert is not necessarily a spending stop; verify the actual configured control before claiming a zero-bill guarantee.
 
 No new workflow, billing setting, runner or permission was installed by the shared-module planning change.
+
+## Two independent execution lanes (owner direction, 15 September 2026)
+
+GitHub-hosted capacity and the owner's physical machine have separate queues.
+Actions is an orchestration service, not itself a hardware identity: inspect
+`runs-on` and actual job metadata before assigning a lane. The current #104
+analysis tooling defaults to hosted execution; it is not implicitly behind the
+instrument backlog or a busy local benchmark. Either lane may execute suitable
+owner-authorized work while the other is occupied, subject to actual dependencies.
+
+Record the owning issue, lane, immutable source SHA, actual run/task identifier,
+state, resource/dependency blocker, evidence and next action in handoffs. Check
+current availability before calling a lane free. Suggested work is not queued work.
+Use unique worktrees/build directories and avoid concurrent branch writes. Do not
+reuse an umbrella-level concurrency group across independent physical resources.
+All jobs on the owner's machine still need the existing machine-wide scheduling
+convention/exclusion, including builds or inference outside this repository.
+
+No new local runner, registration, permission or dispatcher is created by this
+policy. Continue to use the trusted private controller for reviewed revisions;
+never expose that machine to untrusted public PR jobs. Store local hostnames,
+paths and sensitive logs in private evidence. Ordinary hosted correctness checks
+are not representative measurements of the owner's hardware. The policy is also
+recorded on default-branch `AGENTS.md` so agents need not discover an unmerged PR.

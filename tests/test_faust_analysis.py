@@ -1,20 +1,194 @@
-import importlib.util, pathlib, tempfile, unittest
+"""Fast contracts plus opt-in REAL Faust/C++ measurement qualification.
+
+FAUST_ANALYSIS_INTEGRATION=1 requires an explicitly supplied pinned toolchain.
+No compiler-less contract test is reported as an end-to-end measurement test.
+"""
+import importlib.util
+import json
+import math
+import os
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import tempfile
+import unittest
+
 import numpy as np
-ROOT=pathlib.Path(__file__).resolve().parents[1]
-spec=importlib.util.spec_from_file_location('fa',ROOT/'tools/modules/faust_analysis.py'); fa=importlib.util.module_from_spec(spec);spec.loader.exec_module(fa)
+
+ROOT = Path(__file__).resolve().parents[1]
+spec = importlib.util.spec_from_file_location("faust_analysis", ROOT / "tools/modules/faust_analysis.py")
+fa = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(fa)
+
 
 class AnalysisContract(unittest.TestCase):
- def test_source_keeps_integrated_approximation_explicit(self):
-  text=(ROOT/'tools/modules/faust_analysis.py').read_text()
-  self.assertIn('streaming_approx',text)
-  self.assertIn('No normalization',text)
- def test_meter_contract_is_six_outputs(self):
-  text=(ROOT/'tools/modules/faust_analysis_meter.dsp').read_text()
-  for token in ('an.true_peak','an.loudness_momentary','an.loudness_shortterm','an.loudness_integrated'):
-   self.assertIn(token,text)
- def test_sha_is_content_hash(self):
-  with tempfile.TemporaryDirectory() as d:
-   p=pathlib.Path(d)/'x';p.write_bytes(b'abc')
-   self.assertEqual(fa.sha(p),'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad')
+    def test_sha_is_content_hash(self):
+        with tempfile.TemporaryDirectory() as work:
+            path = Path(work) / "x"
+            path.write_bytes(b"abc")
+            self.assertEqual(fa.sha(path), "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")
 
-if __name__=='__main__': unittest.main()
+    def test_rejects_invalid_input(self):
+        with tempfile.TemporaryDirectory() as work:
+            path = Path(work) / "x.f32"
+            for data in (b"", b"abc", np.array([np.nan], "<f4").tobytes(),
+                         np.array([np.inf], "<f4").tobytes()):
+                path.write_bytes(data)
+                with self.assertRaises(ValueError):
+                    fa.read_input(path, 48000, 1)
+            path.write_bytes(np.zeros(3, "<f4").tobytes())
+            for rate, channels in ((0, 1), (48000, 0), (48000, 2), (48000, 33)):
+                with self.assertRaises(ValueError):
+                    fa.read_input(path, rate, channels)
+
+    def test_failed_analysis_removes_stale_success(self):
+        with tempfile.TemporaryDirectory() as work:
+            root = Path(work)
+            source, out = root / "invalid.f32", root / "report"
+            source.write_bytes(b"invalid")
+            out.mkdir()
+            (out / "analysis.json").write_text('{"stale": true}')
+            with self.assertRaises(ValueError):
+                fa.analyze(source, 48000, 1, out, Path("unused"), {})
+            self.assertFalse((out / "analysis.json").exists())
+
+    def test_rejects_missing_library_path(self):
+        with tempfile.TemporaryDirectory() as work:
+            with self.assertRaisesRegex(ValueError, "explicit"):
+                fa.build(Path(work), "unused", "unused")
+
+    def test_rejects_wrong_archive(self):
+        with tempfile.TemporaryDirectory() as work:
+            path = Path(work) / "wrong.tar.gz"
+            path.write_bytes(b"not the pinned release")
+            with self.assertRaisesRegex(ValueError, "SHA-256"):
+                fa.verify_release_archive(path, {})
+
+    def test_library_hash_covers_analyzer_not_only_stdfaust(self):
+        with tempfile.TemporaryDirectory() as work:
+            root = Path(work)
+            (root / "stdfaust.lib").write_text("stdfaust")
+            analyzer = root / "analyzers.lib"
+            analyzer.write_text("before")
+            before = fa.library_manifest(root)
+            analyzer.write_text("after")
+            self.assertNotEqual(before, fa.library_manifest(root))
+
+
+@unittest.skipUnless(os.environ.get("FAUST_ANALYSIS_INTEGRATION") == "1",
+                     "requires explicit pinned Faust analysis integration toolchain")
+class RealAnalysis(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.temp = tempfile.TemporaryDirectory()
+        cls.addClassCleanup(cls.temp.cleanup)
+        cls.root = Path(cls.temp.name)
+        cls.evidence = Path(os.environ.get("FAUST_ANALYSIS_EVIDENCE", cls.root / "evidence")).resolve()
+        cls.evidence.mkdir(parents=True, exist_ok=True)
+        cls.runner, cls.provenance = fa.build(
+            cls.evidence / "build", os.environ["FAUST"], os.environ.get("CXX", "c++"),
+            os.environ["FAUST_LIBRARIES"], os.environ.get("FAUST_ARCHIVE"))
+
+    def measure(self, name, samples, rate=48000, block=256):
+        samples = np.asarray(samples, dtype="<f4")
+        if samples.ndim == 1:
+            samples = samples[:, None]
+        path = self.root / (name + ".f32")
+        samples.tofile(path)
+        report = fa.analyze(path, rate, samples.shape[1], self.evidence / name,
+                            self.runner, self.provenance, block=block)
+        return report, path
+
+    def test_sine_known_peak_rms_and_loudness(self):
+        # Analytic calibration, not a golden output generated by the meter.
+        for rate in (44100, 48000, 96000):
+            x = 0.1 * np.sin(2 * np.pi * 997 * np.arange(rate * 5) / rate)
+            report, _ = self.measure("sine-" + str(rate), x, rate)
+            c = report["channels"][0]
+            self.assertAlmostEqual(c["sample_peak"], 0.1, delta=1e-6)
+            self.assertAlmostEqual(c["rms"], 0.1 / math.sqrt(2), delta=1e-7)
+            self.assertAlmostEqual(c["faust_true_peak_estimate_max"], 0.1, delta=0.002)
+            for field in ("faust_loudness_momentary_final_lufs", "faust_loudness_shortterm_final_lufs"):
+                self.assertAlmostEqual(c[field], -23.0103, delta=0.06)
+            self.assertTrue(c["shortterm_full_window"])
+
+    def test_silence_and_channel_reset(self):
+        rate = 48000
+        x = np.column_stack((0.1 * np.sin(2 * np.pi * 997 * np.arange(rate) / rate), np.zeros(rate)))
+        report, _ = self.measure("stereo-reset", x)
+        c = report["channels"][1]
+        self.assertEqual(c["sample_peak"], 0.0)
+        self.assertEqual(c["rms"], 0.0)
+        self.assertEqual(c["faust_true_peak_hold_final"], 0.0)
+        for key, value in c.items():
+            if key.endswith("_lufs"):
+                self.assertAlmostEqual(value, -100.0, delta=1e-5)
+        self.assertEqual(report["measurement"]["channel_policy"], "independent-mono-no-programme-sum")
+
+    def test_true_peak_intersample_and_independent_fir(self):
+        # Independent NumPy/SciPy construction of the documented 4-phase FIR.
+        from scipy.signal import lfilter
+        n = np.arange(48000)
+        x = (0.97 * np.sin(2 * np.pi * 12000 * n / 48000 + np.pi / 4)).astype("<f4")
+        report, _ = self.measure("intersample", x)
+        h = np.kaiser(48, 10.0) * np.sinc((np.arange(48) - 23.5) / 4.0)
+        padded = np.pad(x.astype(float), (0, fa.TAIL_FRAMES))
+        reference = max(float(np.max(np.abs(lfilter(h[p::4] / np.sum(h[p::4]), [1.0], padded))))
+                        for p in range(4))
+        c = report["channels"][0]
+        self.assertGreater(c["faust_true_peak_estimate_max"], c["sample_peak"] * 1.25)
+        self.assertAlmostEqual(c["faust_true_peak_estimate_max"], reference, delta=2e-6)
+
+    def test_final_frame_impulse_flushes_tail(self):
+        from scipy.signal import lfilter
+        x = np.zeros(257, "<f4")
+        x[-1] = 1.0
+        report, _ = self.measure("tail-impulse", x)
+        h = np.kaiser(48, 10.0) * np.sinc((np.arange(48) - 23.5) / 4.0)
+        padded = np.pad(x.astype(float), (0, fa.TAIL_FRAMES))
+        reference = max(float(np.max(np.abs(lfilter(h[p::4] / np.sum(h[p::4]), [1.0], padded))))
+                        for p in range(4))
+        c = report["channels"][0]
+        self.assertAlmostEqual(c["faust_true_peak_estimate_max"], reference, delta=2e-6)
+        self.assertFalse(c["momentary_full_window"])
+        self.assertFalse(c["shortterm_full_window"])
+        self.assertEqual(report["measurement"]["loudness_end_frame_exclusive"], len(x))
+
+    def test_block_size_invariance_and_no_normalization(self):
+        x = np.random.default_rng(105).normal(0, 0.4, 6001).astype("<f4")
+        reports = [self.measure(f"block-{b}", x, block=b)[0] for b in (1, 127, 256, 511)]
+        for report in reports[1:]:
+            self.assertEqual(report["channels"], reports[0]["channels"])
+        self.assertGreater(reports[0]["channels"][0]["sample_peak"], 1.0)
+
+    def test_independent_ffmpeg_loudness(self):
+        ffmpeg = shutil.which("ffmpeg")
+        self.assertIsNotNone(ffmpeg, "qualification requires FFmpeg reference")
+        x = 0.1 * np.sin(2 * np.pi * 997 * np.arange(48000 * 10) / 48000)
+        report, path = self.measure("ffmpeg-sine", x)
+        p = subprocess.run([ffmpeg, "-hide_banner", "-nostats", "-f", "f32le", "-ar", "48000",
+                            "-ac", "1", "-i", str(path), "-af", "ebur128", "-f", "null", "-"],
+                           capture_output=True, text=True, timeout=30, check=True)
+        matches = re.findall(r"\bI:\s*(-?[\d.]+)\s+LUFS", p.stderr)
+        self.assertTrue(matches, "missing FFmpeg reference summary")
+        reference = float(matches[-1])
+        result = report["channels"][0]["faust_loudness_integrated_streaming_approx_final_lufs"]
+        self.assertAlmostEqual(result, reference, delta=0.25)
+        (self.evidence / "ffmpeg-reference.json").write_text(json.dumps({
+            "ffmpeg_version": subprocess.check_output([ffmpeg, "-version"], text=True).splitlines()[0],
+            "reference_integrated_lufs": reference, "faust_streaming_approx_lufs": result,
+            "difference_lu": result - reference, "tolerance_lu": 0.25,
+            "scope": "stationary 997-Hz mono sine only; not general EBU conformance"}, indent=2) + "\n")
+
+    def test_native_rejects_bad_arguments(self):
+        path = self.root / "invalid.f32"
+        np.zeros(1, "<f4").tofile(path)
+        for rate in ("0", "-1", "4295015296", "48000oops"):
+            p = subprocess.run([str(self.runner), str(path), str(self.root / "out.f32"), rate, "1"],
+                               capture_output=True, timeout=10)
+            self.assertNotEqual(p.returncode, 0)
+
+
+if __name__ == "__main__":
+    unittest.main()
