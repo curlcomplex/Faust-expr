@@ -1,0 +1,1 @@
+Issue #98 checkpoint status: source implementation started. CI compilation and actual Faust audition renders are required before this checkpoint can be called audible/usable. Do not infer hardware fidelity from the source equations alone.
