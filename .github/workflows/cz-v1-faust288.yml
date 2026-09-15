@@ -1,0 +1,16 @@
+name: CZ v1 Faust 2.88 compile
+on: [push, pull_request]
+jobs:
+  compile:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Build Faust 2.88.0
+        run: |
+          git clone --depth 1 --branch 2.88.0 https://github.com/grame-cncm/faust.git /tmp/faust
+          cd /tmp/faust && make -j2 && sudo make install
+      - name: Compile CZ voice
+        run: |
+          faust -v
+          faust -lang cpp -I modules/cz/v1 modules/cz/v1/voice.dsp -o /tmp/cz.cpp
+          test -s /tmp/cz.cpp
