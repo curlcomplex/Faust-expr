@@ -1,0 +1,89 @@
+name: Faust 2.88 compiler and numerical diagnostics
+on:
+  pull_request:
+    paths:
+      - 'tools/modules/compiler_diagnostics.py'
+      - 'tests/test_compiler_diagnostics.py'
+      - 'tests/fixtures/diagnostics/**'
+      - 'modules/COMPILER_DIAGNOSTICS.md'
+      - '.github/workflows/compiler-diagnostics-288.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: faust-compiler-diagnostics-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+defaults:
+  run:
+    shell: bash
+jobs:
+  diagnostics:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    env:
+      FAUST_VERSION: '2.88.0'
+      FAUST_ARCHIVE_SHA256: 'e4e175cf236924b5b7d4784cbb8c50cc01e211159e169655dd9e6d8f92b871d9'
+      EXECUTION_LANE: github-hosted
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Install build dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends g++ zlib1g-dev libncurses-dev
+      - name: Fast contracts
+        run: |
+          set -euo pipefail
+          mkdir -p build/compiler-diagnostics/evidence
+          git rev-parse HEAD > build/compiler-diagnostics/evidence/commit.txt
+          python3 -m unittest tests.test_compiler_diagnostics -v 2>&1 | tee build/compiler-diagnostics/evidence/contracts.log
+      - name: Fetch verified Faust release
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 "https://github.com/grame-cncm/faust/releases/download/${FAUST_VERSION}/faust-${FAUST_VERSION}.tar.gz" -o build/compiler-diagnostics/faust.tar.gz
+          echo "$FAUST_ARCHIVE_SHA256  build/compiler-diagnostics/faust.tar.gz" | sha256sum -c -
+          mkdir -p build/compiler-diagnostics/toolchain
+          tar -xzf build/compiler-diagnostics/faust.tar.gz -C build/compiler-diagnostics/toolchain --strip-components=1
+      - name: Build compiler, static libfaust and interp-tracer
+        run: |
+          set -euo pipefail
+          TC="$GITHUB_WORKSPACE/build/compiler-diagnostics/toolchain"
+          make -C "$TC/build" cmake BACKENDS=regular.cmake TARGETS=regular.cmake > build/compiler-diagnostics/evidence/configure.log 2>&1
+          cmake --build "$TC/build/faustdir" --target faust --parallel 2 > build/compiler-diagnostics/evidence/compiler-build.log 2>&1
+          cmake --build "$TC/build/faustdir" --target staticlib --parallel 2 > build/compiler-diagnostics/evidence/staticlib-build.log 2>&1
+          test -f "$TC/build/lib/libfaust.a"
+          make -C "$TC/tools/benchmark" interp-tracer FAUSTDIR="$TC/build" > build/compiler-diagnostics/evidence/tracer-build.log 2>&1
+          test -x "$TC/tools/benchmark/interp-tracer"
+          "$TC/build/bin/faust" --version | tee build/compiler-diagnostics/evidence/faust-version.txt
+          "$TC/tools/benchmark/interp-tracer" -help > build/compiler-diagnostics/evidence/tracer-help.txt 2>&1 || true
+      - name: Real compiler and interpreter diagnostics
+        env:
+          COMPILER_DIAGNOSTICS_INTEGRATION: '1'
+          FAUST: ${{ github.workspace }}/build/compiler-diagnostics/toolchain/build/bin/faust
+          FAUST_LIBRARIES: ${{ github.workspace }}/build/compiler-diagnostics/toolchain/libraries
+          INTERP_TRACER: ${{ github.workspace }}/build/compiler-diagnostics/toolchain/tools/benchmark/interp-tracer
+        run: |
+          set -euo pipefail
+          python3 -m unittest tests.test_compiler_diagnostics -v 2>&1 | tee build/compiler-diagnostics/evidence/qualification.log
+      - name: Exercise public diagnostic CLI
+        run: |
+          set -euo pipefail
+          TC="$GITHUB_WORKSPACE/build/compiler-diagnostics/toolchain"
+          python3 tools/modules/compiler_diagnostics.py tests/fixtures/diagnostics/safe.dsp \
+            --faust "$TC/build/bin/faust" --faust-libraries "$TC/libraries" \
+            --interp-tracer "$TC/tools/benchmark/interp-tracer" --structural \
+            --out build/compiler-diagnostics/evidence/safe | tee build/compiler-diagnostics/evidence/cli.log
+      - name: Retain source evidence
+        if: always()
+        run: |
+          mkdir -p build/compiler-diagnostics/evidence
+          git archive --format=tar HEAD tools/modules/compiler_diagnostics.py tests/test_compiler_diagnostics.py tests/fixtures/diagnostics modules/COMPILER_DIAGNOSTICS.md .github/workflows/compiler-diagnostics-288.yml > build/compiler-diagnostics/evidence/source.tar
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: faust-compiler-diagnostics-${{ github.sha }}-${{ github.run_attempt }}
+          path: build/compiler-diagnostics/evidence/
+          retention-days: 14
+          if-no-files-found: error
