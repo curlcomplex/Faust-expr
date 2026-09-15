@@ -38,9 +38,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p build/dx7-h1/toolchain build/dx7-h1/evidence
-          curl --fail --location --retry 3 \
-            "https://github.com/grame-cncm/faust/releases/download/${FAUST_VERSION}/faust-${FAUST_VERSION}.tar.gz" \
-            -o build/dx7-h1/faust.tar.gz
+          curl --fail --location --retry 3 "https://github.com/grame-cncm/faust/releases/download/${FAUST_VERSION}/faust-${FAUST_VERSION}.tar.gz" -o build/dx7-h1/faust.tar.gz
           echo "$FAUST_ARCHIVE_SHA256  build/dx7-h1/faust.tar.gz" | sha256sum -c -
           tar -xzf build/dx7-h1/faust.tar.gz -C build/dx7-h1/toolchain --strip-components=1
           test -f build/dx7-h1/toolchain/libraries/dx7/operator.lib
@@ -54,12 +52,11 @@ jobs:
       - name: Execute C01-C03 baseline against pinned MSFA
         run: |
           set -euo pipefail
-          /usr/bin/python3 tools/modules/dx7_slice1.py \
-            --out build/dx7-h1/evidence/slice \
-            --faust build/dx7-h1/toolchain/build/bin/faust \
-            --faust-libraries build/dx7-h1/toolchain/libraries \
-            --faust-archive build/dx7-h1/faust.tar.gz \
-            2>&1 | tee build/dx7-h1/evidence/run.log
+          /usr/bin/python3 tools/modules/dx7_slice1.py --out build/dx7-h1/evidence/slice --faust build/dx7-h1/toolchain/build/bin/faust --faust-libraries build/dx7-h1/toolchain/libraries --faust-archive build/dx7-h1/faust.tar.gz 2>&1 | tee build/dx7-h1/evidence/run.log
+      - name: Identify phase-index scale without changing DSP
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 tools/modules/dx7_phase_index.py --out build/dx7-h1/evidence/phase-index --faust build/dx7-h1/toolchain/build/bin/faust --faust-libraries build/dx7-h1/toolchain/libraries 2>&1 | tee build/dx7-h1/evidence/phase-index.log
       - name: Existing repository regression tests
         run: |
           set -euo pipefail
@@ -69,11 +66,8 @@ jobs:
         run: |
           mkdir -p build/dx7-h1/evidence
           git rev-parse HEAD > build/dx7-h1/evidence/commit.txt
-          git archive --format=tar HEAD modules/dx7-reference-slice tools/modules/dx7_slice1.py tools/modules/dx7_msfa_oracle.cpp tests/test_dx7_slice1.py .github/workflows/dx7-h1.yml > build/dx7-h1/evidence/source.tar
-          if test -x build/dx7-h1/toolchain/build/bin/faust; then
-            cp build/dx7-h1/toolchain/build/bin/faust build/dx7-h1/evidence/faust-2.88.0
-            sha256sum build/dx7-h1/evidence/faust-2.88.0 > build/dx7-h1/evidence/compiler.sha256
-          fi
+          git archive --format=tar HEAD modules/dx7-reference-slice tools/modules/dx7_slice1.py tools/modules/dx7_msfa_oracle.cpp tools/modules/dx7_phase_index.py tools/modules/dx7_msfa_phase_oracle.cpp tests/test_dx7_slice1.py .github/workflows/dx7-h1.yml > build/dx7-h1/evidence/source.tar
+          if test -x build/dx7-h1/toolchain/build/bin/faust; then cp build/dx7-h1/toolchain/build/bin/faust build/dx7-h1/evidence/faust-2.88.0; sha256sum build/dx7-h1/evidence/faust-2.88.0 > build/dx7-h1/evidence/compiler.sha256; fi
       - name: Upload comparison evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
