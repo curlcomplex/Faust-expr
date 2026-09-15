@@ -22,6 +22,10 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with: {persist-credentials: false}
+      - name: Install analysis dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends python3-numpy g++
       - name: Fetch complete pinned Faust release
         run: |
           set -euo pipefail
@@ -38,15 +42,15 @@ jobs:
           build/faust-analysis/toolchain/build/bin/faust --version | tee build/faust-analysis/faust-version.txt
           grep -F "$FAUST_VERSION" build/faust-analysis/faust-version.txt
       - name: Unit tests
-        run: python3 -m unittest tests.test_faust_analysis -v
+        run: /usr/bin/python3 -m unittest tests.test_faust_analysis -v
       - name: Analyze deterministic sine fixture
         run: |
-          python3 - <<'PY'
+          /usr/bin/python3 - <<'PY'
           import numpy as np
           r=48000;t=np.arange(r*5)/r
           (0.1*np.sin(2*np.pi*997*t)).astype('<f4').tofile('build/faust-analysis/sine.f32')
           PY
-          python3 tools/modules/faust_analysis.py build/faust-analysis/sine.f32 --rate 48000 --channels 1 \
+          /usr/bin/python3 tools/modules/faust_analysis.py build/faust-analysis/sine.f32 --rate 48000 --channels 1 \
             --faust build/faust-analysis/toolchain/build/bin/faust --out build/faust-analysis/result
       - name: Retain evidence
         if: always()
