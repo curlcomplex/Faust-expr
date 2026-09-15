@@ -1,0 +1,102 @@
+name: JP-8000 wide Faust 2.88 hosted auditions
+on:
+  push:
+    branches: ['100-jp8000-supersaw-faust']
+    paths:
+      - 'modules/jp-8000/v2/**'
+      - 'tools/modules/jp8000_wide_auditions.py'
+      - '.github/workflows/jp8000-wide-hosted.yml'
+permissions:
+  contents: read
+concurrency:
+  group: jp8000-wide-hosted-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  audition:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      FAUST_VERSION: '2.88.0'
+      FAUST_ARCHIVE_SHA256: 'e4e175cf236924b5b7d4784cbb8c50cc01e211159e169655dd9e6d8f92b871d9'
+    steps:
+      - name: Exact candidate source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          path: source
+      - name: Reviewed main analysis and renderer
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          repository: curlcomplex/Faust-expr
+          ref: 82926f023410ae8367eec3c5d842edbbe34ab439
+          path: lab
+          persist-credentials: false
+      - name: Install bounded build and numerical dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends g++ cmake make zlib1g-dev python3-numpy python3-scipy python3-matplotlib faust
+      - name: Restore verified compiler build
+        id: toolchain
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
+        with:
+          path: ${{ github.workspace }}/faust-288
+          key: jp8000-faust-288-ubuntu24-x64-e4e175cf-v1
+      - name: Build exact Faust release, not Ubuntu's older package
+        if: steps.toolchain.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p faust-288
+          curl --fail --location --retry 3 "https://github.com/grame-cncm/faust/releases/download/$FAUST_VERSION/faust-$FAUST_VERSION.tar.gz" -o faust-288/release.tar.gz
+          echo "$FAUST_ARCHIVE_SHA256  faust-288/release.tar.gz" | sha256sum -c -
+          mkdir -p faust-288/source
+          tar -xzf faust-288/release.tar.gz -C faust-288/source --strip-components=1
+          make -C faust-288/source/build cmake BACKENDS=regular.cmake TARGETS=regular.cmake
+          cmake --build faust-288/source/build/faustdir --target faust --parallel 2
+      - name: Verify compiler and pinned main checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "$FAUST_ARCHIVE_SHA256  faust-288/release.tar.gz" | sha256sum -c -
+          faust-288/source/build/bin/faust --version | tee faust-288/version.txt
+          grep -Fx "FAUST Version $FAUST_VERSION" faust-288/version.txt
+          test "$(git -C lab rev-parse HEAD)" = 82926f023410ae8367eec3c5d842edbbe34ab439
+      - name: Actual compiled Faust renders, chords and regression checks
+        shell: bash
+        env:
+          CXX: g++
+        run: |
+          set -euo pipefail
+          mkdir -p run-logs
+          /usr/bin/python3 source/tools/modules/jp8000_wide_auditions.py \
+            --execution-lane github-hosted --lab-root "$GITHUB_WORKSPACE/lab" \
+            --out "$GITHUB_WORKSPACE/supersaw-results" \
+            --faust "$GITHUB_WORKSPACE/faust-288/source/build/bin/faust" \
+            --faust-libraries "$GITHUB_WORKSPACE/faust-288/source/libraries" \
+            --faust-archive "$GITHUB_WORKSPACE/faust-288/release.tar.gz" \
+            2>&1 | tee run-logs/auditions.log
+      - name: Existing repository tests and smoke
+        shell: bash
+        working-directory: source
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 -m unittest discover -s tests -v 2>&1 | tee ../run-logs/repository-tests.log
+          PATH=/usr/bin:/bin:$PATH bash scripts/build.sh 2>&1 | tee ../run-logs/existing-smoke.log
+      - name: Main analysis regression tests
+        shell: bash
+        working-directory: lab
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 -m unittest tests.test_analysis_review_fixes tests.test_render_probes tests.test_spectral_trace tests.test_harmonic_analysis -v 2>&1 | tee ../run-logs/main-analysis-tests.log
+      - name: Retain recordings and provenance, including failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: jp8000-wide-hosted-${{ github.run_id }}
+          path: |
+            supersaw-results/
+            run-logs/
+            source/evidence/
+            faust-288/version.txt
+          retention-days: 14
+          if-no-files-found: error

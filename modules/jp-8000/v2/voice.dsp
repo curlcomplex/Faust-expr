@@ -1,0 +1,20 @@
+declare name "VA Classics Supersaw measured-law candidate";
+declare version "0.2.0-wide-auditions";
+declare description "Seven 24-bit saw phases; published measured detune/mix fits; approximate pitch-tracked HPF. Not a complete JP-8000.";
+import("stdfaust.lib");
+ss=library("supersaw_core.lib");
+gate=button("gate[curlop:input]");
+freq=hslider("freq[unit:Hz][scale:log][curlop:input]",220,20,8000,.01);
+velocity=hslider("velocity[curlop:input]",1,0,1,.001);
+detune=hslider("detune",0.82,0,1,.001);
+mix=hslider("mix",0.88,0,1,.001);
+phaseSeed=nentry("phaseSeed",1,0,65535,1);
+attack=hslider("attack[unit:s]",.008,.001,2,.001);
+decay=hslider("decay[unit:s]",.35,.005,4,.001);
+sustain=hslider("sustain",.78,0,1,.001);
+release=hslider("release[unit:s]",.65,.005,6,.001);
+level=hslider("level",.12,0,1,.001);
+// Host owns polyphony. Each rendered chord voice is a separate DSP instance.
+heldVelocity=velocity:ba.sAndH(gate>gate');
+env=en.adsr(attack,decay,sustain,release,gate>0);
+process=ss.source(freq,detune,mix,phaseSeed)*env*heldVelocity*level;

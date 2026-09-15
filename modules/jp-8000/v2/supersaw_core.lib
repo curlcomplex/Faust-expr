@@ -1,0 +1,34 @@
+// Original implementation of published measurement fits, not Roland firmware.
+// Reference: Adam Szabo, How to Emulate the Super Saw (2010), pp. 9,11,15,16-19.
+// v1 is retained unchanged. This candidate does not claim bit-accurate JP output.
+import("stdfaust.lib");
+clip01(x) = min(1.0,max(0.0,x));
+// Monotone interpolation of Table 2. Avoid catastrophic single-precision
+// cancellation in the 11th-degree polynomial near the top of the control.
+point(0)=0.0; point(1)=0.00967268; point(2)=0.0220363;
+point(3)=0.0339636; point(4)=0.0467636; point(5)=0.0591273;
+point(6)=0.0714909; point(7)=0.0838545; point(8)=0.0967273;
+point(9)=0.121527; point(10)=0.147127; point(11)=0.193455;
+point(12)=0.243418; point(13)=0.2933815; point(14)=0.343345;
+point(15)=0.3928; point(16)=1.0;
+// Native coordinates are 0,7,15,...119,127, not equally spaced 0..1.
+segment(0,x)=point(1)*min(1.0,max(0.0,x/7.0));
+segment(i,x)=(point(i+1)-point(i))*min(1.0,max(0.0,(x-(8*i-1))/8.0));
+detuneAmount(x)=sum(i,16,segment(i,127.0*clip01(x)));
+centerGain(x)=0.99785-0.55366*clip01(x);
+sideGain(x)=0.044372+clip01(x)*(1.2841-0.73764*clip01(x));
+// Measured frequency offsets, not semitone offsets. Table 1 in Szabo.
+offset(0)=0.0; offset(1)=-0.11002313; offset(2)=-0.06288439;
+offset(3)=-0.01952356; offset(4)=0.01991221;
+offset(5)=0.06216538; offset(6)=0.10745242;
+wrap24(x)=((int(x)+8388608)&16777215)-8388608;
+// Wrap both output and feedback; v1 exposed the pre-wrap sample.
+phase24(step,initial)=(+(int(step)+int(initial)*(1-1')):wrap24)~_;
+initial(i,seed)=(((int(seed)*97+(i+1)*104729)&65535)*256)-8388608;
+osc(i,f,d,seed)=float(phase24(int(f*(1.0+offset(i)*d)*16777216.0/ma.SR),initial(i,seed)))/8388608.0;
+// Phases are seeded per host voice and free-running over repeated gates.
+// This is reproducible audition state, not an assertion about JP reset behavior.
+source(freq,detune,mix,seed)=raw:fi.highpass(2,f) with {
+ f=min(ma.SR*0.20,max(10.0,freq)); d=detuneAmount(detune);
+ raw=osc(0,f,d,seed)*centerGain(mix)+sum(i,6,osc(i+1,f,d,seed))*sideGain(mix);
+};
