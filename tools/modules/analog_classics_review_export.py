@@ -6,7 +6,7 @@ all Faust libraries; metadata normalisation is verified not to alter an
 expression line. The resulting scripts are self-contained.
 """
 from pathlib import Path
-import argparse, hashlib, json, re, subprocess, sys, uuid
+import argparse, hashlib, json, os, re, subprocess, sys, tempfile, uuid
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(Path(__file__).parent))
@@ -20,6 +20,7 @@ PINNED_COMMITS = {
 }
 PINNED_BRANCHES = {"606": "606-reference-tuning", "909": "80-909-reference-tuning", "808-aux": "75-808-fischer-reference-pass"}
 ADAPTATION_EVIDENCE = {}
+EXPORT_EVIDENCE = {}
 FROZEN_PRESETS = {
  "606-low-tom": {"gate":0,"freq":137.55581,"velocity":1,"accent":0,"decay":.29948,"tone":.38612,"noise":.021917,"level":.8},
  "606-high-tom": {"gate":0,"freq":207.57604,"velocity":1,"accent":0,"decay":.205787,"tone":.162234,"noise":.102346,"level":.8},
@@ -93,7 +94,65 @@ def declarations(text):
             result[key] = value.rsplit('";', 1)[0]
     return result
 
-def export_one(source, destination, identity):
+def build_runner(source, folder, include_dirs=()):
+    folder.mkdir(parents=True, exist_ok=True)
+    command = [os.getenv("FAUST", "faust"), "-lang", "cpp", "-single", "-cn", "ModuleDSP"]
+    command += [flag for directory in include_dirs for flag in ("-I", str(directory))]
+    subprocess.run(command + [str(source), "-o", str(folder / "generated.hpp")], check=True, capture_output=True, text=True)
+    subprocess.run([os.getenv("CXX", "c++"), "-std=c++17", "-O2", "-ffp-contract=off", "-I" + str(folder), str(ROOT / "tools/modules/render.cpp"), "-o", str(folder / "render")], check=True, capture_output=True, text=True)
+    return folder / "render", (folder / "generated.hpp").read_text()
+
+def rendered_equivalence(identity, original_text, exported):
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        original = root / "original.dsp"
+        original.write_text(original_text)
+        old, _ = build_runner(original, root / "old")
+        new, _ = build_runner(exported, root / "new")
+        old_score = root / "old.tsv"; new_score = root / "new.tsv"
+        common = "0\tvelocity\t0.7\n64\tgate\t1\n4800\tgate\t0\n"
+        old_controls = subprocess.check_output([str(old), "--controls"], text=True)
+        old_address = "pitch_hz" if any(line.startswith("pitch_hz\t") for line in old_controls.splitlines()) else "freq"
+        old_score.write_text(f"0\t{old_address}\t120\n" + common)
+        new_score.write_text("0\tfreq\t120\n" + common)
+        old_raw = root / "old.f32"; new_raw = root / "new.f32"
+        old_diag = subprocess.check_output([str(old), str(old_score), str(old_raw), "48000", "64", "12000", "0"], text=True)
+        new_diag = subprocess.check_output([str(new), str(new_score), str(new_raw), "48000", "64", "12000", "0"], text=True)
+        if old_raw.read_bytes() != new_raw.read_bytes():
+            raise AssertionError(identity + ": adapted render differs")
+        stable_diagnostics = lambda text: {key:value for key,value in json.loads(text).items() if key != "instrumented_compute_ns"}
+        return {"sampleRate":48000,"blockSize":64,"frames":12000,"oldAddress":old_address,"newAddress":"freq","audioSha256":digest(old_raw),"byteIdentical":True,"oldDiagnostics":stable_diagnostics(old_diag),"newDiagnostics":stable_diagnostics(new_diag)}
+
+def dependency_provenance(source, include_dirs, compiler_version):
+    dependencies = {}
+    visited = set()
+
+    def visit(path):
+        path = path.resolve()
+        if path in visited:
+            return
+        visited.add(path)
+        text = path.read_text()
+        for kind, name in re.findall(r'\b(import|library)\("([^"]+)"\)', text):
+            candidates = (path.parent / name, *(directory / name for directory in include_dirs))
+            dependency = next((candidate.resolve() for candidate in candidates if candidate.exists()), None)
+            if dependency is None:
+                dependencies[("standard-library", name)] = {
+                    "kind": "standard-library", "name": name,
+                    "compilerVersion": compiler_version,
+                }
+                continue
+            relative = str(dependency.relative_to(ROOT))
+            dependencies[("repository-library", relative)] = {
+                "kind": "repository-library", "path": relative,
+                "sha256": digest(dependency), "referencedAs": kind,
+            }
+            visit(dependency)
+
+    visit(source)
+    return [dependencies[key] for key in sorted(dependencies)]
+
+def export_one(source, destination, identity, compiler_version):
     include_dirs = (source.parent, ROOT / "modules/analog-classics/synth-batch", ROOT / "modules/analog-classics/synth-finish")
     command = ["faust", "-e"] + [flag for directory in include_dirs for flag in ("-I", str(directory))] + [str(source), "-o", str(destination)]
     raw = subprocess.run(command, text=True, capture_output=True)
@@ -111,6 +170,7 @@ def export_one(source, destination, identity):
     if code(normalized) != code(expanded):
         raise AssertionError("metadata normalization changed DSP expressions")
     adapted = []
+    before_adaptation = None
     if identity in {"analog-kick-sharp", "analog-snare", "clap"}:
         before_adaptation = normalized
         def replace(pattern, replacement):
@@ -135,7 +195,17 @@ def export_one(source, destination, identity):
             if count == 0:
                 raise AssertionError(f"missing frozen preset control {identity}:{control}")
         destination.write_text(normalized)
-    subprocess.run(["faust", "-lang", "cpp", "-single", str(destination), "-o", str(destination.with_suffix(".hpp"))], check=True, capture_output=True, text=True)
+    with tempfile.TemporaryDirectory() as tmp:
+        runner, header = build_runner(destination, Path(tmp) / "compiled")
+    channels = [int(re.search(r'getNumInputs\(\).*?return\s+(\d+);', header, re.S).group(1)), int(re.search(r'getNumOutputs\(\).*?return\s+(\d+);', header, re.S).group(1))]
+    bars = re.findall(r'(?:hbargraph|vbargraph)\("([^"]+)"', normalized)
+    imports = dependency_provenance(source, include_dirs, compiler_version)
+    output_roles = [{"label":label,"role":"cv" if "[curlop:cvout]" in label else "observation" if "[curlop:meterout]" in label else "bargraph-unclassified"} for label in bars]
+    evidence = {"compiledIo":{"audioInputs":channels[0],"signalOutputs":channels[1]},"namedOutputs":output_roles,"imports":imports}
+    if identity in ADAPTATION_EVIDENCE:
+        evidence["renderedEquivalence"] = rendered_equivalence(identity, before_adaptation, destination)
+    EXPORT_EVIDENCE[identity] = evidence
+    destination.with_suffix(".hpp").write_text(header)
 
 def provenance(identity, source_root):
     if identity.startswith("909-"):
@@ -147,17 +217,23 @@ def provenance(identity, source_root):
 def run(out):
     out = out.resolve(); scripts = out / "scripts"; scripts.mkdir(parents=True, exist_ok=True)
     freeze = json.loads(FREEZE.read_text())
-    compiler_version = subprocess.check_output(["faust", "--version"], text=True).strip()
+    compiler_version = subprocess.check_output(["faust", "--version"], text=True).splitlines()[0]
+    cxx_version = subprocess.check_output([os.getenv("CXX", "c++"), "--version"], text=True).splitlines()[0]
     entries = []
     for subject in SUBJECTS:
         identity, category, relative, rationale = subject[:4]
         source_root = ROOT
         source = source_root / relative; destination = scripts / f"{identity}.dsp"
-        export_one(source, destination, identity)
+        export_one(source, destination, identity, compiler_version)
         meta = declarations(source.read_text())
         commit = next((sha for prefix, sha in PINNED_COMMITS.items() if identity.startswith(prefix)), subprocess.check_output(["git", "log", "-1", "--format=%H", "--", relative], cwd=source_root, text=True).strip())
         branch = next((name for prefix, name in PINNED_BRANCHES.items() if identity.startswith(prefix)), "82-synth-reference-finish")
-        entries.append({"id": f"analog-classics:{identity}", "identity": identity, "displayName": meta.get("name", identity), "category": category, "version": 1, "soundVersion": meta.get("version", "not-declared"), "source": {"path": f"scripts/{destination.name}", "sha256": digest(destination)}, "upstream": {"branch": branch, "commit": commit, "path": relative, "sha256": digest(source)}, "source_commit": commit, "source_path": relative, "source_sha256": digest(source), "export_path": f"scripts/{destination.name}", "export_sha256": digest(destination), "license": meta.get("license", "UNRESOLVED: see source provenance before external release"), "licenseStatus": "declared" if "license" in meta else "unresolved-internal-review", "dependencyProvenance": provenance(identity, source_root), "dependencies": ["expanded standard Faust libraries; no runtime import remains"], "compiler": {"faustVersion": compiler_version, "exportOptions": ["-e", "-I source-parent", "-I synth-batch", "-I synth-finish"], "compileOptions": ["-lang", "cpp", "-single"]}, "status": "internal-review", "selectionRationale": rationale, "selection_rationale": rationale, "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"})
+        license_identifier = meta.get("license", "NOASSERTION")
+        license_status = "declared" if "license" in meta else "unresolved-internal-review"
+        if identity.startswith("909-") and "license" not in meta:
+            license_identifier = "NOASSERTION (module); MIT (identified Plaits formulas)"
+            license_status = "mixed-reviewed"
+        entries.append({"id": f"analog-classics:{identity}", "identity": identity, "displayName": meta.get("name", identity), "category": category, "version": 1, "soundVersion": meta.get("version", "not-declared"), "source": {"path": f"scripts/{destination.name}", "sha256": digest(destination)}, "upstream": {"branch": branch, "commit": commit, "path": relative, "sha256": digest(source)}, "source_commit": commit, "source_path": relative, "source_sha256": digest(source), "export_path": f"scripts/{destination.name}", "export_sha256": digest(destination), "license": license_identifier, "licenseIdentifier": license_identifier, "licenseStatus": license_status, "dependencyProvenance": provenance(identity, source_root), "dependencies": EXPORT_EVIDENCE[identity]["imports"], "compiler": {"faustVersion": compiler_version, "cxxVersion": cxx_version, "exportOptions": ["-e", "-I", "<source-parent>", "-I", "modules/analog-classics/synth-batch", "-I", "modules/analog-classics/synth-finish"], "compileOptions": ["-lang", "cpp", "-single", "-cn", "ModuleDSP"], "runnerCompileOptions": ["-std=c++17", "-O2", "-ffp-contract=off"]}, "status": "internal-review", "selectionRationale": rationale, "selection_rationale": rationale, "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"})
     for entry in entries:
         entry["lineageUuid"] = str(uuid.uuid5(uuid.NAMESPACE_URL, f"curlcomplex/CURLOP/{entry['id']}"))
         labels = re.findall(r'(?:hslider|button|checkbox)\("([^"]+)"', (out / entry["export_path"]).read_text())
@@ -166,6 +242,10 @@ def run(out):
         gaps = [] if entry["category"] != "instrument" or (required <= set(labels) and has_freq) else ["missing canonical tagged one-note input"]
         special = sorted({label.split("[", 1)[0] for label in labels} & {"accent", "slide", "chokeGate", "clock", "reset", "run"})
         entry["metadataAdaptation"] = ADAPTATION_EVIDENCE.get(entry["identity"], "faust expansion and metadata normalization only")
+        entry["dependencies"] = EXPORT_EVIDENCE[entry["identity"]]["imports"]
+        entry["outputEvidence"] = EXPORT_EVIDENCE[entry["identity"]]["compiledIo"] | {"namedOutputs": EXPORT_EVIDENCE[entry["identity"]]["namedOutputs"]}
+        if "renderedEquivalence" in EXPORT_EVIDENCE[entry["identity"]]:
+            entry["metadataAdaptation"]["renderedAudioEquivalence"] = EXPORT_EVIDENCE[entry["identity"]]["renderedEquivalence"]
         if entry["identity"] in FROZEN_PRESETS:
             entry["frozenPresetSettings"] = FROZEN_PRESETS[entry["identity"]]
             entry["adaptedDefaults"] = {k:v for k,v in FROZEN_PRESETS[entry["identity"]].items() if k not in {"gate", "velocity", "accent"}}
