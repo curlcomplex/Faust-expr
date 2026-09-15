@@ -1,0 +1,59 @@
+name: DX7 phase candidate C03
+on:
+  pull_request:
+    paths:
+      - 'tools/modules/dx7_phase_candidate.py'
+      - 'tools/modules/dx7_phase_probe.py'
+      - 'tools/modules/dx7_slice1.py'
+      - 'tools/modules/dx7_msfa_oracle.cpp'
+      - '.github/workflows/dx7-phase-candidate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      FAUST_VERSION: '2.88.0'
+      FAUST_ARCHIVE_SHA256: 'e4e175cf236924b5b7d4784cbb8c50cc01e211159e169655dd9e6d8f92b871d9'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends python3-numpy python3-scipy g++ curl ca-certificates
+      - name: Fetch Faust 2.88.0
+        run: |
+          set -euo pipefail
+          mkdir -p build/dx7-candidate/toolchain
+          curl --fail --location --retry 3 \
+            "https://github.com/grame-cncm/faust/releases/download/${FAUST_VERSION}/faust-${FAUST_VERSION}.tar.gz" \
+            -o build/dx7-candidate/faust.tar.gz
+          echo "$FAUST_ARCHIVE_SHA256  build/dx7-candidate/faust.tar.gz" | sha256sum -c -
+          tar -xzf build/dx7-candidate/faust.tar.gz -C build/dx7-candidate/toolchain --strip-components=1
+      - name: Build Faust
+        run: |
+          set -euo pipefail
+          make -C build/dx7-candidate/toolchain/build cmake BACKENDS=regular.cmake TARGETS=regular.cmake >/dev/null
+          cmake --build build/dx7-candidate/toolchain/build/faustdir --target faust --parallel 2 >/dev/null
+          build/dx7-candidate/toolchain/build/bin/faust --version
+      - name: Run C01-C03 phase candidate
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 tools/modules/dx7_phase_candidate.py \
+            --out build/dx7-candidate/result \
+            --faust build/dx7-candidate/toolchain/build/bin/faust \
+            --libraries build/dx7-candidate/toolchain/libraries \
+            --archive build/dx7-candidate/faust.tar.gz
+      - name: Upload listening examples
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: dx7-phase-candidate-${{ github.event.pull_request.head.sha || github.sha }}
+          path: build/dx7-candidate/result/
+          retention-days: 14
+          if-no-files-found: error
