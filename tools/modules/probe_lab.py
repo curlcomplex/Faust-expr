@@ -8,7 +8,22 @@ from lab import Lab, ROOT, digest, run, metrics, validate_parameters
 
 
 class ProbeLab(Lab):
-    """Build and capture metadata-tagged probes in segregated diagnostic paths."""
+    """Generic probe harness independent of any concrete instrument manifest."""
+    def __init__(self, out: Path):
+        # Do not call Lab.__init__: that legacy lab intentionally binds to
+        # modules/kick-pm. Probe qualification is generic infrastructure and must
+        # remain usable from a clean analysis-only integration branch.
+        self.out = Path(out)
+        self.out.mkdir(parents=True, exist_ok=True)
+        self.manifest = {'controls': {}}
+        self.experiment = {'purpose': 'generic-probe-diagnostics'}
+        self.checks: list[dict] = []
+        self.renders: list[dict] = []
+        self.builds: dict = {}
+        self.defaults = {}
+        self.cpp = os.environ.get('CXX', 'c++')
+        self.faust = os.environ.get('FAUST', 'faust')
+
     def build(self, name: str, source: Path, vector=False, *, diagnostic=False) -> Path:
         if diagnostic and vector:
             raise ValueError('probe capture requires the scalar diagnostic build')
@@ -89,4 +104,3 @@ class ProbeLab(Lab):
                              **({'probe_capture':probe_evidence} if probe_evidence else {})})
         self.check(label+':bounded', np.isfinite(x).all() and float(np.abs(x).max()) < .7)
         return x
-
