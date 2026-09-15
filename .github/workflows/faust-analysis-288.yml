@@ -1,0 +1,58 @@
+name: Faust 2.88 analysis qualification
+on:
+  push:
+    branches: [105-faust-288-analysis]
+  pull_request:
+    paths:
+      - 'tools/modules/faust_analysis*'
+      - 'tests/test_faust_analysis.py'
+      - '.github/workflows/faust-analysis-288.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  analysis:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      FAUST_VERSION: '2.88.0'
+      FAUST_ARCHIVE_SHA256: 'SET_FROM_UPSTREAM_RELEASE_ASSET'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Fetch complete pinned Faust release
+        run: |
+          set -euo pipefail
+          mkdir -p build/faust-analysis/toolchain
+          curl --fail --location --retry 3 \
+            "https://github.com/grame-cncm/faust/releases/download/${FAUST_VERSION}/faust-${FAUST_VERSION}.tar.gz" \
+            -o build/faust-analysis/faust.tar.gz
+          # Deliberately fail until the release asset hash is independently pinned.
+          test "$FAUST_ARCHIVE_SHA256" != SET_FROM_UPSTREAM_RELEASE_ASSET
+          echo "$FAUST_ARCHIVE_SHA256  build/faust-analysis/faust.tar.gz" | sha256sum -c -
+          tar -xzf build/faust-analysis/faust.tar.gz -C build/faust-analysis/toolchain --strip-components=1
+      - name: Build pinned Faust
+        run: |
+          set -euo pipefail
+          make -C build/faust-analysis/toolchain compiler -j2
+          build/faust-analysis/toolchain/build/bin/faust --version | tee build/faust-analysis/faust-version.txt
+          grep -F "$FAUST_VERSION" build/faust-analysis/faust-version.txt
+      - name: Unit tests
+        run: python3 -m unittest tests.test_faust_analysis -v
+      - name: Analyze deterministic sine fixture
+        run: |
+          python3 - <<'PY'
+          import numpy as np
+          r=48000;t=np.arange(r*5)/r
+          (0.1*np.sin(2*np.pi*997*t)).astype('<f4').tofile('build/faust-analysis/sine.f32')
+          PY
+          python3 tools/modules/faust_analysis.py build/faust-analysis/sine.f32 --rate 48000 --channels 1 \
+            --faust build/faust-analysis/toolchain/build/bin/faust --out build/faust-analysis/result
+      - name: Retain evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: faust-analysis-288-${{ github.sha }}
+          path: build/faust-analysis/
+          retention-days: 14
+          if-no-files-found: error
