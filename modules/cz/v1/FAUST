@@ -1,0 +1,1 @@
+Target repository qualification compiler: Faust 2.88.x. Dedicated workflow must not silently validate only Ubuntu's older 2.70 package when 2.88 qualification is available.
