@@ -64,9 +64,15 @@ jobs:
           subprocess.check_call([root/'render-0',root/'alg-0.tsv',root/'alg-0-repeat.f32',str(rate),'128',str(frames),'0'])
           assert (root/'alg-0-repeat.f32').read_bytes()==(root/'alg-0.f32').read_bytes()
           gap=np.zeros(4800,dtype=np.float32); joined=np.concatenate([np.concatenate([x,gap]) for x in arrays])*.5
-          with wave.open(str(root/'listening/01-algorithms-0-to-7.wav'),'wb') as w:
-            w.setnchannels(1); w.setsampwidth(4); w.setframerate(rate); w.writeframes(joined.astype('<f4').tobytes())
-          (root/'results.json').write_text(json.dumps({'status':'completed','renders':9,'algorithms':results,'fixed_playback_gain':.5,'selection':'compile-time bounded graphs'},indent=2))
+          assert np.isfinite(joined).all() and np.max(np.abs(joined)) < 1
+          pcm=np.rint(joined*32767).astype('<i2')
+          listening=root/'listening/01-algorithms-0-to-7.wav'
+          with wave.open(str(listening),'wb') as w:
+            w.setnchannels(1); w.setsampwidth(2); w.setframerate(rate); w.writeframes(pcm.tobytes())
+          with wave.open(str(listening),'rb') as w:
+            assert (w.getnchannels(),w.getsampwidth(),w.getframerate()) == (1,2,rate)
+            assert np.array_equal(np.frombuffer(w.readframes(w.getnframes()),dtype='<i2'),pcm)
+          (root/'results.json').write_text(json.dumps({'status':'completed','renders':9,'algorithms':results,'fixed_playback_gain':.5,'selection':'compile-time bounded graphs','listening_encoding':'PCM16, decoded sample identity checked'},indent=2))
           PY
       - name: Retain evidence and recordings
         if: always()
