@@ -4,7 +4,7 @@ on:
     paths:
       - 'modules/dx7-reference-slice/**'
       - 'tools/modules/dx7_*'
-      - 'tests/test_dx7_slice1.py'
+      - 'tests/test_dx7_*.py'
       - '.github/workflows/dx7-h1.yml'
   workflow_dispatch:
 permissions:
@@ -33,7 +33,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p build/dx7-h1/evidence
-          /usr/bin/python3 -m unittest discover -s tests -p test_dx7_slice1.py -v 2>&1 | tee build/dx7-h1/evidence/contracts.log
+          /usr/bin/python3 -m unittest discover -s tests -p 'test_dx7_*.py' -v 2>&1 | tee build/dx7-h1/evidence/contracts.log
       - name: Fetch and verify complete Faust 2.88.0 release
         run: |
           set -euo pipefail
@@ -60,6 +60,15 @@ jobs:
             --faust-libraries build/dx7-h1/toolchain/libraries \
             --faust-archive build/dx7-h1/faust.tar.gz \
             2>&1 | tee build/dx7-h1/evidence/run.log
+      - name: Execute bounded phase-index probe
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 tools/modules/dx7_phase_probe.py \
+            --out build/dx7-h1/evidence/phase-index \
+            --faust build/dx7-h1/toolchain/build/bin/faust \
+            --faust-libraries build/dx7-h1/toolchain/libraries \
+            --faust-archive build/dx7-h1/faust.tar.gz \
+            2>&1 | tee build/dx7-h1/evidence/phase-index.log
       - name: Existing repository regression tests
         run: |
           set -euo pipefail
@@ -69,7 +78,7 @@ jobs:
         run: |
           mkdir -p build/dx7-h1/evidence
           git rev-parse HEAD > build/dx7-h1/evidence/commit.txt
-          git archive --format=tar HEAD modules/dx7-reference-slice tools/modules/dx7_slice1.py tools/modules/dx7_msfa_oracle.cpp tests/test_dx7_slice1.py .github/workflows/dx7-h1.yml > build/dx7-h1/evidence/source.tar
+          git archive --format=tar HEAD modules/dx7-reference-slice tools/modules/dx7_slice1.py tools/modules/dx7_phase_probe.py tools/modules/dx7_msfa_oracle.cpp tests/test_dx7_slice1.py tests/test_dx7_phase_probe.py .github/workflows/dx7-h1.yml > build/dx7-h1/evidence/source.tar
           if test -x build/dx7-h1/toolchain/build/bin/faust; then
             cp build/dx7-h1/toolchain/build/bin/faust build/dx7-h1/evidence/faust-2.88.0
             sha256sum build/dx7-h1/evidence/faust-2.88.0 > build/dx7-h1/evidence/compiler.sha256
