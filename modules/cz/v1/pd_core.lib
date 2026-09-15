@@ -1,0 +1,32 @@
+import("stdfaust.lib");
+
+// First reusable Casio CZ-style phase-distortion source.
+// Equations adapted from the CZ oscillators by Mike Moser-Booth, ported to
+// Faust by Bart Brouns in VoiceOfFaust (GPL-3.0). This is an architecture
+// source checkpoint, not yet a complete CZ-101/1000 line implementation.
+
+frac01(x)=x-floor(x);
+phasor(f)=+(f/ma.SR)~frac01;
+
+czSquarePhase(p,index)=out with {
+  ix=pow(max(0,min(1,index)),0.25)*0.98;
+  q=frac01(p);
+  half=q>=0.5;
+  r=frac01(q*2+1);
+  warped=r-min(r,(1-r)*(ix/max(0.0001,1-ix)));
+  out=(half+warped)*ma.PI:cos*0.5;
+};
+
+czSinePulsePhase(p,index)=out with {
+  ix=index*(-0.49)+0.5;
+  q=frac01(p);
+  shaped=min(q*((0.5-ix)/max(0.0001,ix)),(1-q)*((0.5-ix)/max(0.0001,1-ix)))+q;
+  out=cos(shaped*4*ma.PI);
+};
+
+square(freq,dcw)=czSquarePhase(phasor(freq),dcw);
+sinePulse(freq,dcw)=czSinePulsePhase(phasor(freq),dcw);
+
+// Morph is intentionally a utility audition control, not a claim that CZ
+// hardware continuously morphs these waveform families.
+source(freq,dcw,morph)=square(freq,dcw)*(1-m)+sinePulse(freq,dcw)*m with {m=max(0,min(1,morph));};
