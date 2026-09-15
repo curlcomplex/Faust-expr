@@ -45,15 +45,17 @@ jobs:
           echo "$FAUST_ARCHIVE_SHA256  build/compiler-diagnostics/faust.tar.gz" | sha256sum -c -
           mkdir -p build/compiler-diagnostics/toolchain
           tar -xzf build/compiler-diagnostics/faust.tar.gz -C build/compiler-diagnostics/toolchain --strip-components=1
-      - name: Build compiler, static libfaust and interp-tracer
+      - name: Build compiler, interpreter libfaust and interp-tracer
         run: |
           set -euo pipefail
           TC="$GITHUB_WORKSPACE/build/compiler-diagnostics/toolchain"
           make -C "$TC/build" cmake BACKENDS=regular.cmake TARGETS=regular.cmake > build/compiler-diagnostics/evidence/configure.log 2>&1
           cmake --build "$TC/build/faustdir" --target faust --parallel 2 > build/compiler-diagnostics/evidence/compiler-build.log 2>&1
-          cmake --build "$TC/build/faustdir" --target staticlib --parallel 2 > build/compiler-diagnostics/evidence/staticlib-build.log 2>&1
-          test -f "$TC/build/lib/libfaust.a"
-          make -C "$TC/tools/benchmark" interp-tracer FAUSTDIR="$TC/build" > build/compiler-diagnostics/evidence/tracer-build.log 2>&1
+          make -C "$TC/build" cmake FAUSTDIR=interpdir BACKENDS=interp.cmake TARGETS=interp.cmake > build/compiler-diagnostics/evidence/interp-configure.log 2>&1
+          make -C "$TC/build" staticlib FAUSTDIR=interpdir BACKENDS=interp.cmake TARGETS=interp.cmake BUILDOPT='--config Release --parallel 2' > build/compiler-diagnostics/evidence/staticlib-build.log 2>&1
+          LIBFAUST=$(find "$TC/build" -name libfaust.a -type f -print -quit)
+          test -n "$LIBFAUST"
+          c++ -std=c++11 -O3 -Wall -no-pie "$TC/tools/benchmark/interp-tracer.cpp" "$LIBFAUST" -I "$TC/architecture" -lz -lncurses -lpthread -o "$TC/tools/benchmark/interp-tracer" > build/compiler-diagnostics/evidence/tracer-build.log 2>&1
           test -x "$TC/tools/benchmark/interp-tracer"
           "$TC/build/bin/faust" --version | tee build/compiler-diagnostics/evidence/faust-version.txt
           "$TC/tools/benchmark/interp-tracer" -help > build/compiler-diagnostics/evidence/tracer-help.txt 2>&1 || true
