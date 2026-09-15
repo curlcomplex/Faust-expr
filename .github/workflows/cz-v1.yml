@@ -1,0 +1,19 @@
+name: CZ v1 Faust compile
+on:
+  push:
+    paths: ['modules/cz/**','.github/workflows/cz-v1.yml']
+  pull_request:
+    paths: ['modules/cz/**','.github/workflows/cz-v1.yml']
+jobs:
+  compile:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends faust
+      - name: Compile CZ voice
+        run: |
+          faust -v
+          faust -lang cpp -I modules/cz/v1 modules/cz/v1/voice.dsp -o /tmp/cz.cpp
+          test -s /tmp/cz.cpp
