@@ -171,12 +171,17 @@ def compare_faustprobe(binary, revision: str, native: dict, out, libs):
     measured = ha.analyze_window(data, case['diagnostics']['rate'], case['fundamental_hz'],
                                 case['measurement']['signal_class'],
                                 max_generated_order=case['measurement']['finite_model']['max_generated_order'])
+    # Deltas below are only meaningful when both sides can attribute the metric.
+    deltas = {}
+    for key in ('sfdr_including_harmonics_db', 'off_harmonic_sfdr_db',
+                'inband_harmonic_to_fundamental_db'):
+        left, right = measured.get(key), case['measurement'].get(key)
+        deltas[key] = None if left is None or right is None else left-right
     return {'status': 'executed', 'backend': 'faust-rs/Cranelift',
             'revision_declared_by_caller': revision, 'binary_sha256': ha.sha(executable),
             'commands': [str(a) for a in args], 'csv_sha256': ha.sha(csv_path),
             'native_case_label': label, 'source_sha256': case['source_sha256'],
-            'metric_deltas_db': {key: measured[key]-case['measurement'][key] for key in
-                                 ('sfdr_including_harmonics_db', 'off_harmonic_sfdr_db', 'inband_harmonic_to_fundamental_db')},
+            'metric_deltas_db': deltas,
             'measurement': measured, 'execution_environment': environment(),
             'interpretation': 'investigation only; no automatic winner, tolerance or sonic acceptance'}
 
@@ -196,7 +201,6 @@ def sweep(out, *, faust, libs, archive, cxx='c++', rates=RATES, faustprobe=None,
     checks = []
     for rate in rates:
         for k in BINS:
-            # frequency slider tops at 24 kHz; bins/rates here never exceed it.
             for shape in (0, 1, 2):
                 rows.append(render_case(*builds['oscillator'], out, f'osc-{rate}-{k}-{shape}', rate, k, {'shape': shape}))
             for drive in DRIVES:
@@ -213,13 +217,18 @@ def sweep(out, *, faust, libs, archive, cxx='c++', rates=RATES, faustprobe=None,
             expected_h = ratio**2 if 3*k < FRAMES/2 else 0.0
             expected_fold = ratio**2 if 3*k > FRAMES/2 else 0.0
         actual_fold = m['finite_model']['identifiable_fold_ratio']
-        passed = (abs(m['inband_harmonic_ratio']**2 - expected_h) < 2e-5 and
+        # The analytic fixture predicts what is OBSERVED on the harmonic grid.
+        # Attribution may intentionally be unavailable if a fold collides there.
+        observed_h = m['observed_harmonic_grid_ratio']**2
+        passed = (abs(observed_h - expected_h) < 2e-5 and
                   actual_fold is not None and abs(actual_fold-expected_fold) < 2e-5)
         checks.append({'label': row['label'], 'passed': passed,
                        'expected_inband_harmonic_power_ratio': expected_h,
+                       'measured_observed_harmonic_grid_power_ratio': observed_h,
+                       'harmonic_attribution_ambiguous': m['harmonic_attribution_ambiguous'],
                        'expected_fold_power_ratio': expected_fold,
                        'measured_fold_power_ratio': actual_fold, 'absolute_power_ratio_tolerance': 2e-5})
-    report = {'schema': 1, 'complete': True, 'passed': all(c['passed'] for c in checks),
+    report = {'schema': 2, 'complete': True, 'passed': all(c['passed'] for c in checks),
               'purpose': 'measurement-fixture-qualification-not-instrument-acceptance',
               'profile': {'fft_frames': FRAMES, 'warmup_frames': FRAMES, 'bins': list(BINS),
                           'rates': list(rates), 'shapes': [0, 1, 2], 'drives': list(DRIVES)},
