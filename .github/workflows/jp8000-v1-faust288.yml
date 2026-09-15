@@ -1,0 +1,22 @@
+name: JP-8000 v1 Faust 2.88 compile
+on:
+  push:
+    paths: ['modules/jp-8000/**','.github/workflows/jp8000-v1-faust288.yml']
+  pull_request:
+    paths: ['modules/jp-8000/**','.github/workflows/jp8000-v1-faust288.yml']
+jobs:
+  compile:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Build Faust 2.88.0
+        run: |
+          git clone --depth 1 --branch 2.88.0 https://github.com/grame-cncm/faust.git /tmp/faust
+          cd /tmp/faust
+          make -j2
+          sudo make install
+      - name: Compile JP-8000 voice
+        run: |
+          faust -v
+          faust -lang cpp -I modules/jp-8000/v1 modules/jp-8000/v1/voice.dsp -o /tmp/jp8000.cpp
+          test -s /tmp/jp8000.cpp
