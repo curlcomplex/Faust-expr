@@ -11,6 +11,12 @@ class AnalogClassicsReviewExport(unittest.TestCase):
             manifest = json.loads((out / "manifest.json").read_text())
             self.assertEqual(manifest["status"], "internal-review-only")
             self.assertEqual(manifest["schema"], "curlop-analog-classics-review/v1")
+            source_tree = manifest["sourceTree"]
+            self.assertEqual(source_tree["branch"], "issue-118-analog-classics-review")
+            self.assertRegex(source_tree["commit"], r"^[0-9a-f]{40}$")
+            self.assertIn("file-level lineage commits are informational only", source_tree["contract"])
+            for dependency_fix in source_tree["dependencyFixes"]:
+                subprocess.run(["git", "merge-base", "--is-ancestor", dependency_fix["commit"], source_tree["commit"]], cwd=ROOT, check=True)
             self.assertEqual(len(manifest["selected"]), 39)
             self.assertEqual(manifest["modules"], manifest["selected"])
             selected = {entry["identity"]: entry for entry in manifest["modules"]}
@@ -28,8 +34,15 @@ class AnalogClassicsReviewExport(unittest.TestCase):
                 self.assertEqual(entry["source"]["sha256"], entry["export_sha256"])
                 self.assertEqual(entry["upstream"]["path"], entry["source_path"])
                 self.assertEqual(entry["upstream"]["sha256"], entry["source_sha256"])
-                self.assertRegex(entry["upstream"]["commit"], r"^[0-9a-f]{40}$")
-                self.assertTrue(entry["upstream"]["branch"])
+                self.assertEqual(entry["upstream"]["commit"], source_tree["commit"])
+                self.assertEqual(entry["upstream"]["branch"], source_tree["branch"])
+                self.assertEqual(entry["source_commit"], source_tree["commit"])
+                self.assertEqual(entry["source_file_last_change_commit"], entry["upstream"]["sourceFileLastChangeCommit"])
+                self.assertRegex(entry["source_file_last_change_commit"], r"^[0-9a-f]{40}$")
+                self.assertTrue(entry["upstream"]["lineage"]["branch"])
+                self.assertRegex(entry["upstream"]["lineage"]["commit"], r"^[0-9a-f]{40}$")
+                source_blob = subprocess.check_output(["git", "show", f"{source_tree['commit']}:{entry['source_path']}"], cwd=ROOT)
+                self.assertEqual(hashlib.sha256(source_blob).hexdigest(), entry["source_sha256"])
                 self.assertEqual(entry["lineageUuid"], str(uuid.uuid5(uuid.NAMESPACE_URL, f"curlcomplex/CURLOP/{entry['id']}")))
                 self.assertIn(entry["licenseStatus"], {"declared", "mixed-reviewed", "unresolved-internal-review"})
                 self.assertTrue(entry["license"])
@@ -40,6 +53,8 @@ class AnalogClassicsReviewExport(unittest.TestCase):
                     if dependency["kind"] == "repository-library":
                         self.assertRegex(dependency["sha256"], r"^[0-9a-f]{64}$")
                         self.assertTrue((ROOT / dependency["path"]).exists())
+                        dependency_blob = subprocess.check_output(["git", "show", f"{source_tree['commit']}:{dependency['path']}"], cwd=ROOT)
+                        self.assertEqual(hashlib.sha256(dependency_blob).hexdigest(), dependency["sha256"])
                     else:
                         self.assertEqual(dependency["compilerVersion"], entry["compiler"]["faustVersion"])
                 self.assertRegex(entry["compiler"]["faustVersion"], r"^FAUST Version \d+\.\d+\.\d+$")

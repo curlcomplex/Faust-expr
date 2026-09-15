@@ -13,6 +13,12 @@ sys.path.insert(0, str(Path(__file__).parent))
 from faust_export_metadata import normalize_expanded
 
 FREEZE = ROOT / "modules/analog-classics/synth-finish/REVIEW_FREEZE.json"
+SOURCE_TREE_BRANCH = "issue-118-analog-classics-review"
+SOURCE_TREE_COMMIT = "149d14b9902167d595f30df1321a2de15c51afd6"
+DEPENDENCY_FIXES = (
+    {"commit": "b34bd21b9213f2810232f7e1bb128c4594c5c568", "scope": "analog-snare engine dependency namespace fix"},
+    {"commit": "fbef71bfcfefc1fe6f3f3d368c6e7faefc4e92d5", "scope": "Trigger Sequencer engine dependency output fix"},
+)
 PINNED_COMMITS = {
     "606": "02f195e64cf274d0e995325fe2fd526d404bbe95",
     "909": "7aa75de6394568410d5b114d62b405138e9c9e35",
@@ -85,6 +91,10 @@ REJECTED = {
 
 def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+def tree_blob_digest(commit, path):
+    blob = subprocess.check_output(["git", "show", f"{commit}:{path}"], cwd=ROOT)
+    return hashlib.sha256(blob).hexdigest()
 
 def declarations(text):
     result = {}
@@ -226,14 +236,20 @@ def run(out):
         source = source_root / relative; destination = scripts / f"{identity}.dsp"
         export_one(source, destination, identity, compiler_version)
         meta = declarations(source.read_text())
-        commit = next((sha for prefix, sha in PINNED_COMMITS.items() if identity.startswith(prefix)), subprocess.check_output(["git", "log", "-1", "--format=%H", "--", relative], cwd=source_root, text=True).strip())
-        branch = next((name for prefix, name in PINNED_BRANCHES.items() if identity.startswith(prefix)), "82-synth-reference-finish")
+        source_file_commit = subprocess.check_output(["git", "log", "-1", "--format=%H", "--", relative], cwd=source_root, text=True).strip()
+        lineage_commit = next((sha for prefix, sha in PINNED_COMMITS.items() if identity.startswith(prefix)), source_file_commit)
+        lineage_branch = next((name for prefix, name in PINNED_BRANCHES.items() if identity.startswith(prefix)), "82-synth-reference-finish")
+        if tree_blob_digest(SOURCE_TREE_COMMIT, relative) != digest(source):
+            raise AssertionError(f"{identity}: source does not match pinned source tree")
+        for dependency in EXPORT_EVIDENCE[identity]["imports"]:
+            if dependency["kind"] == "repository-library" and tree_blob_digest(SOURCE_TREE_COMMIT, dependency["path"]) != dependency["sha256"]:
+                raise AssertionError(f"{identity}: dependency does not match pinned source tree: {dependency['path']}")
         license_identifier = meta.get("license", "NOASSERTION")
         license_status = "declared" if "license" in meta else "unresolved-internal-review"
         if identity.startswith("909-") and "license" not in meta:
             license_identifier = "NOASSERTION (module); MIT (identified Plaits formulas)"
             license_status = "mixed-reviewed"
-        entries.append({"id": f"analog-classics:{identity}", "identity": identity, "displayName": meta.get("name", identity), "category": category, "version": 1, "soundVersion": meta.get("version", "not-declared"), "source": {"path": f"scripts/{destination.name}", "sha256": digest(destination)}, "upstream": {"branch": branch, "commit": commit, "path": relative, "sha256": digest(source)}, "source_commit": commit, "source_path": relative, "source_sha256": digest(source), "export_path": f"scripts/{destination.name}", "export_sha256": digest(destination), "license": license_identifier, "licenseIdentifier": license_identifier, "licenseStatus": license_status, "dependencyProvenance": provenance(identity, source_root), "dependencies": EXPORT_EVIDENCE[identity]["imports"], "compiler": {"faustVersion": compiler_version, "cxxVersion": cxx_version, "exportOptions": ["-e", "-I", "<source-parent>", "-I", "modules/analog-classics/synth-batch", "-I", "modules/analog-classics/synth-finish"], "compileOptions": ["-lang", "cpp", "-single", "-cn", "ModuleDSP"], "runnerCompileOptions": ["-std=c++17", "-O2", "-ffp-contract=off"]}, "status": "internal-review", "selectionRationale": rationale, "selection_rationale": rationale, "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"})
+        entries.append({"id": f"analog-classics:{identity}", "identity": identity, "displayName": meta.get("name", identity), "category": category, "version": 1, "soundVersion": meta.get("version", "not-declared"), "source": {"path": f"scripts/{destination.name}", "sha256": digest(destination)}, "upstream": {"branch": SOURCE_TREE_BRANCH, "commit": SOURCE_TREE_COMMIT, "path": relative, "sha256": digest(source), "sourceFileLastChangeCommit": source_file_commit, "lineage": {"branch": lineage_branch, "commit": lineage_commit}}, "source_commit": SOURCE_TREE_COMMIT, "source_file_last_change_commit": source_file_commit, "source_path": relative, "source_sha256": digest(source), "export_path": f"scripts/{destination.name}", "export_sha256": digest(destination), "license": license_identifier, "licenseIdentifier": license_identifier, "licenseStatus": license_status, "dependencyProvenance": provenance(identity, source_root), "dependencies": EXPORT_EVIDENCE[identity]["imports"], "compiler": {"faustVersion": compiler_version, "cxxVersion": cxx_version, "exportOptions": ["-e", "-I", "<source-parent>", "-I", "modules/analog-classics/synth-batch", "-I", "modules/analog-classics/synth-finish"], "compileOptions": ["-lang", "cpp", "-single", "-cn", "ModuleDSP"], "runnerCompileOptions": ["-std=c++17", "-O2", "-ffp-contract=off"]}, "status": "internal-review", "selectionRationale": rationale, "selection_rationale": rationale, "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"})
     for entry in entries:
         entry["lineageUuid"] = str(uuid.uuid5(uuid.NAMESPACE_URL, f"curlcomplex/CURLOP/{entry['id']}"))
         labels = re.findall(r'(?:hslider|button|checkbox)\("([^"]+)"', (out / entry["export_path"]).read_text())
@@ -253,7 +269,7 @@ def run(out):
             entry["displayName"] = family + " " + voice.replace("-", " ").title()
             entry["displayMetadataAdaptation"] = {"onlyUiMetadataChanged": True, "displayName": entry["displayName"]}
         entry["contractEvidence"] = {"capturedControls": sorted(set(labels)), "canonicalOneNote": entry["category"] != "instrument" or not gaps, "gaps": gaps, "specialEvents": special, "metadataAdapted": entry["identity"] in ADAPTATION_EVIDENCE}
-    manifest = {"schema": 1, "identity": "analog-classics-internal-review-2026-09-15.1", "status": "internal-review-only", "base_review_freeze": {"path": str(FREEZE.relative_to(ROOT)), "sha256": digest(FREEZE), "identity": freeze["id"]}, "modules": entries, "selected": entries, "rejected_or_unselected": REJECTED, "contract": {"one_note": "lowercase gate, freq in Hz, velocity; host owns allocation", "distinct_events": "accent, slide, choke, clock, reset and run are never aliases", "outputs": "audio, CV and observations are separately declared", "identity": "stable identity is manifest identity plus version and source digest, never display text or geometry", "sound_change": "exports are metadata/library expansion only; a sonic change requires a new version and review freeze"}, "consumer_limits": ["No CURLOP runtime, UI, project-state, voice-allocation or device acceptance is claimed.", "Effect/modulation entries retain their native I/O rather than being mislabeled one-note instruments."]}
+    manifest = {"schema": 1, "identity": "analog-classics-internal-review-2026-09-15.1", "status": "internal-review-only", "sourceTree": {"branch": SOURCE_TREE_BRANCH, "commit": SOURCE_TREE_COMMIT, "contract": "Every recorded source and repository-library dependency hash is the blob at this exact commit; file-level lineage commits are informational only.", "dependencyFixes": DEPENDENCY_FIXES}, "base_review_freeze": {"path": str(FREEZE.relative_to(ROOT)), "sha256": digest(FREEZE), "identity": freeze["id"]}, "modules": entries, "selected": entries, "rejected_or_unselected": REJECTED, "contract": {"one_note": "lowercase gate, freq in Hz, velocity; host owns allocation", "distinct_events": "accent, slide, choke, clock, reset and run are never aliases", "outputs": "audio, CV and observations are separately declared", "identity": "stable identity is manifest identity plus version and source digest, never display text or geometry", "sound_change": "exports are metadata/library expansion only; a sonic change requires a new version and review freeze"}, "consumer_limits": ["No CURLOP runtime, UI, project-state, voice-allocation or device acceptance is claimed.", "Effect/modulation entries retain their native I/O rather than being mislabeled one-note instruments."]}
     manifest["schema"] = "curlop-analog-classics-review/v1"
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
 

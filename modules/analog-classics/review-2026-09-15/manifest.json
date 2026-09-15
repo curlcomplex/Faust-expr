@@ -2,6 +2,21 @@
   "schema": "curlop-analog-classics-review/v1",
   "identity": "analog-classics-internal-review-2026-09-15.1",
   "status": "internal-review-only",
+  "sourceTree": {
+    "branch": "issue-118-analog-classics-review",
+    "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+    "contract": "Every recorded source and repository-library dependency hash is the blob at this exact commit; file-level lineage commits are informational only.",
+    "dependencyFixes": [
+      {
+        "commit": "b34bd21b9213f2810232f7e1bb128c4594c5c568",
+        "scope": "analog-snare engine dependency namespace fix"
+      },
+      {
+        "commit": "fbef71bfcfefc1fe6f3f3d368c6e7faefc4e92d5",
+        "scope": "Trigger Sequencer engine dependency output fix"
+      }
+    ]
+  },
   "base_review_freeze": {
     "path": "modules/analog-classics/synth-finish/REVIEW_FREEZE.json",
     "sha256": "76d0e4e858ee64e870d61fdaa5ce8cc7e8dc576c2726c44db6e13de45613a1af",
@@ -20,12 +35,18 @@
         "sha256": "042ae1cc4122eaef6e8596110e378d547821f580f464732880fadf1deb9141af"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/juno-60/v3/voice.dsp",
-        "sha256": "5a0da538ca7d58fb5ff1ac5de506e531181b4de9e36538b2afa59c3c2129ccab"
+        "sha256": "5a0da538ca7d58fb5ff1ac5de506e531181b4de9e36538b2afa59c3c2129ccab",
+        "sourceFileLastChangeCommit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce"
+        }
       },
-      "source_commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
       "source_path": "modules/juno-60/v3/voice.dsp",
       "source_sha256": "5a0da538ca7d58fb5ff1ac5de506e531181b4de9e36538b2afa59c3c2129ccab",
       "export_path": "scripts/juno-60.dsp",
@@ -128,12 +149,18 @@
         "sha256": "16e7cdca53a9c55f5b790a83e0456070f170407d67bd1a6d4c250dcec8dcfdc1"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/juno-106/v3/voice.dsp",
-        "sha256": "c84bf47177ef942f5362a1e3f630cd89a794991090e5138f83357624f8d3813d"
+        "sha256": "c84bf47177ef942f5362a1e3f630cd89a794991090e5138f83357624f8d3813d",
+        "sourceFileLastChangeCommit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce"
+        }
       },
-      "source_commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
       "source_path": "modules/juno-106/v3/voice.dsp",
       "source_sha256": "c84bf47177ef942f5362a1e3f630cd89a794991090e5138f83357624f8d3813d",
       "export_path": "scripts/juno-106.dsp",
@@ -242,12 +269,18 @@
         "sha256": "3cce76089d21825a6579c64c1c5dc49878ebe05795c1d787fb8eed5350f2a694"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/mono-101/v4/voice.dsp",
-        "sha256": "64d8ab4e929ad3a5c3056953d263873f7bc923e33fe8c3ff7f90471ecb7da744"
+        "sha256": "64d8ab4e929ad3a5c3056953d263873f7bc923e33fe8c3ff7f90471ecb7da744",
+        "sourceFileLastChangeCommit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce"
+        }
       },
-      "source_commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
       "source_path": "modules/mono-101/v4/voice.dsp",
       "source_sha256": "64d8ab4e929ad3a5c3056953d263873f7bc923e33fe8c3ff7f90471ecb7da744",
       "export_path": "scripts/sh-101.dsp",
@@ -361,12 +394,18 @@
         "sha256": "eb9f0f1155891ad78c43b2b303c250fbac91f62fd09314a299ff67178c7a5dcc"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "fd2b7efae4951d014fed3fed3cd01f295a0af21e",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/minimoog/v1/voice.dsp",
-        "sha256": "442916e387c9688fa0f29cfab832d65929d2a6dca321685c344dbbc105870899"
+        "sha256": "442916e387c9688fa0f29cfab832d65929d2a6dca321685c344dbbc105870899",
+        "sourceFileLastChangeCommit": "fd2b7efae4951d014fed3fed3cd01f295a0af21e",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "fd2b7efae4951d014fed3fed3cd01f295a0af21e"
+        }
       },
-      "source_commit": "fd2b7efae4951d014fed3fed3cd01f295a0af21e",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "fd2b7efae4951d014fed3fed3cd01f295a0af21e",
       "source_path": "modules/minimoog/v1/voice.dsp",
       "source_sha256": "442916e387c9688fa0f29cfab832d65929d2a6dca321685c344dbbc105870899",
       "export_path": "scripts/mini.dsp",
@@ -467,12 +506,18 @@
         "sha256": "36cc1c7c82eacf99231a4920e99f392977fd2920367abcfb805ff73d14e16e92"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/analog-classics/drums-v2/kick808.dsp",
-        "sha256": "2a8f9579b305623007ac025fba73f2efc8c24a22725d5fafaf1b65616e805613"
+        "sha256": "2a8f9579b305623007ac025fba73f2efc8c24a22725d5fafaf1b65616e805613",
+        "sourceFileLastChangeCommit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4"
+        }
       },
-      "source_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
       "source_path": "modules/analog-classics/drums-v2/kick808.dsp",
       "source_sha256": "2a8f9579b305623007ac025fba73f2efc8c24a22725d5fafaf1b65616e805613",
       "export_path": "scripts/808-kick.dsp",
@@ -552,12 +597,18 @@
         "sha256": "2e4db7d4201ba8299e222ec2dc01fa64a4200279448519b8358f906b1c79f60b"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/analog-classics/drums-v2/snare808.dsp",
-        "sha256": "7fc1da292e02f7c76d1b47d2f8ec389d619a3ad9f80cb866b65f2b31407be260"
+        "sha256": "7fc1da292e02f7c76d1b47d2f8ec389d619a3ad9f80cb866b65f2b31407be260",
+        "sourceFileLastChangeCommit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4"
+        }
       },
-      "source_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
       "source_path": "modules/analog-classics/drums-v2/snare808.dsp",
       "source_sha256": "7fc1da292e02f7c76d1b47d2f8ec389d619a3ad9f80cb866b65f2b31407be260",
       "export_path": "scripts/808-snare.dsp",
@@ -637,12 +688,18 @@
         "sha256": "2c835c3f44cae79741078f749a1162a7ea734d5bfbe7446505cf59f004490c7a"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/analog-classics/drums-v2/clap808.dsp",
-        "sha256": "a8f0bf3f6469c173f12e1a5c47822b9d0a564badd268cfeaf5165b170f597a78"
+        "sha256": "a8f0bf3f6469c173f12e1a5c47822b9d0a564badd268cfeaf5165b170f597a78",
+        "sourceFileLastChangeCommit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4"
+        }
       },
-      "source_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
       "source_path": "modules/analog-classics/drums-v2/clap808.dsp",
       "source_sha256": "a8f0bf3f6469c173f12e1a5c47822b9d0a564badd268cfeaf5165b170f597a78",
       "export_path": "scripts/808-clap.dsp",
@@ -723,12 +780,18 @@
         "sha256": "a39e81a2977ac4906716f095cf084e3492f838959de1d633a7b631c5a198c714"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/analog-classics/drums-v2/cymbal808.dsp",
-        "sha256": "34342d129169f4695fff37a29010dcf816d050dd8ecfc6e6f5b6552f2eec705d"
+        "sha256": "34342d129169f4695fff37a29010dcf816d050dd8ecfc6e6f5b6552f2eec705d",
+        "sourceFileLastChangeCommit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4"
+        }
       },
-      "source_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
       "source_path": "modules/analog-classics/drums-v2/cymbal808.dsp",
       "source_sha256": "34342d129169f4695fff37a29010dcf816d050dd8ecfc6e6f5b6552f2eec705d",
       "export_path": "scripts/808-cymbal.dsp",
@@ -808,12 +871,18 @@
         "sha256": "2dc40a28a2ae1c007e4354d5472b2c6dd33b520eed3bc66cf90cbc96908b3bdb"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/hats-analog/single-note-v1/closed.dsp",
-        "sha256": "1622abc37993a1ce08f3bd550dbb9dc91513658961a707406bc365ba292adeed"
+        "sha256": "1622abc37993a1ce08f3bd550dbb9dc91513658961a707406bc365ba292adeed",
+        "sourceFileLastChangeCommit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27"
+        }
       },
-      "source_commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
       "source_path": "modules/hats-analog/single-note-v1/closed.dsp",
       "source_sha256": "1622abc37993a1ce08f3bd550dbb9dc91513658961a707406bc365ba292adeed",
       "export_path": "scripts/analog-hat-closed.dsp",
@@ -899,12 +968,18 @@
         "sha256": "74a298db0b0ea9a0bb5f6f349cd9bd71a5d5c450bb95a8c99c13a407662ddf45"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/hats-analog/single-note-v1/open.dsp",
-        "sha256": "9bcc793c683af4c24b34346ee28f62ba66e81de895dbcc928ea65ae8a5af7152"
+        "sha256": "9bcc793c683af4c24b34346ee28f62ba66e81de895dbcc928ea65ae8a5af7152",
+        "sourceFileLastChangeCommit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27"
+        }
       },
-      "source_commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
       "source_path": "modules/hats-analog/single-note-v1/open.dsp",
       "source_sha256": "9bcc793c683af4c24b34346ee28f62ba66e81de895dbcc928ea65ae8a5af7152",
       "export_path": "scripts/analog-hat-open.dsp",
@@ -994,12 +1069,18 @@
         "sha256": "04582b55752255d35e670ac72b8d6866f05cd398b57f3155d96a4751957cf575"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "7ed155312580fe5591629beee33ada6a156e8c12",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/kick-analog/sharp-02/optimized.dsp",
-        "sha256": "b83178a14247a2c1b7b9d3f1688351c159edb48a90d2dfc4b47759c69851a1ab"
+        "sha256": "b83178a14247a2c1b7b9d3f1688351c159edb48a90d2dfc4b47759c69851a1ab",
+        "sourceFileLastChangeCommit": "7ed155312580fe5591629beee33ada6a156e8c12",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "7ed155312580fe5591629beee33ada6a156e8c12"
+        }
       },
-      "source_commit": "7ed155312580fe5591629beee33ada6a156e8c12",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "7ed155312580fe5591629beee33ada6a156e8c12",
       "source_path": "modules/kick-analog/sharp-02/optimized.dsp",
       "source_sha256": "b83178a14247a2c1b7b9d3f1688351c159edb48a90d2dfc4b47759c69851a1ab",
       "export_path": "scripts/analog-kick-sharp.dsp",
@@ -1125,12 +1206,18 @@
         "sha256": "83447ee3f0140ef64e2e7a9195d04259266d6cf818d733850e49f07a17fa58dd"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "49403321a0bca76b31f55fa0ffaaf5532518a23f",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/snare-analog/v2/snare.dsp",
-        "sha256": "388379d7a2d3b9b6a048304fa185ede6c31a0814237418278815ef29d11035dc"
+        "sha256": "388379d7a2d3b9b6a048304fa185ede6c31a0814237418278815ef29d11035dc",
+        "sourceFileLastChangeCommit": "49403321a0bca76b31f55fa0ffaaf5532518a23f",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "49403321a0bca76b31f55fa0ffaaf5532518a23f"
+        }
       },
-      "source_commit": "49403321a0bca76b31f55fa0ffaaf5532518a23f",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "49403321a0bca76b31f55fa0ffaaf5532518a23f",
       "source_path": "modules/snare-analog/v2/snare.dsp",
       "source_sha256": "388379d7a2d3b9b6a048304fa185ede6c31a0814237418278815ef29d11035dc",
       "export_path": "scripts/analog-snare.dsp",
@@ -1255,12 +1342,18 @@
         "sha256": "b231f6ce27f16559743c6d1b490247ecfda8b46f10102e5e84af4e799258fbfb"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "b126baa4b86ba8edd49dac9b68945ed2497a799e",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/clap/v3/clap.dsp",
-        "sha256": "53d55e01f60e0652d38a89495aad5d1961705cfe7cbe7ca145eca91561e106ef"
+        "sha256": "53d55e01f60e0652d38a89495aad5d1961705cfe7cbe7ca145eca91561e106ef",
+        "sourceFileLastChangeCommit": "b126baa4b86ba8edd49dac9b68945ed2497a799e",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "b126baa4b86ba8edd49dac9b68945ed2497a799e"
+        }
       },
-      "source_commit": "b126baa4b86ba8edd49dac9b68945ed2497a799e",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "b126baa4b86ba8edd49dac9b68945ed2497a799e",
       "source_path": "modules/clap/v3/clap.dsp",
       "source_sha256": "53d55e01f60e0652d38a89495aad5d1961705cfe7cbe7ca145eca91561e106ef",
       "export_path": "scripts/clap.dsp",
@@ -1379,12 +1472,18 @@
         "sha256": "c9181b93cc5f6dbe6e7b5291603082562e1cca9fe40e2002d89a1e84a1ae0579"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "166acde7bf032b8b87f4835c29703d212a4b0150",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/acid-voice/v1/voice.dsp",
-        "sha256": "e00efa47999f621e2ca6f8649da0e541ef9d3bc6d496466eba828e5b55fc6bd7"
+        "sha256": "e00efa47999f621e2ca6f8649da0e541ef9d3bc6d496466eba828e5b55fc6bd7",
+        "sourceFileLastChangeCommit": "166acde7bf032b8b87f4835c29703d212a4b0150",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "166acde7bf032b8b87f4835c29703d212a4b0150"
+        }
       },
-      "source_commit": "166acde7bf032b8b87f4835c29703d212a4b0150",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "166acde7bf032b8b87f4835c29703d212a4b0150",
       "source_path": "modules/acid-voice/v1/voice.dsp",
       "source_sha256": "e00efa47999f621e2ca6f8649da0e541ef9d3bc6d496466eba828e5b55fc6bd7",
       "export_path": "scripts/acid-voice.dsp",
@@ -1491,12 +1590,18 @@
         "sha256": "881b4843b3699c18511eb1a3df8135402b99201309031516350bdbc09436b8e9"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/trigger-seq/v1/trigger.dsp",
-        "sha256": "b3f512b91216feac98791b547fe7d3dfbc71f884dbf6de1dd455b330018ff780"
+        "sha256": "b3f512b91216feac98791b547fe7d3dfbc71f884dbf6de1dd455b330018ff780",
+        "sourceFileLastChangeCommit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27"
+        }
       },
-      "source_commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
       "source_path": "modules/trigger-seq/v1/trigger.dsp",
       "source_sha256": "b3f512b91216feac98791b547fe7d3dfbc71f884dbf6de1dd455b330018ff780",
       "export_path": "scripts/trigger-seq.dsp",
@@ -1622,12 +1727,18 @@
         "sha256": "41fe8fe7aa9cc283dc14a6c1503f1114e6e5a427610158cac15eabd533d74e63"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "784a4e7c7ae1a81e88b2695fd42f9c20fa5e148e",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/retro-mixer-eq/v1/eq.dsp",
-        "sha256": "36704b5c45242579b24aa715518069eced72964508681c86997b4c11ded06dfe"
+        "sha256": "36704b5c45242579b24aa715518069eced72964508681c86997b4c11ded06dfe",
+        "sourceFileLastChangeCommit": "784a4e7c7ae1a81e88b2695fd42f9c20fa5e148e",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "784a4e7c7ae1a81e88b2695fd42f9c20fa5e148e"
+        }
       },
-      "source_commit": "784a4e7c7ae1a81e88b2695fd42f9c20fa5e148e",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "784a4e7c7ae1a81e88b2695fd42f9c20fa5e148e",
       "source_path": "modules/retro-mixer-eq/v1/eq.dsp",
       "source_sha256": "36704b5c45242579b24aa715518069eced72964508681c86997b4c11ded06dfe",
       "export_path": "scripts/retro-mixer-eq.dsp",
@@ -1704,12 +1815,18 @@
         "sha256": "23c43c76a938cc44179c8cb33bb2c699c02990477dfd65aad225e1b68b42e62d"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "c9c00558558fad79faa78ae6e495a4c367eced32",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/tape-echo/v1/echo.dsp",
-        "sha256": "9421f35acca21f3741796a36b224d5e9c466f93909765924b9a4488e91316c14"
+        "sha256": "9421f35acca21f3741796a36b224d5e9c466f93909765924b9a4488e91316c14",
+        "sourceFileLastChangeCommit": "c9c00558558fad79faa78ae6e495a4c367eced32",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "c9c00558558fad79faa78ae6e495a4c367eced32"
+        }
       },
-      "source_commit": "c9c00558558fad79faa78ae6e495a4c367eced32",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "c9c00558558fad79faa78ae6e495a4c367eced32",
       "source_path": "modules/tape-echo/v1/echo.dsp",
       "source_sha256": "9421f35acca21f3741796a36b224d5e9c466f93909765924b9a4488e91316c14",
       "export_path": "scripts/tape-echo.dsp",
@@ -1790,12 +1907,18 @@
         "sha256": "be69c3725976abe0ea80c02365720ff74f65b6bf79d50c058ab727c264a6a1ec"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "8581dc9a0e54fecee647f38a156368be35a187f5",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/vintage-rack-reverb/v1/reverb.dsp",
-        "sha256": "323e219ee6d052235da8ad94e51ae886f4fbfba2b13e803743495af32305a20f"
+        "sha256": "323e219ee6d052235da8ad94e51ae886f4fbfba2b13e803743495af32305a20f",
+        "sourceFileLastChangeCommit": "8581dc9a0e54fecee647f38a156368be35a187f5",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "8581dc9a0e54fecee647f38a156368be35a187f5"
+        }
       },
-      "source_commit": "8581dc9a0e54fecee647f38a156368be35a187f5",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "8581dc9a0e54fecee647f38a156368be35a187f5",
       "source_path": "modules/vintage-rack-reverb/v1/reverb.dsp",
       "source_sha256": "323e219ee6d052235da8ad94e51ae886f4fbfba2b13e803743495af32305a20f",
       "export_path": "scripts/vintage-rack-reverb.dsp",
@@ -1872,12 +1995,18 @@
         "sha256": "b0d77ead918639ec8681bd9849f8aafb4e01b7122ee31e2ef84201f23aa70c2c"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "c2231d7d09688dc6ba2f75a5d8c9fe3b9f5debb4",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/vintage-tape/v1/tape.dsp",
-        "sha256": "298ccf1d77f91d95e8cf877634eb5d0843f4fdcf25f4d222f2e3a5c289299d0a"
+        "sha256": "298ccf1d77f91d95e8cf877634eb5d0843f4fdcf25f4d222f2e3a5c289299d0a",
+        "sourceFileLastChangeCommit": "c2231d7d09688dc6ba2f75a5d8c9fe3b9f5debb4",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "c2231d7d09688dc6ba2f75a5d8c9fe3b9f5debb4"
+        }
       },
-      "source_commit": "c2231d7d09688dc6ba2f75a5d8c9fe3b9f5debb4",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "c2231d7d09688dc6ba2f75a5d8c9fe3b9f5debb4",
       "source_path": "modules/vintage-tape/v1/tape.dsp",
       "source_sha256": "298ccf1d77f91d95e8cf877634eb5d0843f4fdcf25f4d222f2e3a5c289299d0a",
       "export_path": "scripts/vintage-tape.dsp",
@@ -1952,12 +2081,18 @@
         "sha256": "411c391a6ad14db915074b07f0ea95a04674753977175aa83d8b075c17c28d03"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "3dd01dac01f94d8cf540e4c082c1978814a831b9",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/retro-ensemble/v1/ensemble.dsp",
-        "sha256": "8c719129a2b604a3f69f147233c85fba8cb868c0a3b43a75ac0b726e95025b40"
+        "sha256": "8c719129a2b604a3f69f147233c85fba8cb868c0a3b43a75ac0b726e95025b40",
+        "sourceFileLastChangeCommit": "3dd01dac01f94d8cf540e4c082c1978814a831b9",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "3dd01dac01f94d8cf540e4c082c1978814a831b9"
+        }
       },
-      "source_commit": "3dd01dac01f94d8cf540e4c082c1978814a831b9",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "3dd01dac01f94d8cf540e4c082c1978814a831b9",
       "source_path": "modules/retro-ensemble/v1/ensemble.dsp",
       "source_sha256": "8c719129a2b604a3f69f147233c85fba8cb868c0a3b43a75ac0b726e95025b40",
       "export_path": "scripts/retro-ensemble.dsp",
@@ -2033,12 +2168,18 @@
         "sha256": "6fba57cb5d911f3382dd2bb73dc6a84c920f232f54feb6a96245f3d8a96fa81c"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "166acde7bf032b8b87f4835c29703d212a4b0150",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/bassline-seq/v1/sequence.dsp",
-        "sha256": "06aa0cbbf2b1f1b6ef087dc6044db2eb930b2efb9b88d82512dcbb0d83b01db6"
+        "sha256": "06aa0cbbf2b1f1b6ef087dc6044db2eb930b2efb9b88d82512dcbb0d83b01db6",
+        "sourceFileLastChangeCommit": "166acde7bf032b8b87f4835c29703d212a4b0150",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "166acde7bf032b8b87f4835c29703d212a4b0150"
+        }
       },
-      "source_commit": "166acde7bf032b8b87f4835c29703d212a4b0150",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "166acde7bf032b8b87f4835c29703d212a4b0150",
       "source_path": "modules/bassline-seq/v1/sequence.dsp",
       "source_sha256": "06aa0cbbf2b1f1b6ef087dc6044db2eb930b2efb9b88d82512dcbb0d83b01db6",
       "export_path": "scripts/bassline-seq.dsp",
@@ -2240,12 +2381,18 @@
         "sha256": "1cc2a20ddd5e1773af3392963e8d2ed9e609a59bc00f37ca1677e183de5f38cb"
       },
       "upstream": {
-        "branch": "606-reference-tuning",
-        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-606/v1/kick.dsp",
-        "sha256": "9e11406afe0ee0d27bfeb0669e4f9ab1f06369895e046cc9cc55793b7cee7226"
+        "sha256": "9e11406afe0ee0d27bfeb0669e4f9ab1f06369895e046cc9cc55793b7cee7226",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "606-reference-tuning",
+          "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95"
+        }
       },
-      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-606/v1/kick.dsp",
       "source_sha256": "9e11406afe0ee0d27bfeb0669e4f9ab1f06369895e046cc9cc55793b7cee7226",
       "export_path": "scripts/606-kick.dsp",
@@ -2333,12 +2480,18 @@
         "sha256": "e7405a55826f4196de0a4cec2c34aa5cf2e71f44793ca8006b1f389f3eec009f"
       },
       "upstream": {
-        "branch": "606-reference-tuning",
-        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-606-reference/v1/snare.dsp",
-        "sha256": "dfcce395df56c62676da40e9522bfa1071e38ce9e656662b7991aef6b731ee7d"
+        "sha256": "dfcce395df56c62676da40e9522bfa1071e38ce9e656662b7991aef6b731ee7d",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "606-reference-tuning",
+          "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95"
+        }
       },
-      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-606-reference/v1/snare.dsp",
       "source_sha256": "dfcce395df56c62676da40e9522bfa1071e38ce9e656662b7991aef6b731ee7d",
       "export_path": "scripts/606-snare.dsp",
@@ -2426,12 +2579,18 @@
         "sha256": "a9483a3d1c14547bd41c87f5a1c1e18cb8257cfc0475afbd503ec0973842fa4a"
       },
       "upstream": {
-        "branch": "606-reference-tuning",
-        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-606/v1/tom.dsp",
-        "sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a"
+        "sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "606-reference-tuning",
+          "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95"
+        }
       },
-      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-606/v1/tom.dsp",
       "source_sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a",
       "export_path": "scripts/606-low-tom.dsp",
@@ -2540,12 +2699,18 @@
         "sha256": "369b67266e25944619e62b4a59193738a3b51fae5698e615764164faa0b05ab2"
       },
       "upstream": {
-        "branch": "606-reference-tuning",
-        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-606/v1/tom.dsp",
-        "sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a"
+        "sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "606-reference-tuning",
+          "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95"
+        }
       },
-      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-606/v1/tom.dsp",
       "source_sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a",
       "export_path": "scripts/606-high-tom.dsp",
@@ -2654,12 +2819,18 @@
         "sha256": "ca55535f6acd3f09a532cab9290d82ad6ad9ab536198dfbe22881b611b4257a6"
       },
       "upstream": {
-        "branch": "606-reference-tuning",
-        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-606/v1/closed-hat.dsp",
-        "sha256": "f63cff557b8ace3f7b18d1dafe6dc87fa9cfae6918d9066a6083393fcb552980"
+        "sha256": "f63cff557b8ace3f7b18d1dafe6dc87fa9cfae6918d9066a6083393fcb552980",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "606-reference-tuning",
+          "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95"
+        }
       },
-      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-606/v1/closed-hat.dsp",
       "source_sha256": "f63cff557b8ace3f7b18d1dafe6dc87fa9cfae6918d9066a6083393fcb552980",
       "export_path": "scripts/606-closed-hat.dsp",
@@ -2747,12 +2918,18 @@
         "sha256": "cb271cdc4d1246384969864c26f0bc2aba7a8c89cd3cb2f7912a2454fd2ee6d3"
       },
       "upstream": {
-        "branch": "606-reference-tuning",
-        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-606-reference/v1/open-hat.dsp",
-        "sha256": "d1d47e3f19a36eaf0550a06361c6a46a4f9d7b3d93bf81b256a757cbf9226a07"
+        "sha256": "d1d47e3f19a36eaf0550a06361c6a46a4f9d7b3d93bf81b256a757cbf9226a07",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "606-reference-tuning",
+          "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95"
+        }
       },
-      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-606-reference/v1/open-hat.dsp",
       "source_sha256": "d1d47e3f19a36eaf0550a06361c6a46a4f9d7b3d93bf81b256a757cbf9226a07",
       "export_path": "scripts/606-open-hat.dsp",
@@ -2842,12 +3019,18 @@
         "sha256": "1af67fb367d781ab8397dd86662ef1a4f068e78d6c35ae32b7e7ba1ec92b4a9a"
       },
       "upstream": {
-        "branch": "606-reference-tuning",
-        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-606-reference/v1/cymbal.dsp",
-        "sha256": "d7a3cbd65f22404a5a4c74db5fbca9653d8d56f71c87de9687e06b1c2de48815"
+        "sha256": "d7a3cbd65f22404a5a4c74db5fbca9653d8d56f71c87de9687e06b1c2de48815",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "606-reference-tuning",
+          "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95"
+        }
       },
-      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-606-reference/v1/cymbal.dsp",
       "source_sha256": "d7a3cbd65f22404a5a4c74db5fbca9653d8d56f71c87de9687e06b1c2de48815",
       "export_path": "scripts/606-cymbal.dsp",
@@ -2935,12 +3118,18 @@
         "sha256": "4310c614cc4725508a1ff7eea7a2f0f3569c3fa5065a49827afcb792318d8503"
       },
       "upstream": {
-        "branch": "80-909-reference-tuning",
-        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-909/v1/kick.dsp",
-        "sha256": "f445870825cbde6b0ba13e394cebcb0b3970d7a18997246229f34e5edcefb294"
+        "sha256": "f445870825cbde6b0ba13e394cebcb0b3970d7a18997246229f34e5edcefb294",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "80-909-reference-tuning",
+          "commit": "7aa75de6394568410d5b114d62b405138e9c9e35"
+        }
       },
-      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-909/v1/kick.dsp",
       "source_sha256": "f445870825cbde6b0ba13e394cebcb0b3970d7a18997246229f34e5edcefb294",
       "export_path": "scripts/909-kick.dsp",
@@ -3031,12 +3220,18 @@
         "sha256": "f367ebf7b2c62bf8df6631e26add0cfb78c6d59ffe6b9e7e7c5b1c1e21cc42b4"
       },
       "upstream": {
-        "branch": "80-909-reference-tuning",
-        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-909/v1/snare.dsp",
-        "sha256": "c6fc520a078a65d652318be8d71282d3fc592962c207bfdc0f0af10567fe932a"
+        "sha256": "c6fc520a078a65d652318be8d71282d3fc592962c207bfdc0f0af10567fe932a",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "80-909-reference-tuning",
+          "commit": "7aa75de6394568410d5b114d62b405138e9c9e35"
+        }
       },
-      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-909/v1/snare.dsp",
       "source_sha256": "c6fc520a078a65d652318be8d71282d3fc592962c207bfdc0f0af10567fe932a",
       "export_path": "scripts/909-snare.dsp",
@@ -3127,12 +3322,18 @@
         "sha256": "fdd9373eee17b9c2745ee7e3d02c12b10d54169f1d85ff2fd430437cb814d151"
       },
       "upstream": {
-        "branch": "80-909-reference-tuning",
-        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-909/v1/tom.dsp",
-        "sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75"
+        "sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "80-909-reference-tuning",
+          "commit": "7aa75de6394568410d5b114d62b405138e9c9e35"
+        }
       },
-      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-909/v1/tom.dsp",
       "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
       "export_path": "scripts/909-low-tom.dsp",
@@ -3247,12 +3448,18 @@
         "sha256": "c84e713f0af05c5796dc1ef68e6fe7eedadbf36e8f25638677f10cb40e7188d9"
       },
       "upstream": {
-        "branch": "80-909-reference-tuning",
-        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-909/v1/tom.dsp",
-        "sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75"
+        "sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "80-909-reference-tuning",
+          "commit": "7aa75de6394568410d5b114d62b405138e9c9e35"
+        }
       },
-      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-909/v1/tom.dsp",
       "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
       "export_path": "scripts/909-mid-tom.dsp",
@@ -3367,12 +3574,18 @@
         "sha256": "97af60317c1e71cec257009637fb7544fe4a6d2946388e927026a15b0736019f"
       },
       "upstream": {
-        "branch": "80-909-reference-tuning",
-        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-909/v1/tom.dsp",
-        "sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75"
+        "sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "80-909-reference-tuning",
+          "commit": "7aa75de6394568410d5b114d62b405138e9c9e35"
+        }
       },
-      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-909/v1/tom.dsp",
       "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
       "export_path": "scripts/909-high-tom.dsp",
@@ -3487,12 +3700,18 @@
         "sha256": "b37e020d3b48036da3e5c572403abdfcc3b1ffd0322722bcff6bc5438c62f808"
       },
       "upstream": {
-        "branch": "80-909-reference-tuning",
-        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-909/v1/rim.dsp",
-        "sha256": "85281a7917d697dee47a1475ca24d2ecc08e53b48daa6f807c91367c4ee2e635"
+        "sha256": "85281a7917d697dee47a1475ca24d2ecc08e53b48daa6f807c91367c4ee2e635",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "80-909-reference-tuning",
+          "commit": "7aa75de6394568410d5b114d62b405138e9c9e35"
+        }
       },
-      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-909/v1/rim.dsp",
       "source_sha256": "85281a7917d697dee47a1475ca24d2ecc08e53b48daa6f807c91367c4ee2e635",
       "export_path": "scripts/909-rim.dsp",
@@ -3581,12 +3800,18 @@
         "sha256": "8d7f9372d8a9ea0c90f26fdfc2f6be64310d88bb347dc47210c0b3456797a353"
       },
       "upstream": {
-        "branch": "80-909-reference-tuning",
-        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-909/v1/clap.dsp",
-        "sha256": "371ca9aa94d3b12ba1a40243e712283adfc51bd14bf39f5924759d2ef1942194"
+        "sha256": "371ca9aa94d3b12ba1a40243e712283adfc51bd14bf39f5924759d2ef1942194",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "80-909-reference-tuning",
+          "commit": "7aa75de6394568410d5b114d62b405138e9c9e35"
+        }
       },
-      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-909/v1/clap.dsp",
       "source_sha256": "371ca9aa94d3b12ba1a40243e712283adfc51bd14bf39f5924759d2ef1942194",
       "export_path": "scripts/909-clap.dsp",
@@ -3676,12 +3901,18 @@
         "sha256": "164cb347691328ae0345eda9bcdf97eb8bfdea4857314b4492bb6663b2d89ab9"
       },
       "upstream": {
-        "branch": "75-808-fischer-reference-pass",
-        "commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-808-aux/v1/tom-conga.dsp",
-        "sha256": "34b05cd95d78d4ca55f9cc1b7de8c36d74c748a1422b9e950a30256e2b862b6f"
+        "sha256": "34b05cd95d78d4ca55f9cc1b7de8c36d74c748a1422b9e950a30256e2b862b6f",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "75-808-fischer-reference-pass",
+          "commit": "07464333c5eed1e916820a3fec99b69147561cb0"
+        }
       },
-      "source_commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-808-aux/v1/tom-conga.dsp",
       "source_sha256": "34b05cd95d78d4ca55f9cc1b7de8c36d74c748a1422b9e950a30256e2b862b6f",
       "export_path": "scripts/808-aux-tom-conga.dsp",
@@ -3772,12 +4003,18 @@
         "sha256": "89b2832c6ccbbd294ab0beddf7d252013e69e8658e0d574947ecf01fe2debade"
       },
       "upstream": {
-        "branch": "75-808-fischer-reference-pass",
-        "commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-808-aux/v2/rim-claves.dsp",
-        "sha256": "913f0dc0f7290128c421fcc418cae55e13aae48dfbb382fede5d7c60b267f60d"
+        "sha256": "913f0dc0f7290128c421fcc418cae55e13aae48dfbb382fede5d7c60b267f60d",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "75-808-fischer-reference-pass",
+          "commit": "07464333c5eed1e916820a3fec99b69147561cb0"
+        }
       },
-      "source_commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-808-aux/v2/rim-claves.dsp",
       "source_sha256": "913f0dc0f7290128c421fcc418cae55e13aae48dfbb382fede5d7c60b267f60d",
       "export_path": "scripts/808-aux-rim-claves.dsp",
@@ -3867,12 +4104,18 @@
         "sha256": "f9c1cbbebe6d84af99d1032b7480aeaf02c63a827852d017bcb462e884dfe90b"
       },
       "upstream": {
-        "branch": "75-808-fischer-reference-pass",
-        "commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-808-aux/v1/maracas.dsp",
-        "sha256": "f1d241330dde4e2c6bf5f1db608561e3e3eccbc4619693c99b181dc7172c619c"
+        "sha256": "f1d241330dde4e2c6bf5f1db608561e3e3eccbc4619693c99b181dc7172c619c",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "75-808-fischer-reference-pass",
+          "commit": "07464333c5eed1e916820a3fec99b69147561cb0"
+        }
       },
-      "source_commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-808-aux/v1/maracas.dsp",
       "source_sha256": "f1d241330dde4e2c6bf5f1db608561e3e3eccbc4619693c99b181dc7172c619c",
       "export_path": "scripts/808-aux-maracas.dsp",
@@ -3960,12 +4203,18 @@
         "sha256": "aba85471dc75cdd24b512f92abf37dff511fa22273425a771dd818af3ff8f637"
       },
       "upstream": {
-        "branch": "75-808-fischer-reference-pass",
-        "commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-808-aux/v1/cowbell.dsp",
-        "sha256": "7804add2d39ea1f171c3715a22d2f637d52e3760b4663992fb49a5cb36e8dd41"
+        "sha256": "7804add2d39ea1f171c3715a22d2f637d52e3760b4663992fb49a5cb36e8dd41",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "75-808-fischer-reference-pass",
+          "commit": "07464333c5eed1e916820a3fec99b69147561cb0"
+        }
       },
-      "source_commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-808-aux/v1/cowbell.dsp",
       "source_sha256": "7804add2d39ea1f171c3715a22d2f637d52e3760b4663992fb49a5cb36e8dd41",
       "export_path": "scripts/808-aux-cowbell.dsp",
@@ -4056,12 +4305,18 @@
         "sha256": "042ae1cc4122eaef6e8596110e378d547821f580f464732880fadf1deb9141af"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/juno-60/v3/voice.dsp",
-        "sha256": "5a0da538ca7d58fb5ff1ac5de506e531181b4de9e36538b2afa59c3c2129ccab"
+        "sha256": "5a0da538ca7d58fb5ff1ac5de506e531181b4de9e36538b2afa59c3c2129ccab",
+        "sourceFileLastChangeCommit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce"
+        }
       },
-      "source_commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
       "source_path": "modules/juno-60/v3/voice.dsp",
       "source_sha256": "5a0da538ca7d58fb5ff1ac5de506e531181b4de9e36538b2afa59c3c2129ccab",
       "export_path": "scripts/juno-60.dsp",
@@ -4164,12 +4419,18 @@
         "sha256": "16e7cdca53a9c55f5b790a83e0456070f170407d67bd1a6d4c250dcec8dcfdc1"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/juno-106/v3/voice.dsp",
-        "sha256": "c84bf47177ef942f5362a1e3f630cd89a794991090e5138f83357624f8d3813d"
+        "sha256": "c84bf47177ef942f5362a1e3f630cd89a794991090e5138f83357624f8d3813d",
+        "sourceFileLastChangeCommit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce"
+        }
       },
-      "source_commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
       "source_path": "modules/juno-106/v3/voice.dsp",
       "source_sha256": "c84bf47177ef942f5362a1e3f630cd89a794991090e5138f83357624f8d3813d",
       "export_path": "scripts/juno-106.dsp",
@@ -4278,12 +4539,18 @@
         "sha256": "3cce76089d21825a6579c64c1c5dc49878ebe05795c1d787fb8eed5350f2a694"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/mono-101/v4/voice.dsp",
-        "sha256": "64d8ab4e929ad3a5c3056953d263873f7bc923e33fe8c3ff7f90471ecb7da744"
+        "sha256": "64d8ab4e929ad3a5c3056953d263873f7bc923e33fe8c3ff7f90471ecb7da744",
+        "sourceFileLastChangeCommit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce"
+        }
       },
-      "source_commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "b20f6f93c402d908f519e5f7456a2a6ad75485ce",
       "source_path": "modules/mono-101/v4/voice.dsp",
       "source_sha256": "64d8ab4e929ad3a5c3056953d263873f7bc923e33fe8c3ff7f90471ecb7da744",
       "export_path": "scripts/sh-101.dsp",
@@ -4397,12 +4664,18 @@
         "sha256": "eb9f0f1155891ad78c43b2b303c250fbac91f62fd09314a299ff67178c7a5dcc"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "fd2b7efae4951d014fed3fed3cd01f295a0af21e",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/minimoog/v1/voice.dsp",
-        "sha256": "442916e387c9688fa0f29cfab832d65929d2a6dca321685c344dbbc105870899"
+        "sha256": "442916e387c9688fa0f29cfab832d65929d2a6dca321685c344dbbc105870899",
+        "sourceFileLastChangeCommit": "fd2b7efae4951d014fed3fed3cd01f295a0af21e",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "fd2b7efae4951d014fed3fed3cd01f295a0af21e"
+        }
       },
-      "source_commit": "fd2b7efae4951d014fed3fed3cd01f295a0af21e",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "fd2b7efae4951d014fed3fed3cd01f295a0af21e",
       "source_path": "modules/minimoog/v1/voice.dsp",
       "source_sha256": "442916e387c9688fa0f29cfab832d65929d2a6dca321685c344dbbc105870899",
       "export_path": "scripts/mini.dsp",
@@ -4503,12 +4776,18 @@
         "sha256": "36cc1c7c82eacf99231a4920e99f392977fd2920367abcfb805ff73d14e16e92"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/analog-classics/drums-v2/kick808.dsp",
-        "sha256": "2a8f9579b305623007ac025fba73f2efc8c24a22725d5fafaf1b65616e805613"
+        "sha256": "2a8f9579b305623007ac025fba73f2efc8c24a22725d5fafaf1b65616e805613",
+        "sourceFileLastChangeCommit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4"
+        }
       },
-      "source_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
       "source_path": "modules/analog-classics/drums-v2/kick808.dsp",
       "source_sha256": "2a8f9579b305623007ac025fba73f2efc8c24a22725d5fafaf1b65616e805613",
       "export_path": "scripts/808-kick.dsp",
@@ -4588,12 +4867,18 @@
         "sha256": "2e4db7d4201ba8299e222ec2dc01fa64a4200279448519b8358f906b1c79f60b"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/analog-classics/drums-v2/snare808.dsp",
-        "sha256": "7fc1da292e02f7c76d1b47d2f8ec389d619a3ad9f80cb866b65f2b31407be260"
+        "sha256": "7fc1da292e02f7c76d1b47d2f8ec389d619a3ad9f80cb866b65f2b31407be260",
+        "sourceFileLastChangeCommit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4"
+        }
       },
-      "source_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
       "source_path": "modules/analog-classics/drums-v2/snare808.dsp",
       "source_sha256": "7fc1da292e02f7c76d1b47d2f8ec389d619a3ad9f80cb866b65f2b31407be260",
       "export_path": "scripts/808-snare.dsp",
@@ -4673,12 +4958,18 @@
         "sha256": "2c835c3f44cae79741078f749a1162a7ea734d5bfbe7446505cf59f004490c7a"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/analog-classics/drums-v2/clap808.dsp",
-        "sha256": "a8f0bf3f6469c173f12e1a5c47822b9d0a564badd268cfeaf5165b170f597a78"
+        "sha256": "a8f0bf3f6469c173f12e1a5c47822b9d0a564badd268cfeaf5165b170f597a78",
+        "sourceFileLastChangeCommit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4"
+        }
       },
-      "source_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
       "source_path": "modules/analog-classics/drums-v2/clap808.dsp",
       "source_sha256": "a8f0bf3f6469c173f12e1a5c47822b9d0a564badd268cfeaf5165b170f597a78",
       "export_path": "scripts/808-clap.dsp",
@@ -4759,12 +5050,18 @@
         "sha256": "a39e81a2977ac4906716f095cf084e3492f838959de1d633a7b631c5a198c714"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/analog-classics/drums-v2/cymbal808.dsp",
-        "sha256": "34342d129169f4695fff37a29010dcf816d050dd8ecfc6e6f5b6552f2eec705d"
+        "sha256": "34342d129169f4695fff37a29010dcf816d050dd8ecfc6e6f5b6552f2eec705d",
+        "sourceFileLastChangeCommit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4"
+        }
       },
-      "source_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "fd9c776ec691e12f0451d5606f272d1c530fddd4",
       "source_path": "modules/analog-classics/drums-v2/cymbal808.dsp",
       "source_sha256": "34342d129169f4695fff37a29010dcf816d050dd8ecfc6e6f5b6552f2eec705d",
       "export_path": "scripts/808-cymbal.dsp",
@@ -4844,12 +5141,18 @@
         "sha256": "2dc40a28a2ae1c007e4354d5472b2c6dd33b520eed3bc66cf90cbc96908b3bdb"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/hats-analog/single-note-v1/closed.dsp",
-        "sha256": "1622abc37993a1ce08f3bd550dbb9dc91513658961a707406bc365ba292adeed"
+        "sha256": "1622abc37993a1ce08f3bd550dbb9dc91513658961a707406bc365ba292adeed",
+        "sourceFileLastChangeCommit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27"
+        }
       },
-      "source_commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
       "source_path": "modules/hats-analog/single-note-v1/closed.dsp",
       "source_sha256": "1622abc37993a1ce08f3bd550dbb9dc91513658961a707406bc365ba292adeed",
       "export_path": "scripts/analog-hat-closed.dsp",
@@ -4935,12 +5238,18 @@
         "sha256": "74a298db0b0ea9a0bb5f6f349cd9bd71a5d5c450bb95a8c99c13a407662ddf45"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/hats-analog/single-note-v1/open.dsp",
-        "sha256": "9bcc793c683af4c24b34346ee28f62ba66e81de895dbcc928ea65ae8a5af7152"
+        "sha256": "9bcc793c683af4c24b34346ee28f62ba66e81de895dbcc928ea65ae8a5af7152",
+        "sourceFileLastChangeCommit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27"
+        }
       },
-      "source_commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
       "source_path": "modules/hats-analog/single-note-v1/open.dsp",
       "source_sha256": "9bcc793c683af4c24b34346ee28f62ba66e81de895dbcc928ea65ae8a5af7152",
       "export_path": "scripts/analog-hat-open.dsp",
@@ -5030,12 +5339,18 @@
         "sha256": "04582b55752255d35e670ac72b8d6866f05cd398b57f3155d96a4751957cf575"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "7ed155312580fe5591629beee33ada6a156e8c12",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/kick-analog/sharp-02/optimized.dsp",
-        "sha256": "b83178a14247a2c1b7b9d3f1688351c159edb48a90d2dfc4b47759c69851a1ab"
+        "sha256": "b83178a14247a2c1b7b9d3f1688351c159edb48a90d2dfc4b47759c69851a1ab",
+        "sourceFileLastChangeCommit": "7ed155312580fe5591629beee33ada6a156e8c12",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "7ed155312580fe5591629beee33ada6a156e8c12"
+        }
       },
-      "source_commit": "7ed155312580fe5591629beee33ada6a156e8c12",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "7ed155312580fe5591629beee33ada6a156e8c12",
       "source_path": "modules/kick-analog/sharp-02/optimized.dsp",
       "source_sha256": "b83178a14247a2c1b7b9d3f1688351c159edb48a90d2dfc4b47759c69851a1ab",
       "export_path": "scripts/analog-kick-sharp.dsp",
@@ -5161,12 +5476,18 @@
         "sha256": "83447ee3f0140ef64e2e7a9195d04259266d6cf818d733850e49f07a17fa58dd"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "49403321a0bca76b31f55fa0ffaaf5532518a23f",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/snare-analog/v2/snare.dsp",
-        "sha256": "388379d7a2d3b9b6a048304fa185ede6c31a0814237418278815ef29d11035dc"
+        "sha256": "388379d7a2d3b9b6a048304fa185ede6c31a0814237418278815ef29d11035dc",
+        "sourceFileLastChangeCommit": "49403321a0bca76b31f55fa0ffaaf5532518a23f",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "49403321a0bca76b31f55fa0ffaaf5532518a23f"
+        }
       },
-      "source_commit": "49403321a0bca76b31f55fa0ffaaf5532518a23f",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "49403321a0bca76b31f55fa0ffaaf5532518a23f",
       "source_path": "modules/snare-analog/v2/snare.dsp",
       "source_sha256": "388379d7a2d3b9b6a048304fa185ede6c31a0814237418278815ef29d11035dc",
       "export_path": "scripts/analog-snare.dsp",
@@ -5291,12 +5612,18 @@
         "sha256": "b231f6ce27f16559743c6d1b490247ecfda8b46f10102e5e84af4e799258fbfb"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "b126baa4b86ba8edd49dac9b68945ed2497a799e",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/clap/v3/clap.dsp",
-        "sha256": "53d55e01f60e0652d38a89495aad5d1961705cfe7cbe7ca145eca91561e106ef"
+        "sha256": "53d55e01f60e0652d38a89495aad5d1961705cfe7cbe7ca145eca91561e106ef",
+        "sourceFileLastChangeCommit": "b126baa4b86ba8edd49dac9b68945ed2497a799e",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "b126baa4b86ba8edd49dac9b68945ed2497a799e"
+        }
       },
-      "source_commit": "b126baa4b86ba8edd49dac9b68945ed2497a799e",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "b126baa4b86ba8edd49dac9b68945ed2497a799e",
       "source_path": "modules/clap/v3/clap.dsp",
       "source_sha256": "53d55e01f60e0652d38a89495aad5d1961705cfe7cbe7ca145eca91561e106ef",
       "export_path": "scripts/clap.dsp",
@@ -5415,12 +5742,18 @@
         "sha256": "c9181b93cc5f6dbe6e7b5291603082562e1cca9fe40e2002d89a1e84a1ae0579"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "166acde7bf032b8b87f4835c29703d212a4b0150",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/acid-voice/v1/voice.dsp",
-        "sha256": "e00efa47999f621e2ca6f8649da0e541ef9d3bc6d496466eba828e5b55fc6bd7"
+        "sha256": "e00efa47999f621e2ca6f8649da0e541ef9d3bc6d496466eba828e5b55fc6bd7",
+        "sourceFileLastChangeCommit": "166acde7bf032b8b87f4835c29703d212a4b0150",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "166acde7bf032b8b87f4835c29703d212a4b0150"
+        }
       },
-      "source_commit": "166acde7bf032b8b87f4835c29703d212a4b0150",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "166acde7bf032b8b87f4835c29703d212a4b0150",
       "source_path": "modules/acid-voice/v1/voice.dsp",
       "source_sha256": "e00efa47999f621e2ca6f8649da0e541ef9d3bc6d496466eba828e5b55fc6bd7",
       "export_path": "scripts/acid-voice.dsp",
@@ -5527,12 +5860,18 @@
         "sha256": "881b4843b3699c18511eb1a3df8135402b99201309031516350bdbc09436b8e9"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/trigger-seq/v1/trigger.dsp",
-        "sha256": "b3f512b91216feac98791b547fe7d3dfbc71f884dbf6de1dd455b330018ff780"
+        "sha256": "b3f512b91216feac98791b547fe7d3dfbc71f884dbf6de1dd455b330018ff780",
+        "sourceFileLastChangeCommit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27"
+        }
       },
-      "source_commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "9563b719ee36cf11cd64b085dca720ee28b5bd27",
       "source_path": "modules/trigger-seq/v1/trigger.dsp",
       "source_sha256": "b3f512b91216feac98791b547fe7d3dfbc71f884dbf6de1dd455b330018ff780",
       "export_path": "scripts/trigger-seq.dsp",
@@ -5658,12 +5997,18 @@
         "sha256": "41fe8fe7aa9cc283dc14a6c1503f1114e6e5a427610158cac15eabd533d74e63"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "784a4e7c7ae1a81e88b2695fd42f9c20fa5e148e",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/retro-mixer-eq/v1/eq.dsp",
-        "sha256": "36704b5c45242579b24aa715518069eced72964508681c86997b4c11ded06dfe"
+        "sha256": "36704b5c45242579b24aa715518069eced72964508681c86997b4c11ded06dfe",
+        "sourceFileLastChangeCommit": "784a4e7c7ae1a81e88b2695fd42f9c20fa5e148e",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "784a4e7c7ae1a81e88b2695fd42f9c20fa5e148e"
+        }
       },
-      "source_commit": "784a4e7c7ae1a81e88b2695fd42f9c20fa5e148e",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "784a4e7c7ae1a81e88b2695fd42f9c20fa5e148e",
       "source_path": "modules/retro-mixer-eq/v1/eq.dsp",
       "source_sha256": "36704b5c45242579b24aa715518069eced72964508681c86997b4c11ded06dfe",
       "export_path": "scripts/retro-mixer-eq.dsp",
@@ -5740,12 +6085,18 @@
         "sha256": "23c43c76a938cc44179c8cb33bb2c699c02990477dfd65aad225e1b68b42e62d"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "c9c00558558fad79faa78ae6e495a4c367eced32",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/tape-echo/v1/echo.dsp",
-        "sha256": "9421f35acca21f3741796a36b224d5e9c466f93909765924b9a4488e91316c14"
+        "sha256": "9421f35acca21f3741796a36b224d5e9c466f93909765924b9a4488e91316c14",
+        "sourceFileLastChangeCommit": "c9c00558558fad79faa78ae6e495a4c367eced32",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "c9c00558558fad79faa78ae6e495a4c367eced32"
+        }
       },
-      "source_commit": "c9c00558558fad79faa78ae6e495a4c367eced32",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "c9c00558558fad79faa78ae6e495a4c367eced32",
       "source_path": "modules/tape-echo/v1/echo.dsp",
       "source_sha256": "9421f35acca21f3741796a36b224d5e9c466f93909765924b9a4488e91316c14",
       "export_path": "scripts/tape-echo.dsp",
@@ -5826,12 +6177,18 @@
         "sha256": "be69c3725976abe0ea80c02365720ff74f65b6bf79d50c058ab727c264a6a1ec"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "8581dc9a0e54fecee647f38a156368be35a187f5",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/vintage-rack-reverb/v1/reverb.dsp",
-        "sha256": "323e219ee6d052235da8ad94e51ae886f4fbfba2b13e803743495af32305a20f"
+        "sha256": "323e219ee6d052235da8ad94e51ae886f4fbfba2b13e803743495af32305a20f",
+        "sourceFileLastChangeCommit": "8581dc9a0e54fecee647f38a156368be35a187f5",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "8581dc9a0e54fecee647f38a156368be35a187f5"
+        }
       },
-      "source_commit": "8581dc9a0e54fecee647f38a156368be35a187f5",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "8581dc9a0e54fecee647f38a156368be35a187f5",
       "source_path": "modules/vintage-rack-reverb/v1/reverb.dsp",
       "source_sha256": "323e219ee6d052235da8ad94e51ae886f4fbfba2b13e803743495af32305a20f",
       "export_path": "scripts/vintage-rack-reverb.dsp",
@@ -5908,12 +6265,18 @@
         "sha256": "b0d77ead918639ec8681bd9849f8aafb4e01b7122ee31e2ef84201f23aa70c2c"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "c2231d7d09688dc6ba2f75a5d8c9fe3b9f5debb4",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/vintage-tape/v1/tape.dsp",
-        "sha256": "298ccf1d77f91d95e8cf877634eb5d0843f4fdcf25f4d222f2e3a5c289299d0a"
+        "sha256": "298ccf1d77f91d95e8cf877634eb5d0843f4fdcf25f4d222f2e3a5c289299d0a",
+        "sourceFileLastChangeCommit": "c2231d7d09688dc6ba2f75a5d8c9fe3b9f5debb4",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "c2231d7d09688dc6ba2f75a5d8c9fe3b9f5debb4"
+        }
       },
-      "source_commit": "c2231d7d09688dc6ba2f75a5d8c9fe3b9f5debb4",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "c2231d7d09688dc6ba2f75a5d8c9fe3b9f5debb4",
       "source_path": "modules/vintage-tape/v1/tape.dsp",
       "source_sha256": "298ccf1d77f91d95e8cf877634eb5d0843f4fdcf25f4d222f2e3a5c289299d0a",
       "export_path": "scripts/vintage-tape.dsp",
@@ -5988,12 +6351,18 @@
         "sha256": "411c391a6ad14db915074b07f0ea95a04674753977175aa83d8b075c17c28d03"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "3dd01dac01f94d8cf540e4c082c1978814a831b9",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/retro-ensemble/v1/ensemble.dsp",
-        "sha256": "8c719129a2b604a3f69f147233c85fba8cb868c0a3b43a75ac0b726e95025b40"
+        "sha256": "8c719129a2b604a3f69f147233c85fba8cb868c0a3b43a75ac0b726e95025b40",
+        "sourceFileLastChangeCommit": "3dd01dac01f94d8cf540e4c082c1978814a831b9",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "3dd01dac01f94d8cf540e4c082c1978814a831b9"
+        }
       },
-      "source_commit": "3dd01dac01f94d8cf540e4c082c1978814a831b9",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "3dd01dac01f94d8cf540e4c082c1978814a831b9",
       "source_path": "modules/retro-ensemble/v1/ensemble.dsp",
       "source_sha256": "8c719129a2b604a3f69f147233c85fba8cb868c0a3b43a75ac0b726e95025b40",
       "export_path": "scripts/retro-ensemble.dsp",
@@ -6069,12 +6438,18 @@
         "sha256": "6fba57cb5d911f3382dd2bb73dc6a84c920f232f54feb6a96245f3d8a96fa81c"
       },
       "upstream": {
-        "branch": "82-synth-reference-finish",
-        "commit": "166acde7bf032b8b87f4835c29703d212a4b0150",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/bassline-seq/v1/sequence.dsp",
-        "sha256": "06aa0cbbf2b1f1b6ef087dc6044db2eb930b2efb9b88d82512dcbb0d83b01db6"
+        "sha256": "06aa0cbbf2b1f1b6ef087dc6044db2eb930b2efb9b88d82512dcbb0d83b01db6",
+        "sourceFileLastChangeCommit": "166acde7bf032b8b87f4835c29703d212a4b0150",
+        "lineage": {
+          "branch": "82-synth-reference-finish",
+          "commit": "166acde7bf032b8b87f4835c29703d212a4b0150"
+        }
       },
-      "source_commit": "166acde7bf032b8b87f4835c29703d212a4b0150",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "166acde7bf032b8b87f4835c29703d212a4b0150",
       "source_path": "modules/bassline-seq/v1/sequence.dsp",
       "source_sha256": "06aa0cbbf2b1f1b6ef087dc6044db2eb930b2efb9b88d82512dcbb0d83b01db6",
       "export_path": "scripts/bassline-seq.dsp",
@@ -6276,12 +6651,18 @@
         "sha256": "1cc2a20ddd5e1773af3392963e8d2ed9e609a59bc00f37ca1677e183de5f38cb"
       },
       "upstream": {
-        "branch": "606-reference-tuning",
-        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-606/v1/kick.dsp",
-        "sha256": "9e11406afe0ee0d27bfeb0669e4f9ab1f06369895e046cc9cc55793b7cee7226"
+        "sha256": "9e11406afe0ee0d27bfeb0669e4f9ab1f06369895e046cc9cc55793b7cee7226",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "606-reference-tuning",
+          "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95"
+        }
       },
-      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-606/v1/kick.dsp",
       "source_sha256": "9e11406afe0ee0d27bfeb0669e4f9ab1f06369895e046cc9cc55793b7cee7226",
       "export_path": "scripts/606-kick.dsp",
@@ -6369,12 +6750,18 @@
         "sha256": "e7405a55826f4196de0a4cec2c34aa5cf2e71f44793ca8006b1f389f3eec009f"
       },
       "upstream": {
-        "branch": "606-reference-tuning",
-        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-606-reference/v1/snare.dsp",
-        "sha256": "dfcce395df56c62676da40e9522bfa1071e38ce9e656662b7991aef6b731ee7d"
+        "sha256": "dfcce395df56c62676da40e9522bfa1071e38ce9e656662b7991aef6b731ee7d",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "606-reference-tuning",
+          "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95"
+        }
       },
-      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-606-reference/v1/snare.dsp",
       "source_sha256": "dfcce395df56c62676da40e9522bfa1071e38ce9e656662b7991aef6b731ee7d",
       "export_path": "scripts/606-snare.dsp",
@@ -6462,12 +6849,18 @@
         "sha256": "a9483a3d1c14547bd41c87f5a1c1e18cb8257cfc0475afbd503ec0973842fa4a"
       },
       "upstream": {
-        "branch": "606-reference-tuning",
-        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-606/v1/tom.dsp",
-        "sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a"
+        "sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "606-reference-tuning",
+          "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95"
+        }
       },
-      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-606/v1/tom.dsp",
       "source_sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a",
       "export_path": "scripts/606-low-tom.dsp",
@@ -6576,12 +6969,18 @@
         "sha256": "369b67266e25944619e62b4a59193738a3b51fae5698e615764164faa0b05ab2"
       },
       "upstream": {
-        "branch": "606-reference-tuning",
-        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-606/v1/tom.dsp",
-        "sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a"
+        "sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "606-reference-tuning",
+          "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95"
+        }
       },
-      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-606/v1/tom.dsp",
       "source_sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a",
       "export_path": "scripts/606-high-tom.dsp",
@@ -6690,12 +7089,18 @@
         "sha256": "ca55535f6acd3f09a532cab9290d82ad6ad9ab536198dfbe22881b611b4257a6"
       },
       "upstream": {
-        "branch": "606-reference-tuning",
-        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-606/v1/closed-hat.dsp",
-        "sha256": "f63cff557b8ace3f7b18d1dafe6dc87fa9cfae6918d9066a6083393fcb552980"
+        "sha256": "f63cff557b8ace3f7b18d1dafe6dc87fa9cfae6918d9066a6083393fcb552980",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "606-reference-tuning",
+          "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95"
+        }
       },
-      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-606/v1/closed-hat.dsp",
       "source_sha256": "f63cff557b8ace3f7b18d1dafe6dc87fa9cfae6918d9066a6083393fcb552980",
       "export_path": "scripts/606-closed-hat.dsp",
@@ -6783,12 +7188,18 @@
         "sha256": "cb271cdc4d1246384969864c26f0bc2aba7a8c89cd3cb2f7912a2454fd2ee6d3"
       },
       "upstream": {
-        "branch": "606-reference-tuning",
-        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-606-reference/v1/open-hat.dsp",
-        "sha256": "d1d47e3f19a36eaf0550a06361c6a46a4f9d7b3d93bf81b256a757cbf9226a07"
+        "sha256": "d1d47e3f19a36eaf0550a06361c6a46a4f9d7b3d93bf81b256a757cbf9226a07",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "606-reference-tuning",
+          "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95"
+        }
       },
-      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-606-reference/v1/open-hat.dsp",
       "source_sha256": "d1d47e3f19a36eaf0550a06361c6a46a4f9d7b3d93bf81b256a757cbf9226a07",
       "export_path": "scripts/606-open-hat.dsp",
@@ -6878,12 +7289,18 @@
         "sha256": "1af67fb367d781ab8397dd86662ef1a4f068e78d6c35ae32b7e7ba1ec92b4a9a"
       },
       "upstream": {
-        "branch": "606-reference-tuning",
-        "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-606-reference/v1/cymbal.dsp",
-        "sha256": "d7a3cbd65f22404a5a4c74db5fbca9653d8d56f71c87de9687e06b1c2de48815"
+        "sha256": "d7a3cbd65f22404a5a4c74db5fbca9653d8d56f71c87de9687e06b1c2de48815",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "606-reference-tuning",
+          "commit": "02f195e64cf274d0e995325fe2fd526d404bbe95"
+        }
       },
-      "source_commit": "02f195e64cf274d0e995325fe2fd526d404bbe95",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-606-reference/v1/cymbal.dsp",
       "source_sha256": "d7a3cbd65f22404a5a4c74db5fbca9653d8d56f71c87de9687e06b1c2de48815",
       "export_path": "scripts/606-cymbal.dsp",
@@ -6971,12 +7388,18 @@
         "sha256": "4310c614cc4725508a1ff7eea7a2f0f3569c3fa5065a49827afcb792318d8503"
       },
       "upstream": {
-        "branch": "80-909-reference-tuning",
-        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-909/v1/kick.dsp",
-        "sha256": "f445870825cbde6b0ba13e394cebcb0b3970d7a18997246229f34e5edcefb294"
+        "sha256": "f445870825cbde6b0ba13e394cebcb0b3970d7a18997246229f34e5edcefb294",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "80-909-reference-tuning",
+          "commit": "7aa75de6394568410d5b114d62b405138e9c9e35"
+        }
       },
-      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-909/v1/kick.dsp",
       "source_sha256": "f445870825cbde6b0ba13e394cebcb0b3970d7a18997246229f34e5edcefb294",
       "export_path": "scripts/909-kick.dsp",
@@ -7067,12 +7490,18 @@
         "sha256": "f367ebf7b2c62bf8df6631e26add0cfb78c6d59ffe6b9e7e7c5b1c1e21cc42b4"
       },
       "upstream": {
-        "branch": "80-909-reference-tuning",
-        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-909/v1/snare.dsp",
-        "sha256": "c6fc520a078a65d652318be8d71282d3fc592962c207bfdc0f0af10567fe932a"
+        "sha256": "c6fc520a078a65d652318be8d71282d3fc592962c207bfdc0f0af10567fe932a",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "80-909-reference-tuning",
+          "commit": "7aa75de6394568410d5b114d62b405138e9c9e35"
+        }
       },
-      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-909/v1/snare.dsp",
       "source_sha256": "c6fc520a078a65d652318be8d71282d3fc592962c207bfdc0f0af10567fe932a",
       "export_path": "scripts/909-snare.dsp",
@@ -7163,12 +7592,18 @@
         "sha256": "fdd9373eee17b9c2745ee7e3d02c12b10d54169f1d85ff2fd430437cb814d151"
       },
       "upstream": {
-        "branch": "80-909-reference-tuning",
-        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-909/v1/tom.dsp",
-        "sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75"
+        "sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "80-909-reference-tuning",
+          "commit": "7aa75de6394568410d5b114d62b405138e9c9e35"
+        }
       },
-      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-909/v1/tom.dsp",
       "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
       "export_path": "scripts/909-low-tom.dsp",
@@ -7283,12 +7718,18 @@
         "sha256": "c84e713f0af05c5796dc1ef68e6fe7eedadbf36e8f25638677f10cb40e7188d9"
       },
       "upstream": {
-        "branch": "80-909-reference-tuning",
-        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-909/v1/tom.dsp",
-        "sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75"
+        "sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "80-909-reference-tuning",
+          "commit": "7aa75de6394568410d5b114d62b405138e9c9e35"
+        }
       },
-      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-909/v1/tom.dsp",
       "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
       "export_path": "scripts/909-mid-tom.dsp",
@@ -7403,12 +7844,18 @@
         "sha256": "97af60317c1e71cec257009637fb7544fe4a6d2946388e927026a15b0736019f"
       },
       "upstream": {
-        "branch": "80-909-reference-tuning",
-        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-909/v1/tom.dsp",
-        "sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75"
+        "sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "80-909-reference-tuning",
+          "commit": "7aa75de6394568410d5b114d62b405138e9c9e35"
+        }
       },
-      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-909/v1/tom.dsp",
       "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
       "export_path": "scripts/909-high-tom.dsp",
@@ -7523,12 +7970,18 @@
         "sha256": "b37e020d3b48036da3e5c572403abdfcc3b1ffd0322722bcff6bc5438c62f808"
       },
       "upstream": {
-        "branch": "80-909-reference-tuning",
-        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-909/v1/rim.dsp",
-        "sha256": "85281a7917d697dee47a1475ca24d2ecc08e53b48daa6f807c91367c4ee2e635"
+        "sha256": "85281a7917d697dee47a1475ca24d2ecc08e53b48daa6f807c91367c4ee2e635",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "80-909-reference-tuning",
+          "commit": "7aa75de6394568410d5b114d62b405138e9c9e35"
+        }
       },
-      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-909/v1/rim.dsp",
       "source_sha256": "85281a7917d697dee47a1475ca24d2ecc08e53b48daa6f807c91367c4ee2e635",
       "export_path": "scripts/909-rim.dsp",
@@ -7617,12 +8070,18 @@
         "sha256": "8d7f9372d8a9ea0c90f26fdfc2f6be64310d88bb347dc47210c0b3456797a353"
       },
       "upstream": {
-        "branch": "80-909-reference-tuning",
-        "commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-909/v1/clap.dsp",
-        "sha256": "371ca9aa94d3b12ba1a40243e712283adfc51bd14bf39f5924759d2ef1942194"
+        "sha256": "371ca9aa94d3b12ba1a40243e712283adfc51bd14bf39f5924759d2ef1942194",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "80-909-reference-tuning",
+          "commit": "7aa75de6394568410d5b114d62b405138e9c9e35"
+        }
       },
-      "source_commit": "7aa75de6394568410d5b114d62b405138e9c9e35",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-909/v1/clap.dsp",
       "source_sha256": "371ca9aa94d3b12ba1a40243e712283adfc51bd14bf39f5924759d2ef1942194",
       "export_path": "scripts/909-clap.dsp",
@@ -7712,12 +8171,18 @@
         "sha256": "164cb347691328ae0345eda9bcdf97eb8bfdea4857314b4492bb6663b2d89ab9"
       },
       "upstream": {
-        "branch": "75-808-fischer-reference-pass",
-        "commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-808-aux/v1/tom-conga.dsp",
-        "sha256": "34b05cd95d78d4ca55f9cc1b7de8c36d74c748a1422b9e950a30256e2b862b6f"
+        "sha256": "34b05cd95d78d4ca55f9cc1b7de8c36d74c748a1422b9e950a30256e2b862b6f",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "75-808-fischer-reference-pass",
+          "commit": "07464333c5eed1e916820a3fec99b69147561cb0"
+        }
       },
-      "source_commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-808-aux/v1/tom-conga.dsp",
       "source_sha256": "34b05cd95d78d4ca55f9cc1b7de8c36d74c748a1422b9e950a30256e2b862b6f",
       "export_path": "scripts/808-aux-tom-conga.dsp",
@@ -7808,12 +8273,18 @@
         "sha256": "89b2832c6ccbbd294ab0beddf7d252013e69e8658e0d574947ecf01fe2debade"
       },
       "upstream": {
-        "branch": "75-808-fischer-reference-pass",
-        "commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-808-aux/v2/rim-claves.dsp",
-        "sha256": "913f0dc0f7290128c421fcc418cae55e13aae48dfbb382fede5d7c60b267f60d"
+        "sha256": "913f0dc0f7290128c421fcc418cae55e13aae48dfbb382fede5d7c60b267f60d",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "75-808-fischer-reference-pass",
+          "commit": "07464333c5eed1e916820a3fec99b69147561cb0"
+        }
       },
-      "source_commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-808-aux/v2/rim-claves.dsp",
       "source_sha256": "913f0dc0f7290128c421fcc418cae55e13aae48dfbb382fede5d7c60b267f60d",
       "export_path": "scripts/808-aux-rim-claves.dsp",
@@ -7903,12 +8374,18 @@
         "sha256": "f9c1cbbebe6d84af99d1032b7480aeaf02c63a827852d017bcb462e884dfe90b"
       },
       "upstream": {
-        "branch": "75-808-fischer-reference-pass",
-        "commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-808-aux/v1/maracas.dsp",
-        "sha256": "f1d241330dde4e2c6bf5f1db608561e3e3eccbc4619693c99b181dc7172c619c"
+        "sha256": "f1d241330dde4e2c6bf5f1db608561e3e3eccbc4619693c99b181dc7172c619c",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "75-808-fischer-reference-pass",
+          "commit": "07464333c5eed1e916820a3fec99b69147561cb0"
+        }
       },
-      "source_commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-808-aux/v1/maracas.dsp",
       "source_sha256": "f1d241330dde4e2c6bf5f1db608561e3e3eccbc4619693c99b181dc7172c619c",
       "export_path": "scripts/808-aux-maracas.dsp",
@@ -7996,12 +8473,18 @@
         "sha256": "aba85471dc75cdd24b512f92abf37dff511fa22273425a771dd818af3ff8f637"
       },
       "upstream": {
-        "branch": "75-808-fischer-reference-pass",
-        "commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+        "branch": "issue-118-analog-classics-review",
+        "commit": "149d14b9902167d595f30df1321a2de15c51afd6",
         "path": "modules/drums-808-aux/v1/cowbell.dsp",
-        "sha256": "7804add2d39ea1f171c3715a22d2f637d52e3760b4663992fb49a5cb36e8dd41"
+        "sha256": "7804add2d39ea1f171c3715a22d2f637d52e3760b4663992fb49a5cb36e8dd41",
+        "sourceFileLastChangeCommit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
+        "lineage": {
+          "branch": "75-808-fischer-reference-pass",
+          "commit": "07464333c5eed1e916820a3fec99b69147561cb0"
+        }
       },
-      "source_commit": "07464333c5eed1e916820a3fec99b69147561cb0",
+      "source_commit": "149d14b9902167d595f30df1321a2de15c51afd6",
+      "source_file_last_change_commit": "f1e27b120d5c61c2e76836549a69ae4c9c120ad3",
       "source_path": "modules/drums-808-aux/v1/cowbell.dsp",
       "source_sha256": "7804add2d39ea1f171c3715a22d2f637d52e3760b4663992fb49a5cb36e8dd41",
       "export_path": "scripts/808-aux-cowbell.dsp",
