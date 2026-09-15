@@ -56,10 +56,17 @@ leakage and moving/decaying content. Quarter-window Hann transforms are **guards
 not the measurement window. They are conservative diagnostics, not a proof that
 all possible modulation or wrong user-supplied classifications can be detected.
 
-- `inband_harmonic_ratio` is square root of in-band harmonic power above f0 divided
-  by fundamental power, including all integer multiples strictly below Nyquist.
-  `inband_thd_ratio` is the same number only for declared sine-driven nonlinearities;
-  it is null for oscillators because their harmonics can be intentional.
+- `observed_harmonic_grid_ratio` is always the square root of power observed on
+  integer harmonic bins above f0 divided by fundamental power. Its dB companion is
+  `observed_harmonic_grid_to_fundamental_db`. These are observations, not causal
+  attribution: a folded out-of-band harmonic can land on the same bin.
+- `inband_harmonic_ratio` is the attributable version of that measurement.
+  `inband_thd_ratio` is the same attributable number only for declared sine-driven
+  nonlinearities; it is null for oscillators because their harmonics can be
+  intentional. If an enabled finite harmonic model predicts a folded component
+  colliding with an intended harmonic bin, `harmonic_attribution_ambiguous` is true
+  and `inband_harmonic_ratio`, `inband_harmonic_to_fundamental_db`, and
+  `inband_thd_ratio` are null. The observed harmonic-grid fields remain available.
 - `off_harmonic_to_fundamental_db` sums all other non-DC bins, including Nyquist.
   This contains spurs/noise/modulation/leakage **as well as possible aliases**.
   It is not a measurement of isolated alias energy.
@@ -70,7 +77,9 @@ all possible modulation or wrong user-supplied classifications can be detected.
   For each order above/equal Nyquist, its bin folds by `min(h*k mod N, N-h*k mod N)`.
   Predicted folded locations and levels are reported. The identifiable fold ratio
   is a **power ratio**, not an amplitude ratio. Collisions with DC, Nyquist, in-band
-  harmonics or other folded orders make that aggregate null. Do not deduce source
+  harmonics or other folded orders make that aggregate null. Harmonic-bin collisions
+  are also listed separately in `finite_model.harmonic_collisions` because they
+  invalidate causal attribution of the harmonic-grid energy. Do not deduce source
   identity from coincident spectral energy; unrelated spurs can occupy the same bin.
   A truncated H is not an exhaustive alias model for an infinite-harmonic waveform.
 - dB values have a documented -150-dB ratio floor (thus +150-dB SFDR ceiling).
@@ -92,6 +101,8 @@ The oscillator has three shapes: sine, eight-partial additive with all partials
 at/above Nyquist removed, and the same eight partials without that removal. Partial
 h has amplitude `0.2/h`. Expected harmonic/fold power ratios follow `sum(1/h^2)`
 over their respective domains; no measured output is used to define the answer.
+The qualification compares the analytical in-band prediction with the explicit
+**observed harmonic-grid** power. Attribution is a separate reporting question.
 
 The sine-driven cubic stage is `x + drive*x^3`, input amplitude A=0.4, drives
 0.25/1/4. Its fundamental amplitude is `A + 3*drive*A^3/4`; the third-harmonic
@@ -117,6 +128,8 @@ It uses the same fixture source, verified library manifest, controls, excitation
 rate, block and startup/measurement boundaries. CSV channel count, exact frame
 coverage and finite values are checked; both backend measurements remain visible.
 Differences are investigation signals, not evidence that one backend is correct.
+Metrics whose attribution is unavailable on either side have a null delta rather
+than inventing a numerical comparison.
 
 ```sh
 # Add to the complete native sweep command only after installing/reviewing faustprobe:
@@ -129,7 +142,8 @@ checks 48-kHz clean/folded oscillator and cubic examples. It is never required b
 normal CI, does not fetch/build Rust dependencies, and does not silently turn an
 unavailable backend into a successful comparison. **The default qualification does
 not execute Cranelift.** CSV/argument transport tests do not establish backend parity;
-full compatibility remains conditional on an actual separately recorded opt-in run.
+full compatibility remains conditional on an actual separately recorded opt-in run
+(tracked separately in #130).
 
 ## Verification and execution
 
