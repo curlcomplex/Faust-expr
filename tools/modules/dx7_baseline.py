@@ -27,8 +27,11 @@ ROOT = lab.ROOT
 BRIEF = ROOT / 'modules/dx7/baseline-01'
 FAUSTLIBS = '271228a08981fa10b07732f0861421d1e20d4022'
 MSFA = 'f67d41d313b7dc85f6fb99e79e515cc9d208cfff'
-ADAPTER_VERSION = 'dx7-baseline-01.1'
-CPP_FLAGS = ['-std=c++17', '-O2', '-ffp-contract=off', '-fwrapv']
+ADAPTER_VERSION = 'dx7-baseline-01.2'
+# C++17 cmath imports std::min/max into the legacy core's unqualified lookup.
+# C++11 avoids that collision; stddef.h supplies its omitted size_t declaration.
+# These are build-compatibility flags, not upstream source or DSP modifications.
+CPP_FLAGS = ['-std=c++11', '-include', 'stddef.h', '-O2', '-ffp-contract=off', '-fwrapv']
 SOURCES = ['dx7note.cc', 'fm_core.cc', 'fm_op_kernel.cc', 'env.cc',
            'freqlut.cc', 'exp2.cc', 'sin.cc', 'pitchenv.cc', 'patch.cc']
 
