@@ -1,0 +1,6 @@
+{
+  "tom-conga": {"gate":0,"freq":100,"velocity":1,"accent":0,"mode":0,"decay":0.36,"bend":0.22,"noise":0.16,"tone":0.5,"drive":0.05,"level":0.8},
+  "rim-claves": {"gate":0,"freq":455,"velocity":1,"accent":0,"mode":0,"decay":0.014,"crack":0.55,"tone":0.5,"drive":0.2,"level":0.8},
+  "maracas": {"gate":0,"freq":7200,"velocity":1,"accent":0,"decay":0.045,"tone":0.55,"grit":0.18,"level":0.75},
+  "cowbell": {"gate":0,"freq":540,"velocity":1,"accent":0,"ratio":1.48,"decay":0.42,"tone":0.55,"drive":0.08,"level":0.78}
+}

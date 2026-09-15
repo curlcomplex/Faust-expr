@@ -1,0 +1,30 @@
+// 909 study: persistent single-note primitives. Not a hardware emulation claim.
+// snareSine and transistorVCA translate the MIT Plaits functions by Emilie Gillet.
+// See LICENSES.md for the retained full licence and ORACLES.md for exact pins.
+import("stdfaust.lib");
+clamp(lo,hi,x)=max(lo,min(hi,x));
+sm(x)=x:si.smooth(exp(-1/(.005*ma.SR)));
+seen(h)=max(h)~_;
+lat(h,x)=select2(seen(h),x,ba.sAndH(h,x));
+age(h)=(+(1):min(30*ma.SR):*(1-h))~_;
+phase(h,f)=(+(clamp(0,.45*ma.SR,f)/ma.SR):ma.frac:*(1-h))~_;
+// d is the time to -60 dB; very small recursive state is not allowed to linger.
+fall(t,d)=exp(0-min(25,6.907755278982137*max(0,t)/max(.0001,d)))*float(t<3.5*d);
+env(h,d,hold,attack)=seen(h)*fall(max(0,t-hold),d)*(1-exp(-t/max(.00001,attack))) with {t=age(h)/ma.SR;};
+pitchEnvelope(h,f,amount,seconds)=f*(1+amount*exp(0-min(25,age(h)/(ma.SR*max(.0001,seconds)))));
+// Formula extracted from SyntheticSnareDrum::DistortedSine.
+snareSine(p)=2*tri/(1+abs(tri)) with {tri=select2(p<.5,1-p,p)*4-1.3;};
+// Formula extracted from SyntheticBassDrum::TransistorVCA.
+transistorVCA(x,g)=3*z/(2+abs(z))+.3*g with {z=(x-.6)*g;};
+sine(p)=sin(2*ma.PI*p);
+// New coloration, explicitly separate from the original component oracle.
+finish(x,v,a,l,drive)=((.65*ma.tanh(x*(1+4*drive+.2*a))*v*l*(1+.18*a)):fi.dcblockerat(12));
+ring(f,d)=(step~si.bus(2)):(!,!,_) with {
+ r=exp(-6.907755278982137/(max(.001,d)*ma.SR)); w=2*ma.PI*clamp(15,.42*ma.SR,f)/ma.SR;
+ c=r*cos(w);s=r*sin(w);
+ step(re,im,x)=rn,inn,rn with {rn=c*re-s*im;inn=s*re+c*im+x;};
+};
+chokeGain(h,k)=exp(-progress)*float(progress<20) with {
+ armed=(+(k):min(1):*(1-h))~_;
+ progress=(+(armed/(.00065*ma.SR)):min(24):*(1-h))~_;
+};

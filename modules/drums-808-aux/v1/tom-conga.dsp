@@ -1,0 +1,26 @@
+declare name "808 Tom/Conga";
+declare version "0.1.0-experiment";
+declare author "curlcomplex; circuit/oracle research includes TapTools by Timothy Place";
+declare description "Single-note consolidated 808 tom/conga candidate. Tom/conga and low/mid/high positions are presets/settings, not separate modules; reference comparison pending.";
+import("stdfaust.lib");
+u=library("drums808aux.lib");
+gate=button("gate[curlop:input]");
+freq=hslider("freq[unit:Hz][scale:log][curlop:input]",100,70,520,.001);
+velocity=hslider("velocity[curlop:input]",1,0,1,.001);
+accent=hslider("accent[curlop:input]",0,0,1,.001);
+mode=hslider("mode[col:0][row:0]",0,0,1,1);
+decay=hslider("decay[unit:s][scale:log][col:1][row:0]",.36,.06,1.2,.001);
+bend=hslider("bend[col:2][row:0]",.22,0,1,.001);
+noise=hslider("noise[col:3][row:0]",.16,0,.8,.001):u.sm;
+tone=hslider("tone[col:0][row:1]",.5,0,1,.001):u.sm;
+drive=hslider("drive[col:1][row:1]",.05,0,1,.001):u.sm;
+level=hslider("level[col:2][row:1]",.8,0,1,.001):u.sm;
+h=gate>gate';
+f=u.lat(h,freq);d=u.lat(h,decay);v=u.lat(h,velocity);a=u.lat(h,accent);m=u.lat(h,mode);b=u.lat(h,bend);
+t=u.age(h)/ma.SR;
+fp=f*(1+(.02+.08*b)*exp(0-t/.025));
+body=h:u.ring(fp,d);
+// Toms carry the longer-decaying pink/noise-like 'reverb' layer; congas suppress it.
+room=(no.noise:fi.lowpass(2,700+4200*tone):fi.highpass(1,120))*u.env(h,d*1.4,.00015);
+raw=.72*body + (1-m)*noise*.32*room;
+process=u.finish(raw,v,a,level,drive);
