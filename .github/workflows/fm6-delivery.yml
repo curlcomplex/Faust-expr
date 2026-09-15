@@ -93,6 +93,7 @@ jobs:
         with:
           name: fm6-listening-${{ env.SOURCE_COMMIT }}
           path: build/fm6/delivery/
+          include-hidden-files: true
           retention-days: 14
           if-no-files-found: error
       - name: Upload numerical and build evidence
