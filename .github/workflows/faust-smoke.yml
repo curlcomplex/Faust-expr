@@ -33,6 +33,23 @@ jobs:
           set -euo pipefail
           mkdir -p evidence
           PATH=/usr/bin:/bin:$PATH bash scripts/build.sh 2>&1 | tee evidence/build.log
+      - name: Run DX7 baseline H0 H1 against pinned MSFA
+        if: hashFiles('tools/modules/dx7_baseline.py') != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          PATH=/usr/bin:/bin:$PATH /usr/bin/python3 tools/modules/dx7_baseline.py --out build/dx7-baseline 2>&1 | tee evidence/dx7-baseline.log
+      - name: Retain DX7 baseline evidence separately
+        if: always() && hashFiles('tools/modules/dx7_baseline.py') != ''
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: dx7-baseline-${{ github.sha }}-${{ github.run_attempt }}
+          path: |
+            build/dx7-baseline/
+            !build/dx7-baseline/deps/
+            evidence/dx7-baseline.log
+          if-no-files-found: warn
+          retention-days: 14
       - name: Compile and render the first module experiment
         if: hashFiles('modules/kick-pm/kick.dsp') != ''
         shell: bash

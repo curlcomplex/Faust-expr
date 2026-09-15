@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "sample_rate": 44100,
+  "frames": 65536,
+  "gate_on": 2048,
+  "gate_off": 32768,
+  "velocity": 100,
+  "cases": [
+    {"id":"C01-n45-l80","family":"C01","note":45,"carrier_level":80,"modulator_level":0},
+    {"id":"C01-n57-l60","family":"C01","note":57,"carrier_level":60,"modulator_level":0},
+    {"id":"C01-n57-l80","family":"C01","note":57,"carrier_level":80,"modulator_level":0},
+    {"id":"C01-n57-l99","family":"C01","note":57,"carrier_level":99,"modulator_level":0},
+    {"id":"C01-n69-l80","family":"C01","note":69,"carrier_level":80,"modulator_level":0},
+    {"id":"C02-m50","family":"C02","note":57,"carrier_level":80,"modulator_level":50},
+    {"id":"C02-m70","family":"C02","note":57,"carrier_level":80,"modulator_level":70},
+    {"id":"C02-m90","family":"C02","note":57,"carrier_level":80,"modulator_level":90},
+    {"id":"C03-articulated","family":"C03","note":57,"carrier_level":80,"modulator_level":80}
+  ]
+}
