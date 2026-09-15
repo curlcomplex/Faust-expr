@@ -1,0 +1,1 @@
+Reusable component candidate: `pd_core.lib` owns phase-distortion source generation only. Note lifecycle/envelope belongs to `voice.dsp` for this checkpoint. Future hardware-specific multistage DCO/DCW/DCA envelopes should remain separate components until validated. This preserves the eventual encapsulation/meta-module use case from #92.
