@@ -20,7 +20,7 @@ int main(int argc,char** argv){try{
  std::vector<std::unique_ptr<ModuleDSP>> dsps;std::vector<std::unique_ptr<UI>> uis;
  for(int v=0;v<voices;++v){
   dsps.push_back(std::make_unique<ModuleDSP>());dsps.back()->init(48000);
-  uis.push_back(std::make_unique<UI>());dsps.back()->buildUserInterface(uis.back().get());
+  uis.push_back(std::make_unique<UI>());dsps.back()->buildUserInterface(uis.back().get());uis.back()->finishCleanBenchmark();
   uis.back()->set("pitch_hz",220+v*490);uis.back()->set("shape",.85);
   uis.back()->set("decay",.74);uis.back()->set("drive",.6);
  }
