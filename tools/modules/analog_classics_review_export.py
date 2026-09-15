@@ -6,7 +6,7 @@ all Faust libraries; metadata normalisation is verified not to alter an
 expression line. The resulting scripts are self-contained.
 """
 from pathlib import Path
-import argparse, hashlib, json, subprocess, sys, uuid
+import argparse, hashlib, json, re, subprocess, sys, uuid
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(Path(__file__).parent))
@@ -84,7 +84,7 @@ def declarations(text):
             result[key] = value.rsplit('";', 1)[0]
     return result
 
-def export_one(source, destination):
+def export_one(source, destination, identity):
     include_dirs = (source.parent, ROOT / "modules/analog-classics/synth-batch", ROOT / "modules/analog-classics/synth-finish")
     command = ["faust", "-e"] + [flag for directory in include_dirs for flag in ("-I", str(directory))] + [str(source), "-o", str(destination)]
     raw = subprocess.run(command, text=True, capture_output=True)
@@ -101,6 +101,11 @@ def export_one(source, destination):
     code = lambda text: [x for x in text.splitlines() if not x.lstrip().startswith("declare ")]
     if code(normalized) != code(expanded):
         raise AssertionError("metadata normalization changed DSP expressions")
+    if identity in {"analog-kick-sharp", "analog-snare", "clap"}:
+        normalized = re.sub(r'hslider\("pitch_hz[^"\\]*"', 'hslider("freq[unit:Hz][scale:log][curlop:input]"', normalized)
+        normalized = re.sub(r'button\("gate[^"\\]*"', 'button("gate[curlop:input]"', normalized)
+        normalized = re.sub(r'hslider\("velocity[^"\\]*"', 'hslider("velocity[curlop:input]"', normalized)
+        destination.write_text(normalized)
     subprocess.run(["faust", "-lang", "cpp", "-single", str(destination), "-o", str(destination.with_suffix(".hpp"))], check=True, capture_output=True, text=True)
 
 def provenance(identity, source_root):
@@ -118,13 +123,18 @@ def run(out):
         identity, category, relative, rationale = subject[:4]
         source_root = ROOT
         source = source_root / relative; destination = scripts / f"{identity}.dsp"
-        export_one(source, destination)
+        export_one(source, destination, identity)
         meta = declarations(source.read_text())
         commit = next((sha for prefix, sha in PINNED_COMMITS.items() if identity.startswith(prefix)), subprocess.check_output(["git", "log", "-1", "--format=%H", "--", relative], cwd=source_root, text=True).strip())
         entries.append({"id": f"analog-classics:{identity}", "identity": identity, "displayName": meta.get("name", identity), "category": category, "version": 1, "soundVersion": meta.get("version", "not-declared"), "source": {"path": f"scripts/{destination.name}", "sha256": digest(destination)}, "upstream": {"commit": commit, "path": relative, "sha256": digest(source)}, "source_commit": commit, "source_path": relative, "source_sha256": digest(source), "export_path": f"scripts/{destination.name}", "export_sha256": digest(destination), "license": meta.get("license", provenance(identity, source_root)), "dependencyProvenance": provenance(identity, source_root), "dependencies": [], "status": "internal-review", "selectionRationale": rationale, "selection_rationale": rationale, "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"})
     for entry in entries:
         entry["lineageUuid"] = str(uuid.uuid5(uuid.NAMESPACE_URL, f"curlcomplex/CURLOP/{entry['id']}"))
+        labels = re.findall(r'(?:hslider|button)\("([^"\[]+)', (out / entry["export_path"]).read_text())
+        required = {"gate", "freq", "velocity"}
+        gaps = [] if entry["category"] != "instrument" or required <= set(labels) else ["missing canonical one-note input"]
+        entry["contractEvidence"] = {"capturedControls": sorted(set(labels)), "canonicalOneNote": entry["category"] != "instrument" or not gaps, "gaps": gaps}
     manifest = {"schema": 1, "identity": "analog-classics-internal-review-2026-09-15.1", "status": "internal-review-only", "base_review_freeze": {"path": str(FREEZE.relative_to(ROOT)), "sha256": digest(FREEZE), "identity": freeze["id"]}, "modules": entries, "selected": entries, "rejected_or_unselected": REJECTED, "contract": {"one_note": "lowercase gate, freq in Hz, velocity; host owns allocation", "distinct_events": "accent, slide, choke, clock, reset and run are never aliases", "outputs": "audio, CV and observations are separately declared", "identity": "stable identity is manifest identity plus version and source digest, never display text or geometry", "sound_change": "exports are metadata/library expansion only; a sonic change requires a new version and review freeze"}, "consumer_limits": ["No CURLOP runtime, UI, project-state, voice-allocation or device acceptance is claimed.", "Effect/modulation entries retain their native I/O rather than being mislabeled one-note instruments."]}
+    manifest["schema"] = "curlop-analog-classics-review/v1"
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
 
 if __name__ == "__main__":

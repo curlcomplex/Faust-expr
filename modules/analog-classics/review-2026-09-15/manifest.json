@@ -1,5 +1,5 @@
 {
-  "schema": 1,
+  "schema": "curlop-analog-classics-review/v1",
   "identity": "analog-classics-internal-review-2026-09-15.1",
   "status": "internal-review-only",
   "base_review_freeze": {
@@ -36,7 +36,32 @@
       "selectionRationale": "selected by the hardware/listening freeze; PR89 remains rejected",
       "selection_rationale": "selected by the hardware/listening freeze; PR89 remains rejected",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "1c3f39df-0a90-5fdb-9a97-15928050c9ae"
+      "lineageUuid": "1c3f39df-0a90-5fdb-9a97-15928050c9ae",
+      "contractEvidence": {
+        "capturedControls": [
+          "attack",
+          "cutoff",
+          "decay",
+          "filterEnv",
+          "freq",
+          "gate",
+          "hpf",
+          "level",
+          "lfoRate",
+          "noise",
+          "pulse",
+          "pwm",
+          "pwmDepth",
+          "release",
+          "resonance",
+          "saw",
+          "sub",
+          "sustain",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:juno-106",
@@ -66,7 +91,32 @@
       "selectionRationale": "selected coherent-Roland freeze candidate",
       "selection_rationale": "selected coherent-Roland freeze candidate",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "761c2665-8381-57cd-91a2-83f69c196d22"
+      "lineageUuid": "761c2665-8381-57cd-91a2-83f69c196d22",
+      "contractEvidence": {
+        "capturedControls": [
+          "attack",
+          "cutoff",
+          "decay",
+          "filterEnv",
+          "freq",
+          "gate",
+          "hpf",
+          "level",
+          "lfoRate",
+          "noise",
+          "pulse",
+          "pwm",
+          "pwmDepth",
+          "release",
+          "resonance",
+          "saw",
+          "sub",
+          "sustain",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:sh-101",
@@ -96,7 +146,34 @@
       "selectionRationale": "selected coherent-Roland freeze candidate",
       "selection_rationale": "selected coherent-Roland freeze candidate",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "a19e8424-cdaf-5038-aceb-d44364a4c613"
+      "lineageUuid": "a19e8424-cdaf-5038-aceb-d44364a4c613",
+      "contractEvidence": {
+        "capturedControls": [
+          "attack",
+          "cutoff",
+          "decay",
+          "filterEnv",
+          "freq",
+          "gate",
+          "glideTime",
+          "level",
+          "lfoFilter",
+          "lfoPitch",
+          "lfoRate",
+          "noise",
+          "pulse",
+          "pwm",
+          "pwmDepth",
+          "release",
+          "resonance",
+          "saw",
+          "sub",
+          "sustain",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:mini",
@@ -126,7 +203,33 @@
       "selectionRationale": "stable v1 retained; v2 collapse and v3 experiment remain unselected",
       "selection_rationale": "stable v1 retained; v2 collapse and v3 experiment remain unselected",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "61ac5885-8777-5daf-8674-8eacebfc407f"
+      "lineageUuid": "61ac5885-8777-5daf-8674-8eacebfc407f",
+      "contractEvidence": {
+        "capturedControls": [
+          "attack",
+          "contour",
+          "cutoff",
+          "decay",
+          "detune2",
+          "detune3",
+          "drive",
+          "emphasis",
+          "filterDecay",
+          "freq",
+          "gate",
+          "glideTime",
+          "level",
+          "noise",
+          "osc1",
+          "osc2",
+          "osc3",
+          "release",
+          "sustain",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:808-kick",
@@ -156,7 +259,21 @@
       "selectionRationale": "v2 replaces preserved exploratory v1",
       "selection_rationale": "v2 replaces preserved exploratory v1",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "14967d66-6b8c-5097-9e56-b9505f9d386c"
+      "lineageUuid": "14967d66-6b8c-5097-9e56-b9505f9d386c",
+      "contractEvidence": {
+        "capturedControls": [
+          "click",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "punch",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:808-snare",
@@ -186,7 +303,21 @@
       "selectionRationale": "v2 replaces preserved exploratory v1",
       "selection_rationale": "v2 replaces preserved exploratory v1",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "34dd45c3-089e-5390-8320-b51904058163"
+      "lineageUuid": "34dd45c3-089e-5390-8320-b51904058163",
+      "contractEvidence": {
+        "capturedControls": [
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "noise_color",
+          "snappy",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:808-clap",
@@ -216,7 +347,22 @@
       "selectionRationale": "v2 replaces preserved exploratory v1",
       "selection_rationale": "v2 replaces preserved exploratory v1",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "085cac28-793a-54c4-856a-a25586b9d1ea"
+      "lineageUuid": "085cac28-793a-54c4-856a-a25586b9d1ea",
+      "contractEvidence": {
+        "capturedControls": [
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "snap",
+          "spacing",
+          "tail",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:808-cymbal",
@@ -246,7 +392,21 @@
       "selectionRationale": "v2 replaces preserved exploratory v1",
       "selection_rationale": "v2 replaces preserved exploratory v1",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "95bb57b2-2287-5142-91f9-54cc840b5cc7"
+      "lineageUuid": "95bb57b2-2287-5142-91f9-54cc840b5cc7",
+      "contractEvidence": {
+        "capturedControls": [
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "metal",
+          "shape",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:analog-hat-closed",
@@ -276,7 +436,21 @@
       "selectionRationale": "explicit v2-derived single-note compatibility facade",
       "selection_rationale": "explicit v2-derived single-note compatibility facade",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "bb246d43-e4e4-5553-a53f-0021e3f7beca"
+      "lineageUuid": "bb246d43-e4e4-5553-a53f-0021e3f7beca",
+      "contractEvidence": {
+        "capturedControls": [
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "metal",
+          "shape",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:analog-hat-open",
@@ -306,7 +480,23 @@
       "selectionRationale": "explicit v2-derived single-note compatibility facade with local choke",
       "selection_rationale": "explicit v2-derived single-note compatibility facade with local choke",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "ed34bb6d-2371-5ade-9153-a45795aa0af4"
+      "lineageUuid": "ed34bb6d-2371-5ade-9153-a45795aa0af4",
+      "contractEvidence": {
+        "capturedControls": [
+          "choke",
+          "chokeGate",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "metal",
+          "shape",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:analog-kick-sharp",
@@ -317,7 +507,7 @@
       "soundVersion": "0.2.0-experiment",
       "source": {
         "path": "scripts/analog-kick-sharp.dsp",
-        "sha256": "07e228ed526328e17f3ccea031f6951ebd9d1c42db8097202d5a8e134c2957c9"
+        "sha256": "04582b55752255d35e670ac72b8d6866f05cd398b57f3155d96a4751957cf575"
       },
       "upstream": {
         "commit": "7ed155312580fe5591629beee33ada6a156e8c12",
@@ -328,7 +518,7 @@
       "source_path": "modules/kick-analog/sharp-02/optimized.dsp",
       "source_sha256": "b83178a14247a2c1b7b9d3f1688351c159edb48a90d2dfc4b47759c69851a1ab",
       "export_path": "scripts/analog-kick-sharp.dsp",
-      "export_sha256": "07e228ed526328e17f3ccea031f6951ebd9d1c42db8097202d5a8e134c2957c9",
+      "export_sha256": "04582b55752255d35e670ac72b8d6866f05cd398b57f3155d96a4751957cf575",
       "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
       "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
       "dependencies": [],
@@ -336,7 +526,23 @@
       "selectionRationale": "same-sound optimized candidate; reference path remains preserved",
       "selection_rationale": "same-sound optimized candidate; reference path remains preserved",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "7990867b-5a01-571a-81a4-baa0c8766364"
+      "lineageUuid": "7990867b-5a01-571a-81a4-baa0c8766364",
+      "contractEvidence": {
+        "capturedControls": [
+          "click",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "hold",
+          "sweep",
+          "sweep_time",
+          "velocity",
+          "wave"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:analog-snare",
@@ -347,7 +553,7 @@
       "soundVersion": "0.2.0-experiment",
       "source": {
         "path": "scripts/analog-snare.dsp",
-        "sha256": "42bb43114fbb8da8231eb09ce4711b04281f4ab9a011dfd0c26a839ffcaf89fc"
+        "sha256": "83447ee3f0140ef64e2e7a9195d04259266d6cf818d733850e49f07a17fa58dd"
       },
       "upstream": {
         "commit": "49403321a0bca76b31f55fa0ffaaf5532518a23f",
@@ -358,7 +564,7 @@
       "source_path": "modules/snare-analog/v2/snare.dsp",
       "source_sha256": "388379d7a2d3b9b6a048304fa185ede6c31a0814237418278815ef29d11035dc",
       "export_path": "scripts/analog-snare.dsp",
-      "export_sha256": "42bb43114fbb8da8231eb09ce4711b04281f4ab9a011dfd0c26a839ffcaf89fc",
+      "export_sha256": "83447ee3f0140ef64e2e7a9195d04259266d6cf818d733850e49f07a17fa58dd",
       "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
       "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
       "dependencies": [],
@@ -366,7 +572,22 @@
       "selectionRationale": "v2 delivery supersedes the root prototype",
       "selection_rationale": "v2 delivery supersedes the root prototype",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "7524650e-ccd5-56eb-a9d0-1051c52a811b"
+      "lineageUuid": "7524650e-ccd5-56eb-a9d0-1051c52a811b",
+      "contractEvidence": {
+        "capturedControls": [
+          "balance",
+          "crack",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "noise_color",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:clap",
@@ -377,7 +598,7 @@
       "soundVersion": "0.3.0-experiment",
       "source": {
         "path": "scripts/clap.dsp",
-        "sha256": "24ab483cc054b93581c87dd6da3b30fe96896dd429eb4f1d7d46891940fff112"
+        "sha256": "b231f6ce27f16559743c6d1b490247ecfda8b46f10102e5e84af4e799258fbfb"
       },
       "upstream": {
         "commit": "b126baa4b86ba8edd49dac9b68945ed2497a799e",
@@ -388,7 +609,7 @@
       "source_path": "modules/clap/v3/clap.dsp",
       "source_sha256": "53d55e01f60e0652d38a89495aad5d1961705cfe7cbe7ca145eca91561e106ef",
       "export_path": "scripts/clap.dsp",
-      "export_sha256": "24ab483cc054b93581c87dd6da3b30fe96896dd429eb4f1d7d46891940fff112",
+      "export_sha256": "b231f6ce27f16559743c6d1b490247ecfda8b46f10102e5e84af4e799258fbfb",
       "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
       "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
       "dependencies": [],
@@ -396,7 +617,22 @@
       "selectionRationale": "v3 rebuild selected; v1/v2 rejected identities remain explicit",
       "selection_rationale": "v3 rebuild selected; v1/v2 rejected identities remain explicit",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "069b7db9-171e-5da0-b3e5-3d317183570e"
+      "lineageUuid": "069b7db9-171e-5da0-b3e5-3d317183570e",
+      "contractEvidence": {
+        "capturedControls": [
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "snap",
+          "spacing",
+          "tail",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:acid-voice",
@@ -426,7 +662,26 @@
       "selectionRationale": "current single-note Acid Voice candidate",
       "selection_rationale": "current single-note Acid Voice candidate",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "e0485774-ac2b-574a-9c49-ec0b104ae52e"
+      "lineageUuid": "e0485774-ac2b-574a-9c49-ec0b104ae52e",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "accentAmount",
+          "cutoff",
+          "decay",
+          "drive",
+          "envMod",
+          "freq",
+          "gate",
+          "level",
+          "resonance",
+          "slideTime",
+          "velocity",
+          "wave"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:trigger-seq",
@@ -456,7 +711,16 @@
       "selectionRationale": "external-clock source; CV output and meter observation are distinct",
       "selection_rationale": "external-clock source; CV output and meter observation are distinct",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "cdb3eb4d-4b8b-5e1c-9983-a8f22ae498d0"
+      "lineageUuid": "cdb3eb4d-4b8b-5e1c-9983-a8f22ae498d0",
+      "contractEvidence": {
+        "capturedControls": [
+          "clock",
+          "reset",
+          "run"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:retro-mixer-eq",
@@ -486,7 +750,18 @@
       "selectionRationale": "current compact mixer-EQ candidate",
       "selection_rationale": "current compact mixer-EQ candidate",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "25940d65-c1ae-5edb-a883-422db1647ac0"
+      "lineageUuid": "25940d65-c1ae-5edb-a883-422db1647ac0",
+      "contractEvidence": {
+        "capturedControls": [
+          "bass",
+          "input",
+          "mix",
+          "output",
+          "treble"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:tape-echo",
@@ -516,7 +791,22 @@
       "selectionRationale": "current multi-head echo candidate",
       "selection_rationale": "current multi-head echo candidate",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "d517a79b-52cb-57f9-a183-6fb6e621061a"
+      "lineageUuid": "d517a79b-52cb-57f9-a183-6fb6e621061a",
+      "contractEvidence": {
+        "capturedControls": [
+          "age",
+          "drive",
+          "feedback",
+          "head1",
+          "head2",
+          "head3",
+          "mix",
+          "time",
+          "tone"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:vintage-rack-reverb",
@@ -546,7 +836,18 @@
       "selectionRationale": "current rack-reverb candidate",
       "selection_rationale": "current rack-reverb candidate",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "566e2647-113a-5d0c-bb66-c96a39f5c40f"
+      "lineageUuid": "566e2647-113a-5d0c-bb66-c96a39f5c40f",
+      "contractEvidence": {
+        "capturedControls": [
+          "character",
+          "decay",
+          "mix",
+          "size",
+          "tone"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:vintage-tape",
@@ -576,7 +877,16 @@
       "selectionRationale": "current tape-colour candidate",
       "selection_rationale": "current tape-colour candidate",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "04f9b100-006f-5350-84a3-aeb8d2d1d915"
+      "lineageUuid": "04f9b100-006f-5350-84a3-aeb8d2d1d915",
+      "contractEvidence": {
+        "capturedControls": [
+          "input",
+          "output",
+          "speed"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:retro-ensemble",
@@ -606,7 +916,17 @@
       "selectionRationale": "current ensemble candidate",
       "selection_rationale": "current ensemble candidate",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "1ce8410b-3dcd-5bcd-8caa-4ee9377b646c"
+      "lineageUuid": "1ce8410b-3dcd-5bcd-8caa-4ee9377b646c",
+      "contractEvidence": {
+        "capturedControls": [
+          "brighten",
+          "fullness",
+          "mix",
+          "voices"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:bassline-seq",
@@ -636,7 +956,16 @@
       "selectionRationale": "current Acid-batch sequencer entry",
       "selection_rationale": "current Acid-batch sequencer entry",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "2de5e547-d6d7-52db-bf3c-de1e16fc7c24"
+      "lineageUuid": "2de5e547-d6d7-52db-bf3c-de1e16fc7c24",
+      "contractEvidence": {
+        "capturedControls": [
+          "clock",
+          "reset",
+          "run"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:606-kick",
@@ -666,7 +995,21 @@
       "selectionRationale": "#79 frozen 606 kick selection",
       "selection_rationale": "#79 frozen 606 kick selection",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "0ec3f6b5-c31f-5037-a470-65699bacdc2a"
+      "lineageUuid": "0ec3f6b5-c31f-5037-a470-65699bacdc2a",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "click",
+          "decay",
+          "freq",
+          "gate",
+          "level",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:606-snare",
@@ -696,7 +1039,21 @@
       "selectionRationale": "#79 frozen 606 snare selection",
       "selection_rationale": "#79 frozen 606 snare selection",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "240a8edb-d52f-5708-8ac0-fb57825f44e6"
+      "lineageUuid": "240a8edb-d52f-5708-8ac0-fb57825f44e6",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "decay",
+          "freq",
+          "gate",
+          "level",
+          "snappy",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:606-low-tom",
@@ -726,7 +1083,21 @@
       "selectionRationale": "#79 frozen 606 low-tom preset",
       "selection_rationale": "#79 frozen 606 low-tom preset",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "8398af1c-bccc-5366-9c0c-138a95bf2897"
+      "lineageUuid": "8398af1c-bccc-5366-9c0c-138a95bf2897",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "decay",
+          "freq",
+          "gate",
+          "level",
+          "noise",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:606-high-tom",
@@ -756,7 +1127,21 @@
       "selectionRationale": "#79 frozen 606 high-tom preset",
       "selection_rationale": "#79 frozen 606 high-tom preset",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "b85417b2-4be1-5b92-aeb1-ca696b58dfcb"
+      "lineageUuid": "b85417b2-4be1-5b92-aeb1-ca696b58dfcb",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "decay",
+          "freq",
+          "gate",
+          "level",
+          "noise",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:606-closed-hat",
@@ -786,7 +1171,21 @@
       "selectionRationale": "#79 frozen 606 closed-hat selection",
       "selection_rationale": "#79 frozen 606 closed-hat selection",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "425aab9f-e570-5f7f-9f1c-2d1054d1df1b"
+      "lineageUuid": "425aab9f-e570-5f7f-9f1c-2d1054d1df1b",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "decay",
+          "freq",
+          "gate",
+          "level",
+          "metalSpread",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:606-open-hat",
@@ -816,7 +1215,22 @@
       "selectionRationale": "#79 frozen 606 open-hat/choke selection",
       "selection_rationale": "#79 frozen 606 open-hat/choke selection",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "3250fac3-e336-5c3d-9530-c492681132ce"
+      "lineageUuid": "3250fac3-e336-5c3d-9530-c492681132ce",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "chokeGate",
+          "decay",
+          "freq",
+          "gate",
+          "level",
+          "metalSpread",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:606-cymbal",
@@ -846,7 +1260,21 @@
       "selectionRationale": "#79 frozen 606 cymbal selection",
       "selection_rationale": "#79 frozen 606 cymbal selection",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "d88ea414-140a-582e-9f74-708e18f13210"
+      "lineageUuid": "d88ea414-140a-582e-9f74-708e18f13210",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "decay",
+          "freq",
+          "gate",
+          "level",
+          "metalSpread",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:909-kick",
@@ -876,7 +1304,24 @@
       "selectionRationale": "#81 frozen recorded-anchor selection",
       "selection_rationale": "#81 frozen recorded-anchor selection",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "d20bbd5b-8f48-537b-a4ae-414a6dd68c3b"
+      "lineageUuid": "d20bbd5b-8f48-537b-a4ae-414a6dd68c3b",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "attack",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "level",
+          "pitchAmount",
+          "pitchDecay",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:909-snare",
@@ -906,7 +1351,24 @@
       "selectionRationale": "#81 frozen recorded-anchor selection",
       "selection_rationale": "#81 frozen recorded-anchor selection",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "dd6faa9e-1e71-5697-8f8f-99b9b3e53225"
+      "lineageUuid": "dd6faa9e-1e71-5697-8f8f-99b9b3e53225",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "bend",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "level",
+          "noiseDecay",
+          "snappy",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:909-low-tom",
@@ -936,7 +1398,23 @@
       "selectionRationale": "#81 frozen recorded-anchor preset",
       "selection_rationale": "#81 frozen recorded-anchor preset",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "f018492d-28e2-5016-94af-435aee7c3475"
+      "lineageUuid": "f018492d-28e2-5016-94af-435aee7c3475",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "bend",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "level",
+          "noise",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:909-mid-tom",
@@ -966,7 +1444,23 @@
       "selectionRationale": "#81 frozen recorded-anchor preset",
       "selection_rationale": "#81 frozen recorded-anchor preset",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "c31f0667-a394-57af-8127-40a6ed2cc9c1"
+      "lineageUuid": "c31f0667-a394-57af-8127-40a6ed2cc9c1",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "bend",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "level",
+          "noise",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:909-high-tom",
@@ -996,7 +1490,23 @@
       "selectionRationale": "#81 frozen recorded-anchor preset",
       "selection_rationale": "#81 frozen recorded-anchor preset",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "4285d738-abd3-5b06-bb21-dacd1a2cc2ff"
+      "lineageUuid": "4285d738-abd3-5b06-bb21-dacd1a2cc2ff",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "bend",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "level",
+          "noise",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:909-rim",
@@ -1026,7 +1536,22 @@
       "selectionRationale": "#81 frozen recorded-anchor selection",
       "selection_rationale": "#81 frozen recorded-anchor selection",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "3f40927c-bd6c-52c4-8f6a-0423f8231387"
+      "lineageUuid": "3f40927c-bd6c-52c4-8f6a-0423f8231387",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "level",
+          "snap",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:909-clap",
@@ -1056,7 +1581,23 @@
       "selectionRationale": "#81 frozen recorded-anchor selection",
       "selection_rationale": "#81 frozen recorded-anchor selection",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "aac7644a-bedf-5252-b8b2-ad0fd9177eae"
+      "lineageUuid": "aac7644a-bedf-5252-b8b2-ad0fd9177eae",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "level",
+          "spacing",
+          "tail",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:808-aux-tom-conga",
@@ -1086,7 +1627,24 @@
       "selectionRationale": "#76 experimental auxiliary source retained for review",
       "selection_rationale": "#76 experimental auxiliary source retained for review",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "77c0ae78-0bdf-520f-9a8d-b228f7923b2f"
+      "lineageUuid": "77c0ae78-0bdf-520f-9a8d-b228f7923b2f",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "bend",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "level",
+          "mode",
+          "noise",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:808-aux-rim-claves",
@@ -1116,7 +1674,23 @@
       "selectionRationale": "#76 selected v2 Claves pitch correction",
       "selection_rationale": "#76 selected v2 Claves pitch correction",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "6b628dee-1c35-5c48-97d6-4f9d874e65b7"
+      "lineageUuid": "6b628dee-1c35-5c48-97d6-4f9d874e65b7",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "crack",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "level",
+          "mode",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:808-aux-maracas",
@@ -1146,7 +1720,21 @@
       "selectionRationale": "#76 experimental auxiliary source retained for review",
       "selection_rationale": "#76 experimental auxiliary source retained for review",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "3e94ef70-37b0-5b6b-8b59-b940e89614a9"
+      "lineageUuid": "3e94ef70-37b0-5b6b-8b59-b940e89614a9",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "decay",
+          "freq",
+          "gate",
+          "grit",
+          "level",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:808-aux-cowbell",
@@ -1176,7 +1764,22 @@
       "selectionRationale": "#76 experimental auxiliary source retained for review",
       "selection_rationale": "#76 experimental auxiliary source retained for review",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "00c9385c-6c4c-575a-8ca8-b62c8649dd68"
+      "lineageUuid": "00c9385c-6c4c-575a-8ca8-b62c8649dd68",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "level",
+          "ratio",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     }
   ],
   "selected": [
@@ -1208,7 +1811,32 @@
       "selectionRationale": "selected by the hardware/listening freeze; PR89 remains rejected",
       "selection_rationale": "selected by the hardware/listening freeze; PR89 remains rejected",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "1c3f39df-0a90-5fdb-9a97-15928050c9ae"
+      "lineageUuid": "1c3f39df-0a90-5fdb-9a97-15928050c9ae",
+      "contractEvidence": {
+        "capturedControls": [
+          "attack",
+          "cutoff",
+          "decay",
+          "filterEnv",
+          "freq",
+          "gate",
+          "hpf",
+          "level",
+          "lfoRate",
+          "noise",
+          "pulse",
+          "pwm",
+          "pwmDepth",
+          "release",
+          "resonance",
+          "saw",
+          "sub",
+          "sustain",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:juno-106",
@@ -1238,7 +1866,32 @@
       "selectionRationale": "selected coherent-Roland freeze candidate",
       "selection_rationale": "selected coherent-Roland freeze candidate",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "761c2665-8381-57cd-91a2-83f69c196d22"
+      "lineageUuid": "761c2665-8381-57cd-91a2-83f69c196d22",
+      "contractEvidence": {
+        "capturedControls": [
+          "attack",
+          "cutoff",
+          "decay",
+          "filterEnv",
+          "freq",
+          "gate",
+          "hpf",
+          "level",
+          "lfoRate",
+          "noise",
+          "pulse",
+          "pwm",
+          "pwmDepth",
+          "release",
+          "resonance",
+          "saw",
+          "sub",
+          "sustain",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:sh-101",
@@ -1268,7 +1921,34 @@
       "selectionRationale": "selected coherent-Roland freeze candidate",
       "selection_rationale": "selected coherent-Roland freeze candidate",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "a19e8424-cdaf-5038-aceb-d44364a4c613"
+      "lineageUuid": "a19e8424-cdaf-5038-aceb-d44364a4c613",
+      "contractEvidence": {
+        "capturedControls": [
+          "attack",
+          "cutoff",
+          "decay",
+          "filterEnv",
+          "freq",
+          "gate",
+          "glideTime",
+          "level",
+          "lfoFilter",
+          "lfoPitch",
+          "lfoRate",
+          "noise",
+          "pulse",
+          "pwm",
+          "pwmDepth",
+          "release",
+          "resonance",
+          "saw",
+          "sub",
+          "sustain",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:mini",
@@ -1298,7 +1978,33 @@
       "selectionRationale": "stable v1 retained; v2 collapse and v3 experiment remain unselected",
       "selection_rationale": "stable v1 retained; v2 collapse and v3 experiment remain unselected",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "61ac5885-8777-5daf-8674-8eacebfc407f"
+      "lineageUuid": "61ac5885-8777-5daf-8674-8eacebfc407f",
+      "contractEvidence": {
+        "capturedControls": [
+          "attack",
+          "contour",
+          "cutoff",
+          "decay",
+          "detune2",
+          "detune3",
+          "drive",
+          "emphasis",
+          "filterDecay",
+          "freq",
+          "gate",
+          "glideTime",
+          "level",
+          "noise",
+          "osc1",
+          "osc2",
+          "osc3",
+          "release",
+          "sustain",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:808-kick",
@@ -1328,7 +2034,21 @@
       "selectionRationale": "v2 replaces preserved exploratory v1",
       "selection_rationale": "v2 replaces preserved exploratory v1",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "14967d66-6b8c-5097-9e56-b9505f9d386c"
+      "lineageUuid": "14967d66-6b8c-5097-9e56-b9505f9d386c",
+      "contractEvidence": {
+        "capturedControls": [
+          "click",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "punch",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:808-snare",
@@ -1358,7 +2078,21 @@
       "selectionRationale": "v2 replaces preserved exploratory v1",
       "selection_rationale": "v2 replaces preserved exploratory v1",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "34dd45c3-089e-5390-8320-b51904058163"
+      "lineageUuid": "34dd45c3-089e-5390-8320-b51904058163",
+      "contractEvidence": {
+        "capturedControls": [
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "noise_color",
+          "snappy",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:808-clap",
@@ -1388,7 +2122,22 @@
       "selectionRationale": "v2 replaces preserved exploratory v1",
       "selection_rationale": "v2 replaces preserved exploratory v1",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "085cac28-793a-54c4-856a-a25586b9d1ea"
+      "lineageUuid": "085cac28-793a-54c4-856a-a25586b9d1ea",
+      "contractEvidence": {
+        "capturedControls": [
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "snap",
+          "spacing",
+          "tail",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:808-cymbal",
@@ -1418,7 +2167,21 @@
       "selectionRationale": "v2 replaces preserved exploratory v1",
       "selection_rationale": "v2 replaces preserved exploratory v1",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "95bb57b2-2287-5142-91f9-54cc840b5cc7"
+      "lineageUuid": "95bb57b2-2287-5142-91f9-54cc840b5cc7",
+      "contractEvidence": {
+        "capturedControls": [
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "metal",
+          "shape",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:analog-hat-closed",
@@ -1448,7 +2211,21 @@
       "selectionRationale": "explicit v2-derived single-note compatibility facade",
       "selection_rationale": "explicit v2-derived single-note compatibility facade",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "bb246d43-e4e4-5553-a53f-0021e3f7beca"
+      "lineageUuid": "bb246d43-e4e4-5553-a53f-0021e3f7beca",
+      "contractEvidence": {
+        "capturedControls": [
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "metal",
+          "shape",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:analog-hat-open",
@@ -1478,7 +2255,23 @@
       "selectionRationale": "explicit v2-derived single-note compatibility facade with local choke",
       "selection_rationale": "explicit v2-derived single-note compatibility facade with local choke",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "ed34bb6d-2371-5ade-9153-a45795aa0af4"
+      "lineageUuid": "ed34bb6d-2371-5ade-9153-a45795aa0af4",
+      "contractEvidence": {
+        "capturedControls": [
+          "choke",
+          "chokeGate",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "metal",
+          "shape",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:analog-kick-sharp",
@@ -1489,7 +2282,7 @@
       "soundVersion": "0.2.0-experiment",
       "source": {
         "path": "scripts/analog-kick-sharp.dsp",
-        "sha256": "07e228ed526328e17f3ccea031f6951ebd9d1c42db8097202d5a8e134c2957c9"
+        "sha256": "04582b55752255d35e670ac72b8d6866f05cd398b57f3155d96a4751957cf575"
       },
       "upstream": {
         "commit": "7ed155312580fe5591629beee33ada6a156e8c12",
@@ -1500,7 +2293,7 @@
       "source_path": "modules/kick-analog/sharp-02/optimized.dsp",
       "source_sha256": "b83178a14247a2c1b7b9d3f1688351c159edb48a90d2dfc4b47759c69851a1ab",
       "export_path": "scripts/analog-kick-sharp.dsp",
-      "export_sha256": "07e228ed526328e17f3ccea031f6951ebd9d1c42db8097202d5a8e134c2957c9",
+      "export_sha256": "04582b55752255d35e670ac72b8d6866f05cd398b57f3155d96a4751957cf575",
       "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
       "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
       "dependencies": [],
@@ -1508,7 +2301,23 @@
       "selectionRationale": "same-sound optimized candidate; reference path remains preserved",
       "selection_rationale": "same-sound optimized candidate; reference path remains preserved",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "7990867b-5a01-571a-81a4-baa0c8766364"
+      "lineageUuid": "7990867b-5a01-571a-81a4-baa0c8766364",
+      "contractEvidence": {
+        "capturedControls": [
+          "click",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "hold",
+          "sweep",
+          "sweep_time",
+          "velocity",
+          "wave"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:analog-snare",
@@ -1519,7 +2328,7 @@
       "soundVersion": "0.2.0-experiment",
       "source": {
         "path": "scripts/analog-snare.dsp",
-        "sha256": "42bb43114fbb8da8231eb09ce4711b04281f4ab9a011dfd0c26a839ffcaf89fc"
+        "sha256": "83447ee3f0140ef64e2e7a9195d04259266d6cf818d733850e49f07a17fa58dd"
       },
       "upstream": {
         "commit": "49403321a0bca76b31f55fa0ffaaf5532518a23f",
@@ -1530,7 +2339,7 @@
       "source_path": "modules/snare-analog/v2/snare.dsp",
       "source_sha256": "388379d7a2d3b9b6a048304fa185ede6c31a0814237418278815ef29d11035dc",
       "export_path": "scripts/analog-snare.dsp",
-      "export_sha256": "42bb43114fbb8da8231eb09ce4711b04281f4ab9a011dfd0c26a839ffcaf89fc",
+      "export_sha256": "83447ee3f0140ef64e2e7a9195d04259266d6cf818d733850e49f07a17fa58dd",
       "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
       "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
       "dependencies": [],
@@ -1538,7 +2347,22 @@
       "selectionRationale": "v2 delivery supersedes the root prototype",
       "selection_rationale": "v2 delivery supersedes the root prototype",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "7524650e-ccd5-56eb-a9d0-1051c52a811b"
+      "lineageUuid": "7524650e-ccd5-56eb-a9d0-1051c52a811b",
+      "contractEvidence": {
+        "capturedControls": [
+          "balance",
+          "crack",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "noise_color",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:clap",
@@ -1549,7 +2373,7 @@
       "soundVersion": "0.3.0-experiment",
       "source": {
         "path": "scripts/clap.dsp",
-        "sha256": "24ab483cc054b93581c87dd6da3b30fe96896dd429eb4f1d7d46891940fff112"
+        "sha256": "b231f6ce27f16559743c6d1b490247ecfda8b46f10102e5e84af4e799258fbfb"
       },
       "upstream": {
         "commit": "b126baa4b86ba8edd49dac9b68945ed2497a799e",
@@ -1560,7 +2384,7 @@
       "source_path": "modules/clap/v3/clap.dsp",
       "source_sha256": "53d55e01f60e0652d38a89495aad5d1961705cfe7cbe7ca145eca91561e106ef",
       "export_path": "scripts/clap.dsp",
-      "export_sha256": "24ab483cc054b93581c87dd6da3b30fe96896dd429eb4f1d7d46891940fff112",
+      "export_sha256": "b231f6ce27f16559743c6d1b490247ecfda8b46f10102e5e84af4e799258fbfb",
       "license": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
       "dependencyProvenance": "Authored Faust-expr source; expanded standard Faust library provenance is retained in exported declarations.",
       "dependencies": [],
@@ -1568,7 +2392,22 @@
       "selectionRationale": "v3 rebuild selected; v1/v2 rejected identities remain explicit",
       "selection_rationale": "v3 rebuild selected; v1/v2 rejected identities remain explicit",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "069b7db9-171e-5da0-b3e5-3d317183570e"
+      "lineageUuid": "069b7db9-171e-5da0-b3e5-3d317183570e",
+      "contractEvidence": {
+        "capturedControls": [
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "snap",
+          "spacing",
+          "tail",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:acid-voice",
@@ -1598,7 +2437,26 @@
       "selectionRationale": "current single-note Acid Voice candidate",
       "selection_rationale": "current single-note Acid Voice candidate",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "e0485774-ac2b-574a-9c49-ec0b104ae52e"
+      "lineageUuid": "e0485774-ac2b-574a-9c49-ec0b104ae52e",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "accentAmount",
+          "cutoff",
+          "decay",
+          "drive",
+          "envMod",
+          "freq",
+          "gate",
+          "level",
+          "resonance",
+          "slideTime",
+          "velocity",
+          "wave"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:trigger-seq",
@@ -1628,7 +2486,16 @@
       "selectionRationale": "external-clock source; CV output and meter observation are distinct",
       "selection_rationale": "external-clock source; CV output and meter observation are distinct",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "cdb3eb4d-4b8b-5e1c-9983-a8f22ae498d0"
+      "lineageUuid": "cdb3eb4d-4b8b-5e1c-9983-a8f22ae498d0",
+      "contractEvidence": {
+        "capturedControls": [
+          "clock",
+          "reset",
+          "run"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:retro-mixer-eq",
@@ -1658,7 +2525,18 @@
       "selectionRationale": "current compact mixer-EQ candidate",
       "selection_rationale": "current compact mixer-EQ candidate",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "25940d65-c1ae-5edb-a883-422db1647ac0"
+      "lineageUuid": "25940d65-c1ae-5edb-a883-422db1647ac0",
+      "contractEvidence": {
+        "capturedControls": [
+          "bass",
+          "input",
+          "mix",
+          "output",
+          "treble"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:tape-echo",
@@ -1688,7 +2566,22 @@
       "selectionRationale": "current multi-head echo candidate",
       "selection_rationale": "current multi-head echo candidate",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "d517a79b-52cb-57f9-a183-6fb6e621061a"
+      "lineageUuid": "d517a79b-52cb-57f9-a183-6fb6e621061a",
+      "contractEvidence": {
+        "capturedControls": [
+          "age",
+          "drive",
+          "feedback",
+          "head1",
+          "head2",
+          "head3",
+          "mix",
+          "time",
+          "tone"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:vintage-rack-reverb",
@@ -1718,7 +2611,18 @@
       "selectionRationale": "current rack-reverb candidate",
       "selection_rationale": "current rack-reverb candidate",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "566e2647-113a-5d0c-bb66-c96a39f5c40f"
+      "lineageUuid": "566e2647-113a-5d0c-bb66-c96a39f5c40f",
+      "contractEvidence": {
+        "capturedControls": [
+          "character",
+          "decay",
+          "mix",
+          "size",
+          "tone"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:vintage-tape",
@@ -1748,7 +2652,16 @@
       "selectionRationale": "current tape-colour candidate",
       "selection_rationale": "current tape-colour candidate",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "04f9b100-006f-5350-84a3-aeb8d2d1d915"
+      "lineageUuid": "04f9b100-006f-5350-84a3-aeb8d2d1d915",
+      "contractEvidence": {
+        "capturedControls": [
+          "input",
+          "output",
+          "speed"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:retro-ensemble",
@@ -1778,7 +2691,17 @@
       "selectionRationale": "current ensemble candidate",
       "selection_rationale": "current ensemble candidate",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "1ce8410b-3dcd-5bcd-8caa-4ee9377b646c"
+      "lineageUuid": "1ce8410b-3dcd-5bcd-8caa-4ee9377b646c",
+      "contractEvidence": {
+        "capturedControls": [
+          "brighten",
+          "fullness",
+          "mix",
+          "voices"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:bassline-seq",
@@ -1808,7 +2731,16 @@
       "selectionRationale": "current Acid-batch sequencer entry",
       "selection_rationale": "current Acid-batch sequencer entry",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "2de5e547-d6d7-52db-bf3c-de1e16fc7c24"
+      "lineageUuid": "2de5e547-d6d7-52db-bf3c-de1e16fc7c24",
+      "contractEvidence": {
+        "capturedControls": [
+          "clock",
+          "reset",
+          "run"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:606-kick",
@@ -1838,7 +2770,21 @@
       "selectionRationale": "#79 frozen 606 kick selection",
       "selection_rationale": "#79 frozen 606 kick selection",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "0ec3f6b5-c31f-5037-a470-65699bacdc2a"
+      "lineageUuid": "0ec3f6b5-c31f-5037-a470-65699bacdc2a",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "click",
+          "decay",
+          "freq",
+          "gate",
+          "level",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:606-snare",
@@ -1868,7 +2814,21 @@
       "selectionRationale": "#79 frozen 606 snare selection",
       "selection_rationale": "#79 frozen 606 snare selection",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "240a8edb-d52f-5708-8ac0-fb57825f44e6"
+      "lineageUuid": "240a8edb-d52f-5708-8ac0-fb57825f44e6",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "decay",
+          "freq",
+          "gate",
+          "level",
+          "snappy",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:606-low-tom",
@@ -1898,7 +2858,21 @@
       "selectionRationale": "#79 frozen 606 low-tom preset",
       "selection_rationale": "#79 frozen 606 low-tom preset",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "8398af1c-bccc-5366-9c0c-138a95bf2897"
+      "lineageUuid": "8398af1c-bccc-5366-9c0c-138a95bf2897",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "decay",
+          "freq",
+          "gate",
+          "level",
+          "noise",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:606-high-tom",
@@ -1928,7 +2902,21 @@
       "selectionRationale": "#79 frozen 606 high-tom preset",
       "selection_rationale": "#79 frozen 606 high-tom preset",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "b85417b2-4be1-5b92-aeb1-ca696b58dfcb"
+      "lineageUuid": "b85417b2-4be1-5b92-aeb1-ca696b58dfcb",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "decay",
+          "freq",
+          "gate",
+          "level",
+          "noise",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:606-closed-hat",
@@ -1958,7 +2946,21 @@
       "selectionRationale": "#79 frozen 606 closed-hat selection",
       "selection_rationale": "#79 frozen 606 closed-hat selection",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "425aab9f-e570-5f7f-9f1c-2d1054d1df1b"
+      "lineageUuid": "425aab9f-e570-5f7f-9f1c-2d1054d1df1b",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "decay",
+          "freq",
+          "gate",
+          "level",
+          "metalSpread",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:606-open-hat",
@@ -1988,7 +2990,22 @@
       "selectionRationale": "#79 frozen 606 open-hat/choke selection",
       "selection_rationale": "#79 frozen 606 open-hat/choke selection",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "3250fac3-e336-5c3d-9530-c492681132ce"
+      "lineageUuid": "3250fac3-e336-5c3d-9530-c492681132ce",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "chokeGate",
+          "decay",
+          "freq",
+          "gate",
+          "level",
+          "metalSpread",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:606-cymbal",
@@ -2018,7 +3035,21 @@
       "selectionRationale": "#79 frozen 606 cymbal selection",
       "selection_rationale": "#79 frozen 606 cymbal selection",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "d88ea414-140a-582e-9f74-708e18f13210"
+      "lineageUuid": "d88ea414-140a-582e-9f74-708e18f13210",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "decay",
+          "freq",
+          "gate",
+          "level",
+          "metalSpread",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:909-kick",
@@ -2048,7 +3079,24 @@
       "selectionRationale": "#81 frozen recorded-anchor selection",
       "selection_rationale": "#81 frozen recorded-anchor selection",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "d20bbd5b-8f48-537b-a4ae-414a6dd68c3b"
+      "lineageUuid": "d20bbd5b-8f48-537b-a4ae-414a6dd68c3b",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "attack",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "level",
+          "pitchAmount",
+          "pitchDecay",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:909-snare",
@@ -2078,7 +3126,24 @@
       "selectionRationale": "#81 frozen recorded-anchor selection",
       "selection_rationale": "#81 frozen recorded-anchor selection",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "dd6faa9e-1e71-5697-8f8f-99b9b3e53225"
+      "lineageUuid": "dd6faa9e-1e71-5697-8f8f-99b9b3e53225",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "bend",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "level",
+          "noiseDecay",
+          "snappy",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:909-low-tom",
@@ -2108,7 +3173,23 @@
       "selectionRationale": "#81 frozen recorded-anchor preset",
       "selection_rationale": "#81 frozen recorded-anchor preset",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "f018492d-28e2-5016-94af-435aee7c3475"
+      "lineageUuid": "f018492d-28e2-5016-94af-435aee7c3475",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "bend",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "level",
+          "noise",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:909-mid-tom",
@@ -2138,7 +3219,23 @@
       "selectionRationale": "#81 frozen recorded-anchor preset",
       "selection_rationale": "#81 frozen recorded-anchor preset",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "c31f0667-a394-57af-8127-40a6ed2cc9c1"
+      "lineageUuid": "c31f0667-a394-57af-8127-40a6ed2cc9c1",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "bend",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "level",
+          "noise",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:909-high-tom",
@@ -2168,7 +3265,23 @@
       "selectionRationale": "#81 frozen recorded-anchor preset",
       "selection_rationale": "#81 frozen recorded-anchor preset",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "4285d738-abd3-5b06-bb21-dacd1a2cc2ff"
+      "lineageUuid": "4285d738-abd3-5b06-bb21-dacd1a2cc2ff",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "bend",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "level",
+          "noise",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:909-rim",
@@ -2198,7 +3311,22 @@
       "selectionRationale": "#81 frozen recorded-anchor selection",
       "selection_rationale": "#81 frozen recorded-anchor selection",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "3f40927c-bd6c-52c4-8f6a-0423f8231387"
+      "lineageUuid": "3f40927c-bd6c-52c4-8f6a-0423f8231387",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "level",
+          "snap",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:909-clap",
@@ -2228,7 +3356,23 @@
       "selectionRationale": "#81 frozen recorded-anchor selection",
       "selection_rationale": "#81 frozen recorded-anchor selection",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "aac7644a-bedf-5252-b8b2-ad0fd9177eae"
+      "lineageUuid": "aac7644a-bedf-5252-b8b2-ad0fd9177eae",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "level",
+          "spacing",
+          "tail",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:808-aux-tom-conga",
@@ -2258,7 +3402,24 @@
       "selectionRationale": "#76 experimental auxiliary source retained for review",
       "selection_rationale": "#76 experimental auxiliary source retained for review",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "77c0ae78-0bdf-520f-9a8d-b228f7923b2f"
+      "lineageUuid": "77c0ae78-0bdf-520f-9a8d-b228f7923b2f",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "bend",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "level",
+          "mode",
+          "noise",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:808-aux-rim-claves",
@@ -2288,7 +3449,23 @@
       "selectionRationale": "#76 selected v2 Claves pitch correction",
       "selection_rationale": "#76 selected v2 Claves pitch correction",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "6b628dee-1c35-5c48-97d6-4f9d874e65b7"
+      "lineageUuid": "6b628dee-1c35-5c48-97d6-4f9d874e65b7",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "crack",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "level",
+          "mode",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:808-aux-maracas",
@@ -2318,7 +3495,21 @@
       "selectionRationale": "#76 experimental auxiliary source retained for review",
       "selection_rationale": "#76 experimental auxiliary source retained for review",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "3e94ef70-37b0-5b6b-8b59-b940e89614a9"
+      "lineageUuid": "3e94ef70-37b0-5b6b-8b59-b940e89614a9",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "decay",
+          "freq",
+          "gate",
+          "grit",
+          "level",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     },
     {
       "id": "analog-classics:808-aux-cowbell",
@@ -2348,7 +3539,22 @@
       "selectionRationale": "#76 experimental auxiliary source retained for review",
       "selection_rationale": "#76 experimental auxiliary source retained for review",
       "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
-      "lineageUuid": "00c9385c-6c4c-575a-8ca8-b62c8649dd68"
+      "lineageUuid": "00c9385c-6c4c-575a-8ca8-b62c8649dd68",
+      "contractEvidence": {
+        "capturedControls": [
+          "accent",
+          "decay",
+          "drive",
+          "freq",
+          "gate",
+          "level",
+          "ratio",
+          "tone",
+          "velocity"
+        ],
+        "canonicalOneNote": true,
+        "gaps": []
+      }
     }
   ],
   "rejected_or_unselected": {
