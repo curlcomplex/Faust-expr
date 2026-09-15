@@ -141,7 +141,7 @@ def run(out):
         entries.append({"id": f"analog-classics:{identity}", "identity": identity, "displayName": meta.get("name", identity), "category": category, "version": 1, "soundVersion": meta.get("version", "not-declared"), "source": {"path": f"scripts/{destination.name}", "sha256": digest(destination)}, "upstream": {"commit": commit, "path": relative, "sha256": digest(source)}, "source_commit": commit, "source_path": relative, "source_sha256": digest(source), "export_path": f"scripts/{destination.name}", "export_sha256": digest(destination), "license": meta.get("license", provenance(identity, source_root)), "dependencyProvenance": provenance(identity, source_root), "dependencies": [], "status": "internal-review", "selectionRationale": rationale, "selection_rationale": rationale, "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds"})
     for entry in entries:
         entry["lineageUuid"] = str(uuid.uuid5(uuid.NAMESPACE_URL, f"curlcomplex/CURLOP/{entry['id']}"))
-        labels = re.findall(r'(?:hslider|button)\("([^"]+)"', (out / entry["export_path"]).read_text())
+        labels = re.findall(r'(?:hslider|button|checkbox)\("([^"]+)"', (out / entry["export_path"]).read_text())
         required = {"gate[curlop:input]", "velocity[curlop:input]"}
         has_freq = any(label.startswith("freq[") and "[unit:Hz]" in label and "[curlop:input]" in label for label in labels)
         gaps = [] if entry["category"] != "instrument" or (required <= set(labels) and has_freq) else ["missing canonical tagged one-note input"]

@@ -40,6 +40,7 @@ class AnalogClassicsReviewExport(unittest.TestCase):
                     self.assertFalse(entry["contractEvidence"]["metadataAdapted"])
                     self.assertIsInstance(entry["metadataAdaptation"], str)
             self.assertIn("accent", selected["acid-voice"]["contractEvidence"]["specialEvents"])
+            self.assertIn("slide", selected["acid-voice"]["contractEvidence"]["specialEvents"])
             self.assertIn("accent", selected["606-kick"]["contractEvidence"]["specialEvents"])
             self.assertIn("chokeGate", selected["606-open-hat"]["contractEvidence"]["specialEvents"])
             for event in ("clock", "reset", "run"):
