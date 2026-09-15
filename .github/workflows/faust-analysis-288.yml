@@ -6,6 +6,11 @@ on:
       - 'tools/modules/faust_analysis*'
       - 'tools/modules/faust_spectral_descriptors.dsp'
       - 'tools/modules/spectral_trace.py'
+      - 'tools/modules/harmonic_analysis.py'
+      - 'tools/modules/harmonic_qualification.py'
+      - 'tests/test_harmonic_analysis.py'
+      - 'tests/fixtures/harmonics/**'
+      - 'modules/HARMONIC_QUALIFICATION.md'
       - 'tests/test_spectral_trace.py'
       - 'modules/SPECTRAL_TRACES.md'
       - 'tests/test_faust_analysis.py'
@@ -25,6 +30,11 @@ on:
       - 'tools/modules/faust_analysis*'
       - 'tools/modules/faust_spectral_descriptors.dsp'
       - 'tools/modules/spectral_trace.py'
+      - 'tools/modules/harmonic_analysis.py'
+      - 'tools/modules/harmonic_qualification.py'
+      - 'tests/test_harmonic_analysis.py'
+      - 'tests/fixtures/harmonics/**'
+      - 'modules/HARMONIC_QUALIFICATION.md'
       - 'tests/test_spectral_trace.py'
       - 'modules/SPECTRAL_TRACES.md'
       - 'tests/test_faust_analysis.py'
@@ -86,6 +96,10 @@ jobs:
         run: |
           set -euo pipefail
           /usr/bin/python3 -m unittest discover -s tests -p test_spectral_trace.py -v 2>&1 | tee build/faust-analysis/evidence/spectral-contracts.log
+      - name: Harmonic measurement contracts
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 -m unittest discover -s tests -p test_harmonic_analysis.py -v 2>&1 | tee build/faust-analysis/evidence/harmonic-contracts.log
       - name: Fetch complete pinned Faust release
         run: |
           set -euo pipefail
@@ -154,11 +168,21 @@ jobs:
         run: |
           set -euo pipefail
           /usr/bin/python3 -m unittest discover -s tests -p test_spectral_trace.py -v 2>&1 | tee build/faust-analysis/evidence/spectral-qualification.log
+      - name: Real harmonic and aliasing qualification
+        env:
+          HARMONIC_INTEGRATION: '1'
+          FAUST: ${{ github.workspace }}/build/faust-analysis/toolchain/build/bin/faust
+          FAUST_LIBRARIES: ${{ github.workspace }}/build/faust-analysis/toolchain/libraries
+          FAUST_ARCHIVE: ${{ github.workspace }}/build/faust-analysis/faust.tar.gz
+          HARMONIC_EVIDENCE: ${{ github.workspace }}/build/faust-analysis/evidence/harmonics
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 -m unittest discover -s tests -p test_harmonic_analysis.py -v 2>&1 | tee build/faust-analysis/evidence/harmonic-qualification.log
       - name: Retain compact reproducible evidence
         if: always()
         run: |
           mkdir -p build/faust-analysis/evidence
-          git archive --format=tar HEAD tools/modules/spectral_trace.py tools/modules/faust_spectral_descriptors.dsp tests/test_spectral_trace.py modules/SPECTRAL_TRACES.md tools/modules/faust_analysis.py tools/modules/faust_analysis_meter.dsp tools/modules/faust_analysis_runner.cpp tests/test_faust_analysis.py tests/test_render_probes.py tests/fixtures/probes tests/fixtures/probe_debug.dsp tools/modules/probe_lab.py tools/modules/render.cpp tools/modules/lab.py tools/modules/fit_api.cpp tools/modules/color_fit_api.cpp modules/PROBE_CAPTURE.md 'tools/modules/*benchmark.cpp' .github/workflows/faust-analysis-288.yml > build/faust-analysis/evidence/source.tar
+          git archive --format=tar HEAD tools/modules/harmonic_analysis.py tools/modules/harmonic_qualification.py tests/test_harmonic_analysis.py tests/fixtures/harmonics modules/HARMONIC_QUALIFICATION.md tools/modules/spectral_trace.py tools/modules/faust_spectral_descriptors.dsp tests/test_spectral_trace.py modules/SPECTRAL_TRACES.md tools/modules/faust_analysis.py tools/modules/faust_analysis_meter.dsp tools/modules/faust_analysis_runner.cpp tests/test_faust_analysis.py tests/test_render_probes.py tests/fixtures/probes tests/fixtures/probe_debug.dsp tools/modules/probe_lab.py tools/modules/render.cpp tools/modules/lab.py tools/modules/fit_api.cpp tools/modules/color_fit_api.cpp modules/PROBE_CAPTURE.md 'tools/modules/*benchmark.cpp' .github/workflows/faust-analysis-288.yml > build/faust-analysis/evidence/source.tar
       - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
