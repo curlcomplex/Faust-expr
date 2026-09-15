@@ -722,4 +722,5 @@ ID_676 = !, !;
 ID_677 = !, ID_676;
 ID_678 = _, ID_677;
 ID_679 = ID_675 : ID_678;
-process = ID_679;
+curlop_mono_process = ID_679;
+process = curlop_mono_process <: _, _;

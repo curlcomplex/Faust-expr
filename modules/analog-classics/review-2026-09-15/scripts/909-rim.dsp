@@ -238,4 +238,5 @@ ID_197 = + ~ ID_196;
 ID_198 = ID_191 : ID_197;
 ID_199 = ID_185 : ID_198;
 ID_200 = ID_177 : ID_199;
-process = ID_200;
+curlop_mono_process = ID_200;
+process = curlop_mono_process <: _, _;
