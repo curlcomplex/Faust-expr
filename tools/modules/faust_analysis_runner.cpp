@@ -27,6 +27,13 @@ struct UI {
 };
 #include "analysis_generated.hpp"
 
+// The default #105 meter ABI is unchanged. Other OFFLINE analyzers explicitly
+// select their output count at compilation; a mismatched DSP still fails closed.
+#ifndef FAUST_ANALYSIS_OUTPUTS
+#define FAUST_ANALYSIS_OUTPUTS 6
+#endif
+static_assert(FAUST_ANALYSIS_OUTPUTS >= 1 && FAUST_ANALYSIS_OUTPUTS <= 64);
+
 static long long integer(const char* s) {
     const std::string value(s);
     if (value.empty() || value.find_first_not_of("0123456789") != std::string::npos)
@@ -57,7 +64,7 @@ int main(int argc, char** argv) {
         if (!input) throw std::runtime_error("input open failed");
         auto module = std::make_unique<ModuleDSP>();
         module->init(static_cast<int>(rate_arg));
-        constexpr int outputs = 6;
+        constexpr int outputs = FAUST_ANALYSIS_OUTPUTS;
         if (module->getNumInputs() != 1 || module->getNumOutputs() != outputs)
             throw std::runtime_error("analysis DSP IO contract changed");
         std::ofstream output(argv[2], std::ios::binary);
