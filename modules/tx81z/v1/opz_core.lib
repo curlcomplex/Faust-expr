@@ -1,0 +1,38 @@
+import("stdfaust.lib");
+
+// First TX81Z/OPZ Faust core. The eight waveform equations follow the
+// construction in Aaron Giles' BSD-licensed ymfm YM2414/OPZ implementation.
+
+frac(x) = x-int(x);
+phasor(f) = f/ma.SR : (+ : frac) ~ _;
+
+signedSquareSin(x) = (x>=0)*x*x - (x<0)*x*x;
+
+waveAt(p,n) =
+    (n==0)*s0 + (n==1)*s1 + (n==2)*s2 + (n==3)*s3
+  + (n==4)*s4 + (n==5)*s5 + (n==6)*s6 + (n==7)*s7
+with {
+    q = frac(p);
+    a = sin(2*ma.PI*q);
+    b = sin(4*ma.PI*q);
+    first = q < .5;
+    s0 = a;
+    s1 = signedSquareSin(a);
+    s2 = first*a;
+    s3 = first*signedSquareSin(a);
+    s4 = first*b;
+    s5 = first*signedSquareSin(b);
+    s6 = first*b;
+    s7 = first*signedSquareSin(b);
+};
+
+operator(freq,phaseMod,wave) = waveAt(frac(phasor(freq)+phaseMod),int(wave));
+
+// Simple serial four-operator path for the first playable checkpoint.
+// Full 8-algorithm routing and hardware level laws follow in the next pass.
+serial4(freq,r2,r3,r4,l2,l3,l4,w1,w2,w3,w4) = o1 with {
+    o4 = operator(freq*r4,0,w4)*l4;
+    o3 = operator(freq*r3,o4,w3)*l3;
+    o2 = operator(freq*r2,o3,w2)*l2;
+    o1 = operator(freq,o2,w1);
+};
