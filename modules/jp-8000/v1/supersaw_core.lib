@@ -1,0 +1,39 @@
+import("stdfaust.lib");
+
+// JP-8000 Supersaw first Faust port.
+// Detune distribution follows the reverse-engineered TC170C140 table used by
+// house-of-houses/ubersaw. This v1 intentionally keeps oscillator arithmetic
+// floating-point while the 24-bit wrap path is ported separately.
+
+clip01(x) = min(1.0,max(0.0,x));
+
+detuneCurve(x) = ((((((((((10028.7312891634*x
+ - 50818.8652045924)*x
+ + 111363.4808729368)*x
+ - 138150.6761080548)*x
+ + 106649.6679158292)*x
+ - 53046.9642751875)*x
+ + 17019.9518580080)*x
+ - 3425.0836591318)*x
+ + 404.2703938388)*x
+ - 24.1878824391)*x
+ + 0.6717417634)*x
+ + 0.0030115596;
+
+ratio(st) = pow(2.0,st/12.0);
+voice(f,st,g) = os.sawtooth(f*ratio(st))*g;
+
+// Reverse-engineered asymmetric spread table normalized by 1440.
+supersaw(freq,detune,mix) =
+    voice(freq, 0.0, 1.0)
+  + voice(freq, ( 128.0/1440.0)*d, side)
+  + voice(freq, (-128.0/1440.0)*d, side)
+  + voice(freq, ( 816.0/1440.0)*d, side)
+  + voice(freq, (-824.0/1440.0)*d, side)
+  + voice(freq, (1408.0/1440.0)*d, side)
+  + voice(freq,(-1440.0/1440.0)*d, side)
+with {
+    shaped = detuneCurve(clip01(detune));
+    d = shaped; // full control corresponds to approximately one semitone outer spread
+    side = clip01(mix)*clip01(mix);
+};
