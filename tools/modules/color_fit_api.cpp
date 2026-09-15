@@ -7,7 +7,8 @@ extern "C" int color_render(const double* values, int count, int rate, int frame
     try {
         if (!values || !output || rate<8000 || rate>96000 || frames<1 || frames>rate*8
             || block<1 || block>8192 || off<1 || off>frames) return -1;
-        auto s=std::make_unique<ModuleDSP>(); s->init(rate); UI ui; s->buildUserInterface(&ui);
+        auto s=std::make_unique<ModuleDSP>(); s->init(rate); UI ui; s->buildUserInterface(&ui); ui.finish();
+        if (diagnosticBuild || ui.probe_count()) return -6; // never fit with diagnostic DSP
         if (s->getNumInputs()!=0 || s->getNumOutputs()!=1 || count!=int(ui.zones.size())) return -2;
         int i=0;
         for (const auto& [name,z]:ui.zones) {
