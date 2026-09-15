@@ -23,6 +23,14 @@ class AnalogClassicsReviewExport(unittest.TestCase):
                 self.assertTrue(export.with_suffix(".hpp").exists())
                 self.assertEqual(entry["status"], "internal-review")
                 self.assertEqual(entry["source"]["path"], entry["export_path"])
+                if entry["category"] == "instrument":
+                    controls = entry["contractEvidence"]["capturedControls"]
+                    self.assertIn("gate[curlop:input]", controls)
+                    self.assertIn("velocity[curlop:input]", controls)
+                    self.assertTrue(any(c.startswith("freq[") and "[unit:Hz]" in c and "[curlop:input]" in c for c in controls))
+            for identity in ("analog-kick-sharp", "analog-snare", "clap"):
+                self.assertEqual(selected[identity]["metadataAdaptation"]["kind"], "ui-address-only")
+                self.assertTrue(selected[identity]["contractEvidence"]["metadataAdapted"])
             self.assertIn("modules/juno-60/candidates/pr89-0b98748d/voice.dsp", manifest["rejected_or_unselected"])
             self.assertIn("909 sample-backed voices", manifest["rejected_or_unselected"])
 

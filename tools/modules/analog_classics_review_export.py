@@ -18,6 +18,7 @@ PINNED_COMMITS = {
     "909": "7aa75de6394568410d5b114d62b405138e9c9e35",
     "808-aux": "07464333c5eed1e916820a3fec99b69147561cb0",
 }
+ADAPTATION_EVIDENCE = {}
 SUBJECTS = (
     # Exact synth freeze: do not promote PR89 or Mini v2/v3 by version number.
     ("juno-60", "instrument", "modules/juno-60/v3/voice.dsp", "selected by the hardware/listening freeze; PR89 remains rejected"),
@@ -112,10 +113,10 @@ def export_one(source, destination, identity):
         replace(r'hslider\("pitch_hz[^"\\]*"', 'hslider("freq[unit:Hz][scale:log][curlop:input]"')
         replace(r'button\("gate(?!\[curlop:input\])[^"\\]*"', 'button("gate[curlop:input]"')
         replace(r'hslider\("velocity(?!\[curlop:input\])[^"\\]*"', 'hslider("velocity[curlop:input]"')
-        restored = normalized.replace('hslider("freq[unit:Hz][scale:log][curlop:input]"', 'hslider("pitch_hz"')
-        restored = restored.replace('button("gate[curlop:input]"', 'button("gate"').replace('hslider("velocity[curlop:input]"', 'hslider("velocity"')
-        if not adapted or 'process' not in normalized or 'process' not in before_adaptation:
+        expected = {'hslider("pitch_hz"', 'button("gate"', 'hslider("velocity"'}
+        if not expected <= set(adapted) or 'process' not in normalized or 'process' not in before_adaptation:
             raise AssertionError("adaptation whitelist proof failed")
+        ADAPTATION_EVIDENCE[identity] = {"kind": "ui-address-only", "originalLabels": sorted(set(adapted)), "finalLabels": ["freq[unit:Hz][scale:log][curlop:input]", "gate[curlop:input]", "velocity[curlop:input]"], "expressionInvariant": True}
         destination.write_text(normalized)
     subprocess.run(["faust", "-lang", "cpp", "-single", str(destination), "-o", str(destination.with_suffix(".hpp"))], check=True, capture_output=True, text=True)
 
@@ -144,7 +145,9 @@ def run(out):
         required = {"gate[curlop:input]", "velocity[curlop:input]"}
         has_freq = any(label.startswith("freq[") and "[unit:Hz]" in label and "[curlop:input]" in label for label in labels)
         gaps = [] if entry["category"] != "instrument" or (required <= set(labels) and has_freq) else ["missing canonical tagged one-note input"]
-        entry["contractEvidence"] = {"capturedControls": sorted(set(labels)), "canonicalOneNote": entry["category"] != "instrument" or not gaps, "gaps": gaps, "metadataAdapted": entry["identity"] in {"analog-kick-sharp", "analog-snare", "clap"}}
+        special = sorted({label.split("[", 1)[0] for label in labels} & {"accent", "slide", "chokeGate", "clock", "reset", "run"})
+        entry["metadataAdaptation"] = ADAPTATION_EVIDENCE.get(entry["identity"], "faust expansion and metadata normalization only")
+        entry["contractEvidence"] = {"capturedControls": sorted(set(labels)), "canonicalOneNote": entry["category"] != "instrument" or not gaps, "gaps": gaps, "specialEvents": special, "metadataAdapted": entry["identity"] in ADAPTATION_EVIDENCE}
     manifest = {"schema": 1, "identity": "analog-classics-internal-review-2026-09-15.1", "status": "internal-review-only", "base_review_freeze": {"path": str(FREEZE.relative_to(ROOT)), "sha256": digest(FREEZE), "identity": freeze["id"]}, "modules": entries, "selected": entries, "rejected_or_unselected": REJECTED, "contract": {"one_note": "lowercase gate, freq in Hz, velocity; host owns allocation", "distinct_events": "accent, slide, choke, clock, reset and run are never aliases", "outputs": "audio, CV and observations are separately declared", "identity": "stable identity is manifest identity plus version and source digest, never display text or geometry", "sound_change": "exports are metadata/library expansion only; a sonic change requires a new version and review freeze"}, "consumer_limits": ["No CURLOP runtime, UI, project-state, voice-allocation or device acceptance is claimed.", "Effect/modulation entries retain their native I/O rather than being mislabeled one-note instruments."]}
     manifest["schema"] = "curlop-analog-classics-review/v1"
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")

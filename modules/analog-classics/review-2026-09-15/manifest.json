@@ -35,7 +35,7 @@
       "status": "internal-review",
       "selectionRationale": "selected by the hardware/listening freeze; PR89 remains rejected",
       "selection_rationale": "selected by the hardware/listening freeze; PR89 remains rejected",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "1c3f39df-0a90-5fdb-9a97-15928050c9ae",
       "contractEvidence": {
         "capturedControls": [
@@ -61,6 +61,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -91,7 +92,7 @@
       "status": "internal-review",
       "selectionRationale": "selected coherent-Roland freeze candidate",
       "selection_rationale": "selected coherent-Roland freeze candidate",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "761c2665-8381-57cd-91a2-83f69c196d22",
       "contractEvidence": {
         "capturedControls": [
@@ -117,6 +118,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -147,7 +149,7 @@
       "status": "internal-review",
       "selectionRationale": "selected coherent-Roland freeze candidate",
       "selection_rationale": "selected coherent-Roland freeze candidate",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "a19e8424-cdaf-5038-aceb-d44364a4c613",
       "contractEvidence": {
         "capturedControls": [
@@ -175,6 +177,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -205,7 +208,7 @@
       "status": "internal-review",
       "selectionRationale": "stable v1 retained; v2 collapse and v3 experiment remain unselected",
       "selection_rationale": "stable v1 retained; v2 collapse and v3 experiment remain unselected",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "61ac5885-8777-5daf-8674-8eacebfc407f",
       "contractEvidence": {
         "capturedControls": [
@@ -232,6 +235,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -262,7 +266,7 @@
       "status": "internal-review",
       "selectionRationale": "v2 replaces preserved exploratory v1",
       "selection_rationale": "v2 replaces preserved exploratory v1",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "14967d66-6b8c-5097-9e56-b9505f9d386c",
       "contractEvidence": {
         "capturedControls": [
@@ -277,6 +281,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -307,7 +312,7 @@
       "status": "internal-review",
       "selectionRationale": "v2 replaces preserved exploratory v1",
       "selection_rationale": "v2 replaces preserved exploratory v1",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "34dd45c3-089e-5390-8320-b51904058163",
       "contractEvidence": {
         "capturedControls": [
@@ -322,6 +327,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -352,7 +358,7 @@
       "status": "internal-review",
       "selectionRationale": "v2 replaces preserved exploratory v1",
       "selection_rationale": "v2 replaces preserved exploratory v1",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "085cac28-793a-54c4-856a-a25586b9d1ea",
       "contractEvidence": {
         "capturedControls": [
@@ -368,6 +374,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -398,7 +405,7 @@
       "status": "internal-review",
       "selectionRationale": "v2 replaces preserved exploratory v1",
       "selection_rationale": "v2 replaces preserved exploratory v1",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "95bb57b2-2287-5142-91f9-54cc840b5cc7",
       "contractEvidence": {
         "capturedControls": [
@@ -413,6 +420,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -443,7 +451,7 @@
       "status": "internal-review",
       "selectionRationale": "explicit v2-derived single-note compatibility facade",
       "selection_rationale": "explicit v2-derived single-note compatibility facade",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "bb246d43-e4e4-5553-a53f-0021e3f7beca",
       "contractEvidence": {
         "capturedControls": [
@@ -458,6 +466,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -488,7 +497,7 @@
       "status": "internal-review",
       "selectionRationale": "explicit v2-derived single-note compatibility facade with local choke",
       "selection_rationale": "explicit v2-derived single-note compatibility facade with local choke",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "ed34bb6d-2371-5ade-9153-a45795aa0af4",
       "contractEvidence": {
         "capturedControls": [
@@ -505,6 +514,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "chokeGate"
+        ],
         "metadataAdapted": false
       }
     },
@@ -535,7 +547,20 @@
       "status": "internal-review",
       "selectionRationale": "same-sound optimized candidate; reference path remains preserved",
       "selection_rationale": "same-sound optimized candidate; reference path remains preserved",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": {
+        "kind": "ui-address-only",
+        "originalLabels": [
+          "button(\"gate\"",
+          "hslider(\"pitch_hz\"",
+          "hslider(\"velocity\""
+        ],
+        "finalLabels": [
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "velocity[curlop:input]"
+        ],
+        "expressionInvariant": true
+      },
       "lineageUuid": "7990867b-5a01-571a-81a4-baa0c8766364",
       "contractEvidence": {
         "capturedControls": [
@@ -552,6 +577,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": true
       }
     },
@@ -582,7 +608,20 @@
       "status": "internal-review",
       "selectionRationale": "v2 delivery supersedes the root prototype",
       "selection_rationale": "v2 delivery supersedes the root prototype",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": {
+        "kind": "ui-address-only",
+        "originalLabels": [
+          "button(\"gate\"",
+          "hslider(\"pitch_hz\"",
+          "hslider(\"velocity\""
+        ],
+        "finalLabels": [
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "velocity[curlop:input]"
+        ],
+        "expressionInvariant": true
+      },
       "lineageUuid": "7524650e-ccd5-56eb-a9d0-1051c52a811b",
       "contractEvidence": {
         "capturedControls": [
@@ -598,6 +637,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": true
       }
     },
@@ -628,7 +668,20 @@
       "status": "internal-review",
       "selectionRationale": "v3 rebuild selected; v1/v2 rejected identities remain explicit",
       "selection_rationale": "v3 rebuild selected; v1/v2 rejected identities remain explicit",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": {
+        "kind": "ui-address-only",
+        "originalLabels": [
+          "button(\"gate\"",
+          "hslider(\"pitch_hz\"",
+          "hslider(\"velocity\""
+        ],
+        "finalLabels": [
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "velocity[curlop:input]"
+        ],
+        "expressionInvariant": true
+      },
       "lineageUuid": "069b7db9-171e-5da0-b3e5-3d317183570e",
       "contractEvidence": {
         "capturedControls": [
@@ -644,6 +697,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": true
       }
     },
@@ -674,7 +728,7 @@
       "status": "internal-review",
       "selectionRationale": "current single-note Acid Voice candidate",
       "selection_rationale": "current single-note Acid Voice candidate",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "e0485774-ac2b-574a-9c49-ec0b104ae52e",
       "contractEvidence": {
         "capturedControls": [
@@ -694,6 +748,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -724,7 +781,7 @@
       "status": "internal-review",
       "selectionRationale": "external-clock source; CV output and meter observation are distinct",
       "selection_rationale": "external-clock source; CV output and meter observation are distinct",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "cdb3eb4d-4b8b-5e1c-9983-a8f22ae498d0",
       "contractEvidence": {
         "capturedControls": [
@@ -734,6 +791,11 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "clock",
+          "reset",
+          "run"
+        ],
         "metadataAdapted": false
       }
     },
@@ -764,7 +826,7 @@
       "status": "internal-review",
       "selectionRationale": "current compact mixer-EQ candidate",
       "selection_rationale": "current compact mixer-EQ candidate",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "25940d65-c1ae-5edb-a883-422db1647ac0",
       "contractEvidence": {
         "capturedControls": [
@@ -776,6 +838,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -806,7 +869,7 @@
       "status": "internal-review",
       "selectionRationale": "current multi-head echo candidate",
       "selection_rationale": "current multi-head echo candidate",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "d517a79b-52cb-57f9-a183-6fb6e621061a",
       "contractEvidence": {
         "capturedControls": [
@@ -822,6 +885,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -852,7 +916,7 @@
       "status": "internal-review",
       "selectionRationale": "current rack-reverb candidate",
       "selection_rationale": "current rack-reverb candidate",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "566e2647-113a-5d0c-bb66-c96a39f5c40f",
       "contractEvidence": {
         "capturedControls": [
@@ -864,6 +928,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -894,7 +959,7 @@
       "status": "internal-review",
       "selectionRationale": "current tape-colour candidate",
       "selection_rationale": "current tape-colour candidate",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "04f9b100-006f-5350-84a3-aeb8d2d1d915",
       "contractEvidence": {
         "capturedControls": [
@@ -904,6 +969,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -934,7 +1000,7 @@
       "status": "internal-review",
       "selectionRationale": "current ensemble candidate",
       "selection_rationale": "current ensemble candidate",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "1ce8410b-3dcd-5bcd-8caa-4ee9377b646c",
       "contractEvidence": {
         "capturedControls": [
@@ -945,6 +1011,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -975,7 +1042,7 @@
       "status": "internal-review",
       "selectionRationale": "current Acid-batch sequencer entry",
       "selection_rationale": "current Acid-batch sequencer entry",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "2de5e547-d6d7-52db-bf3c-de1e16fc7c24",
       "contractEvidence": {
         "capturedControls": [
@@ -985,6 +1052,11 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "clock",
+          "reset",
+          "run"
+        ],
         "metadataAdapted": false
       }
     },
@@ -1015,7 +1087,7 @@
       "status": "internal-review",
       "selectionRationale": "#79 frozen 606 kick selection",
       "selection_rationale": "#79 frozen 606 kick selection",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "0ec3f6b5-c31f-5037-a470-65699bacdc2a",
       "contractEvidence": {
         "capturedControls": [
@@ -1030,6 +1102,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -1060,7 +1135,7 @@
       "status": "internal-review",
       "selectionRationale": "#79 frozen 606 snare selection",
       "selection_rationale": "#79 frozen 606 snare selection",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "240a8edb-d52f-5708-8ac0-fb57825f44e6",
       "contractEvidence": {
         "capturedControls": [
@@ -1075,6 +1150,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -1105,7 +1183,7 @@
       "status": "internal-review",
       "selectionRationale": "#79 frozen 606 low-tom preset",
       "selection_rationale": "#79 frozen 606 low-tom preset",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "8398af1c-bccc-5366-9c0c-138a95bf2897",
       "contractEvidence": {
         "capturedControls": [
@@ -1120,6 +1198,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -1150,7 +1231,7 @@
       "status": "internal-review",
       "selectionRationale": "#79 frozen 606 high-tom preset",
       "selection_rationale": "#79 frozen 606 high-tom preset",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "b85417b2-4be1-5b92-aeb1-ca696b58dfcb",
       "contractEvidence": {
         "capturedControls": [
@@ -1165,6 +1246,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -1195,7 +1279,7 @@
       "status": "internal-review",
       "selectionRationale": "#79 frozen 606 closed-hat selection",
       "selection_rationale": "#79 frozen 606 closed-hat selection",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "425aab9f-e570-5f7f-9f1c-2d1054d1df1b",
       "contractEvidence": {
         "capturedControls": [
@@ -1210,6 +1294,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -1240,7 +1327,7 @@
       "status": "internal-review",
       "selectionRationale": "#79 frozen 606 open-hat/choke selection",
       "selection_rationale": "#79 frozen 606 open-hat/choke selection",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "3250fac3-e336-5c3d-9530-c492681132ce",
       "contractEvidence": {
         "capturedControls": [
@@ -1256,6 +1343,10 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent",
+          "chokeGate"
+        ],
         "metadataAdapted": false
       }
     },
@@ -1286,7 +1377,7 @@
       "status": "internal-review",
       "selectionRationale": "#79 frozen 606 cymbal selection",
       "selection_rationale": "#79 frozen 606 cymbal selection",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "d88ea414-140a-582e-9f74-708e18f13210",
       "contractEvidence": {
         "capturedControls": [
@@ -1301,6 +1392,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -1331,7 +1425,7 @@
       "status": "internal-review",
       "selectionRationale": "#81 frozen recorded-anchor selection",
       "selection_rationale": "#81 frozen recorded-anchor selection",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "d20bbd5b-8f48-537b-a4ae-414a6dd68c3b",
       "contractEvidence": {
         "capturedControls": [
@@ -1349,6 +1443,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -1379,7 +1476,7 @@
       "status": "internal-review",
       "selectionRationale": "#81 frozen recorded-anchor selection",
       "selection_rationale": "#81 frozen recorded-anchor selection",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "dd6faa9e-1e71-5697-8f8f-99b9b3e53225",
       "contractEvidence": {
         "capturedControls": [
@@ -1397,6 +1494,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -1427,7 +1527,7 @@
       "status": "internal-review",
       "selectionRationale": "#81 frozen recorded-anchor preset",
       "selection_rationale": "#81 frozen recorded-anchor preset",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "f018492d-28e2-5016-94af-435aee7c3475",
       "contractEvidence": {
         "capturedControls": [
@@ -1444,6 +1544,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -1474,7 +1577,7 @@
       "status": "internal-review",
       "selectionRationale": "#81 frozen recorded-anchor preset",
       "selection_rationale": "#81 frozen recorded-anchor preset",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "c31f0667-a394-57af-8127-40a6ed2cc9c1",
       "contractEvidence": {
         "capturedControls": [
@@ -1491,6 +1594,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -1521,7 +1627,7 @@
       "status": "internal-review",
       "selectionRationale": "#81 frozen recorded-anchor preset",
       "selection_rationale": "#81 frozen recorded-anchor preset",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "4285d738-abd3-5b06-bb21-dacd1a2cc2ff",
       "contractEvidence": {
         "capturedControls": [
@@ -1538,6 +1644,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -1568,7 +1677,7 @@
       "status": "internal-review",
       "selectionRationale": "#81 frozen recorded-anchor selection",
       "selection_rationale": "#81 frozen recorded-anchor selection",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "3f40927c-bd6c-52c4-8f6a-0423f8231387",
       "contractEvidence": {
         "capturedControls": [
@@ -1584,6 +1693,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -1614,7 +1726,7 @@
       "status": "internal-review",
       "selectionRationale": "#81 frozen recorded-anchor selection",
       "selection_rationale": "#81 frozen recorded-anchor selection",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "aac7644a-bedf-5252-b8b2-ad0fd9177eae",
       "contractEvidence": {
         "capturedControls": [
@@ -1631,6 +1743,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -1661,7 +1776,7 @@
       "status": "internal-review",
       "selectionRationale": "#76 experimental auxiliary source retained for review",
       "selection_rationale": "#76 experimental auxiliary source retained for review",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "77c0ae78-0bdf-520f-9a8d-b228f7923b2f",
       "contractEvidence": {
         "capturedControls": [
@@ -1679,6 +1794,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -1709,7 +1827,7 @@
       "status": "internal-review",
       "selectionRationale": "#76 selected v2 Claves pitch correction",
       "selection_rationale": "#76 selected v2 Claves pitch correction",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "6b628dee-1c35-5c48-97d6-4f9d874e65b7",
       "contractEvidence": {
         "capturedControls": [
@@ -1726,6 +1844,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -1756,7 +1877,7 @@
       "status": "internal-review",
       "selectionRationale": "#76 experimental auxiliary source retained for review",
       "selection_rationale": "#76 experimental auxiliary source retained for review",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "3e94ef70-37b0-5b6b-8b59-b940e89614a9",
       "contractEvidence": {
         "capturedControls": [
@@ -1771,6 +1892,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -1801,7 +1925,7 @@
       "status": "internal-review",
       "selectionRationale": "#76 experimental auxiliary source retained for review",
       "selection_rationale": "#76 experimental auxiliary source retained for review",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "00c9385c-6c4c-575a-8ca8-b62c8649dd68",
       "contractEvidence": {
         "capturedControls": [
@@ -1817,6 +1941,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     }
@@ -1849,7 +1976,7 @@
       "status": "internal-review",
       "selectionRationale": "selected by the hardware/listening freeze; PR89 remains rejected",
       "selection_rationale": "selected by the hardware/listening freeze; PR89 remains rejected",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "1c3f39df-0a90-5fdb-9a97-15928050c9ae",
       "contractEvidence": {
         "capturedControls": [
@@ -1875,6 +2002,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -1905,7 +2033,7 @@
       "status": "internal-review",
       "selectionRationale": "selected coherent-Roland freeze candidate",
       "selection_rationale": "selected coherent-Roland freeze candidate",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "761c2665-8381-57cd-91a2-83f69c196d22",
       "contractEvidence": {
         "capturedControls": [
@@ -1931,6 +2059,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -1961,7 +2090,7 @@
       "status": "internal-review",
       "selectionRationale": "selected coherent-Roland freeze candidate",
       "selection_rationale": "selected coherent-Roland freeze candidate",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "a19e8424-cdaf-5038-aceb-d44364a4c613",
       "contractEvidence": {
         "capturedControls": [
@@ -1989,6 +2118,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -2019,7 +2149,7 @@
       "status": "internal-review",
       "selectionRationale": "stable v1 retained; v2 collapse and v3 experiment remain unselected",
       "selection_rationale": "stable v1 retained; v2 collapse and v3 experiment remain unselected",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "61ac5885-8777-5daf-8674-8eacebfc407f",
       "contractEvidence": {
         "capturedControls": [
@@ -2046,6 +2176,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -2076,7 +2207,7 @@
       "status": "internal-review",
       "selectionRationale": "v2 replaces preserved exploratory v1",
       "selection_rationale": "v2 replaces preserved exploratory v1",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "14967d66-6b8c-5097-9e56-b9505f9d386c",
       "contractEvidence": {
         "capturedControls": [
@@ -2091,6 +2222,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -2121,7 +2253,7 @@
       "status": "internal-review",
       "selectionRationale": "v2 replaces preserved exploratory v1",
       "selection_rationale": "v2 replaces preserved exploratory v1",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "34dd45c3-089e-5390-8320-b51904058163",
       "contractEvidence": {
         "capturedControls": [
@@ -2136,6 +2268,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -2166,7 +2299,7 @@
       "status": "internal-review",
       "selectionRationale": "v2 replaces preserved exploratory v1",
       "selection_rationale": "v2 replaces preserved exploratory v1",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "085cac28-793a-54c4-856a-a25586b9d1ea",
       "contractEvidence": {
         "capturedControls": [
@@ -2182,6 +2315,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -2212,7 +2346,7 @@
       "status": "internal-review",
       "selectionRationale": "v2 replaces preserved exploratory v1",
       "selection_rationale": "v2 replaces preserved exploratory v1",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "95bb57b2-2287-5142-91f9-54cc840b5cc7",
       "contractEvidence": {
         "capturedControls": [
@@ -2227,6 +2361,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -2257,7 +2392,7 @@
       "status": "internal-review",
       "selectionRationale": "explicit v2-derived single-note compatibility facade",
       "selection_rationale": "explicit v2-derived single-note compatibility facade",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "bb246d43-e4e4-5553-a53f-0021e3f7beca",
       "contractEvidence": {
         "capturedControls": [
@@ -2272,6 +2407,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -2302,7 +2438,7 @@
       "status": "internal-review",
       "selectionRationale": "explicit v2-derived single-note compatibility facade with local choke",
       "selection_rationale": "explicit v2-derived single-note compatibility facade with local choke",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "ed34bb6d-2371-5ade-9153-a45795aa0af4",
       "contractEvidence": {
         "capturedControls": [
@@ -2319,6 +2455,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "chokeGate"
+        ],
         "metadataAdapted": false
       }
     },
@@ -2349,7 +2488,20 @@
       "status": "internal-review",
       "selectionRationale": "same-sound optimized candidate; reference path remains preserved",
       "selection_rationale": "same-sound optimized candidate; reference path remains preserved",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": {
+        "kind": "ui-address-only",
+        "originalLabels": [
+          "button(\"gate\"",
+          "hslider(\"pitch_hz\"",
+          "hslider(\"velocity\""
+        ],
+        "finalLabels": [
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "velocity[curlop:input]"
+        ],
+        "expressionInvariant": true
+      },
       "lineageUuid": "7990867b-5a01-571a-81a4-baa0c8766364",
       "contractEvidence": {
         "capturedControls": [
@@ -2366,6 +2518,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": true
       }
     },
@@ -2396,7 +2549,20 @@
       "status": "internal-review",
       "selectionRationale": "v2 delivery supersedes the root prototype",
       "selection_rationale": "v2 delivery supersedes the root prototype",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": {
+        "kind": "ui-address-only",
+        "originalLabels": [
+          "button(\"gate\"",
+          "hslider(\"pitch_hz\"",
+          "hslider(\"velocity\""
+        ],
+        "finalLabels": [
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "velocity[curlop:input]"
+        ],
+        "expressionInvariant": true
+      },
       "lineageUuid": "7524650e-ccd5-56eb-a9d0-1051c52a811b",
       "contractEvidence": {
         "capturedControls": [
@@ -2412,6 +2578,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": true
       }
     },
@@ -2442,7 +2609,20 @@
       "status": "internal-review",
       "selectionRationale": "v3 rebuild selected; v1/v2 rejected identities remain explicit",
       "selection_rationale": "v3 rebuild selected; v1/v2 rejected identities remain explicit",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": {
+        "kind": "ui-address-only",
+        "originalLabels": [
+          "button(\"gate\"",
+          "hslider(\"pitch_hz\"",
+          "hslider(\"velocity\""
+        ],
+        "finalLabels": [
+          "freq[unit:Hz][scale:log][curlop:input]",
+          "gate[curlop:input]",
+          "velocity[curlop:input]"
+        ],
+        "expressionInvariant": true
+      },
       "lineageUuid": "069b7db9-171e-5da0-b3e5-3d317183570e",
       "contractEvidence": {
         "capturedControls": [
@@ -2458,6 +2638,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": true
       }
     },
@@ -2488,7 +2669,7 @@
       "status": "internal-review",
       "selectionRationale": "current single-note Acid Voice candidate",
       "selection_rationale": "current single-note Acid Voice candidate",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "e0485774-ac2b-574a-9c49-ec0b104ae52e",
       "contractEvidence": {
         "capturedControls": [
@@ -2508,6 +2689,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -2538,7 +2722,7 @@
       "status": "internal-review",
       "selectionRationale": "external-clock source; CV output and meter observation are distinct",
       "selection_rationale": "external-clock source; CV output and meter observation are distinct",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "cdb3eb4d-4b8b-5e1c-9983-a8f22ae498d0",
       "contractEvidence": {
         "capturedControls": [
@@ -2548,6 +2732,11 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "clock",
+          "reset",
+          "run"
+        ],
         "metadataAdapted": false
       }
     },
@@ -2578,7 +2767,7 @@
       "status": "internal-review",
       "selectionRationale": "current compact mixer-EQ candidate",
       "selection_rationale": "current compact mixer-EQ candidate",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "25940d65-c1ae-5edb-a883-422db1647ac0",
       "contractEvidence": {
         "capturedControls": [
@@ -2590,6 +2779,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -2620,7 +2810,7 @@
       "status": "internal-review",
       "selectionRationale": "current multi-head echo candidate",
       "selection_rationale": "current multi-head echo candidate",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "d517a79b-52cb-57f9-a183-6fb6e621061a",
       "contractEvidence": {
         "capturedControls": [
@@ -2636,6 +2826,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -2666,7 +2857,7 @@
       "status": "internal-review",
       "selectionRationale": "current rack-reverb candidate",
       "selection_rationale": "current rack-reverb candidate",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "566e2647-113a-5d0c-bb66-c96a39f5c40f",
       "contractEvidence": {
         "capturedControls": [
@@ -2678,6 +2869,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -2708,7 +2900,7 @@
       "status": "internal-review",
       "selectionRationale": "current tape-colour candidate",
       "selection_rationale": "current tape-colour candidate",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "04f9b100-006f-5350-84a3-aeb8d2d1d915",
       "contractEvidence": {
         "capturedControls": [
@@ -2718,6 +2910,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -2748,7 +2941,7 @@
       "status": "internal-review",
       "selectionRationale": "current ensemble candidate",
       "selection_rationale": "current ensemble candidate",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "1ce8410b-3dcd-5bcd-8caa-4ee9377b646c",
       "contractEvidence": {
         "capturedControls": [
@@ -2759,6 +2952,7 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [],
         "metadataAdapted": false
       }
     },
@@ -2789,7 +2983,7 @@
       "status": "internal-review",
       "selectionRationale": "current Acid-batch sequencer entry",
       "selection_rationale": "current Acid-batch sequencer entry",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "2de5e547-d6d7-52db-bf3c-de1e16fc7c24",
       "contractEvidence": {
         "capturedControls": [
@@ -2799,6 +2993,11 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "clock",
+          "reset",
+          "run"
+        ],
         "metadataAdapted": false
       }
     },
@@ -2829,7 +3028,7 @@
       "status": "internal-review",
       "selectionRationale": "#79 frozen 606 kick selection",
       "selection_rationale": "#79 frozen 606 kick selection",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "0ec3f6b5-c31f-5037-a470-65699bacdc2a",
       "contractEvidence": {
         "capturedControls": [
@@ -2844,6 +3043,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -2874,7 +3076,7 @@
       "status": "internal-review",
       "selectionRationale": "#79 frozen 606 snare selection",
       "selection_rationale": "#79 frozen 606 snare selection",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "240a8edb-d52f-5708-8ac0-fb57825f44e6",
       "contractEvidence": {
         "capturedControls": [
@@ -2889,6 +3091,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -2919,7 +3124,7 @@
       "status": "internal-review",
       "selectionRationale": "#79 frozen 606 low-tom preset",
       "selection_rationale": "#79 frozen 606 low-tom preset",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "8398af1c-bccc-5366-9c0c-138a95bf2897",
       "contractEvidence": {
         "capturedControls": [
@@ -2934,6 +3139,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -2964,7 +3172,7 @@
       "status": "internal-review",
       "selectionRationale": "#79 frozen 606 high-tom preset",
       "selection_rationale": "#79 frozen 606 high-tom preset",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "b85417b2-4be1-5b92-aeb1-ca696b58dfcb",
       "contractEvidence": {
         "capturedControls": [
@@ -2979,6 +3187,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -3009,7 +3220,7 @@
       "status": "internal-review",
       "selectionRationale": "#79 frozen 606 closed-hat selection",
       "selection_rationale": "#79 frozen 606 closed-hat selection",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "425aab9f-e570-5f7f-9f1c-2d1054d1df1b",
       "contractEvidence": {
         "capturedControls": [
@@ -3024,6 +3235,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -3054,7 +3268,7 @@
       "status": "internal-review",
       "selectionRationale": "#79 frozen 606 open-hat/choke selection",
       "selection_rationale": "#79 frozen 606 open-hat/choke selection",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "3250fac3-e336-5c3d-9530-c492681132ce",
       "contractEvidence": {
         "capturedControls": [
@@ -3070,6 +3284,10 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent",
+          "chokeGate"
+        ],
         "metadataAdapted": false
       }
     },
@@ -3100,7 +3318,7 @@
       "status": "internal-review",
       "selectionRationale": "#79 frozen 606 cymbal selection",
       "selection_rationale": "#79 frozen 606 cymbal selection",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "d88ea414-140a-582e-9f74-708e18f13210",
       "contractEvidence": {
         "capturedControls": [
@@ -3115,6 +3333,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -3145,7 +3366,7 @@
       "status": "internal-review",
       "selectionRationale": "#81 frozen recorded-anchor selection",
       "selection_rationale": "#81 frozen recorded-anchor selection",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "d20bbd5b-8f48-537b-a4ae-414a6dd68c3b",
       "contractEvidence": {
         "capturedControls": [
@@ -3163,6 +3384,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -3193,7 +3417,7 @@
       "status": "internal-review",
       "selectionRationale": "#81 frozen recorded-anchor selection",
       "selection_rationale": "#81 frozen recorded-anchor selection",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "dd6faa9e-1e71-5697-8f8f-99b9b3e53225",
       "contractEvidence": {
         "capturedControls": [
@@ -3211,6 +3435,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -3241,7 +3468,7 @@
       "status": "internal-review",
       "selectionRationale": "#81 frozen recorded-anchor preset",
       "selection_rationale": "#81 frozen recorded-anchor preset",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "f018492d-28e2-5016-94af-435aee7c3475",
       "contractEvidence": {
         "capturedControls": [
@@ -3258,6 +3485,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -3288,7 +3518,7 @@
       "status": "internal-review",
       "selectionRationale": "#81 frozen recorded-anchor preset",
       "selection_rationale": "#81 frozen recorded-anchor preset",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "c31f0667-a394-57af-8127-40a6ed2cc9c1",
       "contractEvidence": {
         "capturedControls": [
@@ -3305,6 +3535,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -3335,7 +3568,7 @@
       "status": "internal-review",
       "selectionRationale": "#81 frozen recorded-anchor preset",
       "selection_rationale": "#81 frozen recorded-anchor preset",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "4285d738-abd3-5b06-bb21-dacd1a2cc2ff",
       "contractEvidence": {
         "capturedControls": [
@@ -3352,6 +3585,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -3382,7 +3618,7 @@
       "status": "internal-review",
       "selectionRationale": "#81 frozen recorded-anchor selection",
       "selection_rationale": "#81 frozen recorded-anchor selection",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "3f40927c-bd6c-52c4-8f6a-0423f8231387",
       "contractEvidence": {
         "capturedControls": [
@@ -3398,6 +3634,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -3428,7 +3667,7 @@
       "status": "internal-review",
       "selectionRationale": "#81 frozen recorded-anchor selection",
       "selection_rationale": "#81 frozen recorded-anchor selection",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "aac7644a-bedf-5252-b8b2-ad0fd9177eae",
       "contractEvidence": {
         "capturedControls": [
@@ -3445,6 +3684,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -3475,7 +3717,7 @@
       "status": "internal-review",
       "selectionRationale": "#76 experimental auxiliary source retained for review",
       "selection_rationale": "#76 experimental auxiliary source retained for review",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "77c0ae78-0bdf-520f-9a8d-b228f7923b2f",
       "contractEvidence": {
         "capturedControls": [
@@ -3493,6 +3735,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -3523,7 +3768,7 @@
       "status": "internal-review",
       "selectionRationale": "#76 selected v2 Claves pitch correction",
       "selection_rationale": "#76 selected v2 Claves pitch correction",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "6b628dee-1c35-5c48-97d6-4f9d874e65b7",
       "contractEvidence": {
         "capturedControls": [
@@ -3540,6 +3785,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -3570,7 +3818,7 @@
       "status": "internal-review",
       "selectionRationale": "#76 experimental auxiliary source retained for review",
       "selection_rationale": "#76 experimental auxiliary source retained for review",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "3e94ef70-37b0-5b6b-8b59-b940e89614a9",
       "contractEvidence": {
         "capturedControls": [
@@ -3585,6 +3833,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     },
@@ -3615,7 +3866,7 @@
       "status": "internal-review",
       "selectionRationale": "#76 experimental auxiliary source retained for review",
       "selection_rationale": "#76 experimental auxiliary source retained for review",
-      "metadataAdaptation": "faust -e library expansion and metadata normalization only; expression lines are invariant and standalone compile succeeds",
+      "metadataAdaptation": "faust expansion and metadata normalization only",
       "lineageUuid": "00c9385c-6c4c-575a-8ca8-b62c8649dd68",
       "contractEvidence": {
         "capturedControls": [
@@ -3631,6 +3882,9 @@
         ],
         "canonicalOneNote": true,
         "gaps": [],
+        "specialEvents": [
+          "accent"
+        ],
         "metadataAdapted": false
       }
     }
