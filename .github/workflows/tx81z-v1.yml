@@ -1,0 +1,23 @@
+name: TX81Z v2 distribution Faust compatibility
+on:
+  push:
+    branches: [main]
+    paths: ['modules/tx81z/**', '.github/workflows/tx81z-v1.yml']
+  pull_request:
+    paths: ['modules/tx81z/**', '.github/workflows/tx81z-v1.yml']
+permissions:
+  contents: read
+jobs:
+  compile:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends faust
+      - name: Compile v2; preserve the uncompilable historical v1 draft
+        run: |
+          set -euo pipefail
+          faust -v
+          faust -lang cpp -I modules/tx81z/v2 modules/tx81z/v2/voice.dsp -o /tmp/tx81z.cpp
+          test -s /tmp/tx81z.cpp

@@ -1,0 +1,84 @@
+name: TX81Z v3 eight-algorithm Faust qualification
+on:
+  pull_request:
+    paths: ['modules/tx81z/v3/**','tests/test_tx81z_algorithms.py','.github/workflows/tx81z-v3-faust288.yml']
+permissions: {contents: read}
+concurrency:
+  group: tx81z-v3-hosted-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {persist-credentials: false}
+      - name: Read reviewed renderer from main
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with: {ref: '82926f023410ae8367eec3c5d842edbbe34ab439', path: .reviewed-lab, persist-credentials: false}
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends g++ python3-numpy
+      - name: Contracts
+        run: python3 -m unittest discover -s tests -p test_tx81z_algorithms.py -v
+      - name: Fetch and build pinned Faust 2.88
+        run: |
+          set -euo pipefail; mkdir -p build/v3/toolchain
+          curl --fail --location --retry 3 https://github.com/grame-cncm/faust/releases/download/2.88.0/faust-2.88.0.tar.gz -o build/v3/faust.tar.gz
+          echo 'e4e175cf236924b5b7d4784cbb8c50cc01e211159e169655dd9e6d8f92b871d9  build/v3/faust.tar.gz' | sha256sum -c -
+          tar -xzf build/v3/faust.tar.gz -C build/v3/toolchain --strip-components=1
+          make -C build/v3/toolchain/build cmake BACKENDS=regular.cmake TARGETS=regular.cmake >/dev/null
+          cmake --build build/v3/toolchain/build/faustdir --target faust --parallel 2 >/dev/null
+      - name: Compile and render all eight bounded algorithm graphs
+        run: |
+          set -euo pipefail
+          F=build/v3/toolchain/build/bin/faust; L=build/v3/toolchain/libraries
+          mkdir -p build/v3/evidence/listening
+          cp .reviewed-lab/tools/modules/render.cpp build/v3/evidence/render.cpp
+          python3 - <<'PY'
+          from pathlib import Path
+          base=Path('modules/tx81z/v3/voice.dsp').read_text()
+          out=Path('build/v3/evidence')
+          for a in range(8):
+            text=base.replace('opz.alg0(',f'opz.alg{a}(')
+            (out/f'voice-alg{a}.dsp').write_text(text)
+          PY
+          for a in 0 1 2 3 4 5 6 7; do
+            $F -I "$L" -I modules/tx81z/v3 -lang cpp -single -cn ModuleDSP build/v3/evidence/voice-alg${a}.dsp -o build/v3/evidence/generated-${a}.hpp
+            cp build/v3/evidence/generated-${a}.hpp build/v3/evidence/generated.hpp
+            g++ -std=c++17 -O2 -ffp-contract=off -Ibuild/v3/evidence build/v3/evidence/render.cpp -o build/v3/evidence/render-${a}
+          done
+          rm build/v3/evidence/generated.hpp
+          python3 - <<'PY'
+          from pathlib import Path
+          import json, subprocess, numpy as np, wave, hashlib
+          root=Path('build/v3/evidence'); rate=48000; frames=72000
+          base={'freq':110,'velocity':1,'op1Wave':0,'op2Wave':6,'op3Wave':1,'op4Wave':7,'op1Ratio':1,'op2Ratio':2,'op3Ratio':3,'op4Ratio':4,'op1Level':.75,'op2Level':.28,'op3Level':.22,'op4Level':.18,'attack':.003,'decay':.3,'sustain':.55,'release':.35,'level':.16}
+          arrays=[]; results=[]
+          for a in range(8):
+            exe=root/f'render-{a}'; score=root/f'alg-{a}.tsv'; raw=root/f'alg-{a}.f32'
+            events=[(0,k,v) for k,v in base.items()]+[(2400,'gate',1),(48000,'gate',0)]
+            score.write_text(''.join(f'{i}\t{k}\t{v}\n' for i,k,v in sorted(events)))
+            d=json.loads(subprocess.check_output([exe,score,raw,str(rate),'128',str(frames),'0'],text=True))
+            x=np.fromfile(raw,dtype='<f4'); assert np.isfinite(x).all() and np.max(np.abs(x))>.005
+            arrays.append(x); results.append({'algorithm':a,'sha256':hashlib.sha256(raw.read_bytes()).hexdigest(),'peak':float(np.max(np.abs(x)))})
+          assert len(set(r['sha256'] for r in results))==8
+          subprocess.check_call([root/'render-0',root/'alg-0.tsv',root/'alg-0-repeat.f32',str(rate),'128',str(frames),'0'])
+          assert (root/'alg-0-repeat.f32').read_bytes()==(root/'alg-0.f32').read_bytes()
+          gap=np.zeros(4800,dtype=np.float32); joined=np.concatenate([np.concatenate([x,gap]) for x in arrays])*.5
+          assert np.isfinite(joined).all() and np.max(np.abs(joined)) < 1
+          pcm=np.rint(joined*32767).astype('<i2')
+          listening=root/'listening/01-algorithms-0-to-7.wav'
+          with wave.open(str(listening),'wb') as w:
+            w.setnchannels(1); w.setsampwidth(2); w.setframerate(rate); w.writeframes(pcm.tobytes())
+          with wave.open(str(listening),'rb') as w:
+            assert (w.getnchannels(),w.getsampwidth(),w.getframerate()) == (1,2,rate)
+            assert np.array_equal(np.frombuffer(w.readframes(w.getnframes()),dtype='<i2'),pcm)
+          (root/'results.json').write_text(json.dumps({'status':'completed','renders':9,'algorithms':results,'fixed_playback_gain':.5,'selection':'compile-time bounded graphs','listening_encoding':'PCM16, decoded sample identity checked'},indent=2))
+          PY
+      - name: Retain evidence and recordings
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: tx81z-v3-${{ github.run_id }}
+          path: build/v3/evidence/
+          retention-days: 14
+          if-no-files-found: error
