@@ -1,0 +1,35 @@
+name: DX7 oracle slice
+on:
+  push:
+    branches: [112-dx7-oracle-slice]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: dx7-oracle-slice-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  manifest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Validate bounded first-slice cases
+        run: python3 tools/modules/dx7_slice_cases.py
+      - name: Unit tests
+        run: python3 -m unittest tests.test_dx7_slice_cases -v
+      - name: Record slice provenance
+        if: always()
+        run: |
+          mkdir -p build/dx7-slice
+          git rev-parse HEAD > build/dx7-slice/commit.txt
+          python3 tools/modules/dx7_slice_cases.py > build/dx7-slice/cases.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: dx7-slice-${{ github.sha }}
+          path: build/dx7-slice/
+          retention-days: 14
+          if-no-files-found: error
