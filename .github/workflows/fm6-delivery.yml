@@ -1,0 +1,109 @@
+name: FM6 playable voice and listening evidence
+on:
+  pull_request:
+    paths:
+      - 'tools/modules/fm6_*'
+      - 'modules/fm6-classic/**'
+      - 'tests/test_fm6_delivery.py'
+      - '.github/workflows/fm6-delivery.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: fm6-hosted-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      FAUST_VERSION: '2.88.0'
+      FAUST_ARCHIVE_SHA256: 'e4e175cf236924b5b7d4784cbb8c50cc01e211159e169655dd9e6d8f92b871d9'
+      MSFA_COMMIT: 'f67d41d313b7dc85f6fb99e79e515cc9d208cfff'
+      EXECUTION_LANE: github-hosted
+      SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Install bounded build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends python3-numpy python3-scipy python3-matplotlib g++ ffmpeg curl ca-certificates
+      - name: Verify dependencies and generate candidate sources
+        run: |
+          set -euo pipefail
+          mkdir -p build/fm6/toolchain build/fm6/evidence
+          git rev-parse HEAD > build/fm6/evidence/commit.txt
+          curl --fail --location --retry 3 "https://github.com/grame-cncm/faust/releases/download/${FAUST_VERSION}/faust-${FAUST_VERSION}.tar.gz" -o build/fm6/faust.tar.gz
+          echo "$FAUST_ARCHIVE_SHA256  build/fm6/faust.tar.gz" | sha256sum -c -
+          tar -xzf build/fm6/faust.tar.gz -C build/fm6/toolchain --strip-components=1
+          git init -q build/fm6/msfa
+          git -C build/fm6/msfa remote add origin https://github.com/google/music-synthesizer-for-android.git
+          git -C build/fm6/msfa fetch -q --depth=1 origin "$MSFA_COMMIT"
+          git -C build/fm6/msfa checkout -q --detach FETCH_HEAD
+          test "$(git -C build/fm6/msfa rev-parse HEAD)" = "$MSFA_COMMIT"
+          /usr/bin/python3 tools/modules/fm6_prepare.py --libraries build/fm6/toolchain/libraries --msfa build/fm6/msfa
+          /usr/bin/python3 -m unittest discover -s tests -p test_fm6_delivery.py -v 2>&1 | tee build/fm6/evidence/contracts.log
+          ! grep -q 'skipped' build/fm6/evidence/contracts.log
+      - name: Build pinned Faust 2.88
+        run: |
+          set -euo pipefail
+          make -C build/fm6/toolchain/build cmake BACKENDS=regular.cmake TARGETS=regular.cmake > build/fm6/evidence/configure.log 2>&1
+          cmake --build build/fm6/toolchain/build/faustdir --target faust --parallel 2 > build/fm6/evidence/compiler-build.log 2>&1
+          build/fm6/toolchain/build/bin/faust --version | tee build/fm6/evidence/faust-version.txt
+          grep -Fx "FAUST Version $FAUST_VERSION" build/fm6/evidence/faust-version.txt
+      - name: Compile full voice and execute reference comparisons
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 tools/modules/fm6_delivery.py --out build/fm6/evidence/qualification \
+            --faust build/fm6/toolchain/build/bin/faust --libraries build/fm6/toolchain/libraries \
+            --msfa build/fm6/msfa 2>&1 | tee build/fm6/evidence/qualification.log
+          test -z "$(git -C build/fm6/msfa status --porcelain)"
+      - name: Existing repository regression tests
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 -m unittest discover -s tests -v 2>&1 | tee build/fm6/evidence/regression.log
+      - name: Package ready sources and directly playable comparisons
+        run: |
+          set -euo pipefail
+          mkdir -p build/fm6/delivery
+          cp -r modules/fm6-classic build/fm6/delivery/module
+          cp -r build/fm6/evidence/qualification/listening build/fm6/delivery/listening
+          cp build/fm6/evidence/qualification/results.json build/fm6/delivery/results.json
+          cp build/fm6/evidence/commit.txt build/fm6/delivery/commit.txt
+          /usr/bin/python3 tools/modules/fm6_export.py --module modules/fm6-classic --out build/fm6/delivery/FM6_Classic.dsp \
+            --faust build/fm6/toolchain/build/bin/faust --libraries build/fm6/toolchain/libraries \
+            --baseline build/fm6/evidence/qualification --verify-out build/fm6/evidence/export
+          cp build/fm6/evidence/export/verification.json build/fm6/delivery/export-verification.json
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json
+          d=Path('build/fm6/delivery')
+          (d/'READ_ME.txt').write_text('FM6 Classic candidate. Each comparison plays original MSFA reference first, then the candidate, with a 250 ms gap. Reference core has one fixed multiplier of 0.1; candidate output level is 0.2 over its half-scale carriers. No per-patch normalization or effects. Six original programs; no factory assets. FM6_Classic.dsp is a compact single-file voice using standard Faust libraries; its audio was checked against the multi-file voice. See module/README.md and results.json for scope, provenance and remaining fidelity limits. Draft/unmerged, not hardware or target-device approval.\n')
+          (d/'SHA256SUMS.json').write_text(json.dumps({str(p.relative_to(d)):hashlib.sha256(p.read_bytes()).hexdigest() for p in d.rglob('*') if p.is_file()},indent=2)+'\n')
+          PY
+      - name: Preserve source identity
+        if: always()
+        run: |
+          mkdir -p build/fm6/evidence
+          git archive --format=tar.gz HEAD > build/fm6/evidence/repository-source.tar.gz
+          if test -d modules/fm6-classic/v1; then tar -czf build/fm6/evidence/ready-module.tar.gz -C modules fm6-classic; fi
+          if test -x build/fm6/toolchain/build/bin/faust; then sha256sum build/fm6/toolchain/build/bin/faust > build/fm6/evidence/compiler.sha256; fi
+      - name: Upload listening and source delivery
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: fm6-listening-${{ env.SOURCE_COMMIT }}
+          path: build/fm6/delivery/
+          include-hidden-files: true
+          retention-days: 14
+          if-no-files-found: error
+      - name: Upload numerical and build evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: fm6-evidence-${{ env.SOURCE_COMMIT }}
+          path: build/fm6/evidence/
+          retention-days: 14
+          if-no-files-found: error
