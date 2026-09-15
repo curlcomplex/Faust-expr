@@ -146,9 +146,17 @@ def compare_faustprobe(binary, revision: str, native: dict, out, libs):
     out = Path(out).resolve()
     case = native
     label = case['label']
+    if not re.fullmatch(r'[A-Za-z0-9_.-]+', label) or label in ('.', '..'):
+        raise ValueError('invalid comparison label')
+    binary_hash = ha.sha(executable)
     source = FIXTURES/(case['fixture']+'.dsp')
     if ha.sha(source) != case['source_sha256'] or ha.sha(out/case['raw_path']) != case['raw_sha256']:
         raise ValueError('native source/output changed before optional comparison')
+    if ha.sha(out/case['score_path']) != case['score_sha256']:
+        raise ValueError('native parameter score changed before optional comparison')
+    expected_score = ''.join(f'0\t{k}\t{v:.17g}\n' for k, v in sorted(case['params'].items()))
+    if (out/case['score_path']).read_text() != expected_score:
+        raise ValueError('optional parameters differ from native score')
     manifest_hash = hashlib.sha256(json.dumps(common.library_manifest(Path(libs).resolve()), sort_keys=True).encode()).hexdigest()
     if manifest_hash != case['library_manifest_sha256']:
         raise ValueError('optional backend libraries differ from native libraries')
@@ -161,16 +169,48 @@ def compare_faustprobe(binary, revision: str, native: dict, out, libs):
     for key, value in sorted(case['params'].items()):
         args += ['--set', f'{key}={value:.17g}']
     args.append(source)
-    result = subprocess.run([str(a) for a in args], capture_output=True, text=True, timeout=180)
-    (out/(label+'-faustprobe.stderr')).write_text(result.stderr)
-    if result.returncode:
-        raise RuntimeError(f'optional faustprobe failed ({result.returncode}): {result.stderr}')
-    data = parse_faustprobe_csv(result.stdout, FRAMES, FRAMES)
+    # Save raw output before parsing, including failing executions. A stale
+    # success report must never survive a failed attempt with the same label.
     csv_path = out/(label+'-faustprobe.csv')
-    csv_path.write_text(result.stdout)
-    measured = ha.analyze_window(data, case['diagnostics']['rate'], case['fundamental_hz'],
-                                case['measurement']['signal_class'],
-                                max_generated_order=case['measurement']['finite_model']['max_generated_order'])
+    stderr_path = out/(label+'-faustprobe.stderr')
+    execution_path = out/(label+'-faustprobe-execution.json')
+    for path in (execution_path, csv_path, stderr_path):
+        path.unlink(missing_ok=True)
+    command = [str(a) for a in args]
+    execution = {'schema': 1, 'status': 'failed', 'command': command,
+                 'revision_declared_by_caller': revision, 'binary_sha256': binary_hash}
+    try:
+        result = subprocess.run(command, capture_output=True, text=True, timeout=180)
+        csv_path.write_text(result.stdout)
+        stderr_path.write_text(result.stderr)
+        execution['exit_code'] = result.returncode
+        if result.returncode:
+            raise RuntimeError(f'optional faustprobe failed ({result.returncode}): {result.stderr}')
+        data = parse_faustprobe_csv(result.stdout, FRAMES, FRAMES)
+        measured = ha.analyze_window(data, case['diagnostics']['rate'], case['fundamental_hz'],
+                                    case['measurement']['signal_class'],
+                                    max_generated_order=case['measurement']['finite_model']['max_generated_order'])
+        if ha.sha(executable) != binary_hash or ha.sha(source) != case['source_sha256']:
+            raise RuntimeError('optional binary/source changed during execution')
+        if ha.sha(out/case['raw_path']) != case['raw_sha256']:
+            raise RuntimeError('native output changed during optional comparison')
+        native_samples = np.fromfile(out/case['raw_path'], dtype='<f4')[FRAMES:FRAMES*2]
+        if native_samples.shape != data.shape:
+            raise RuntimeError('native comparison window length mismatch')
+        residual = data.astype(np.float64) - native_samples.astype(np.float64)
+        execution['status'] = 'executed'
+    except subprocess.TimeoutExpired as error:
+        for path, text in ((csv_path, error.stdout), (stderr_path, error.stderr)):
+            path.write_text(text.decode('utf-8', errors='replace') if isinstance(text, bytes) else (text or ''))
+        execution['error'] = 'timeout after 180 seconds'
+        raise
+    except (ValueError, RuntimeError, OSError) as error:
+        execution['error'] = str(error)
+        raise
+    finally:
+        execution['csv_sha256'] = ha.sha(csv_path) if csv_path.exists() else None
+        execution['stderr_sha256'] = ha.sha(stderr_path) if stderr_path.exists() else None
+        execution_path.write_text(json.dumps(execution, indent=2, sort_keys=True)+'\n')
     # Deltas below are only meaningful when both sides can attribute the metric.
     deltas = {}
     for key in ('sfdr_including_harmonics_db', 'off_harmonic_sfdr_db',
@@ -178,9 +218,20 @@ def compare_faustprobe(binary, revision: str, native: dict, out, libs):
         left, right = measured.get(key), case['measurement'].get(key)
         deltas[key] = None if left is None or right is None else left-right
     return {'status': 'executed', 'backend': 'faust-rs/Cranelift',
-            'revision_declared_by_caller': revision, 'binary_sha256': ha.sha(executable),
+            'revision_declared_by_caller': revision, 'binary_sha256': binary_hash,
             'commands': [str(a) for a in args], 'csv_sha256': ha.sha(csv_path),
+            'stderr_sha256': ha.sha(stderr_path), 'execution_sha256': ha.sha(execution_path),
             'native_case_label': label, 'source_sha256': case['source_sha256'],
+            'native_raw_sha256': case['raw_sha256'], 'score_sha256': case['score_sha256'],
+            'library_manifest_sha256': manifest_hash, 'input_sha256': case['input_sha256'],
+            'configuration': {'rate': case['diagnostics']['rate'], 'block': case['diagnostics']['block'],
+                              'frames_rendered': FRAMES*2, 'skip_frames': FRAMES,
+                              'frames_compared': FRAMES, 'controls': case['params'],
+                              'internal_precision': 'double', 'comparison_precision': 'float32',
+                              'csv_conversion': 'decimal to float32, matching native raw output'},
+            'sample_difference': {'maximum_absolute': float(np.max(np.abs(residual))),
+                                  'rms': float(np.sqrt(np.mean(residual*residual))),
+                                  'bit_identical_after_float32_conversion': bool(np.array_equal(data, native_samples))},
             'metric_deltas_db': deltas,
             'measurement': measured, 'execution_environment': environment(),
             'interpretation': 'investigation only; no automatic winner, tolerance or sonic acceptance'}
@@ -242,8 +293,16 @@ def sweep(out, *, faust, libs, archive, cxx='c++', rates=RATES, faustprobe=None,
                    (r['fixture'] == 'cubic' and r['bin'] == 6827 and r['params']['drive'] == 4.0))]
         if not chosen:
             raise ValueError('optional comparison requires the 48000-Hz sweep')
-        report['optional_faustprobe'] = {'status': 'executed', 'required_for_native_qualification': False,
-            'cases': [compare_faustprobe(faustprobe, revision or '', r, out, libs) for r in chosen]}
+        optional = {'status': 'running', 'required_for_native_qualification': False, 'cases': []}
+        report['optional_faustprobe'] = optional
+        try:
+            for row in chosen:
+                optional['cases'].append(compare_faustprobe(faustprobe, revision or '', row, out, libs))
+            optional['status'] = 'executed'
+        except (ValueError, OSError, RuntimeError, subprocess.TimeoutExpired) as error:
+            optional.update(status='failed', error=str(error))
+            destination.write_text(json.dumps(report, indent=2, sort_keys=True, allow_nan=False)+'\n')
+            raise
     destination.write_text(json.dumps(report, indent=2, sort_keys=True, allow_nan=False)+'\n')
     if not report['passed']:
         raise AssertionError('analytic harmonic/fold qualification failed; see qualification.json')
