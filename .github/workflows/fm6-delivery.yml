@@ -73,12 +73,15 @@ jobs:
           cp -r build/fm6/evidence/qualification/listening build/fm6/delivery/listening
           cp build/fm6/evidence/qualification/results.json build/fm6/delivery/results.json
           cp build/fm6/evidence/commit.txt build/fm6/delivery/commit.txt
-          cp build/fm6/evidence/qualification/build/scalar/expanded.dsp build/fm6/delivery/FM6_Classic.dsp
+          /usr/bin/python3 tools/modules/fm6_export.py --module modules/fm6-classic --out build/fm6/delivery/FM6_Classic.dsp \
+            --faust build/fm6/toolchain/build/bin/faust --libraries build/fm6/toolchain/libraries \
+            --baseline build/fm6/evidence/qualification --verify-out build/fm6/evidence/export
+          cp build/fm6/evidence/export/verification.json build/fm6/delivery/export-verification.json
           /usr/bin/python3 - <<'PY'
           from pathlib import Path
           import hashlib,json
           d=Path('build/fm6/delivery')
-          (d/'READ_ME.txt').write_text('FM6 Classic candidate. Each comparison plays original MSFA reference first, then the candidate, with a 250 ms gap. Reference core has one fixed multiplier of 0.1; candidate output level is 0.2 over its half-scale carriers. No per-patch normalization or effects. Six original programs; no factory assets. FM6_Classic.dsp is the expanded standalone Faust source. See module/README.md and results.json for scope, provenance and remaining fidelity limits. Draft/unmerged, not hardware or target-device approval.\n')
+          (d/'READ_ME.txt').write_text('FM6 Classic candidate. Each comparison plays original MSFA reference first, then the candidate, with a 250 ms gap. Reference core has one fixed multiplier of 0.1; candidate output level is 0.2 over its half-scale carriers. No per-patch normalization or effects. Six original programs; no factory assets. FM6_Classic.dsp is a compact single-file voice using standard Faust libraries; its audio was checked against the multi-file voice. See module/README.md and results.json for scope, provenance and remaining fidelity limits. Draft/unmerged, not hardware or target-device approval.\n')
           (d/'SHA256SUMS.json').write_text(json.dumps({str(p.relative_to(d)):hashlib.sha256(p.read_bytes()).hexdigest() for p in d.rglob('*') if p.is_file()},indent=2)+'\n')
           PY
       - name: Preserve source identity

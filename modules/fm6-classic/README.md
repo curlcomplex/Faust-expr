@@ -15,7 +15,7 @@ No library installation is modified. No proprietary ROM or factory patches are u
 
 Generated `v1/`, `manifest.json` and `presets.json` are deliberately build products,
 not hand-maintained duplicate sources. The qualified CI artifact includes these
-ready-to-inspect/load source files, an expanded self-contained Faust source,
+ready-to-inspect/load source files, a compact single-file Faust voice (standard libraries required),
 reference and candidate audio, patch exports, hashes and measurements.
 
 ```sh
@@ -77,3 +77,9 @@ approval is implied by successful Linux rendering.
 
 Preserved baselines: #115 and #119. This version does not replace their source
 or audio and must not silently replace any old project sound identity.
+
+`fm6_export.py` inlines only the machine-local dependencies, preserving definitions
+rather than distributing the 156 MB expanded diagnostic expression. A fresh direct
+compilation must reproduce C01/C02/C03 sample-identically before packaging. The
+export check also exercises all six LFO waveforms at maximum AM depth as
+candidate-only tests; this does not turn MSFA into an AM oracle.
