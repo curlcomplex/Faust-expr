@@ -1,0 +1,1 @@
+v1 now uses signed 24-bit wrapping phase arithmetic and the asymmetric detune table from the MIT `house-of-houses/ubersaw` reference. It remains a source checkpoint: random note-on phase, exact HPF path, complete JP oscillator family/filter/modulation and physical-hardware qualification remain governed by #100. Every audible delivery must include direct recordings.
