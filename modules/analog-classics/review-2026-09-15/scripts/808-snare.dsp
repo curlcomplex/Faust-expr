@@ -414,5 +414,4 @@ ID_358 = 1, ID_357;
 ID_359 = (ID_358 : min);
 ID_360 = ID_347, ID_359;
 ID_361 = ID_360 : *;
-curlop_mono_process = ID_361;
-process = curlop_mono_process <: _, _;
+process = ID_361;

@@ -1,6 +1,6 @@
 {
   "schema": "curlop-analog-classics-review/v1",
-  "identity": "analog-classics-internal-review-2026-09-15.3",
+  "identity": "analog-classics-internal-review-2026-09-15.2",
   "status": "internal-review-only",
   "sourceTree": {
     "branch": "issue-118-analog-classics-review",
@@ -17,14 +17,6 @@
       }
     ]
   },
-  "outputBoundaryContract": {
-    "audioInstruments": 30,
-    "audioEffects": 5,
-    "controlRoleModules": 2,
-    "instrumentOutput": "stereo duplicate of the exact source mono signal",
-    "effectOutput": "native stereo preserved",
-    "controlOutput": "native typed CV/observation signals preserved"
-  },
   "base_review_freeze": {
     "path": "modules/analog-classics/synth-finish/REVIEW_FREEZE.json",
     "sha256": "76d0e4e858ee64e870d61fdaa5ce8cc7e8dc576c2726c44db6e13de45613a1af",
@@ -40,7 +32,7 @@
       "soundVersion": "0.3.0-coherent-candidate",
       "source": {
         "path": "scripts/juno-60.dsp",
-        "sha256": "c8484f67fcbf7a562248450c3e09fd8f291441fb4a058842aadc8edf32633726"
+        "sha256": "042ae1cc4122eaef6e8596110e378d547821f580f464732880fadf1deb9141af"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -58,7 +50,7 @@
       "source_path": "modules/juno-60/v3/voice.dsp",
       "source_sha256": "5a0da538ca7d58fb5ff1ac5de506e531181b4de9e36538b2afa59c3c2129ccab",
       "export_path": "scripts/juno-60.dsp",
-      "export_sha256": "c8484f67fcbf7a562248450c3e09fd8f291441fb4a058842aadc8edf32633726",
+      "export_sha256": "042ae1cc4122eaef6e8596110e378d547821f580f464732880fadf1deb9141af",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -114,21 +106,8 @@
       "lineageUuid": "1c3f39df-0a90-5fdb-9a97-15928050c9ae",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "7454fab1ea092a67baa36d9291908178e39957049cc908384a3a9d7680164e22",
-        "leftSha256": "7454fab1ea092a67baa36d9291908178e39957049cc908384a3a9d7680164e22",
-        "rightSha256": "7454fab1ea092a67baa36d9291908178e39957049cc908384a3a9d7680164e22",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -167,7 +146,7 @@
       "soundVersion": "0.3.0-coherent-candidate",
       "source": {
         "path": "scripts/juno-106.dsp",
-        "sha256": "1101fd53fbdb38e2482d9890397e3117dd7c40e98b4ffb0b73d9461ed5894211"
+        "sha256": "16e7cdca53a9c55f5b790a83e0456070f170407d67bd1a6d4c250dcec8dcfdc1"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -185,7 +164,7 @@
       "source_path": "modules/juno-106/v3/voice.dsp",
       "source_sha256": "c84bf47177ef942f5362a1e3f630cd89a794991090e5138f83357624f8d3813d",
       "export_path": "scripts/juno-106.dsp",
-      "export_sha256": "1101fd53fbdb38e2482d9890397e3117dd7c40e98b4ffb0b73d9461ed5894211",
+      "export_sha256": "16e7cdca53a9c55f5b790a83e0456070f170407d67bd1a6d4c250dcec8dcfdc1",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -247,21 +226,8 @@
       "lineageUuid": "761c2665-8381-57cd-91a2-83f69c196d22",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "5eaab76ca82b83c413a5ecbb1353d6767fe2c6fbcf358bd07007eb6c82167382",
-        "leftSha256": "5eaab76ca82b83c413a5ecbb1353d6767fe2c6fbcf358bd07007eb6c82167382",
-        "rightSha256": "5eaab76ca82b83c413a5ecbb1353d6767fe2c6fbcf358bd07007eb6c82167382",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -300,7 +266,7 @@
       "soundVersion": "0.4.0-coherent-candidate",
       "source": {
         "path": "scripts/sh-101.dsp",
-        "sha256": "4a4be99288757061c1e52defdc2eeb6e1ae98e64b900b9ad96dd151227d9ef2f"
+        "sha256": "3cce76089d21825a6579c64c1c5dc49878ebe05795c1d787fb8eed5350f2a694"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -318,7 +284,7 @@
       "source_path": "modules/mono-101/v4/voice.dsp",
       "source_sha256": "64d8ab4e929ad3a5c3056953d263873f7bc923e33fe8c3ff7f90471ecb7da744",
       "export_path": "scripts/sh-101.dsp",
-      "export_sha256": "4a4be99288757061c1e52defdc2eeb6e1ae98e64b900b9ad96dd151227d9ef2f",
+      "export_sha256": "3cce76089d21825a6579c64c1c5dc49878ebe05795c1d787fb8eed5350f2a694",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -380,21 +346,8 @@
       "lineageUuid": "a19e8424-cdaf-5038-aceb-d44364a4c613",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "86ec31c5d50919315ba116a21ccd45a553d61be913ff871a4c078ff5898bb552",
-        "leftSha256": "86ec31c5d50919315ba116a21ccd45a553d61be913ff871a4c078ff5898bb552",
-        "rightSha256": "86ec31c5d50919315ba116a21ccd45a553d61be913ff871a4c078ff5898bb552",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -438,7 +391,7 @@
       "soundVersion": "0.1.1-experiment",
       "source": {
         "path": "scripts/mini.dsp",
-        "sha256": "fd57a2ef4f9c03789ae26197114318479096199815ba164fc6310332e1abc3d0"
+        "sha256": "eb9f0f1155891ad78c43b2b303c250fbac91f62fd09314a299ff67178c7a5dcc"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -456,7 +409,7 @@
       "source_path": "modules/minimoog/v1/voice.dsp",
       "source_sha256": "442916e387c9688fa0f29cfab832d65929d2a6dca321685c344dbbc105870899",
       "export_path": "scripts/mini.dsp",
-      "export_sha256": "fd57a2ef4f9c03789ae26197114318479096199815ba164fc6310332e1abc3d0",
+      "export_sha256": "eb9f0f1155891ad78c43b2b303c250fbac91f62fd09314a299ff67178c7a5dcc",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -506,21 +459,8 @@
       "lineageUuid": "61ac5885-8777-5daf-8674-8eacebfc407f",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "b168ec7901133f16cf92bebcf2501acde089b975edd71477370b19a418092d29",
-        "leftSha256": "b168ec7901133f16cf92bebcf2501acde089b975edd71477370b19a418092d29",
-        "rightSha256": "b168ec7901133f16cf92bebcf2501acde089b975edd71477370b19a418092d29",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -563,7 +503,7 @@
       "soundVersion": "0.2.0-experiment",
       "source": {
         "path": "scripts/808-kick.dsp",
-        "sha256": "e899014a499a741e6ffee0041af27c7883f8bbe83e9efbbdf430d93c6b12b9de"
+        "sha256": "36cc1c7c82eacf99231a4920e99f392977fd2920367abcfb805ff73d14e16e92"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -581,7 +521,7 @@
       "source_path": "modules/analog-classics/drums-v2/kick808.dsp",
       "source_sha256": "2a8f9579b305623007ac025fba73f2efc8c24a22725d5fafaf1b65616e805613",
       "export_path": "scripts/808-kick.dsp",
-      "export_sha256": "e899014a499a741e6ffee0041af27c7883f8bbe83e9efbbdf430d93c6b12b9de",
+      "export_sha256": "36cc1c7c82eacf99231a4920e99f392977fd2920367abcfb805ff73d14e16e92",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -625,21 +565,8 @@
       "lineageUuid": "14967d66-6b8c-5097-9e56-b9505f9d386c",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "5242198736b3d1db8b9b33a119a07d5def02f82dbd9e9b59886aff1e1c2bb656",
-        "leftSha256": "5242198736b3d1db8b9b33a119a07d5def02f82dbd9e9b59886aff1e1c2bb656",
-        "rightSha256": "5242198736b3d1db8b9b33a119a07d5def02f82dbd9e9b59886aff1e1c2bb656",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -667,7 +594,7 @@
       "soundVersion": "0.2.0-experiment",
       "source": {
         "path": "scripts/808-snare.dsp",
-        "sha256": "98373107915482bbdc95e42d4924737a8efb67856e8dd357c79689df91092d3f"
+        "sha256": "2e4db7d4201ba8299e222ec2dc01fa64a4200279448519b8358f906b1c79f60b"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -685,7 +612,7 @@
       "source_path": "modules/analog-classics/drums-v2/snare808.dsp",
       "source_sha256": "7fc1da292e02f7c76d1b47d2f8ec389d619a3ad9f80cb866b65f2b31407be260",
       "export_path": "scripts/808-snare.dsp",
-      "export_sha256": "98373107915482bbdc95e42d4924737a8efb67856e8dd357c79689df91092d3f",
+      "export_sha256": "2e4db7d4201ba8299e222ec2dc01fa64a4200279448519b8358f906b1c79f60b",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -729,21 +656,8 @@
       "lineageUuid": "34dd45c3-089e-5390-8320-b51904058163",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "876b13abb4552d026f2a52247e209ccc7ce34859d5e0be93b06a702c91f4f1d0",
-        "leftSha256": "876b13abb4552d026f2a52247e209ccc7ce34859d5e0be93b06a702c91f4f1d0",
-        "rightSha256": "876b13abb4552d026f2a52247e209ccc7ce34859d5e0be93b06a702c91f4f1d0",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -771,7 +685,7 @@
       "soundVersion": "0.2.0-experiment",
       "source": {
         "path": "scripts/808-clap.dsp",
-        "sha256": "e1f529dc9e1b443c6a84078b283f1c13c0be1fe167dca1ac7eda222a3e6d4347"
+        "sha256": "2c835c3f44cae79741078f749a1162a7ea734d5bfbe7446505cf59f004490c7a"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -789,7 +703,7 @@
       "source_path": "modules/analog-classics/drums-v2/clap808.dsp",
       "source_sha256": "a8f0bf3f6469c173f12e1a5c47822b9d0a564badd268cfeaf5165b170f597a78",
       "export_path": "scripts/808-clap.dsp",
-      "export_sha256": "e1f529dc9e1b443c6a84078b283f1c13c0be1fe167dca1ac7eda222a3e6d4347",
+      "export_sha256": "2c835c3f44cae79741078f749a1162a7ea734d5bfbe7446505cf59f004490c7a",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -833,21 +747,8 @@
       "lineageUuid": "085cac28-793a-54c4-856a-a25586b9d1ea",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "ef65969fcb90a6e2dd83df3380fa409b31e9fd182618db579e67e31dd360f455",
-        "leftSha256": "ef65969fcb90a6e2dd83df3380fa409b31e9fd182618db579e67e31dd360f455",
-        "rightSha256": "ef65969fcb90a6e2dd83df3380fa409b31e9fd182618db579e67e31dd360f455",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -876,7 +777,7 @@
       "soundVersion": "0.2.0-experiment",
       "source": {
         "path": "scripts/808-cymbal.dsp",
-        "sha256": "e3f9c57690d4212495491aefa5553cde1e9150718fc5b4f44b0d69ebe3c2ab9e"
+        "sha256": "a39e81a2977ac4906716f095cf084e3492f838959de1d633a7b631c5a198c714"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -894,7 +795,7 @@
       "source_path": "modules/analog-classics/drums-v2/cymbal808.dsp",
       "source_sha256": "34342d129169f4695fff37a29010dcf816d050dd8ecfc6e6f5b6552f2eec705d",
       "export_path": "scripts/808-cymbal.dsp",
-      "export_sha256": "e3f9c57690d4212495491aefa5553cde1e9150718fc5b4f44b0d69ebe3c2ab9e",
+      "export_sha256": "a39e81a2977ac4906716f095cf084e3492f838959de1d633a7b631c5a198c714",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -938,21 +839,8 @@
       "lineageUuid": "95bb57b2-2287-5142-91f9-54cc840b5cc7",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "ec274dfe40eaf2d97aa295d40e25baa7bb345bdfdb1b64bf6947b90951a8fb8a",
-        "leftSha256": "ec274dfe40eaf2d97aa295d40e25baa7bb345bdfdb1b64bf6947b90951a8fb8a",
-        "rightSha256": "ec274dfe40eaf2d97aa295d40e25baa7bb345bdfdb1b64bf6947b90951a8fb8a",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -980,7 +868,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/analog-hat-closed.dsp",
-        "sha256": "65e3f68a59c5837cb4fa5c877195cbdf6288a7fcb0a022cdd531511296526052"
+        "sha256": "2dc40a28a2ae1c007e4354d5472b2c6dd33b520eed3bc66cf90cbc96908b3bdb"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -998,7 +886,7 @@
       "source_path": "modules/hats-analog/single-note-v1/closed.dsp",
       "source_sha256": "1622abc37993a1ce08f3bd550dbb9dc91513658961a707406bc365ba292adeed",
       "export_path": "scripts/analog-hat-closed.dsp",
-      "export_sha256": "65e3f68a59c5837cb4fa5c877195cbdf6288a7fcb0a022cdd531511296526052",
+      "export_sha256": "2dc40a28a2ae1c007e4354d5472b2c6dd33b520eed3bc66cf90cbc96908b3bdb",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -1048,21 +936,8 @@
       "lineageUuid": "bb246d43-e4e4-5553-a53f-0021e3f7beca",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "9b7177e2d9e210a9d21ae53dbac0f481b1e0236d1145802dad3d3219d8458288",
-        "leftSha256": "9b7177e2d9e210a9d21ae53dbac0f481b1e0236d1145802dad3d3219d8458288",
-        "rightSha256": "9b7177e2d9e210a9d21ae53dbac0f481b1e0236d1145802dad3d3219d8458288",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -1090,7 +965,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/analog-hat-open.dsp",
-        "sha256": "3661096ae7a77298c3edd2210f8aeda29aa0a31de8666fae9bcde4bcc2b7121e"
+        "sha256": "74a298db0b0ea9a0bb5f6f349cd9bd71a5d5c450bb95a8c99c13a407662ddf45"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -1108,7 +983,7 @@
       "source_path": "modules/hats-analog/single-note-v1/open.dsp",
       "source_sha256": "9bcc793c683af4c24b34346ee28f62ba66e81de895dbcc928ea65ae8a5af7152",
       "export_path": "scripts/analog-hat-open.dsp",
-      "export_sha256": "3661096ae7a77298c3edd2210f8aeda29aa0a31de8666fae9bcde4bcc2b7121e",
+      "export_sha256": "74a298db0b0ea9a0bb5f6f349cd9bd71a5d5c450bb95a8c99c13a407662ddf45",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -1158,21 +1033,8 @@
       "lineageUuid": "ed34bb6d-2371-5ade-9153-a45795aa0af4",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "b89cc95296b4fb90a281b0f512a155dcf6e53d80948cdf3163c32a34b6317d5d",
-        "leftSha256": "b89cc95296b4fb90a281b0f512a155dcf6e53d80948cdf3163c32a34b6317d5d",
-        "rightSha256": "b89cc95296b4fb90a281b0f512a155dcf6e53d80948cdf3163c32a34b6317d5d",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -1204,7 +1066,7 @@
       "soundVersion": "0.2.0-experiment",
       "source": {
         "path": "scripts/analog-kick-sharp.dsp",
-        "sha256": "d76de7be0465f14858a489628078693020b53fa1b3b1e68ea2a281024a127351"
+        "sha256": "04582b55752255d35e670ac72b8d6866f05cd398b57f3155d96a4751957cf575"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -1222,7 +1084,7 @@
       "source_path": "modules/kick-analog/sharp-02/optimized.dsp",
       "source_sha256": "b83178a14247a2c1b7b9d3f1688351c159edb48a90d2dfc4b47759c69851a1ab",
       "export_path": "scripts/analog-kick-sharp.dsp",
-      "export_sha256": "d76de7be0465f14858a489628078693020b53fa1b3b1e68ea2a281024a127351",
+      "export_sha256": "04582b55752255d35e670ac72b8d6866f05cd398b57f3155d96a4751957cf575",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -1310,21 +1172,8 @@
       "lineageUuid": "7990867b-5a01-571a-81a4-baa0c8766364",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "0dc0bdcf7b36261b7bffd5178e5171b050b4c8bae535bb1739e184539a1e13cb",
-        "leftSha256": "0dc0bdcf7b36261b7bffd5178e5171b050b4c8bae535bb1739e184539a1e13cb",
-        "rightSha256": "0dc0bdcf7b36261b7bffd5178e5171b050b4c8bae535bb1739e184539a1e13cb",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -1354,7 +1203,7 @@
       "soundVersion": "0.2.0-experiment",
       "source": {
         "path": "scripts/analog-snare.dsp",
-        "sha256": "63f2d64cbbb388fd54ca86eb9e65b46688f896e6b9c0ab89e96800a84f367447"
+        "sha256": "83447ee3f0140ef64e2e7a9195d04259266d6cf818d733850e49f07a17fa58dd"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -1372,7 +1221,7 @@
       "source_path": "modules/snare-analog/v2/snare.dsp",
       "source_sha256": "388379d7a2d3b9b6a048304fa185ede6c31a0814237418278815ef29d11035dc",
       "export_path": "scripts/analog-snare.dsp",
-      "export_sha256": "63f2d64cbbb388fd54ca86eb9e65b46688f896e6b9c0ab89e96800a84f367447",
+      "export_sha256": "83447ee3f0140ef64e2e7a9195d04259266d6cf818d733850e49f07a17fa58dd",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -1460,21 +1309,8 @@
       "lineageUuid": "7524650e-ccd5-56eb-a9d0-1051c52a811b",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "d9e3ab90f8e7a850baf6171346d9f0c5ebb15748b2c7aa7471087223554ff002",
-        "leftSha256": "d9e3ab90f8e7a850baf6171346d9f0c5ebb15748b2c7aa7471087223554ff002",
-        "rightSha256": "d9e3ab90f8e7a850baf6171346d9f0c5ebb15748b2c7aa7471087223554ff002",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -1503,7 +1339,7 @@
       "soundVersion": "0.3.0-experiment",
       "source": {
         "path": "scripts/clap.dsp",
-        "sha256": "31aad138ea4bc797adb5b1534be932e9f08c5c1e9c61fe6640293accbc15bf5b"
+        "sha256": "b231f6ce27f16559743c6d1b490247ecfda8b46f10102e5e84af4e799258fbfb"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -1521,7 +1357,7 @@
       "source_path": "modules/clap/v3/clap.dsp",
       "source_sha256": "53d55e01f60e0652d38a89495aad5d1961705cfe7cbe7ca145eca91561e106ef",
       "export_path": "scripts/clap.dsp",
-      "export_sha256": "31aad138ea4bc797adb5b1534be932e9f08c5c1e9c61fe6640293accbc15bf5b",
+      "export_sha256": "b231f6ce27f16559743c6d1b490247ecfda8b46f10102e5e84af4e799258fbfb",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -1603,21 +1439,8 @@
       "lineageUuid": "069b7db9-171e-5da0-b3e5-3d317183570e",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "9899aa8747c6efdcaf8aa587d9a973e910aa7b0235cddd00cc5dc17d1bd80299",
-        "leftSha256": "9899aa8747c6efdcaf8aa587d9a973e910aa7b0235cddd00cc5dc17d1bd80299",
-        "rightSha256": "9899aa8747c6efdcaf8aa587d9a973e910aa7b0235cddd00cc5dc17d1bd80299",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -1646,7 +1469,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/acid-voice.dsp",
-        "sha256": "166df8d6070fff090f8a3c4574f0f67614b7da4c6336656e8a4834b4ad7a7522"
+        "sha256": "c9181b93cc5f6dbe6e7b5291603082562e1cca9fe40e2002d89a1e84a1ae0579"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -1664,7 +1487,7 @@
       "source_path": "modules/acid-voice/v1/voice.dsp",
       "source_sha256": "e00efa47999f621e2ca6f8649da0e541ef9d3bc6d496466eba828e5b55fc6bd7",
       "export_path": "scripts/acid-voice.dsp",
-      "export_sha256": "166df8d6070fff090f8a3c4574f0f67614b7da4c6336656e8a4834b4ad7a7522",
+      "export_sha256": "c9181b93cc5f6dbe6e7b5291603082562e1cca9fe40e2002d89a1e84a1ae0579",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -1726,21 +1549,8 @@
       "lineageUuid": "e0485774-ac2b-574a-9c49-ec0b104ae52e",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "6bf71a33fcd985a4857c67045b8c960e9850779042655bebb6da6dce179a9bad",
-        "leftSha256": "6bf71a33fcd985a4857c67045b8c960e9850779042655bebb6da6dce179a9bad",
-        "rightSha256": "6bf71a33fcd985a4857c67045b8c960e9850779042655bebb6da6dce179a9bad",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -1846,7 +1656,6 @@
       "outputEvidence": {
         "audioInputs": 0,
         "signalOutputs": 2,
-        "role": "control",
         "namedOutputs": [
           {
             "label": "gate[curlop:cvout]",
@@ -1857,11 +1666,6 @@
             "role": "observation"
           }
         ]
-      },
-      "outputAdaptation": {
-        "kind": "none-control-role",
-        "sourceOutputs": 2,
-        "finalOutputs": 2
       },
       "contractEvidence": {
         "capturedControls": [
@@ -1983,13 +1787,7 @@
       "outputEvidence": {
         "audioInputs": 2,
         "signalOutputs": 2,
-        "role": "audio-effect",
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "none-native-stereo",
-        "sourceOutputs": 2,
-        "finalOutputs": 2
       },
       "contractEvidence": {
         "capturedControls": [
@@ -2077,13 +1875,7 @@
       "outputEvidence": {
         "audioInputs": 2,
         "signalOutputs": 2,
-        "role": "audio-effect",
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "none-native-stereo",
-        "sourceOutputs": 2,
-        "finalOutputs": 2
       },
       "contractEvidence": {
         "capturedControls": [
@@ -2175,13 +1967,7 @@
       "outputEvidence": {
         "audioInputs": 2,
         "signalOutputs": 2,
-        "role": "audio-effect",
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "none-native-stereo",
-        "sourceOutputs": 2,
-        "finalOutputs": 2
       },
       "contractEvidence": {
         "capturedControls": [
@@ -2269,13 +2055,7 @@
       "outputEvidence": {
         "audioInputs": 2,
         "signalOutputs": 2,
-        "role": "audio-effect",
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "none-native-stereo",
-        "sourceOutputs": 2,
-        "finalOutputs": 2
       },
       "contractEvidence": {
         "capturedControls": [
@@ -2361,13 +2141,7 @@
       "outputEvidence": {
         "audioInputs": 2,
         "signalOutputs": 2,
-        "role": "audio-effect",
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "none-native-stereo",
-        "sourceOutputs": 2,
-        "finalOutputs": 2
       },
       "contractEvidence": {
         "capturedControls": [
@@ -2460,7 +2234,6 @@
       "outputEvidence": {
         "audioInputs": 0,
         "signalOutputs": 5,
-        "role": "control",
         "namedOutputs": [
           {
             "label": "freq[unit:Hz][curlop:cvout]",
@@ -2483,11 +2256,6 @@
             "role": "observation"
           }
         ]
-      },
-      "outputAdaptation": {
-        "kind": "none-control-role",
-        "sourceOutputs": 5,
-        "finalOutputs": 5
       },
       "contractEvidence": {
         "capturedControls": [
@@ -2610,7 +2378,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/606-kick.dsp",
-        "sha256": "292d0137f213fed0b2978cd62dd9d29796b38d08c1bcea0b76825792cf1d7617"
+        "sha256": "1cc2a20ddd5e1773af3392963e8d2ed9e609a59bc00f37ca1677e183de5f38cb"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -2628,7 +2396,7 @@
       "source_path": "modules/drums-606/v1/kick.dsp",
       "source_sha256": "9e11406afe0ee0d27bfeb0669e4f9ab1f06369895e046cc9cc55793b7cee7226",
       "export_path": "scripts/606-kick.dsp",
-      "export_sha256": "292d0137f213fed0b2978cd62dd9d29796b38d08c1bcea0b76825792cf1d7617",
+      "export_sha256": "1cc2a20ddd5e1773af3392963e8d2ed9e609a59bc00f37ca1677e183de5f38cb",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -2678,21 +2446,8 @@
       "lineageUuid": "0ec3f6b5-c31f-5037-a470-65699bacdc2a",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "2eaafd755d7a955131f54313234be7194f4746b881b8fb64130cbf7be04a9893",
-        "leftSha256": "2eaafd755d7a955131f54313234be7194f4746b881b8fb64130cbf7be04a9893",
-        "rightSha256": "2eaafd755d7a955131f54313234be7194f4746b881b8fb64130cbf7be04a9893",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -2722,7 +2477,7 @@
       "soundVersion": "0.2.0-reference-candidate",
       "source": {
         "path": "scripts/606-snare.dsp",
-        "sha256": "024610ab73d61b85d7e5738208f27f42568f7710f0ad0895bdce04fe803f2c33"
+        "sha256": "e7405a55826f4196de0a4cec2c34aa5cf2e71f44793ca8006b1f389f3eec009f"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -2740,7 +2495,7 @@
       "source_path": "modules/drums-606-reference/v1/snare.dsp",
       "source_sha256": "dfcce395df56c62676da40e9522bfa1071e38ce9e656662b7991aef6b731ee7d",
       "export_path": "scripts/606-snare.dsp",
-      "export_sha256": "024610ab73d61b85d7e5738208f27f42568f7710f0ad0895bdce04fe803f2c33",
+      "export_sha256": "e7405a55826f4196de0a4cec2c34aa5cf2e71f44793ca8006b1f389f3eec009f",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -2790,21 +2545,8 @@
       "lineageUuid": "240a8edb-d52f-5708-8ac0-fb57825f44e6",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "6e29e1417d35b6d3fe24fbb5de29850de6b657cc09d039fbc0b06c43d0ebb601",
-        "leftSha256": "6e29e1417d35b6d3fe24fbb5de29850de6b657cc09d039fbc0b06c43d0ebb601",
-        "rightSha256": "6e29e1417d35b6d3fe24fbb5de29850de6b657cc09d039fbc0b06c43d0ebb601",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -2834,7 +2576,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/606-low-tom.dsp",
-        "sha256": "b365502a5313340afda3aed9d98e91d0ffd1ebeb71aab2b52424227274af5a73"
+        "sha256": "a9483a3d1c14547bd41c87f5a1c1e18cb8257cfc0475afbd503ec0973842fa4a"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -2852,7 +2594,7 @@
       "source_path": "modules/drums-606/v1/tom.dsp",
       "source_sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a",
       "export_path": "scripts/606-low-tom.dsp",
-      "export_sha256": "b365502a5313340afda3aed9d98e91d0ffd1ebeb71aab2b52424227274af5a73",
+      "export_sha256": "a9483a3d1c14547bd41c87f5a1c1e18cb8257cfc0475afbd503ec0973842fa4a",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -2902,21 +2644,8 @@
       "lineageUuid": "8398af1c-bccc-5366-9c0c-138a95bf2897",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "5e7237c87552e58db31a612742e4927a85d0958c6c6be40424faf28349f1f5a1",
-        "leftSha256": "5e7237c87552e58db31a612742e4927a85d0958c6c6be40424faf28349f1f5a1",
-        "rightSha256": "5e7237c87552e58db31a612742e4927a85d0958c6c6be40424faf28349f1f5a1",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "frozenPresetSettings": {
         "gate": 0,
@@ -2967,7 +2696,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/606-high-tom.dsp",
-        "sha256": "501f1d2c924cf78b307d8432d39f9325f40ec656795f4cdc4e0826b09c22777e"
+        "sha256": "369b67266e25944619e62b4a59193738a3b51fae5698e615764164faa0b05ab2"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -2985,7 +2714,7 @@
       "source_path": "modules/drums-606/v1/tom.dsp",
       "source_sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a",
       "export_path": "scripts/606-high-tom.dsp",
-      "export_sha256": "501f1d2c924cf78b307d8432d39f9325f40ec656795f4cdc4e0826b09c22777e",
+      "export_sha256": "369b67266e25944619e62b4a59193738a3b51fae5698e615764164faa0b05ab2",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -3035,21 +2764,8 @@
       "lineageUuid": "b85417b2-4be1-5b92-aeb1-ca696b58dfcb",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "7375c9adb0c5c12b717d0d53fcce49eb797c28dfece9044f0fd9529ed898e120",
-        "leftSha256": "7375c9adb0c5c12b717d0d53fcce49eb797c28dfece9044f0fd9529ed898e120",
-        "rightSha256": "7375c9adb0c5c12b717d0d53fcce49eb797c28dfece9044f0fd9529ed898e120",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "frozenPresetSettings": {
         "gate": 0,
@@ -3100,7 +2816,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/606-closed-hat.dsp",
-        "sha256": "47c42810070f0823c7768fd3b15ced0914f1dd4d94af3f739b248514807dada9"
+        "sha256": "ca55535f6acd3f09a532cab9290d82ad6ad9ab536198dfbe22881b611b4257a6"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -3118,7 +2834,7 @@
       "source_path": "modules/drums-606/v1/closed-hat.dsp",
       "source_sha256": "f63cff557b8ace3f7b18d1dafe6dc87fa9cfae6918d9066a6083393fcb552980",
       "export_path": "scripts/606-closed-hat.dsp",
-      "export_sha256": "47c42810070f0823c7768fd3b15ced0914f1dd4d94af3f739b248514807dada9",
+      "export_sha256": "ca55535f6acd3f09a532cab9290d82ad6ad9ab536198dfbe22881b611b4257a6",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -3168,21 +2884,8 @@
       "lineageUuid": "425aab9f-e570-5f7f-9f1c-2d1054d1df1b",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "8c412429e6701c7418fa9e6e630b2306929e7467e42b7fa9c5ac30f7677bb248",
-        "leftSha256": "8c412429e6701c7418fa9e6e630b2306929e7467e42b7fa9c5ac30f7677bb248",
-        "rightSha256": "8c412429e6701c7418fa9e6e630b2306929e7467e42b7fa9c5ac30f7677bb248",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -3212,7 +2915,7 @@
       "soundVersion": "0.2.0-reference-candidate",
       "source": {
         "path": "scripts/606-open-hat.dsp",
-        "sha256": "529ee4c28f3ddc489bfff37465e4a0f2dc10f80f12ec93b50febd450a10f9b38"
+        "sha256": "cb271cdc4d1246384969864c26f0bc2aba7a8c89cd3cb2f7912a2454fd2ee6d3"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -3230,7 +2933,7 @@
       "source_path": "modules/drums-606-reference/v1/open-hat.dsp",
       "source_sha256": "d1d47e3f19a36eaf0550a06361c6a46a4f9d7b3d93bf81b256a757cbf9226a07",
       "export_path": "scripts/606-open-hat.dsp",
-      "export_sha256": "529ee4c28f3ddc489bfff37465e4a0f2dc10f80f12ec93b50febd450a10f9b38",
+      "export_sha256": "cb271cdc4d1246384969864c26f0bc2aba7a8c89cd3cb2f7912a2454fd2ee6d3",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -3280,21 +2983,8 @@
       "lineageUuid": "3250fac3-e336-5c3d-9530-c492681132ce",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "39ef19c10632c13c9b6e20ebb3ab50209f504929fddc3a823d6ae0e7cc510728",
-        "leftSha256": "39ef19c10632c13c9b6e20ebb3ab50209f504929fddc3a823d6ae0e7cc510728",
-        "rightSha256": "39ef19c10632c13c9b6e20ebb3ab50209f504929fddc3a823d6ae0e7cc510728",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -3326,7 +3016,7 @@
       "soundVersion": "0.2.0-reference-candidate",
       "source": {
         "path": "scripts/606-cymbal.dsp",
-        "sha256": "416b1e4fee6802ceae898e1bf07d8eec23c7c1562b7859261f27b6a1331273cd"
+        "sha256": "1af67fb367d781ab8397dd86662ef1a4f068e78d6c35ae32b7e7ba1ec92b4a9a"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -3344,7 +3034,7 @@
       "source_path": "modules/drums-606-reference/v1/cymbal.dsp",
       "source_sha256": "d7a3cbd65f22404a5a4c74db5fbca9653d8d56f71c87de9687e06b1c2de48815",
       "export_path": "scripts/606-cymbal.dsp",
-      "export_sha256": "416b1e4fee6802ceae898e1bf07d8eec23c7c1562b7859261f27b6a1331273cd",
+      "export_sha256": "1af67fb367d781ab8397dd86662ef1a4f068e78d6c35ae32b7e7ba1ec92b4a9a",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -3394,21 +3084,8 @@
       "lineageUuid": "d88ea414-140a-582e-9f74-708e18f13210",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "ac69994550bebdd885893dcae2beffc0c7f8bc0ebc89a9559058dbe9e88be875",
-        "leftSha256": "ac69994550bebdd885893dcae2beffc0c7f8bc0ebc89a9559058dbe9e88be875",
-        "rightSha256": "ac69994550bebdd885893dcae2beffc0c7f8bc0ebc89a9559058dbe9e88be875",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -3438,7 +3115,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/909-kick.dsp",
-        "sha256": "3f32b535e939ab4ed9ff35938b497c3f0078f735bedd2fb3168c2e2d4eb8ce3d"
+        "sha256": "4310c614cc4725508a1ff7eea7a2f0f3569c3fa5065a49827afcb792318d8503"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -3456,7 +3133,7 @@
       "source_path": "modules/drums-909/v1/kick.dsp",
       "source_sha256": "f445870825cbde6b0ba13e394cebcb0b3970d7a18997246229f34e5edcefb294",
       "export_path": "scripts/909-kick.dsp",
-      "export_sha256": "3f32b535e939ab4ed9ff35938b497c3f0078f735bedd2fb3168c2e2d4eb8ce3d",
+      "export_sha256": "4310c614cc4725508a1ff7eea7a2f0f3569c3fa5065a49827afcb792318d8503",
       "license": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseIdentifier": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseStatus": "mixed-reviewed",
@@ -3506,21 +3183,8 @@
       "lineageUuid": "d20bbd5b-8f48-537b-a4ae-414a6dd68c3b",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "08675ffb9339db04b971e1570f3faf070ff7f47f25ed2c7acb8e59e508603561",
-        "leftSha256": "08675ffb9339db04b971e1570f3faf070ff7f47f25ed2c7acb8e59e508603561",
-        "rightSha256": "08675ffb9339db04b971e1570f3faf070ff7f47f25ed2c7acb8e59e508603561",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -3553,7 +3217,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/909-snare.dsp",
-        "sha256": "2e3cdcb35dec60e1868e1bafa63fe3f3429392ec9ece5be00d07c6cfab90433b"
+        "sha256": "f367ebf7b2c62bf8df6631e26add0cfb78c6d59ffe6b9e7e7c5b1c1e21cc42b4"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -3571,7 +3235,7 @@
       "source_path": "modules/drums-909/v1/snare.dsp",
       "source_sha256": "c6fc520a078a65d652318be8d71282d3fc592962c207bfdc0f0af10567fe932a",
       "export_path": "scripts/909-snare.dsp",
-      "export_sha256": "2e3cdcb35dec60e1868e1bafa63fe3f3429392ec9ece5be00d07c6cfab90433b",
+      "export_sha256": "f367ebf7b2c62bf8df6631e26add0cfb78c6d59ffe6b9e7e7c5b1c1e21cc42b4",
       "license": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseIdentifier": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseStatus": "mixed-reviewed",
@@ -3621,21 +3285,8 @@
       "lineageUuid": "dd6faa9e-1e71-5697-8f8f-99b9b3e53225",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "324b7721610e093548df2d58ddb2c18ed4da15329706d886b50fdfeedb32f1d4",
-        "leftSha256": "324b7721610e093548df2d58ddb2c18ed4da15329706d886b50fdfeedb32f1d4",
-        "rightSha256": "324b7721610e093548df2d58ddb2c18ed4da15329706d886b50fdfeedb32f1d4",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -3668,7 +3319,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/909-tom.dsp",
-        "sha256": "49844bebdfa39839c81ac6a0b8b3e9aec295eae958b32a6a72fa3e108408a1b5"
+        "sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -3686,7 +3337,7 @@
       "source_path": "modules/drums-909/v1/tom.dsp",
       "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
       "export_path": "scripts/909-tom.dsp",
-      "export_sha256": "49844bebdfa39839c81ac6a0b8b3e9aec295eae958b32a6a72fa3e108408a1b5",
+      "export_sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6",
       "license": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseIdentifier": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseStatus": "mixed-reviewed",
@@ -3736,21 +3387,8 @@
       "lineageUuid": "eebdc653-f54b-5507-8d8f-fc9fd6e765f5",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "b7f2f06b7b8cd8520fdb64a6e8952339319a1b7bc676521db576b3d17303926f",
-        "leftSha256": "b7f2f06b7b8cd8520fdb64a6e8952339319a1b7bc676521db576b3d17303926f",
-        "rightSha256": "b7f2f06b7b8cd8520fdb64a6e8952339319a1b7bc676521db576b3d17303926f",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "canonicalDefaultState": {
         "kind": "source-defaults",
@@ -3853,7 +3491,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/909-rim.dsp",
-        "sha256": "8f229e7d3f1bdbba04954481f2d1ffe0e352083a99d183aeca5d39723259c2a4"
+        "sha256": "b37e020d3b48036da3e5c572403abdfcc3b1ffd0322722bcff6bc5438c62f808"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -3871,7 +3509,7 @@
       "source_path": "modules/drums-909/v1/rim.dsp",
       "source_sha256": "85281a7917d697dee47a1475ca24d2ecc08e53b48daa6f807c91367c4ee2e635",
       "export_path": "scripts/909-rim.dsp",
-      "export_sha256": "8f229e7d3f1bdbba04954481f2d1ffe0e352083a99d183aeca5d39723259c2a4",
+      "export_sha256": "b37e020d3b48036da3e5c572403abdfcc3b1ffd0322722bcff6bc5438c62f808",
       "license": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseIdentifier": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseStatus": "mixed-reviewed",
@@ -3921,21 +3559,8 @@
       "lineageUuid": "3f40927c-bd6c-52c4-8f6a-0423f8231387",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "4c4e98996342d40b72ee06460b6b56ab8fde72b64f78771aeaae789d9bbd1ed0",
-        "leftSha256": "4c4e98996342d40b72ee06460b6b56ab8fde72b64f78771aeaae789d9bbd1ed0",
-        "rightSha256": "4c4e98996342d40b72ee06460b6b56ab8fde72b64f78771aeaae789d9bbd1ed0",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -3966,7 +3591,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/909-clap.dsp",
-        "sha256": "f322b72eb35747e9f7c60751ffc20259750d6e5efac84db3ff16df9c28f82aae"
+        "sha256": "8d7f9372d8a9ea0c90f26fdfc2f6be64310d88bb347dc47210c0b3456797a353"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -3984,7 +3609,7 @@
       "source_path": "modules/drums-909/v1/clap.dsp",
       "source_sha256": "371ca9aa94d3b12ba1a40243e712283adfc51bd14bf39f5924759d2ef1942194",
       "export_path": "scripts/909-clap.dsp",
-      "export_sha256": "f322b72eb35747e9f7c60751ffc20259750d6e5efac84db3ff16df9c28f82aae",
+      "export_sha256": "8d7f9372d8a9ea0c90f26fdfc2f6be64310d88bb347dc47210c0b3456797a353",
       "license": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseIdentifier": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseStatus": "mixed-reviewed",
@@ -4034,21 +3659,8 @@
       "lineageUuid": "aac7644a-bedf-5252-b8b2-ad0fd9177eae",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "c8d78748bd6d616efbb15df4e0e5355e6ce3eb0e8c98947b3b5e0e3d89819a55",
-        "leftSha256": "c8d78748bd6d616efbb15df4e0e5355e6ce3eb0e8c98947b3b5e0e3d89819a55",
-        "rightSha256": "c8d78748bd6d616efbb15df4e0e5355e6ce3eb0e8c98947b3b5e0e3d89819a55",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -4080,7 +3692,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/808-aux-tom-conga.dsp",
-        "sha256": "b122ba0ab7f0e586f07289c74a7ab3652e77f913bd84bd13b4b987d7dedf91ab"
+        "sha256": "164cb347691328ae0345eda9bcdf97eb8bfdea4857314b4492bb6663b2d89ab9"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -4098,7 +3710,7 @@
       "source_path": "modules/drums-808-aux/v1/tom-conga.dsp",
       "source_sha256": "34b05cd95d78d4ca55f9cc1b7de8c36d74c748a1422b9e950a30256e2b862b6f",
       "export_path": "scripts/808-aux-tom-conga.dsp",
-      "export_sha256": "b122ba0ab7f0e586f07289c74a7ab3652e77f913bd84bd13b4b987d7dedf91ab",
+      "export_sha256": "164cb347691328ae0345eda9bcdf97eb8bfdea4857314b4492bb6663b2d89ab9",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -4148,21 +3760,8 @@
       "lineageUuid": "77c0ae78-0bdf-520f-9a8d-b228f7923b2f",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "862719116197c7842059e3ba012f4c5e24cc2e631ddeda1284019416224bb944",
-        "leftSha256": "862719116197c7842059e3ba012f4c5e24cc2e631ddeda1284019416224bb944",
-        "rightSha256": "862719116197c7842059e3ba012f4c5e24cc2e631ddeda1284019416224bb944",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -4195,7 +3794,7 @@
       "soundVersion": "0.1.1-experiment",
       "source": {
         "path": "scripts/808-aux-rim-claves.dsp",
-        "sha256": "de077f21f56a0a3f121b90bc3ef6221f07d96d6be82898fbd66d9b113ba0c1ca"
+        "sha256": "89b2832c6ccbbd294ab0beddf7d252013e69e8658e0d574947ecf01fe2debade"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -4213,7 +3812,7 @@
       "source_path": "modules/drums-808-aux/v2/rim-claves.dsp",
       "source_sha256": "913f0dc0f7290128c421fcc418cae55e13aae48dfbb382fede5d7c60b267f60d",
       "export_path": "scripts/808-aux-rim-claves.dsp",
-      "export_sha256": "de077f21f56a0a3f121b90bc3ef6221f07d96d6be82898fbd66d9b113ba0c1ca",
+      "export_sha256": "89b2832c6ccbbd294ab0beddf7d252013e69e8658e0d574947ecf01fe2debade",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -4263,21 +3862,8 @@
       "lineageUuid": "6b628dee-1c35-5c48-97d6-4f9d874e65b7",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "68851b53f09bec079a5b1f44cc84af206880614bd317f2ba60a01728709e7eec",
-        "leftSha256": "68851b53f09bec079a5b1f44cc84af206880614bd317f2ba60a01728709e7eec",
-        "rightSha256": "68851b53f09bec079a5b1f44cc84af206880614bd317f2ba60a01728709e7eec",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -4309,7 +3895,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/808-aux-maracas.dsp",
-        "sha256": "27c365f15da585033ba461b3f649440f7a32ba35787f9788ca1e4dfc1329744a"
+        "sha256": "f9c1cbbebe6d84af99d1032b7480aeaf02c63a827852d017bcb462e884dfe90b"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -4327,7 +3913,7 @@
       "source_path": "modules/drums-808-aux/v1/maracas.dsp",
       "source_sha256": "f1d241330dde4e2c6bf5f1db608561e3e3eccbc4619693c99b181dc7172c619c",
       "export_path": "scripts/808-aux-maracas.dsp",
-      "export_sha256": "27c365f15da585033ba461b3f649440f7a32ba35787f9788ca1e4dfc1329744a",
+      "export_sha256": "f9c1cbbebe6d84af99d1032b7480aeaf02c63a827852d017bcb462e884dfe90b",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -4377,21 +3963,8 @@
       "lineageUuid": "3e94ef70-37b0-5b6b-8b59-b940e89614a9",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "7c90b855b228aaaf6133a43ab26c5f004e9224a8a0cb9b821626c1a5ee5e7651",
-        "leftSha256": "7c90b855b228aaaf6133a43ab26c5f004e9224a8a0cb9b821626c1a5ee5e7651",
-        "rightSha256": "7c90b855b228aaaf6133a43ab26c5f004e9224a8a0cb9b821626c1a5ee5e7651",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -4421,7 +3994,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/808-aux-cowbell.dsp",
-        "sha256": "cbb6508eaa92f90b4c2f775e822a32c56e55ae4bb27d303cbaf8935258dfc41d"
+        "sha256": "aba85471dc75cdd24b512f92abf37dff511fa22273425a771dd818af3ff8f637"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -4439,7 +4012,7 @@
       "source_path": "modules/drums-808-aux/v1/cowbell.dsp",
       "source_sha256": "7804add2d39ea1f171c3715a22d2f637d52e3760b4663992fb49a5cb36e8dd41",
       "export_path": "scripts/808-aux-cowbell.dsp",
-      "export_sha256": "cbb6508eaa92f90b4c2f775e822a32c56e55ae4bb27d303cbaf8935258dfc41d",
+      "export_sha256": "aba85471dc75cdd24b512f92abf37dff511fa22273425a771dd818af3ff8f637",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -4489,21 +4062,8 @@
       "lineageUuid": "00c9385c-6c4c-575a-8ca8-b62c8649dd68",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "ad4410701f0dbba9510dc42853b44bedc5eb92a8916e882976a2f5278b2b12a5",
-        "leftSha256": "ad4410701f0dbba9510dc42853b44bedc5eb92a8916e882976a2f5278b2b12a5",
-        "rightSha256": "ad4410701f0dbba9510dc42853b44bedc5eb92a8916e882976a2f5278b2b12a5",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -4536,7 +4096,7 @@
       "soundVersion": "0.3.0-coherent-candidate",
       "source": {
         "path": "scripts/juno-60.dsp",
-        "sha256": "c8484f67fcbf7a562248450c3e09fd8f291441fb4a058842aadc8edf32633726"
+        "sha256": "042ae1cc4122eaef6e8596110e378d547821f580f464732880fadf1deb9141af"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -4554,7 +4114,7 @@
       "source_path": "modules/juno-60/v3/voice.dsp",
       "source_sha256": "5a0da538ca7d58fb5ff1ac5de506e531181b4de9e36538b2afa59c3c2129ccab",
       "export_path": "scripts/juno-60.dsp",
-      "export_sha256": "c8484f67fcbf7a562248450c3e09fd8f291441fb4a058842aadc8edf32633726",
+      "export_sha256": "042ae1cc4122eaef6e8596110e378d547821f580f464732880fadf1deb9141af",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -4610,21 +4170,8 @@
       "lineageUuid": "1c3f39df-0a90-5fdb-9a97-15928050c9ae",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "7454fab1ea092a67baa36d9291908178e39957049cc908384a3a9d7680164e22",
-        "leftSha256": "7454fab1ea092a67baa36d9291908178e39957049cc908384a3a9d7680164e22",
-        "rightSha256": "7454fab1ea092a67baa36d9291908178e39957049cc908384a3a9d7680164e22",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -4663,7 +4210,7 @@
       "soundVersion": "0.3.0-coherent-candidate",
       "source": {
         "path": "scripts/juno-106.dsp",
-        "sha256": "1101fd53fbdb38e2482d9890397e3117dd7c40e98b4ffb0b73d9461ed5894211"
+        "sha256": "16e7cdca53a9c55f5b790a83e0456070f170407d67bd1a6d4c250dcec8dcfdc1"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -4681,7 +4228,7 @@
       "source_path": "modules/juno-106/v3/voice.dsp",
       "source_sha256": "c84bf47177ef942f5362a1e3f630cd89a794991090e5138f83357624f8d3813d",
       "export_path": "scripts/juno-106.dsp",
-      "export_sha256": "1101fd53fbdb38e2482d9890397e3117dd7c40e98b4ffb0b73d9461ed5894211",
+      "export_sha256": "16e7cdca53a9c55f5b790a83e0456070f170407d67bd1a6d4c250dcec8dcfdc1",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -4743,21 +4290,8 @@
       "lineageUuid": "761c2665-8381-57cd-91a2-83f69c196d22",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "5eaab76ca82b83c413a5ecbb1353d6767fe2c6fbcf358bd07007eb6c82167382",
-        "leftSha256": "5eaab76ca82b83c413a5ecbb1353d6767fe2c6fbcf358bd07007eb6c82167382",
-        "rightSha256": "5eaab76ca82b83c413a5ecbb1353d6767fe2c6fbcf358bd07007eb6c82167382",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -4796,7 +4330,7 @@
       "soundVersion": "0.4.0-coherent-candidate",
       "source": {
         "path": "scripts/sh-101.dsp",
-        "sha256": "4a4be99288757061c1e52defdc2eeb6e1ae98e64b900b9ad96dd151227d9ef2f"
+        "sha256": "3cce76089d21825a6579c64c1c5dc49878ebe05795c1d787fb8eed5350f2a694"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -4814,7 +4348,7 @@
       "source_path": "modules/mono-101/v4/voice.dsp",
       "source_sha256": "64d8ab4e929ad3a5c3056953d263873f7bc923e33fe8c3ff7f90471ecb7da744",
       "export_path": "scripts/sh-101.dsp",
-      "export_sha256": "4a4be99288757061c1e52defdc2eeb6e1ae98e64b900b9ad96dd151227d9ef2f",
+      "export_sha256": "3cce76089d21825a6579c64c1c5dc49878ebe05795c1d787fb8eed5350f2a694",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -4876,21 +4410,8 @@
       "lineageUuid": "a19e8424-cdaf-5038-aceb-d44364a4c613",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "86ec31c5d50919315ba116a21ccd45a553d61be913ff871a4c078ff5898bb552",
-        "leftSha256": "86ec31c5d50919315ba116a21ccd45a553d61be913ff871a4c078ff5898bb552",
-        "rightSha256": "86ec31c5d50919315ba116a21ccd45a553d61be913ff871a4c078ff5898bb552",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -4934,7 +4455,7 @@
       "soundVersion": "0.1.1-experiment",
       "source": {
         "path": "scripts/mini.dsp",
-        "sha256": "fd57a2ef4f9c03789ae26197114318479096199815ba164fc6310332e1abc3d0"
+        "sha256": "eb9f0f1155891ad78c43b2b303c250fbac91f62fd09314a299ff67178c7a5dcc"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -4952,7 +4473,7 @@
       "source_path": "modules/minimoog/v1/voice.dsp",
       "source_sha256": "442916e387c9688fa0f29cfab832d65929d2a6dca321685c344dbbc105870899",
       "export_path": "scripts/mini.dsp",
-      "export_sha256": "fd57a2ef4f9c03789ae26197114318479096199815ba164fc6310332e1abc3d0",
+      "export_sha256": "eb9f0f1155891ad78c43b2b303c250fbac91f62fd09314a299ff67178c7a5dcc",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -5002,21 +4523,8 @@
       "lineageUuid": "61ac5885-8777-5daf-8674-8eacebfc407f",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "b168ec7901133f16cf92bebcf2501acde089b975edd71477370b19a418092d29",
-        "leftSha256": "b168ec7901133f16cf92bebcf2501acde089b975edd71477370b19a418092d29",
-        "rightSha256": "b168ec7901133f16cf92bebcf2501acde089b975edd71477370b19a418092d29",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -5059,7 +4567,7 @@
       "soundVersion": "0.2.0-experiment",
       "source": {
         "path": "scripts/808-kick.dsp",
-        "sha256": "e899014a499a741e6ffee0041af27c7883f8bbe83e9efbbdf430d93c6b12b9de"
+        "sha256": "36cc1c7c82eacf99231a4920e99f392977fd2920367abcfb805ff73d14e16e92"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -5077,7 +4585,7 @@
       "source_path": "modules/analog-classics/drums-v2/kick808.dsp",
       "source_sha256": "2a8f9579b305623007ac025fba73f2efc8c24a22725d5fafaf1b65616e805613",
       "export_path": "scripts/808-kick.dsp",
-      "export_sha256": "e899014a499a741e6ffee0041af27c7883f8bbe83e9efbbdf430d93c6b12b9de",
+      "export_sha256": "36cc1c7c82eacf99231a4920e99f392977fd2920367abcfb805ff73d14e16e92",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -5121,21 +4629,8 @@
       "lineageUuid": "14967d66-6b8c-5097-9e56-b9505f9d386c",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "5242198736b3d1db8b9b33a119a07d5def02f82dbd9e9b59886aff1e1c2bb656",
-        "leftSha256": "5242198736b3d1db8b9b33a119a07d5def02f82dbd9e9b59886aff1e1c2bb656",
-        "rightSha256": "5242198736b3d1db8b9b33a119a07d5def02f82dbd9e9b59886aff1e1c2bb656",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -5163,7 +4658,7 @@
       "soundVersion": "0.2.0-experiment",
       "source": {
         "path": "scripts/808-snare.dsp",
-        "sha256": "98373107915482bbdc95e42d4924737a8efb67856e8dd357c79689df91092d3f"
+        "sha256": "2e4db7d4201ba8299e222ec2dc01fa64a4200279448519b8358f906b1c79f60b"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -5181,7 +4676,7 @@
       "source_path": "modules/analog-classics/drums-v2/snare808.dsp",
       "source_sha256": "7fc1da292e02f7c76d1b47d2f8ec389d619a3ad9f80cb866b65f2b31407be260",
       "export_path": "scripts/808-snare.dsp",
-      "export_sha256": "98373107915482bbdc95e42d4924737a8efb67856e8dd357c79689df91092d3f",
+      "export_sha256": "2e4db7d4201ba8299e222ec2dc01fa64a4200279448519b8358f906b1c79f60b",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -5225,21 +4720,8 @@
       "lineageUuid": "34dd45c3-089e-5390-8320-b51904058163",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "876b13abb4552d026f2a52247e209ccc7ce34859d5e0be93b06a702c91f4f1d0",
-        "leftSha256": "876b13abb4552d026f2a52247e209ccc7ce34859d5e0be93b06a702c91f4f1d0",
-        "rightSha256": "876b13abb4552d026f2a52247e209ccc7ce34859d5e0be93b06a702c91f4f1d0",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -5267,7 +4749,7 @@
       "soundVersion": "0.2.0-experiment",
       "source": {
         "path": "scripts/808-clap.dsp",
-        "sha256": "e1f529dc9e1b443c6a84078b283f1c13c0be1fe167dca1ac7eda222a3e6d4347"
+        "sha256": "2c835c3f44cae79741078f749a1162a7ea734d5bfbe7446505cf59f004490c7a"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -5285,7 +4767,7 @@
       "source_path": "modules/analog-classics/drums-v2/clap808.dsp",
       "source_sha256": "a8f0bf3f6469c173f12e1a5c47822b9d0a564badd268cfeaf5165b170f597a78",
       "export_path": "scripts/808-clap.dsp",
-      "export_sha256": "e1f529dc9e1b443c6a84078b283f1c13c0be1fe167dca1ac7eda222a3e6d4347",
+      "export_sha256": "2c835c3f44cae79741078f749a1162a7ea734d5bfbe7446505cf59f004490c7a",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -5329,21 +4811,8 @@
       "lineageUuid": "085cac28-793a-54c4-856a-a25586b9d1ea",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "ef65969fcb90a6e2dd83df3380fa409b31e9fd182618db579e67e31dd360f455",
-        "leftSha256": "ef65969fcb90a6e2dd83df3380fa409b31e9fd182618db579e67e31dd360f455",
-        "rightSha256": "ef65969fcb90a6e2dd83df3380fa409b31e9fd182618db579e67e31dd360f455",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -5372,7 +4841,7 @@
       "soundVersion": "0.2.0-experiment",
       "source": {
         "path": "scripts/808-cymbal.dsp",
-        "sha256": "e3f9c57690d4212495491aefa5553cde1e9150718fc5b4f44b0d69ebe3c2ab9e"
+        "sha256": "a39e81a2977ac4906716f095cf084e3492f838959de1d633a7b631c5a198c714"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -5390,7 +4859,7 @@
       "source_path": "modules/analog-classics/drums-v2/cymbal808.dsp",
       "source_sha256": "34342d129169f4695fff37a29010dcf816d050dd8ecfc6e6f5b6552f2eec705d",
       "export_path": "scripts/808-cymbal.dsp",
-      "export_sha256": "e3f9c57690d4212495491aefa5553cde1e9150718fc5b4f44b0d69ebe3c2ab9e",
+      "export_sha256": "a39e81a2977ac4906716f095cf084e3492f838959de1d633a7b631c5a198c714",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -5434,21 +4903,8 @@
       "lineageUuid": "95bb57b2-2287-5142-91f9-54cc840b5cc7",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "ec274dfe40eaf2d97aa295d40e25baa7bb345bdfdb1b64bf6947b90951a8fb8a",
-        "leftSha256": "ec274dfe40eaf2d97aa295d40e25baa7bb345bdfdb1b64bf6947b90951a8fb8a",
-        "rightSha256": "ec274dfe40eaf2d97aa295d40e25baa7bb345bdfdb1b64bf6947b90951a8fb8a",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -5476,7 +4932,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/analog-hat-closed.dsp",
-        "sha256": "65e3f68a59c5837cb4fa5c877195cbdf6288a7fcb0a022cdd531511296526052"
+        "sha256": "2dc40a28a2ae1c007e4354d5472b2c6dd33b520eed3bc66cf90cbc96908b3bdb"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -5494,7 +4950,7 @@
       "source_path": "modules/hats-analog/single-note-v1/closed.dsp",
       "source_sha256": "1622abc37993a1ce08f3bd550dbb9dc91513658961a707406bc365ba292adeed",
       "export_path": "scripts/analog-hat-closed.dsp",
-      "export_sha256": "65e3f68a59c5837cb4fa5c877195cbdf6288a7fcb0a022cdd531511296526052",
+      "export_sha256": "2dc40a28a2ae1c007e4354d5472b2c6dd33b520eed3bc66cf90cbc96908b3bdb",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -5544,21 +5000,8 @@
       "lineageUuid": "bb246d43-e4e4-5553-a53f-0021e3f7beca",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "9b7177e2d9e210a9d21ae53dbac0f481b1e0236d1145802dad3d3219d8458288",
-        "leftSha256": "9b7177e2d9e210a9d21ae53dbac0f481b1e0236d1145802dad3d3219d8458288",
-        "rightSha256": "9b7177e2d9e210a9d21ae53dbac0f481b1e0236d1145802dad3d3219d8458288",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -5586,7 +5029,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/analog-hat-open.dsp",
-        "sha256": "3661096ae7a77298c3edd2210f8aeda29aa0a31de8666fae9bcde4bcc2b7121e"
+        "sha256": "74a298db0b0ea9a0bb5f6f349cd9bd71a5d5c450bb95a8c99c13a407662ddf45"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -5604,7 +5047,7 @@
       "source_path": "modules/hats-analog/single-note-v1/open.dsp",
       "source_sha256": "9bcc793c683af4c24b34346ee28f62ba66e81de895dbcc928ea65ae8a5af7152",
       "export_path": "scripts/analog-hat-open.dsp",
-      "export_sha256": "3661096ae7a77298c3edd2210f8aeda29aa0a31de8666fae9bcde4bcc2b7121e",
+      "export_sha256": "74a298db0b0ea9a0bb5f6f349cd9bd71a5d5c450bb95a8c99c13a407662ddf45",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -5654,21 +5097,8 @@
       "lineageUuid": "ed34bb6d-2371-5ade-9153-a45795aa0af4",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "b89cc95296b4fb90a281b0f512a155dcf6e53d80948cdf3163c32a34b6317d5d",
-        "leftSha256": "b89cc95296b4fb90a281b0f512a155dcf6e53d80948cdf3163c32a34b6317d5d",
-        "rightSha256": "b89cc95296b4fb90a281b0f512a155dcf6e53d80948cdf3163c32a34b6317d5d",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -5700,7 +5130,7 @@
       "soundVersion": "0.2.0-experiment",
       "source": {
         "path": "scripts/analog-kick-sharp.dsp",
-        "sha256": "d76de7be0465f14858a489628078693020b53fa1b3b1e68ea2a281024a127351"
+        "sha256": "04582b55752255d35e670ac72b8d6866f05cd398b57f3155d96a4751957cf575"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -5718,7 +5148,7 @@
       "source_path": "modules/kick-analog/sharp-02/optimized.dsp",
       "source_sha256": "b83178a14247a2c1b7b9d3f1688351c159edb48a90d2dfc4b47759c69851a1ab",
       "export_path": "scripts/analog-kick-sharp.dsp",
-      "export_sha256": "d76de7be0465f14858a489628078693020b53fa1b3b1e68ea2a281024a127351",
+      "export_sha256": "04582b55752255d35e670ac72b8d6866f05cd398b57f3155d96a4751957cf575",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -5806,21 +5236,8 @@
       "lineageUuid": "7990867b-5a01-571a-81a4-baa0c8766364",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "0dc0bdcf7b36261b7bffd5178e5171b050b4c8bae535bb1739e184539a1e13cb",
-        "leftSha256": "0dc0bdcf7b36261b7bffd5178e5171b050b4c8bae535bb1739e184539a1e13cb",
-        "rightSha256": "0dc0bdcf7b36261b7bffd5178e5171b050b4c8bae535bb1739e184539a1e13cb",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -5850,7 +5267,7 @@
       "soundVersion": "0.2.0-experiment",
       "source": {
         "path": "scripts/analog-snare.dsp",
-        "sha256": "63f2d64cbbb388fd54ca86eb9e65b46688f896e6b9c0ab89e96800a84f367447"
+        "sha256": "83447ee3f0140ef64e2e7a9195d04259266d6cf818d733850e49f07a17fa58dd"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -5868,7 +5285,7 @@
       "source_path": "modules/snare-analog/v2/snare.dsp",
       "source_sha256": "388379d7a2d3b9b6a048304fa185ede6c31a0814237418278815ef29d11035dc",
       "export_path": "scripts/analog-snare.dsp",
-      "export_sha256": "63f2d64cbbb388fd54ca86eb9e65b46688f896e6b9c0ab89e96800a84f367447",
+      "export_sha256": "83447ee3f0140ef64e2e7a9195d04259266d6cf818d733850e49f07a17fa58dd",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -5956,21 +5373,8 @@
       "lineageUuid": "7524650e-ccd5-56eb-a9d0-1051c52a811b",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "d9e3ab90f8e7a850baf6171346d9f0c5ebb15748b2c7aa7471087223554ff002",
-        "leftSha256": "d9e3ab90f8e7a850baf6171346d9f0c5ebb15748b2c7aa7471087223554ff002",
-        "rightSha256": "d9e3ab90f8e7a850baf6171346d9f0c5ebb15748b2c7aa7471087223554ff002",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -5999,7 +5403,7 @@
       "soundVersion": "0.3.0-experiment",
       "source": {
         "path": "scripts/clap.dsp",
-        "sha256": "31aad138ea4bc797adb5b1534be932e9f08c5c1e9c61fe6640293accbc15bf5b"
+        "sha256": "b231f6ce27f16559743c6d1b490247ecfda8b46f10102e5e84af4e799258fbfb"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -6017,7 +5421,7 @@
       "source_path": "modules/clap/v3/clap.dsp",
       "source_sha256": "53d55e01f60e0652d38a89495aad5d1961705cfe7cbe7ca145eca91561e106ef",
       "export_path": "scripts/clap.dsp",
-      "export_sha256": "31aad138ea4bc797adb5b1534be932e9f08c5c1e9c61fe6640293accbc15bf5b",
+      "export_sha256": "b231f6ce27f16559743c6d1b490247ecfda8b46f10102e5e84af4e799258fbfb",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -6099,21 +5503,8 @@
       "lineageUuid": "069b7db9-171e-5da0-b3e5-3d317183570e",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "9899aa8747c6efdcaf8aa587d9a973e910aa7b0235cddd00cc5dc17d1bd80299",
-        "leftSha256": "9899aa8747c6efdcaf8aa587d9a973e910aa7b0235cddd00cc5dc17d1bd80299",
-        "rightSha256": "9899aa8747c6efdcaf8aa587d9a973e910aa7b0235cddd00cc5dc17d1bd80299",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -6142,7 +5533,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/acid-voice.dsp",
-        "sha256": "166df8d6070fff090f8a3c4574f0f67614b7da4c6336656e8a4834b4ad7a7522"
+        "sha256": "c9181b93cc5f6dbe6e7b5291603082562e1cca9fe40e2002d89a1e84a1ae0579"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -6160,7 +5551,7 @@
       "source_path": "modules/acid-voice/v1/voice.dsp",
       "source_sha256": "e00efa47999f621e2ca6f8649da0e541ef9d3bc6d496466eba828e5b55fc6bd7",
       "export_path": "scripts/acid-voice.dsp",
-      "export_sha256": "166df8d6070fff090f8a3c4574f0f67614b7da4c6336656e8a4834b4ad7a7522",
+      "export_sha256": "c9181b93cc5f6dbe6e7b5291603082562e1cca9fe40e2002d89a1e84a1ae0579",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -6222,21 +5613,8 @@
       "lineageUuid": "e0485774-ac2b-574a-9c49-ec0b104ae52e",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "6bf71a33fcd985a4857c67045b8c960e9850779042655bebb6da6dce179a9bad",
-        "leftSha256": "6bf71a33fcd985a4857c67045b8c960e9850779042655bebb6da6dce179a9bad",
-        "rightSha256": "6bf71a33fcd985a4857c67045b8c960e9850779042655bebb6da6dce179a9bad",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -6342,7 +5720,6 @@
       "outputEvidence": {
         "audioInputs": 0,
         "signalOutputs": 2,
-        "role": "control",
         "namedOutputs": [
           {
             "label": "gate[curlop:cvout]",
@@ -6353,11 +5730,6 @@
             "role": "observation"
           }
         ]
-      },
-      "outputAdaptation": {
-        "kind": "none-control-role",
-        "sourceOutputs": 2,
-        "finalOutputs": 2
       },
       "contractEvidence": {
         "capturedControls": [
@@ -6479,13 +5851,7 @@
       "outputEvidence": {
         "audioInputs": 2,
         "signalOutputs": 2,
-        "role": "audio-effect",
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "none-native-stereo",
-        "sourceOutputs": 2,
-        "finalOutputs": 2
       },
       "contractEvidence": {
         "capturedControls": [
@@ -6573,13 +5939,7 @@
       "outputEvidence": {
         "audioInputs": 2,
         "signalOutputs": 2,
-        "role": "audio-effect",
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "none-native-stereo",
-        "sourceOutputs": 2,
-        "finalOutputs": 2
       },
       "contractEvidence": {
         "capturedControls": [
@@ -6671,13 +6031,7 @@
       "outputEvidence": {
         "audioInputs": 2,
         "signalOutputs": 2,
-        "role": "audio-effect",
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "none-native-stereo",
-        "sourceOutputs": 2,
-        "finalOutputs": 2
       },
       "contractEvidence": {
         "capturedControls": [
@@ -6765,13 +6119,7 @@
       "outputEvidence": {
         "audioInputs": 2,
         "signalOutputs": 2,
-        "role": "audio-effect",
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "none-native-stereo",
-        "sourceOutputs": 2,
-        "finalOutputs": 2
       },
       "contractEvidence": {
         "capturedControls": [
@@ -6857,13 +6205,7 @@
       "outputEvidence": {
         "audioInputs": 2,
         "signalOutputs": 2,
-        "role": "audio-effect",
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "none-native-stereo",
-        "sourceOutputs": 2,
-        "finalOutputs": 2
       },
       "contractEvidence": {
         "capturedControls": [
@@ -6956,7 +6298,6 @@
       "outputEvidence": {
         "audioInputs": 0,
         "signalOutputs": 5,
-        "role": "control",
         "namedOutputs": [
           {
             "label": "freq[unit:Hz][curlop:cvout]",
@@ -6979,11 +6320,6 @@
             "role": "observation"
           }
         ]
-      },
-      "outputAdaptation": {
-        "kind": "none-control-role",
-        "sourceOutputs": 5,
-        "finalOutputs": 5
       },
       "contractEvidence": {
         "capturedControls": [
@@ -7106,7 +6442,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/606-kick.dsp",
-        "sha256": "292d0137f213fed0b2978cd62dd9d29796b38d08c1bcea0b76825792cf1d7617"
+        "sha256": "1cc2a20ddd5e1773af3392963e8d2ed9e609a59bc00f37ca1677e183de5f38cb"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -7124,7 +6460,7 @@
       "source_path": "modules/drums-606/v1/kick.dsp",
       "source_sha256": "9e11406afe0ee0d27bfeb0669e4f9ab1f06369895e046cc9cc55793b7cee7226",
       "export_path": "scripts/606-kick.dsp",
-      "export_sha256": "292d0137f213fed0b2978cd62dd9d29796b38d08c1bcea0b76825792cf1d7617",
+      "export_sha256": "1cc2a20ddd5e1773af3392963e8d2ed9e609a59bc00f37ca1677e183de5f38cb",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -7174,21 +6510,8 @@
       "lineageUuid": "0ec3f6b5-c31f-5037-a470-65699bacdc2a",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "2eaafd755d7a955131f54313234be7194f4746b881b8fb64130cbf7be04a9893",
-        "leftSha256": "2eaafd755d7a955131f54313234be7194f4746b881b8fb64130cbf7be04a9893",
-        "rightSha256": "2eaafd755d7a955131f54313234be7194f4746b881b8fb64130cbf7be04a9893",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -7218,7 +6541,7 @@
       "soundVersion": "0.2.0-reference-candidate",
       "source": {
         "path": "scripts/606-snare.dsp",
-        "sha256": "024610ab73d61b85d7e5738208f27f42568f7710f0ad0895bdce04fe803f2c33"
+        "sha256": "e7405a55826f4196de0a4cec2c34aa5cf2e71f44793ca8006b1f389f3eec009f"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -7236,7 +6559,7 @@
       "source_path": "modules/drums-606-reference/v1/snare.dsp",
       "source_sha256": "dfcce395df56c62676da40e9522bfa1071e38ce9e656662b7991aef6b731ee7d",
       "export_path": "scripts/606-snare.dsp",
-      "export_sha256": "024610ab73d61b85d7e5738208f27f42568f7710f0ad0895bdce04fe803f2c33",
+      "export_sha256": "e7405a55826f4196de0a4cec2c34aa5cf2e71f44793ca8006b1f389f3eec009f",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -7286,21 +6609,8 @@
       "lineageUuid": "240a8edb-d52f-5708-8ac0-fb57825f44e6",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "6e29e1417d35b6d3fe24fbb5de29850de6b657cc09d039fbc0b06c43d0ebb601",
-        "leftSha256": "6e29e1417d35b6d3fe24fbb5de29850de6b657cc09d039fbc0b06c43d0ebb601",
-        "rightSha256": "6e29e1417d35b6d3fe24fbb5de29850de6b657cc09d039fbc0b06c43d0ebb601",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -7330,7 +6640,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/606-low-tom.dsp",
-        "sha256": "b365502a5313340afda3aed9d98e91d0ffd1ebeb71aab2b52424227274af5a73"
+        "sha256": "a9483a3d1c14547bd41c87f5a1c1e18cb8257cfc0475afbd503ec0973842fa4a"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -7348,7 +6658,7 @@
       "source_path": "modules/drums-606/v1/tom.dsp",
       "source_sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a",
       "export_path": "scripts/606-low-tom.dsp",
-      "export_sha256": "b365502a5313340afda3aed9d98e91d0ffd1ebeb71aab2b52424227274af5a73",
+      "export_sha256": "a9483a3d1c14547bd41c87f5a1c1e18cb8257cfc0475afbd503ec0973842fa4a",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -7398,21 +6708,8 @@
       "lineageUuid": "8398af1c-bccc-5366-9c0c-138a95bf2897",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "5e7237c87552e58db31a612742e4927a85d0958c6c6be40424faf28349f1f5a1",
-        "leftSha256": "5e7237c87552e58db31a612742e4927a85d0958c6c6be40424faf28349f1f5a1",
-        "rightSha256": "5e7237c87552e58db31a612742e4927a85d0958c6c6be40424faf28349f1f5a1",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "frozenPresetSettings": {
         "gate": 0,
@@ -7463,7 +6760,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/606-high-tom.dsp",
-        "sha256": "501f1d2c924cf78b307d8432d39f9325f40ec656795f4cdc4e0826b09c22777e"
+        "sha256": "369b67266e25944619e62b4a59193738a3b51fae5698e615764164faa0b05ab2"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -7481,7 +6778,7 @@
       "source_path": "modules/drums-606/v1/tom.dsp",
       "source_sha256": "15bb63cf3700737b57b92e37b35dec5bb9a3ffee7f290f80cdb778f59e20213a",
       "export_path": "scripts/606-high-tom.dsp",
-      "export_sha256": "501f1d2c924cf78b307d8432d39f9325f40ec656795f4cdc4e0826b09c22777e",
+      "export_sha256": "369b67266e25944619e62b4a59193738a3b51fae5698e615764164faa0b05ab2",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -7531,21 +6828,8 @@
       "lineageUuid": "b85417b2-4be1-5b92-aeb1-ca696b58dfcb",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "7375c9adb0c5c12b717d0d53fcce49eb797c28dfece9044f0fd9529ed898e120",
-        "leftSha256": "7375c9adb0c5c12b717d0d53fcce49eb797c28dfece9044f0fd9529ed898e120",
-        "rightSha256": "7375c9adb0c5c12b717d0d53fcce49eb797c28dfece9044f0fd9529ed898e120",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "frozenPresetSettings": {
         "gate": 0,
@@ -7596,7 +6880,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/606-closed-hat.dsp",
-        "sha256": "47c42810070f0823c7768fd3b15ced0914f1dd4d94af3f739b248514807dada9"
+        "sha256": "ca55535f6acd3f09a532cab9290d82ad6ad9ab536198dfbe22881b611b4257a6"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -7614,7 +6898,7 @@
       "source_path": "modules/drums-606/v1/closed-hat.dsp",
       "source_sha256": "f63cff557b8ace3f7b18d1dafe6dc87fa9cfae6918d9066a6083393fcb552980",
       "export_path": "scripts/606-closed-hat.dsp",
-      "export_sha256": "47c42810070f0823c7768fd3b15ced0914f1dd4d94af3f739b248514807dada9",
+      "export_sha256": "ca55535f6acd3f09a532cab9290d82ad6ad9ab536198dfbe22881b611b4257a6",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -7664,21 +6948,8 @@
       "lineageUuid": "425aab9f-e570-5f7f-9f1c-2d1054d1df1b",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "8c412429e6701c7418fa9e6e630b2306929e7467e42b7fa9c5ac30f7677bb248",
-        "leftSha256": "8c412429e6701c7418fa9e6e630b2306929e7467e42b7fa9c5ac30f7677bb248",
-        "rightSha256": "8c412429e6701c7418fa9e6e630b2306929e7467e42b7fa9c5ac30f7677bb248",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -7708,7 +6979,7 @@
       "soundVersion": "0.2.0-reference-candidate",
       "source": {
         "path": "scripts/606-open-hat.dsp",
-        "sha256": "529ee4c28f3ddc489bfff37465e4a0f2dc10f80f12ec93b50febd450a10f9b38"
+        "sha256": "cb271cdc4d1246384969864c26f0bc2aba7a8c89cd3cb2f7912a2454fd2ee6d3"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -7726,7 +6997,7 @@
       "source_path": "modules/drums-606-reference/v1/open-hat.dsp",
       "source_sha256": "d1d47e3f19a36eaf0550a06361c6a46a4f9d7b3d93bf81b256a757cbf9226a07",
       "export_path": "scripts/606-open-hat.dsp",
-      "export_sha256": "529ee4c28f3ddc489bfff37465e4a0f2dc10f80f12ec93b50febd450a10f9b38",
+      "export_sha256": "cb271cdc4d1246384969864c26f0bc2aba7a8c89cd3cb2f7912a2454fd2ee6d3",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -7776,21 +7047,8 @@
       "lineageUuid": "3250fac3-e336-5c3d-9530-c492681132ce",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "39ef19c10632c13c9b6e20ebb3ab50209f504929fddc3a823d6ae0e7cc510728",
-        "leftSha256": "39ef19c10632c13c9b6e20ebb3ab50209f504929fddc3a823d6ae0e7cc510728",
-        "rightSha256": "39ef19c10632c13c9b6e20ebb3ab50209f504929fddc3a823d6ae0e7cc510728",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -7822,7 +7080,7 @@
       "soundVersion": "0.2.0-reference-candidate",
       "source": {
         "path": "scripts/606-cymbal.dsp",
-        "sha256": "416b1e4fee6802ceae898e1bf07d8eec23c7c1562b7859261f27b6a1331273cd"
+        "sha256": "1af67fb367d781ab8397dd86662ef1a4f068e78d6c35ae32b7e7ba1ec92b4a9a"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -7840,7 +7098,7 @@
       "source_path": "modules/drums-606-reference/v1/cymbal.dsp",
       "source_sha256": "d7a3cbd65f22404a5a4c74db5fbca9653d8d56f71c87de9687e06b1c2de48815",
       "export_path": "scripts/606-cymbal.dsp",
-      "export_sha256": "416b1e4fee6802ceae898e1bf07d8eec23c7c1562b7859261f27b6a1331273cd",
+      "export_sha256": "1af67fb367d781ab8397dd86662ef1a4f068e78d6c35ae32b7e7ba1ec92b4a9a",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -7890,21 +7148,8 @@
       "lineageUuid": "d88ea414-140a-582e-9f74-708e18f13210",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "ac69994550bebdd885893dcae2beffc0c7f8bc0ebc89a9559058dbe9e88be875",
-        "leftSha256": "ac69994550bebdd885893dcae2beffc0c7f8bc0ebc89a9559058dbe9e88be875",
-        "rightSha256": "ac69994550bebdd885893dcae2beffc0c7f8bc0ebc89a9559058dbe9e88be875",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -7934,7 +7179,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/909-kick.dsp",
-        "sha256": "3f32b535e939ab4ed9ff35938b497c3f0078f735bedd2fb3168c2e2d4eb8ce3d"
+        "sha256": "4310c614cc4725508a1ff7eea7a2f0f3569c3fa5065a49827afcb792318d8503"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -7952,7 +7197,7 @@
       "source_path": "modules/drums-909/v1/kick.dsp",
       "source_sha256": "f445870825cbde6b0ba13e394cebcb0b3970d7a18997246229f34e5edcefb294",
       "export_path": "scripts/909-kick.dsp",
-      "export_sha256": "3f32b535e939ab4ed9ff35938b497c3f0078f735bedd2fb3168c2e2d4eb8ce3d",
+      "export_sha256": "4310c614cc4725508a1ff7eea7a2f0f3569c3fa5065a49827afcb792318d8503",
       "license": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseIdentifier": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseStatus": "mixed-reviewed",
@@ -8002,21 +7247,8 @@
       "lineageUuid": "d20bbd5b-8f48-537b-a4ae-414a6dd68c3b",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "08675ffb9339db04b971e1570f3faf070ff7f47f25ed2c7acb8e59e508603561",
-        "leftSha256": "08675ffb9339db04b971e1570f3faf070ff7f47f25ed2c7acb8e59e508603561",
-        "rightSha256": "08675ffb9339db04b971e1570f3faf070ff7f47f25ed2c7acb8e59e508603561",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -8049,7 +7281,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/909-snare.dsp",
-        "sha256": "2e3cdcb35dec60e1868e1bafa63fe3f3429392ec9ece5be00d07c6cfab90433b"
+        "sha256": "f367ebf7b2c62bf8df6631e26add0cfb78c6d59ffe6b9e7e7c5b1c1e21cc42b4"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -8067,7 +7299,7 @@
       "source_path": "modules/drums-909/v1/snare.dsp",
       "source_sha256": "c6fc520a078a65d652318be8d71282d3fc592962c207bfdc0f0af10567fe932a",
       "export_path": "scripts/909-snare.dsp",
-      "export_sha256": "2e3cdcb35dec60e1868e1bafa63fe3f3429392ec9ece5be00d07c6cfab90433b",
+      "export_sha256": "f367ebf7b2c62bf8df6631e26add0cfb78c6d59ffe6b9e7e7c5b1c1e21cc42b4",
       "license": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseIdentifier": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseStatus": "mixed-reviewed",
@@ -8117,21 +7349,8 @@
       "lineageUuid": "dd6faa9e-1e71-5697-8f8f-99b9b3e53225",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "324b7721610e093548df2d58ddb2c18ed4da15329706d886b50fdfeedb32f1d4",
-        "leftSha256": "324b7721610e093548df2d58ddb2c18ed4da15329706d886b50fdfeedb32f1d4",
-        "rightSha256": "324b7721610e093548df2d58ddb2c18ed4da15329706d886b50fdfeedb32f1d4",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -8164,7 +7383,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/909-tom.dsp",
-        "sha256": "49844bebdfa39839c81ac6a0b8b3e9aec295eae958b32a6a72fa3e108408a1b5"
+        "sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -8182,7 +7401,7 @@
       "source_path": "modules/drums-909/v1/tom.dsp",
       "source_sha256": "a43aadf81e3c4567cbdd0ca6f0d876d23b4292f77644aa362c2f0a0681f94c75",
       "export_path": "scripts/909-tom.dsp",
-      "export_sha256": "49844bebdfa39839c81ac6a0b8b3e9aec295eae958b32a6a72fa3e108408a1b5",
+      "export_sha256": "48dd45882991813a0bd25d856193eac42f51a98a4b1779aacbc02b721d0480f6",
       "license": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseIdentifier": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseStatus": "mixed-reviewed",
@@ -8232,21 +7451,8 @@
       "lineageUuid": "eebdc653-f54b-5507-8d8f-fc9fd6e765f5",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "b7f2f06b7b8cd8520fdb64a6e8952339319a1b7bc676521db576b3d17303926f",
-        "leftSha256": "b7f2f06b7b8cd8520fdb64a6e8952339319a1b7bc676521db576b3d17303926f",
-        "rightSha256": "b7f2f06b7b8cd8520fdb64a6e8952339319a1b7bc676521db576b3d17303926f",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "canonicalDefaultState": {
         "kind": "source-defaults",
@@ -8349,7 +7555,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/909-rim.dsp",
-        "sha256": "8f229e7d3f1bdbba04954481f2d1ffe0e352083a99d183aeca5d39723259c2a4"
+        "sha256": "b37e020d3b48036da3e5c572403abdfcc3b1ffd0322722bcff6bc5438c62f808"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -8367,7 +7573,7 @@
       "source_path": "modules/drums-909/v1/rim.dsp",
       "source_sha256": "85281a7917d697dee47a1475ca24d2ecc08e53b48daa6f807c91367c4ee2e635",
       "export_path": "scripts/909-rim.dsp",
-      "export_sha256": "8f229e7d3f1bdbba04954481f2d1ffe0e352083a99d183aeca5d39723259c2a4",
+      "export_sha256": "b37e020d3b48036da3e5c572403abdfcc3b1ffd0322722bcff6bc5438c62f808",
       "license": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseIdentifier": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseStatus": "mixed-reviewed",
@@ -8417,21 +7623,8 @@
       "lineageUuid": "3f40927c-bd6c-52c4-8f6a-0423f8231387",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "4c4e98996342d40b72ee06460b6b56ab8fde72b64f78771aeaae789d9bbd1ed0",
-        "leftSha256": "4c4e98996342d40b72ee06460b6b56ab8fde72b64f78771aeaae789d9bbd1ed0",
-        "rightSha256": "4c4e98996342d40b72ee06460b6b56ab8fde72b64f78771aeaae789d9bbd1ed0",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -8462,7 +7655,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/909-clap.dsp",
-        "sha256": "f322b72eb35747e9f7c60751ffc20259750d6e5efac84db3ff16df9c28f82aae"
+        "sha256": "8d7f9372d8a9ea0c90f26fdfc2f6be64310d88bb347dc47210c0b3456797a353"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -8480,7 +7673,7 @@
       "source_path": "modules/drums-909/v1/clap.dsp",
       "source_sha256": "371ca9aa94d3b12ba1a40243e712283adfc51bd14bf39f5924759d2ef1942194",
       "export_path": "scripts/909-clap.dsp",
-      "export_sha256": "f322b72eb35747e9f7c60751ffc20259750d6e5efac84db3ff16df9c28f82aae",
+      "export_sha256": "8d7f9372d8a9ea0c90f26fdfc2f6be64310d88bb347dc47210c0b3456797a353",
       "license": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseIdentifier": "NOASSERTION (module); MIT (identified Plaits formulas)",
       "licenseStatus": "mixed-reviewed",
@@ -8530,21 +7723,8 @@
       "lineageUuid": "aac7644a-bedf-5252-b8b2-ad0fd9177eae",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "c8d78748bd6d616efbb15df4e0e5355e6ce3eb0e8c98947b3b5e0e3d89819a55",
-        "leftSha256": "c8d78748bd6d616efbb15df4e0e5355e6ce3eb0e8c98947b3b5e0e3d89819a55",
-        "rightSha256": "c8d78748bd6d616efbb15df4e0e5355e6ce3eb0e8c98947b3b5e0e3d89819a55",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -8576,7 +7756,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/808-aux-tom-conga.dsp",
-        "sha256": "b122ba0ab7f0e586f07289c74a7ab3652e77f913bd84bd13b4b987d7dedf91ab"
+        "sha256": "164cb347691328ae0345eda9bcdf97eb8bfdea4857314b4492bb6663b2d89ab9"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -8594,7 +7774,7 @@
       "source_path": "modules/drums-808-aux/v1/tom-conga.dsp",
       "source_sha256": "34b05cd95d78d4ca55f9cc1b7de8c36d74c748a1422b9e950a30256e2b862b6f",
       "export_path": "scripts/808-aux-tom-conga.dsp",
-      "export_sha256": "b122ba0ab7f0e586f07289c74a7ab3652e77f913bd84bd13b4b987d7dedf91ab",
+      "export_sha256": "164cb347691328ae0345eda9bcdf97eb8bfdea4857314b4492bb6663b2d89ab9",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -8644,21 +7824,8 @@
       "lineageUuid": "77c0ae78-0bdf-520f-9a8d-b228f7923b2f",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "862719116197c7842059e3ba012f4c5e24cc2e631ddeda1284019416224bb944",
-        "leftSha256": "862719116197c7842059e3ba012f4c5e24cc2e631ddeda1284019416224bb944",
-        "rightSha256": "862719116197c7842059e3ba012f4c5e24cc2e631ddeda1284019416224bb944",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -8691,7 +7858,7 @@
       "soundVersion": "0.1.1-experiment",
       "source": {
         "path": "scripts/808-aux-rim-claves.dsp",
-        "sha256": "de077f21f56a0a3f121b90bc3ef6221f07d96d6be82898fbd66d9b113ba0c1ca"
+        "sha256": "89b2832c6ccbbd294ab0beddf7d252013e69e8658e0d574947ecf01fe2debade"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -8709,7 +7876,7 @@
       "source_path": "modules/drums-808-aux/v2/rim-claves.dsp",
       "source_sha256": "913f0dc0f7290128c421fcc418cae55e13aae48dfbb382fede5d7c60b267f60d",
       "export_path": "scripts/808-aux-rim-claves.dsp",
-      "export_sha256": "de077f21f56a0a3f121b90bc3ef6221f07d96d6be82898fbd66d9b113ba0c1ca",
+      "export_sha256": "89b2832c6ccbbd294ab0beddf7d252013e69e8658e0d574947ecf01fe2debade",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -8759,21 +7926,8 @@
       "lineageUuid": "6b628dee-1c35-5c48-97d6-4f9d874e65b7",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "68851b53f09bec079a5b1f44cc84af206880614bd317f2ba60a01728709e7eec",
-        "leftSha256": "68851b53f09bec079a5b1f44cc84af206880614bd317f2ba60a01728709e7eec",
-        "rightSha256": "68851b53f09bec079a5b1f44cc84af206880614bd317f2ba60a01728709e7eec",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -8805,7 +7959,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/808-aux-maracas.dsp",
-        "sha256": "27c365f15da585033ba461b3f649440f7a32ba35787f9788ca1e4dfc1329744a"
+        "sha256": "f9c1cbbebe6d84af99d1032b7480aeaf02c63a827852d017bcb462e884dfe90b"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -8823,7 +7977,7 @@
       "source_path": "modules/drums-808-aux/v1/maracas.dsp",
       "source_sha256": "f1d241330dde4e2c6bf5f1db608561e3e3eccbc4619693c99b181dc7172c619c",
       "export_path": "scripts/808-aux-maracas.dsp",
-      "export_sha256": "27c365f15da585033ba461b3f649440f7a32ba35787f9788ca1e4dfc1329744a",
+      "export_sha256": "f9c1cbbebe6d84af99d1032b7480aeaf02c63a827852d017bcb462e884dfe90b",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -8873,21 +8027,8 @@
       "lineageUuid": "3e94ef70-37b0-5b6b-8b59-b940e89614a9",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "7c90b855b228aaaf6133a43ab26c5f004e9224a8a0cb9b821626c1a5ee5e7651",
-        "leftSha256": "7c90b855b228aaaf6133a43ab26c5f004e9224a8a0cb9b821626c1a5ee5e7651",
-        "rightSha256": "7c90b855b228aaaf6133a43ab26c5f004e9224a8a0cb9b821626c1a5ee5e7651",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -8917,7 +8058,7 @@
       "soundVersion": "0.1.0-experiment",
       "source": {
         "path": "scripts/808-aux-cowbell.dsp",
-        "sha256": "cbb6508eaa92f90b4c2f775e822a32c56e55ae4bb27d303cbaf8935258dfc41d"
+        "sha256": "aba85471dc75cdd24b512f92abf37dff511fa22273425a771dd818af3ff8f637"
       },
       "upstream": {
         "branch": "issue-118-analog-classics-review",
@@ -8935,7 +8076,7 @@
       "source_path": "modules/drums-808-aux/v1/cowbell.dsp",
       "source_sha256": "7804add2d39ea1f171c3715a22d2f637d52e3760b4663992fb49a5cb36e8dd41",
       "export_path": "scripts/808-aux-cowbell.dsp",
-      "export_sha256": "cbb6508eaa92f90b4c2f775e822a32c56e55ae4bb27d303cbaf8935258dfc41d",
+      "export_sha256": "aba85471dc75cdd24b512f92abf37dff511fa22273425a771dd818af3ff8f637",
       "license": "NOASSERTION",
       "licenseIdentifier": "NOASSERTION",
       "licenseStatus": "unresolved-internal-review",
@@ -8985,21 +8126,8 @@
       "lineageUuid": "00c9385c-6c4c-575a-8ca8-b62c8649dd68",
       "outputEvidence": {
         "audioInputs": 0,
-        "signalOutputs": 2,
-        "role": "audio-instrument",
+        "signalOutputs": 1,
         "namedOutputs": []
-      },
-      "outputAdaptation": {
-        "kind": "mono-to-stereo-duplicate",
-        "sourceOutputs": 1,
-        "finalOutputs": 2,
-        "sampleRate": 48000,
-        "blockSize": 64,
-        "frames": 12000,
-        "monoSha256": "ad4410701f0dbba9510dc42853b44bedc5eb92a8916e882976a2f5278b2b12a5",
-        "leftSha256": "ad4410701f0dbba9510dc42853b44bedc5eb92a8916e882976a2f5278b2b12a5",
-        "rightSha256": "ad4410701f0dbba9510dc42853b44bedc5eb92a8916e882976a2f5278b2b12a5",
-        "eachChannelByteIdenticalToSourceMono": true
       },
       "contractEvidence": {
         "capturedControls": [
@@ -9052,12 +8180,12 @@
   "contract": {
     "one_note": "lowercase gate, freq in Hz, velocity; host owns allocation",
     "distinct_events": "accent, slide, choke, clock, reset and run are never aliases",
-    "outputs": "audio instruments duplicate mono to a stereo host boundary; native stereo effects and typed control outputs are preserved",
+    "outputs": "audio, CV and observations are separately declared",
     "identity": "stable identity is manifest identity plus version and source digest, never display text or geometry",
-    "sound_change": "per-channel DSP is unchanged by the output-width wrapper; a sonic change requires a new version and review freeze"
+    "sound_change": "exports are metadata/library expansion only; a sonic change requires a new version and review freeze"
   },
   "consumer_limits": [
     "No CURLOP runtime, UI, project-state, voice-allocation or device acceptance is claimed.",
-    "Effects retain native stereo I/O and modulation entries retain typed CV/observation outputs."
+    "Effect/modulation entries retain their native I/O rather than being mislabeled one-note instruments."
   ]
 }

@@ -1212,5 +1212,4 @@ ID_1172 = ID_1168, ID_1171;
 ID_1173 = !, ID_963;
 ID_1174 = _, ID_1173;
 ID_1175 = ID_1172 : ID_1174;
-curlop_mono_process = ID_1175;
-process = curlop_mono_process <: _, _;
+process = ID_1175;

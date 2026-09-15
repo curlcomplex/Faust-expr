@@ -119,15 +119,13 @@ def build_runner(source, folder, include_dirs=()):
     subprocess.run([os.getenv("CXX", "c++"), "-std=c++17", "-O2", "-ffp-contract=off", "-I" + str(folder), str(ROOT / "tools/modules/render.cpp"), "-o", str(folder / "render")], check=True, capture_output=True, text=True)
     return folder / "render", (folder / "generated.hpp").read_text()
 
-def rendered_equivalence(identity, original_text, adapted_text):
+def rendered_equivalence(identity, original_text, exported):
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
         original = root / "original.dsp"
-        adapted = root / "adapted.dsp"
         original.write_text(original_text)
-        adapted.write_text(adapted_text)
         old, _ = build_runner(original, root / "old")
-        new, _ = build_runner(adapted, root / "new")
+        new, _ = build_runner(exported, root / "new")
         old_score = root / "old.tsv"; new_score = root / "new.tsv"
         common = "0\tvelocity\t0.7\n64\tgate\t1\n4800\tgate\t0\n"
         old_controls = subprocess.check_output([str(old), "--controls"], text=True)
@@ -141,25 +139,6 @@ def rendered_equivalence(identity, original_text, adapted_text):
             raise AssertionError(identity + ": adapted render differs")
         stable_diagnostics = lambda text: {key:value for key,value in json.loads(text).items() if key != "instrumented_compute_ns"}
         return {"sampleRate":48000,"blockSize":64,"frames":12000,"oldAddress":old_address,"newAddress":"freq","audioSha256":digest(old_raw),"byteIdentical":True,"oldDiagnostics":stable_diagnostics(old_diag),"newDiagnostics":stable_diagnostics(new_diag)}
-
-def stereo_equivalence(identity, mono_text, stereo_export):
-    with tempfile.TemporaryDirectory() as tmp:
-        root = Path(tmp)
-        mono_source = root / "mono.dsp"
-        mono_source.write_text(mono_text)
-        mono, _ = build_runner(mono_source, root / "mono")
-        stereo, _ = build_runner(stereo_export, root / "stereo")
-        score = root / "score.tsv"
-        score.write_text("0\tvelocity\t0.7\n64\tgate\t1\n4800\tgate\t0\n")
-        mono_raw = root / "mono.f32"; stereo_raw = root / "stereo.f32"
-        mono_diag = json.loads(subprocess.check_output([str(mono), str(score), str(mono_raw), "48000", "64", "12000", "0"], text=True))
-        stereo_diag = json.loads(subprocess.check_output([str(stereo), str(score), str(stereo_raw), "48000", "64", "12000", "0"], text=True))
-        mono_bytes = mono_raw.read_bytes(); stereo_bytes = stereo_raw.read_bytes()
-        left = b"".join(stereo_bytes[offset:offset + 4] for offset in range(0, len(stereo_bytes), 8))
-        right = b"".join(stereo_bytes[offset + 4:offset + 8] for offset in range(0, len(stereo_bytes), 8))
-        if mono_diag["channels"] != 1 or stereo_diag["channels"] != 2 or mono_bytes != left or mono_bytes != right:
-            raise AssertionError(identity + ": stereo boundary does not preserve the mono signal per channel")
-        return {"kind":"mono-to-stereo-duplicate","sourceOutputs":1,"finalOutputs":2,"sampleRate":48000,"blockSize":64,"frames":12000,"monoSha256":hashlib.sha256(mono_bytes).hexdigest(),"leftSha256":hashlib.sha256(left).hexdigest(),"rightSha256":hashlib.sha256(right).hexdigest(),"eachChannelByteIdenticalToSourceMono":True}
 
 def dependency_provenance(source, include_dirs, compiler_version):
     dependencies = {}
@@ -190,7 +169,7 @@ def dependency_provenance(source, include_dirs, compiler_version):
     visit(source)
     return [dependencies[key] for key in sorted(dependencies)]
 
-def export_one(source, destination, identity, category, compiler_version):
+def export_one(source, destination, identity, compiler_version):
     include_dirs = (source.parent, ROOT / "modules/analog-classics/synth-batch", ROOT / "modules/analog-classics/synth-finish")
     command = ["faust", "-e"] + [flag for directory in include_dirs for flag in ("-I", str(directory))] + [str(source), "-o", str(destination)]
     raw = subprocess.run(command, text=True, capture_output=True)
@@ -233,23 +212,15 @@ def export_one(source, destination, identity, category, compiler_version):
             if count == 0:
                 raise AssertionError(f"missing frozen preset control {identity}:{control}")
         destination.write_text(normalized)
-    before_output_adaptation = normalized
-    if category == "instrument":
-        normalized, count = re.subn(r'(?m)^process\s*=\s*([^;]+);\s*$', r'curlop_mono_process = \1;\nprocess = curlop_mono_process <: _, _;', normalized)
-        if count != 1:
-            raise AssertionError(f"{identity}: expected one mono process expression")
-        destination.write_text(normalized)
     with tempfile.TemporaryDirectory() as tmp:
         runner, header = build_runner(destination, Path(tmp) / "compiled")
     channels = [int(re.search(r'getNumInputs\(\).*?return\s+(\d+);', header, re.S).group(1)), int(re.search(r'getNumOutputs\(\).*?return\s+(\d+);', header, re.S).group(1))]
     bars = re.findall(r'(?:hbargraph|vbargraph)\("([^"]+)"', normalized)
     imports = dependency_provenance(source, include_dirs, compiler_version)
     output_roles = [{"label":label,"role":"cv" if "[curlop:cvout]" in label else "observation" if "[curlop:meterout]" in label else "bargraph-unclassified"} for label in bars]
-    role = "audio-instrument" if category == "instrument" else "audio-effect" if category == "effect" else "control"
-    output_adaptation = stereo_equivalence(identity, before_output_adaptation, destination) if category == "instrument" else {"kind":"none-native-stereo","sourceOutputs":channels[1],"finalOutputs":channels[1]} if category == "effect" else {"kind":"none-control-role","sourceOutputs":channels[1],"finalOutputs":channels[1]}
-    evidence = {"compiledIo":{"audioInputs":channels[0],"signalOutputs":channels[1],"role":role},"namedOutputs":output_roles,"imports":imports,"controlDefaults":control_defaults(normalized),"outputAdaptation":output_adaptation}
+    evidence = {"compiledIo":{"audioInputs":channels[0],"signalOutputs":channels[1]},"namedOutputs":output_roles,"imports":imports,"controlDefaults":control_defaults(normalized)}
     if identity in ADAPTATION_EVIDENCE:
-        evidence["renderedEquivalence"] = rendered_equivalence(identity, before_adaptation, before_output_adaptation)
+        evidence["renderedEquivalence"] = rendered_equivalence(identity, before_adaptation, destination)
     EXPORT_EVIDENCE[identity] = evidence
     destination.with_suffix(".hpp").write_text(header)
 
@@ -273,7 +244,7 @@ def run(out):
         identity, category, relative, rationale = subject[:4]
         source_root = ROOT
         source = source_root / relative; destination = scripts / f"{identity}.dsp"
-        export_one(source, destination, identity, category, compiler_version)
+        export_one(source, destination, identity, compiler_version)
         meta = declarations(source.read_text())
         source_file_commit = subprocess.check_output(["git", "log", "-1", "--format=%H", "--", relative], cwd=source_root, text=True).strip()
         lineage_commit = next((sha for prefix, sha in PINNED_COMMITS.items() if identity.startswith(prefix)), source_file_commit)
@@ -299,7 +270,6 @@ def run(out):
         entry["metadataAdaptation"] = ADAPTATION_EVIDENCE.get(entry["identity"], "faust expansion and metadata normalization only")
         entry["dependencies"] = EXPORT_EVIDENCE[entry["identity"]]["imports"]
         entry["outputEvidence"] = EXPORT_EVIDENCE[entry["identity"]]["compiledIo"] | {"namedOutputs": EXPORT_EVIDENCE[entry["identity"]]["namedOutputs"]}
-        entry["outputAdaptation"] = EXPORT_EVIDENCE[entry["identity"]]["outputAdaptation"]
         if "renderedEquivalence" in EXPORT_EVIDENCE[entry["identity"]]:
             entry["metadataAdaptation"]["renderedAudioEquivalence"] = EXPORT_EVIDENCE[entry["identity"]]["renderedEquivalence"]
         if entry["identity"] in FROZEN_PRESETS:
@@ -312,7 +282,7 @@ def run(out):
             entry["canonicalDefaultState"] = {"kind": "source-defaults", "settings": EXPORT_EVIDENCE[entry["identity"]]["controlDefaults"]}
             entry["namedPresets"] = [{"name": preset.replace("-", " ").title(), "presetId": preset, "status": "frozen-reference-anchor", "reference": drums_909[preset]["reference"], "settings": drums_909[preset]["settings"]} for preset in ("low-tom", "mid-tom", "high-tom")]
         entry["contractEvidence"] = {"capturedControls": sorted(set(labels)), "canonicalOneNote": entry["category"] != "instrument" or not gaps, "gaps": gaps, "specialEvents": special, "metadataAdapted": entry["identity"] in ADAPTATION_EVIDENCE}
-    manifest = {"schema": 1, "identity": "analog-classics-internal-review-2026-09-15.3", "status": "internal-review-only", "sourceTree": {"branch": SOURCE_TREE_BRANCH, "commit": SOURCE_TREE_COMMIT, "contract": "Every recorded source and repository-library dependency hash is the blob at this exact commit; file-level lineage commits are informational only.", "dependencyFixes": DEPENDENCY_FIXES}, "outputBoundaryContract": {"audioInstruments":30,"audioEffects":5,"controlRoleModules":2,"instrumentOutput":"stereo duplicate of the exact source mono signal","effectOutput":"native stereo preserved","controlOutput":"native typed CV/observation signals preserved"}, "base_review_freeze": {"path": str(FREEZE.relative_to(ROOT)), "sha256": digest(FREEZE), "identity": freeze["id"]}, "modules": entries, "selected": entries, "supersededIdentities": SUPERSEDED_IDENTITIES, "rejected_or_unselected": REJECTED, "contract": {"one_note": "lowercase gate, freq in Hz, velocity; host owns allocation", "distinct_events": "accent, slide, choke, clock, reset and run are never aliases", "outputs": "audio instruments duplicate mono to a stereo host boundary; native stereo effects and typed control outputs are preserved", "identity": "stable identity is manifest identity plus version and source digest, never display text or geometry", "sound_change": "per-channel DSP is unchanged by the output-width wrapper; a sonic change requires a new version and review freeze"}, "consumer_limits": ["No CURLOP runtime, UI, project-state, voice-allocation or device acceptance is claimed.", "Effects retain native stereo I/O and modulation entries retain typed CV/observation outputs."]}
+    manifest = {"schema": 1, "identity": "analog-classics-internal-review-2026-09-15.2", "status": "internal-review-only", "sourceTree": {"branch": SOURCE_TREE_BRANCH, "commit": SOURCE_TREE_COMMIT, "contract": "Every recorded source and repository-library dependency hash is the blob at this exact commit; file-level lineage commits are informational only.", "dependencyFixes": DEPENDENCY_FIXES}, "base_review_freeze": {"path": str(FREEZE.relative_to(ROOT)), "sha256": digest(FREEZE), "identity": freeze["id"]}, "modules": entries, "selected": entries, "supersededIdentities": SUPERSEDED_IDENTITIES, "rejected_or_unselected": REJECTED, "contract": {"one_note": "lowercase gate, freq in Hz, velocity; host owns allocation", "distinct_events": "accent, slide, choke, clock, reset and run are never aliases", "outputs": "audio, CV and observations are separately declared", "identity": "stable identity is manifest identity plus version and source digest, never display text or geometry", "sound_change": "exports are metadata/library expansion only; a sonic change requires a new version and review freeze"}, "consumer_limits": ["No CURLOP runtime, UI, project-state, voice-allocation or device acceptance is claimed.", "Effect/modulation entries retain their native I/O rather than being mislabeled one-note instruments."]}
     manifest["schema"] = "curlop-analog-classics-review/v1"
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
 

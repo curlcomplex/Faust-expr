@@ -588,5 +588,4 @@ ID_532 = + ~ ID_531;
 ID_533 = ID_526 : ID_532;
 ID_534 = ID_520 : ID_533;
 ID_535 = ID_512 : ID_534;
-curlop_mono_process = ID_535;
-process = curlop_mono_process <: _, _;
+process = ID_535;

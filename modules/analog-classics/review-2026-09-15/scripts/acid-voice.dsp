@@ -447,5 +447,4 @@ ID_403 = !, ID_402;
 ID_404 = !, ID_403;
 ID_405 = _, ID_404;
 ID_406 = ID_400 : ID_405;
-curlop_mono_process = ID_406;
-process = curlop_mono_process <: _, _;
+process = ID_406;

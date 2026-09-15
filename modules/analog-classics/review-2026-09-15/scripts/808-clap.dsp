@@ -944,5 +944,4 @@ ID_892 = 1, ID_891;
 ID_893 = (ID_892 : min);
 ID_894 = ID_885, ID_893;
 ID_895 = ID_894 : *;
-curlop_mono_process = ID_895;
-process = curlop_mono_process <: _, _;
+process = ID_895;
