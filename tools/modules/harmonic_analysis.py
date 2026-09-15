@@ -43,9 +43,10 @@ def analyze_window(samples, rate: int, fundamental_hz: float, signal_class: str,
                    *, max_generated_order: int | None = None) -> dict:
     """Require a known coherent fundamental. Invalid measurements raise, never pass.
 
-    Optional finite-harmonic model predicts fold locations, not causality. A folded
-    component can coincide with DC, an intended harmonic or another folded order;
-    such collisions are reported and prevent a separately attributable fold ratio.
+    Optional finite-harmonic models predict fold locations, not causality. Observed
+    harmonic-grid energy is always reported. If a predicted fold lands on an
+    intended harmonic bin, attributable harmonic/THD values are withheld because
+    the observed energy cannot be separated into harmonic and folded components.
     """
     if signal_class not in SIGNAL_CLASSES:
         raise ValueError('unsupported signal class: use stationary components, not percussion/noise')
@@ -72,7 +73,6 @@ def analyze_window(samples, rate: int, fundamental_hz: float, signal_class: str,
     peak = float(np.max(np.abs(x)))
     if peak == 0 or peak > 1e10 or peak < 1e-15:
         raise ValueError('silent or unsupported numerical amplitude')
-    # Scale only for numerical stability in guards, never the saved input or output.
     p = power_spectrum(x)
     ac = float(np.sum(p[1:]))
     fpower = float(p[k])
@@ -82,8 +82,7 @@ def analyze_window(samples, rate: int, fundamental_hz: float, signal_class: str,
     concentration = fpower / neighborhood
     if concentration < GUARDS['fundamental_neighbor_power_fraction']:
         raise ValueError('fundamental is detuned, modulated or not coherent with the window')
-    # Independently check stationarity over four tapered subwindows. These guards
-    # are NOT the measurement window: the actual metric uses the rectangular DFT.
+
     q = n // 4
     taper = np.hanning(q)
     z, rms, spectra = [], [], []
@@ -103,18 +102,20 @@ def analyze_window(samples, rate: int, fundamental_hz: float, signal_class: str,
             deviation > GUARDS['quarter_fundamental_complex_deviation_max'] or
             spectral_change > GUARDS['quarter_spectral_relative_change_max']):
         raise ValueError('nonstationary amplitude/phase: select a settled window')
-    # No automatic strongest-bin f0 detection: a harmonic may be louder than f0.
+
     orders = np.arange(1, (n // 2 - 1) // k + 1, dtype=int)
     harmonic_bins = orders * k
+    harmonic_bin_set = {int(v) for v in harmonic_bins}
     off = np.ones(len(p), dtype=bool)
     off[0] = False
     off[harmonic_bins] = False
     noncarrier = np.ones(len(p), dtype=bool)
     noncarrier[[0, k]] = False
-    hpower = float(np.sum(p[harmonic_bins[1:]]))
+    observed_hpower = float(np.sum(p[harmonic_bins[1:]]))
     off_power = float(np.sum(p[off]))
     spur_power = float(np.max(p[noncarrier]))
     off_spur = float(np.max(p[off]))
+
     folded: dict[int, list[int]] = {}
     if max_generated_order:
         for order in range(2, max_generated_order + 1):
@@ -122,18 +123,28 @@ def analyze_window(samples, rate: int, fundamental_hz: float, signal_class: str,
                 remainder = (order * k) % n
                 folded.setdefault(min(remainder, n - remainder), []).append(order)
     collisions = [{'bin': b, 'orders': h, 'reason': 'DC/Nyquist/intended-harmonic or multiple-fold collision'}
-                  for b, h in folded.items() if b in (0, n//2) or b in harmonic_bins or len(h) != 1]
+                  for b, h in folded.items() if b in (0, n//2) or b in harmonic_bin_set or len(h) != 1]
+    harmonic_collisions = [c for c in collisions if c['bin'] in harmonic_bin_set]
+    harmonic_attribution_ambiguous = bool(harmonic_collisions)
     fold_ratio = None if max_generated_order is None or collisions else sum(float(p[b]) for b in folded) / fpower
+    observed_harmonic_ratio = math.sqrt(observed_hpower/fpower)
+    attributable_harmonic_ratio = None if harmonic_attribution_ambiguous else observed_harmonic_ratio
+    attributable_harmonic_db = None if harmonic_attribution_ambiguous else db(observed_hpower/fpower)
     largest = sorted(np.flatnonzero(noncarrier), key=lambda i: p[i], reverse=True)[:12]
+
     return {
         'valid': True, 'signal_class': signal_class, 'frames': n, 'rate': rate,
         'fundamental_hz': float(fundamental_hz), 'fundamental_bin': k,
         'window': 'rectangular-coherent-no-padding', 'bin_width_hz': rate/n,
         'dc': float(np.mean(x)), 'rms': float(np.sqrt(np.mean(x*x))), 'sample_peak': peak,
         'fundamental_rms': math.sqrt(fpower),
-        'inband_harmonic_ratio': math.sqrt(hpower/fpower),
-        'inband_thd_ratio': math.sqrt(hpower/fpower) if signal_class == 'sine-driven-nonlinearity' else None,
-        'inband_harmonic_to_fundamental_db': db(hpower/fpower),
+        'observed_harmonic_grid_ratio': observed_harmonic_ratio,
+        'observed_harmonic_grid_to_fundamental_db': db(observed_hpower/fpower),
+        'harmonic_attribution_ambiguous': harmonic_attribution_ambiguous,
+        'inband_harmonic_ratio': attributable_harmonic_ratio,
+        'inband_thd_ratio': (attributable_harmonic_ratio
+                             if signal_class == 'sine-driven-nonlinearity' else None),
+        'inband_harmonic_to_fundamental_db': attributable_harmonic_db,
         'off_harmonic_to_fundamental_db': db(off_power/fpower),
         'sfdr_including_harmonics_db': -db(spur_power/fpower),
         'off_harmonic_sfdr_db': -db(off_spur/fpower), 'db_floor': DB_FLOOR,
@@ -146,6 +157,7 @@ def analyze_window(samples, rate: int, fundamental_hz: float, signal_class: str,
                          'predicted_folds': [{'orders': h, 'bin': b, 'hz': b*rate/n,
                                               'dbc': db(float(p[b])/fpower)} for b, h in sorted(folded.items())],
                          'collisions': collisions,
+                         'harmonic_collisions': harmonic_collisions,
                          'identifiable_fold_ratio': fold_ratio,
                          'identifiable_fold_to_fundamental_db': db(fold_ratio) if fold_ratio is not None else None},
         'guards': {**GUARDS, 'fundamental_neighborhood_fraction': concentration,
@@ -154,9 +166,10 @@ def analyze_window(samples, rate: int, fundamental_hz: float, signal_class: str,
                    'quarter_fundamental_complex_deviation': deviation},
         'interpretation': [
             'Harmonic energy is not automatically distortion for an oscillator.',
+            'Observed harmonic-grid energy is always reported; attributable harmonic/THD values are null when a predicted fold collides with a harmonic bin.',
             'Off-harmonic energy includes noise, spurs and modulation; it is not isolated alias energy.',
             'Predicted folds require an externally justified finite harmonic model; coincident energy alone does not prove aliasing.',
-            'In-band THD excludes folded out-of-band harmonics; SFDR includes all non-DC/non-fundamental bins.',
+            'In-band THD excludes attributable folded out-of-band harmonics; SFDR includes all non-DC/non-fundamental bins.',
             'Guard tolerances qualify measurement applicability, not musical acceptance or audibility.'],
     }
 
