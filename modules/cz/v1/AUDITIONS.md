@@ -1,0 +1,1 @@
+Actual Faust renders required before reporting this checkpoint: square-like DCW sweep, sine-pulse DCW sweep, low musical phrase, glassy articulated phrase. Direct audio must accompany every user-facing audible checkpoint.
