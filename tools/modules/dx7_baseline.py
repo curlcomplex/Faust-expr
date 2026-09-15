@@ -27,7 +27,7 @@ ROOT = lab.ROOT
 BRIEF = ROOT / 'modules/dx7/baseline-01'
 FAUSTLIBS = '271228a08981fa10b07732f0861421d1e20d4022'
 MSFA = 'f67d41d313b7dc85f6fb99e79e515cc9d208cfff'
-ADAPTER_VERSION = 'dx7-baseline-01.2'
+ADAPTER_VERSION = 'dx7-baseline-01.3'
 # C++17 cmath imports std::min/max into the legacy core's unqualified lookup.
 # C++11 avoids that collision; stddef.h supplies its omitted size_t declaration.
 # These are build-compatibility flags, not upstream source or DSP modifications.
@@ -111,10 +111,12 @@ def faust_source(c, libraries):
         assert len(args)==42
         return 'dx.operator('+','.join(map(str,args))+')'
     mod=operator(2,'0') if c['family']!='C01' else '0'
+    # Resolve through the pinned -I directory. An absolute import containing
+    # hyphens makes Faust 2.70's -e output emit an invalid metadata identifier.
     return ('// Diagnostic projection of stock dx7 algorithm 1: OP2 -> OP1.\n'
             '// Inactive operators are omitted; no output gain or DSP correction.\n'
             'declare name "DX7 baseline '+c['id']+'";\n'
-            'dx=library('+json.dumps(str(libraries/'dx7/dx7.lib'))+');\n'
+            'dx=library("dx7/dx7.lib");\n'
             'gate=button("gate");\n'
             'freq=hslider("freq[unit:Hz]",220,8,20000,.001);\n'
             'velocity=hslider("velocity",1,0,1,.001);\n'
@@ -266,6 +268,7 @@ def execute(out):
             report['renders'].append({'case':c['id'],'engine':'msfa','label':label,'command':cmd,'raw_sha256':lab.digest(raw),'score_sha256':lab.digest(score),'diagnostics':diag})
             return x
         for c in suite['cases']:
+            print('CASE '+c['id'],flush=True)
             d=rawdir/c['id']; d.mkdir()
             packed,expected,sysex=patch_data(c)
             (d/'patch128.bin').write_bytes(packed); (d/'patch.syx').write_bytes(sysex)
@@ -273,6 +276,8 @@ def execute(out):
             (d/'msfa.tsv').write_text(f"0\tnote\t{c['note']}\n0\tvelocity\t{suite['velocity']}\n{suite['gate_on']}\tgate\t1\n{suite['gate_off']}\tgate\t0\n")
             source=d/'baseline.dsp'; source.write_text(faust_source(c,libraries))
             program=worker.build(c['id'],source)
+            expanded=(out/'faust-builds'/c['id']/'expanded.dsp').read_text()
+            check(c['id']+':pinned-dx7-import',str(libraries/'dx7/operator.lib') in expanded and str(libraries/'dx7/env.lib') in expanded)
             a=render_faust(c,d,program,'faust'); b=render_msfa(c,d,'msfa')
             check(c['id']+':faust-cold-repeat',np.array_equal(a,render_faust(c,d,program,'faust-repeat')))
             check(c['id']+':msfa-cold-repeat',np.array_equal(b,render_msfa(c,d,'msfa-repeat')))
