@@ -10,7 +10,9 @@ v=library("../v7/voice.dsp");
 // Convert that amplitude ratio into OPZ total-level steps (0.75 dB each) so
 // KVS=0 is velocity-independent instead of applying v7's old global velocity gain.
 vel=max(0.0,min(1.0,v.latchedVelocity));
-velTL(kvs)=int(max(0.0,min(127.0,(-20.0*log(max(0.000001,pow(2.0,-float(kvs))+(1.0-pow(2.0,-float(kvs)))*vel))/log(10.0))/0.75+0.5)));
+minVelAmp(kvs)=pow(2.0,0.0-float(kvs));
+velAmp(kvs)=minVelAmp(kvs)+(1.0-minVelAmp(kvs))*vel;
+velTL(kvs)=int(max(0.0,min(127.0,((0.0-20.0*log(max(0.000001,velAmp(kvs)))/log(10.0))/0.75)+0.5)));
 
 op1KVS=nentry("op1KVS",0,0,7,1); op2KVS=nentry("op2KVS",0,0,7,1); op3KVS=nentry("op3KVS",0,0,7,1); op4KVS=nentry("op4KVS",0,0,7,1);
 op2EGShift=nentry("op2EGShift",0,0,3,1); op3EGShift=nentry("op3EGShift",0,0,3,1); op4EGShift=nentry("op4EGShift",0,0,3,1);
