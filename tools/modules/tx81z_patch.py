@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Checked TX81Z single-voice VCED/ACED -> v10 Faust controls.
 
-Yamaha TX81Z manual pp.71-74: edit buffers are OP4,OP3,OP2,OP1;
-packed VMEM uses a DIFFERENT order. This module accepts edit buffers only.
+Actual edit buffers use OP4,OP2,OP3,OP1, confirmed by Edisyn's vcedParameters
+and asymmetric author-documented patch files. Yamaha's printed parameter
+list swaps the middle two labels; blindly following it breaks those patches.
 D1L is a level (15=maximum), whereas OPZ SL is attenuation (0=maximum).
 Small numerical parameter facts follow ax81z@5848832989c7864092a277e9428d44f817c6173f.
 See modules/tx81z/v10/REFERENCE.md for scope and the provisional BC curve.
@@ -15,8 +16,8 @@ from pathlib import Path
 
 VCED_SIZE = 93
 ACED_SIZE = 23
-OP_VCED = {1: 39, 2: 26, 3: 13, 4: 0}
-OP_ACED = {1: 15, 2: 10, 3: 5, 4: 0}
+OP_VCED = {1: 39, 2: 13, 3: 26, 4: 0}
+OP_ACED = {1: 15, 2: 5, 3: 10, 4: 0}
 ACED_ID = b'LM  8976AE'
 RATIO_GROUPS = (
     (0,4,8,10,13,16,19,22,25,28,31,34,36,40,42,45),
