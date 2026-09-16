@@ -67,6 +67,12 @@ jobs:
           cmake --build build/tx81z/toolchain/build/faustdir --target faust --parallel 2 > build/tx81z/logs/compiler-build.log 2>&1
           cp build/tx81z/toolchain/build/bin/faust build/tx81z/faust-2.88.0
           tar -czf build/tx81z/libraries.tar.gz -C build/tx81z/toolchain libraries
+      - name: Compile TX81Z-facing fixed-frequency candidate
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 tools/modules/tx81z_prepare.py --ymfm build/tx81z/ymfm --out modules/tx81z/v5/opz_tables.lib | tee build/tx81z/logs/v6-prepare.log
+          build/tx81z/toolchain/build/bin/faust -lang cpp -single -I build/tx81z/toolchain/libraries -I modules/tx81z/v6 -I modules/tx81z/v5 modules/tx81z/v6/voice.dsp -o build/tx81z/v6.cpp 2>&1 | tee build/tx81z/logs/v6-compile.log
+          test -s build/tx81z/v6.cpp
       - name: Execute compiled Faust and native ymfm waveform checks and auditions
         run: |
           set -euo pipefail
@@ -108,6 +114,7 @@ jobs:
             build/tx81z/results/
             build/tx81z/runtime-results/
             build/tx81z/logs/
+            build/tx81z/v6.cpp
             build/tx81z/source-commit.txt
             build/tx81z/source.tar.gz
             build/tx81z/ymfm-source.tar.gz
