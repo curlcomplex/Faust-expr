@@ -6,8 +6,13 @@ coarse is a TX81Z panel ratio index, not the OPZ multiple nibble: the firmware
 ratio families correspond to OPZ DT2 groups and multiple slots. Output level is
 the inverse of the OPZ 0.75 dB total-level control to within the documented
 ~0.74 dB TX81Z panel step, so 99 -> TL 0 and 0 -> TL 99. DET is centred at 3.
-Level scaling and EG bias remain explicit because the current one-note voice has
-no qualified panel policy for them yet.
+
+VCED LS is a 0..99 keyboard level-scaling depth and is now mapped directly to
+per-operator LS controls. EBS is *not* a static patch attenuation: it is the
+per-operator sensitivity to the voice's EG-bias controller (breath controller,
+or aftertouch when configured to act as BC). It is therefore mapped to EBS
+controls while the live EG-bias controller value remains a host input, not an
+unresolved patch byte.
 """
 from __future__ import annotations
 import argparse, json
@@ -16,9 +21,6 @@ from pathlib import Path
 VCED_SIZE=93; ACED_SIZE=23
 OP_VCED={1:39,2:13,3:26,4:0}
 OP_ACED={1:15,2:5,3:10,4:0}
-# TX81Z ratio-coarse ordering. Each row is one OPZ DT2 family; the position in
-# the row is the OPZ multiple nibble. This is the compact form of the published
-# 64-ratio table and matches independent TX81Z implementations.
 RATIO_GROUPS=(
     (0,4,8,10,13,16,19,22,25,28,31,34,36,40,42,45),
     (1,5,9,14,18,23,26,30,35,39,43,46,49,52,55,58),
@@ -26,7 +28,6 @@ RATIO_GROUPS=(
     (3,7,12,17,21,27,32,37,41,47,51,54,57,60,62,63),
 )
 RATIO_MAP={panel:(multiple,dt2) for dt2,row in enumerate(RATIO_GROUPS) for multiple,panel in enumerate(row)}
-# VCED DET is 0..6 with centre=3. OPZ DT1 uses 0..3 for +0..+3 and 5..7 for -1..-3.
 DET_TO_DT1=(7,6,5,0,1,2,3)
 
 def _bytes(path: str, size: int) -> bytes:
@@ -64,11 +65,10 @@ def to_controls(patch: dict) -> tuple[dict,dict]:
     unresolved={}
     for op,p in patch['operators'].items():
         q=f'op{op}'; multiple,dt2=_ratio_fields(p['crs'])
-        c.update({q+'AR':p['ar'],q+'D1R':p['d1r'],q+'D2R':p['d2r'],q+'RR':p['rr'],q+'SL':p['d1l'],q+'KS':p['rs'],q+'AME':p['ame'],q+'KVS':p['kvs'],q+'TL':max(0,min(127,99-p['out'])),q+'Mode':p['fixed'],q+'Coarse':multiple,q+'DT1':_dt1(p['det']),q+'DT2':dt2,q+'Range':p['range'],q+'Fine':p['fine'],q+'Wave':p['wave'],q+'FixedCRS':p['crs']})
+        c.update({q+'AR':p['ar'],q+'D1R':p['d1r'],q+'D2R':p['d2r'],q+'RR':p['rr'],q+'SL':p['d1l'],q+'KS':p['rs'],q+'LS':p['ls'],q+'EBS':p['ebs'],q+'AME':p['ame'],q+'KVS':p['kvs'],q+'TL':max(0,min(127,99-p['out'])),q+'Mode':p['fixed'],q+'Coarse':multiple,q+'DT1':_dt1(p['det']),q+'DT2':dt2,q+'Range':p['range'],q+'Fine':p['fine'],q+'Wave':p['wave'],q+'FixedCRS':p['crs']})
         if op!=1: c[q+'EGShift']=p['eg_shift']
-        unresolved[q]={'level_scaling':p['ls'],'eg_bias':p['ebs']}
-        if op==1 and p['eg_shift']!=0: unresolved[q]['unexpected_eg_shift']=p['eg_shift']
-    unresolved['voice']={'transpose':patch['transpose'],'reverb_rate':patch['reverb_rate']}
+        if op==1 and p['eg_shift']!=0: unresolved[q]={'unexpected_eg_shift':p['eg_shift']}
+    unresolved['voice']={'transpose':patch['transpose'],'reverb_rate':patch['reverb_rate'],'eg_bias_controller':'runtime input; patch stores only per-operator EBS'}
     return c,unresolved
 
 def main():
