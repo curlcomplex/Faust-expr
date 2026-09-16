@@ -1,0 +1,36 @@
+{
+  "schema": "faust-expr/tx81z-patch-sources/v1",
+  "source": "Matt Gregory's original TX81Z programming tutorial",
+  "tutorial": "https://mgregory22.me/tx81z/filter.html",
+  "retrieved_on": "2026-09-16",
+  "first_verified_mac_run": 35114310161,
+  "format": "Yamaha VCED 93 bytes plus ACED 23 bytes, two checked SysEx frames",
+  "redistribution": "Original patch bytes remain in private execution evidence; this repository records identifiers only. No patch bank or firmware is included.",
+  "patches": [
+    {
+      "name": "Filter1",
+      "url": "https://mgregory22.me/tx81z/patches/Filter1.syx",
+      "bytes": 142,
+      "sha256": "09710fd1969910129d257db447c1f81320a039e66fd2d02888c394d51617ed2e"
+    },
+    {
+      "name": "Filter2",
+      "url": "https://mgregory22.me/tx81z/patches/Filter2.syx",
+      "bytes": 142,
+      "sha256": "f8294a9a07d34a99e5cc187dd0ee663c42b51e22a9b8528b5fa879464a68c75d"
+    },
+    {
+      "name": "FilterBass",
+      "url": "https://mgregory22.me/tx81z/patches/FilterBass.syx",
+      "bytes": 142,
+      "sha256": "01d0a166f02ee9bd655eedd4d80d1f67b6792a30f8cbfab999028e50ad4608e0"
+    }
+  ],
+  "ordering_counterexample": {
+    "manual_interpretation_rejected": "OP4, OP3, OP2, OP1",
+    "actual_edit_buffer_order": "OP4, OP2, OP3, OP1",
+    "Filter2_natural_operator_levels": [90, 65, 75, 82],
+    "Filter2_half_sine_operators": [3, 4],
+    "evidence": "The tutorial's unequal levels and waveform assignments disagree with the initial printed-order decoder; they agree with Edisyn's parameter order. The initial failing assertion is retained in run 35114310161."
+  }
+}
