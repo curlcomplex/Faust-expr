@@ -1,0 +1,15 @@
+// Callable TX81Z source boundaries extracted from the qualified v10 voice.
+import("stdfaust.lib");
+opz=library("../v5/opz_core.lib");
+panel=library("../v6/panel_frequency.lib");
+policy=library("../v10/panel_policy.lib");
+phaseStep(bf,mode,coarse,fine,dt1,dt2,range,fixedCrs)=panel.phaseStep(bf,mode,coarse,fine,dt1,dt2,range,fixedCrs);
+phase(step,gate)=opz.phase(step,gate)>>10;
+envelope(gate,tick,count,keyBf,ar,d1r,d2r,sl,rr,ks,reverb)=opz.envelope(gate,tick,count,keyBf,ar,d1r,d2r,sl,rr,ks,reverb):(_,!);
+totalTL(baseTL,kvs,ls,ebs,bcDepth,note,velocity,cc2,algorithm,operatorIndex)=policy.totalTL(baseTL,kvs,ls,ebs,bcDepth,note,velocity,cc2,algorithm,operatorIndex);
+op(phaseValue,atten,tl,wave)=opz.operator(phaseValue,atten,tl,wave);
+feedbackOp(phaseValue,atten,tl,wave,feedback)=opz.feedbackOperator(phaseValue,atten,tl,wave,feedback);
+in3(algorithm,o4)=opz.r.in3(algorithm,o4);
+in2(algorithm,o4,o3)=opz.r.in2(algorithm,o4,o3);
+in1(algorithm,o4,o3,o2)=opz.r.in1(algorithm,o4,o3,o2);
+carriers(algorithm,o4,o3,o2,o1)=opz.r.carriers(algorithm,o4,o3,o2,o1);
