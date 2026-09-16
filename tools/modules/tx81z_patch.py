@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-"""Decode TX81Z VCED+ACED voice data without inventing unsettled mappings.
+"""Decode TX81Z VCED+ACED voice data into the working Faust voice controls.
 
-Offsets follow TX81Z Programmer's documented 93-byte VCED and 23-byte ACED
-layouts. `to_controls` emits only mappings that are direct in the current Faust
-voice. Output-level, coarse-ratio, DET, level scaling, EG bias and KVS remain
-explicitly unmapped until their TX81Z->engine policies are implemented.
+Offsets follow the documented 93-byte VCED and 23-byte ACED layouts. Frequency
+coarse is a TX81Z panel ratio index, not the OPZ multiple nibble: the firmware
+ratio families correspond to OPZ DT2 groups and multiple slots. Output level is
+the inverse of the OPZ 0.75 dB total-level control to within the documented
+~0.74 dB TX81Z panel step, so 99 -> TL 0 and 0 -> TL 99. DET is centred at 3.
+Level scaling and EG bias remain explicit because the current one-note voice has
+no qualified panel policy for them yet.
 """
 from __future__ import annotations
 import argparse, json
@@ -13,6 +16,18 @@ from pathlib import Path
 VCED_SIZE=93; ACED_SIZE=23
 OP_VCED={1:39,2:13,3:26,4:0}
 OP_ACED={1:15,2:5,3:10,4:0}
+# TX81Z ratio-coarse ordering. Each row is one OPZ DT2 family; the position in
+# the row is the OPZ multiple nibble. This is the compact form of the published
+# 64-ratio table and matches independent TX81Z implementations.
+RATIO_GROUPS=(
+    (0,4,8,10,13,16,19,22,25,28,31,34,36,40,42,45),
+    (1,5,9,14,18,23,26,30,35,39,43,46,49,52,55,58),
+    (2,6,11,15,20,24,29,33,38,44,48,50,53,56,59,61),
+    (3,7,12,17,21,27,32,37,41,47,51,54,57,60,62,63),
+)
+RATIO_MAP={panel:(multiple,dt2) for dt2,row in enumerate(RATIO_GROUPS) for multiple,panel in enumerate(row)}
+# VCED DET is 0..6 with centre=3. OPZ DT1 uses 0..3 for +0..+3 and 5..7 for -1..-3.
+DET_TO_DT1=(7,6,5,0,1,2,3)
 
 def _bytes(path: str, size: int) -> bytes:
     data=Path(path).read_bytes()
@@ -36,14 +51,22 @@ def decode(vced: bytes, aced: bytes) -> dict:
             'lfo':{'speed':vced[54],'delay':vced[55],'pmd':vced[56],'amd':vced[57],'sync':vced[58],'wave':vced[59],'pms':vced[60],'ams':vced[61]},
             'transpose':vced[62],'reverb_rate':aced[20]}
 
+def _ratio_fields(panel_coarse: int) -> tuple[int,int]:
+    if panel_coarse not in RATIO_MAP: raise ValueError(f"ratio coarse out of range: {panel_coarse}")
+    return RATIO_MAP[panel_coarse]
+
+def _dt1(det: int) -> int:
+    if not 0 <= det < len(DET_TO_DT1): raise ValueError(f"DET out of range: {det}")
+    return DET_TO_DT1[det]
+
 def to_controls(patch: dict) -> tuple[dict,dict]:
     l=patch['lfo']; c={'algorithm':patch['algorithm'],'feedback':patch['feedback'],'lfoSpeed':l['speed'],'lfoDelay':l['delay'],'pModDepth':l['pmd'],'aModDepth':l['amd'],'lfoSync':l['sync'],'lfoWave':l['wave'],'pModSens':l['pms'],'aModSens':l['ams']}
     unresolved={}
     for op,p in patch['operators'].items():
-        q=f'op{op}'
-        c.update({q+'AR':p['ar'],q+'D1R':p['d1r'],q+'D2R':p['d2r'],q+'RR':p['rr'],q+'SL':p['d1l'],q+'KS':p['rs'],q+'AME':p['ame'],q+'Mode':p['fixed'],q+'Range':p['range'],q+'Fine':p['fine'],q+'Wave':p['wave'],q+'FixedCRS':p['crs']})
+        q=f'op{op}'; multiple,dt2=_ratio_fields(p['crs'])
+        c.update({q+'AR':p['ar'],q+'D1R':p['d1r'],q+'D2R':p['d2r'],q+'RR':p['rr'],q+'SL':p['d1l'],q+'KS':p['rs'],q+'AME':p['ame'],q+'KVS':p['kvs'],q+'TL':max(0,min(127,99-p['out'])),q+'Mode':p['fixed'],q+'Coarse':multiple,q+'DT1':_dt1(p['det']),q+'DT2':dt2,q+'Range':p['range'],q+'Fine':p['fine'],q+'Wave':p['wave'],q+'FixedCRS':p['crs']})
         if op!=1: c[q+'EGShift']=p['eg_shift']
-        unresolved[q]={'output_level':p['out'],'ratio_coarse':p['crs'],'detune':p['det'],'level_scaling':p['ls'],'eg_bias':p['ebs'],'key_velocity_sensitivity':p['kvs']}
+        unresolved[q]={'level_scaling':p['ls'],'eg_bias':p['ebs']}
         if op==1 and p['eg_shift']!=0: unresolved[q]['unexpected_eg_shift']=p['eg_shift']
     unresolved['voice']={'transpose':patch['transpose'],'reverb_rate':patch['reverb_rate']}
     return c,unresolved
