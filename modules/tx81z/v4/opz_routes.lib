@@ -1,0 +1,26 @@
+// OPZ v4: four running operators, eight runtime connection topologies.
+// Topology from ymfm@81aec25ccbb98f4873a255f7551ac4dadac59b4a,
+// src/ymfm_fm.ipp::fm_channel::output_4op (BSD-3-Clause).
+// Copyright (c) 2021 Aaron Giles. See ../YMFM-LICENSE.txt.
+// Waveform equations are the qualified, unchanged v2 implementation.
+// This is not the chip's fixed-point bus, feedback, or envelope model.
+import("stdfaust.lib");
+wave = library("../v2/opz_core.lib");
+
+// Public operator order preserves v2: OP1 is the final serial carrier;
+// OP4 is the first serial modulator. ymfm's evaluation O1..O4 is reversed.
+// Algorithm a is zero-based internally, matching ymfm's table.
+in3(a,o4) = ((a==0)|(a==3)|(a==4)|(a==5)|(a==6))*o4;
+in2(a,o4,o3) = ((a==0)|(a==1)|(a==2))*o3 + ((a==1)|(a==5))*o4;
+in1(a,o4,o3,o2) = (a<=4)*o2 + ((a==2)|(a==5))*o4 + (a==3)*o3;
+carriers(a,o4,o3,o2,o1) = o1 + (a>=4)*o3 + (a>=5)*o2 + (a==7)*o4;
+
+// Select connections BEFORE evaluating each operator; never select eight
+// complete voices afterward. No added feedback delay or cross-voice state.
+voice(a,f,r1,r2,r3,r4,l1,l2,l3,l4,w1,w2,w3,w4) = carriers(a,o4,o3,o2,o1)
+with {
+    o4 = wave.op(f*r4,0,w4)*l4;
+    o3 = wave.op(f*r3,in3(a,o4),w3)*l3;
+    o2 = wave.op(f*r2,in2(a,o4,o3),w2)*l2;
+    o1 = wave.op(f*r1,in1(a,o4,o3,o2),w1)*l1;
+};

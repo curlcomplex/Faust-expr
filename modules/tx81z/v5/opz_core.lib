@@ -1,0 +1,95 @@
+// OPZ frequency/envelope/operator translation, not a complete TX81Z firmware model.
+// Adapted from ymfm@81aec25ccbb98f4873a255f7551ac4dadac59b4a (BSD-3-Clause).
+// Copyright (c) 2021 Aaron Giles. Full notice: ../YMFM-LICENSE.txt.
+// Every integer clock at 55930 Hz is compared against the unchanged native core.
+// Other sample rates adapt pitch and EG cadence; feedback remains two HOST samples.
+import("stdfaust.lib");
+t = library("opz_tables.lib");
+r = library("../v4/opz_routes.lib");
+
+clipi(lo,hi,x) = int(max(lo,min(hi,x)));
+multiple(coarse,fine) = int(select2(coarse==0,coarse<<4,8)) | int(fine);
+fixedHz(range,coarse,fine) = multiple(coarse,fine) << int(range);
+keycode(bf) = (int(bf)>>8)&31;
+detune(dt,k) = int(t.detune(4*k+(int(dt)&3)))*select2(dt>=4,1,-1);
+delta(dt2) = select2(dt2>=2,select2(dt2==1,0,384),select2(dt2==3,500,608));
+// This implements the pinned native octave/saturation law, not equal-temperament fitting.
+keyStep(bf,dt2) = select2(b2>7,int(t.keyStep(e%768)) >> clipi(0,7,7-b2),int(t.keyStep(767))) with {
+    code=(int(bf)>>6)&15;
+    e=((code-(code>>2))<<6)+(int(bf)&63)+delta(dt2);
+    b2=((int(bf)>>10)&7)+(e/768:int);
+};
+ratioStep(bf,coarse,fine,dt1,dt2) = ((keyStep(bf,dt2)+detune(dt1,keycode(bf)))*multiple(coarse,fine))>>4;
+// The hardware-facing register fields overlap in ratio and fixed modes.
+// Separate public controls below are a deliberate authoring convenience.
+phaseStep(bf,mode,coarse,fine,dt1,dt2,range) = select2(mode>0,normal,fixed) with {
+    rs=ratioStep(bf,coarse,fine,dt1,dt2);
+    // Preserve a fractional host-rate carry without signed 32-bit overflow.
+    radd=select2(int(ma.SR)==55930,int(float(rs)*(55930.0/ma.SR)*256.0),rs<<8);
+    racc=+(select2(mode>0,radd,0)) ~ (int : &(255));
+    normal=racc>>8;
+    fadd=select2(int(ma.SR)==55930,int(float(75*fixedHz(range,coarse,fine))*(55930.0/ma.SR)),75*fixedHz(range,coarse,fine));
+    facc=+(select2(mode>0,0,fadd)) ~ (int : &(4095));
+    fixed=facc>>12;
+};
+// Public Hz -> nearest 1/64-semitone OPZ key position; bounded chip register range.
+fromHz(hz) = (oct<<10) | (code<<6) | frac with {
+    pitch=clipi(0,6143,floor((69.0+12.0*log(max(1.0,hz)/440.0)/log(2.0)-13.0)*64.0+0.5));
+    oct=pitch/768:int; note=(pitch/64:int)%12; frac=pitch%64;
+    code=note+(note/3:int);
+};
+// EG advances once per three native clocks. One event/output sample for SR>=18644.
+// 14-bit phase is sufficient for every native rate table's stepping period.
+egClock = tick,count with {
+    clockSum=+(55930) ~ (%(3*int(ma.SR)));
+    tick=clockSum>=3*int(ma.SR);
+    count=(+(int(tick)) ~ (&(16383))): &(16383);
+};
+effective(raw,ks) = select2(raw==0,min(63,raw+ks),0);
+// Return attenuation and native state number (attack=1,decay=2,sustain=3,release=4,reverb=5).
+envelope(g,tick,count,bf,ar,dr,sr,sl,rr,ks,rev) = (next ~ (_, _)) : ((1023-_),+(4)) with {
+    k=keycode(bf) >> (3-int(ks));
+    ra=effective(2*int(ar),k); rd=effective(2*int(dr),k); rs=effective(2*int(sr),k);
+    rel=effective(4*int(rr)+2,k); reverb=select2(rev>0,rel,min(rel,effective(4*int(rev)+2,k)));
+    sustain=(int(sl) | ((int(sl)+1)&16))<<5;
+    on=(g>0)&(g'<=0); off=(g<=0)&(g'>0);
+    next(prevLevel,prevState) = 1023-atten, state-4 with {
+        old=int(prevState)+4;
+        s0=select2(on, select2(off & (old<4), old, 4),1);
+        a0=select2(on & (ra>=62),1023-int(prevLevel),0);
+        s1=select2(tick & (s0==1) & (a0==0),s0,2);
+        s2=select2(tick & (s1==2) & (a0>=sustain),s1,3);
+        rate=select2(s2>=3,select2(s2==2,ra,rd),select2(s2==3,select2(s2==4,reverb,rel),rs));
+        shift=rate>>2;
+        due=tick & ((int(count)&((1<<max(0,11-shift))-1))==0);
+        idx=(int(count)>>max(0,11-shift))&7;
+        inc=int(t.increment(rate*8+idx));
+        change=select2(s2==1,inc,select2(rate<62,0,((-a0-1)*inc)>>4));
+        atten=select2(due,a0,min(1023,a0+change));
+        state=select2(due & (s2==4) & (atten>=192),s2,5);
+    };
+};
+phase(step,g) = next ~ _ with {
+    on=(g>0)&(g'<=0);
+    next(prev) = (int(step)+select2(on,int(prev),0)) & 1048575;
+};
+// Native waveform construction operates in logarithmic attenuation, not sin() * envelope.
+sineLog(p) = int(t.sineLog(select2((int(p)&256)!=0,int(p),-1-int(p))&255));
+waveLog(p,w) = select2((w>=2)&((int(p)&512)!=0),val,2137) with {
+    q=select2(w>=4,int(p),int(p)*2);
+    mag=sineLog(q);
+    m=select2((int(w)&1)!=0,mag,min(2137,2*mag));
+    sign=select2(w>=6,(q&512)<<6,0);
+    val=m|sign;
+};
+operator(p,atten,tl,w) = select2(atten>896,signed,0) with {
+    word=waveLog(p,w);
+    a=(word&32767)+(min(1023,int(atten)+(int(tl)<<3))<<2);
+    v=int(t.power(a&255))>>(a>>8);
+    signed=v*select2((word&32768)!=0,1,-1);
+};
+feedbackOperator(p,atten,tl,w,fb) = (next ~ (_, _)) : (_,!) with {
+    next(prev,older) = operator(p+mod,atten,tl,w),prev with {
+        mod=select2(fb>0,0,(int(prev)+int(older))>>(10-int(fb)));
+    };
+};

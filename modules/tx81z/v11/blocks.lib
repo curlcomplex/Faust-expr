@@ -1,0 +1,31 @@
+// Callable TX81Z source boundaries; arithmetic remains in the retained libraries.
+// See README.md for units, state, feedback and initialization contracts.
+import("stdfaust.lib");
+opz=library("../v5/opz_core.lib");
+panel=library("../v6/panel_frequency.lib");
+policy=library("../v10/panel_policy.lib");
+lfo=library("../v7/lfo.lib");
+
+// Hz -> packed OPZ key/fraction. This quantizes to 1/64 semitone.
+fromHz(hz)=opz.fromHz(hz);
+// Pair (tick, 14-bit count). Share this pair across an instrument's envelopes.
+egClock=opz.egClock;
+phaseStep(bf,mode,coarse,fine,dt1,dt2,range,fixedCrs)=panel.phaseStep(bf,mode,coarse,fine,dt1,dt2,range,fixedCrs);
+// Stateful 20-bit accumulator; output is its upper 10 bits, NOT radians.
+phase(step,gate)=opz.phase(step,gate)>>10;
+envelope(gate,tick,count,keyBf,ar,d1r,d2r,sl,rr,ks,reverb)=opz.envelope(gate,tick,count,keyBf,ar,d1r,d2r,sl,rr,ks,reverb):(_,!);
+totalTL(baseTL,kvs,ls,ebs,bcDepth,note,velocity,cc2,algorithm,operatorIndex)=policy.totalTL(baseTL,kvs,ls,ebs,bcDepth,note,velocity,cc2,algorithm,operatorIndex);
+// OPZ bus output is a signed integer amplitude; attenuation/TL are not gains.
+op(phaseValue,atten,tl,wave)=opz.operator(phaseValue,atten,tl,wave);
+// Owns two delayed outputs. Do NOT add an extra recursive-composition delay.
+feedbackOp(phaseValue,atten,tl,wave,feedback)=opz.feedbackOperator(phaseValue,atten,tl,wave,feedback);
+modulatePhase(phaseValue,bus)=phaseValue+(int(bus)>>1);
+attenuation(eg,shift,am,enable)=min(1023,(int(eg)>>int(shift))+int(am)*int(enable));
+toAudio(bus)=float(bus)*(1.0/32768.0);
+pmDelta(speed,delay,depth,sensitivity,wave,sync,gate)=lfo.pmDelta(speed,delay,depth,sensitivity,wave,sync,gate);
+amOffset(speed,delay,depth,sensitivity,wave,sync,gate)=lfo.amOffset(speed,delay,depth,sensitivity,wave,sync,gate);
+// Routing algorithms are ZERO-based; front-panel algorithm controls are 1..8.
+in3(algorithm,o4)=opz.r.in3(algorithm,o4);
+in2(algorithm,o4,o3)=opz.r.in2(algorithm,o4,o3);
+in1(algorithm,o4,o3,o2)=opz.r.in1(algorithm,o4,o3,o2);
+carriers(algorithm,o4,o3,o2,o1)=opz.r.carriers(algorithm,o4,o3,o2,o1);

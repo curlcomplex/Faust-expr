@@ -1,0 +1,25 @@
+// TX81Z panel policy, sound identity 0.10.0. No oscillator or envelope replacement.
+// Numerical parameter facts: Andrew Evdokimov, ax81z@5848832989c7864092a277e9428d44f817c6173f,
+// Math.md (KLS, KVS, Basic TL, Algo TL). Yamaha TX81Z Owner's Manual pp.19-22,71-74.
+// Independently expressed in Faust; no firmware or third-party executable code included.
+// See REFERENCE.md for source contradictions and the explicitly provisional BC curve.
+import("stdfaust.lib");
+clipi(lo,hi,x)=int(max(lo,min(hi,x)));
+expo(x)=(clipi(0,99,x)*165)>>6;
+keyCode(note)=(oct<<4)+n+(n/3:int) with {
+    index=clipi(13,108,note)-13;
+    oct=index/12:int; n=index%12;
+};
+klsTable(i)=(waveform{0,1,2,3,4,5,6,7,8,9,11,14,16,19,23,28,33,39,47,57,67,80,95,113,134,160,190,224,255},clipi(0,28,i)):rdtable;
+levelScaleTL(ls,note)=(expo(ls)*int(klsTable(max(0,keyCode(note)-14)>>2)))>>8;
+velocityTable(i)=(waveform{254,192,180,174,168,162,158,152,148,144,141,138,134,130,128,125,122,119,116,114,112,109,107,105,103,101,99,97,95,93,92,90,88,86,85,83,82,81,79,78,76,75,74,72,71,70,68,67,66,65,64,63,62,60,59,58,57,56,55,54,53,52,50,49,48,47,46,45,44,43,42,41,40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,26,25,24,23,22,22,21,20,19,18,18,17,16,16,15,14,14,13,12,12,11,11,10,9,9,8,7,7,6,6,5,5,4,4,3,3,2,2,1,1,0},clipi(0,127,i)):rdtable;
+velocityTL(kvs,midiVelocity)=select2(k==0,((32*k*int(velocityTable(midiVelocity)))>>8)+15-2*k,0) with { k=clipi(0,7,kvs); };
+lowLevel(i)=(waveform{127,122,118,114,110,107,104,102,100,98,96,94,92,90,88,86,85,84,82,81},clipi(0,19,i)):rdtable;
+basicTL(level)=select2(x<20,99-x,int(lowLevel(x))) with { x=clipi(0,99,level); };
+// Natural Yamaha OP1..4, zero-based algorithm. Trim only audible carriers.
+algorithmTrim(a,op)=8*((a==4)&((op==1)|(op==3)))+13*(((a==5)|(a==6))&(op<=3))+16*(a==7);
+// PROVISIONAL family model, not measured TX81Z parity: XCent 0.12.7 DSP28,
+// 7 May 2026, disclosed DX100 B10 calibration. CC2=127 removes attenuation.
+// Retain patch BC EG-bias depth AND operator EBS; never substitute static EBS gain.
+breathBiasTL(ebs,depth,cc2)=clipi(0,127,((127-clipi(0,127,cc2))*clipi(0,7,ebs)*clipi(0,99,depth))/2540);
+totalTL(base,kvs,ls,ebs,depth,note,velocity,cc2,a,op)=clipi(0,127,int(base)+velocityTL(kvs,velocity)+levelScaleTL(ls,note)+breathBiasTL(ebs,depth,cc2)+algorithmTrim(a,op));

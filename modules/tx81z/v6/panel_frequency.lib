@@ -1,0 +1,15 @@
+// TX81Z-facing fixed-frequency mapping layered over the retained v5 native-law core.
+// Yamaha TX81Z owner manual: fixed ranges 8-255 ... 1024-32640 Hz.
+// VCED/ACED mapping: fixed frequency uses FREQ upper 4 bits + ACED FINE + FIX RANGE.
+import("stdfaust.lib");
+v5=library("../v5/opz_core.lib");
+
+clipi(lo,hi,x)=int(max(lo,min(hi,x)));
+fixedCoarse(crs)= (clipi(0,63,crs)>>2)&15;
+fixedBase(crs,fine)= (select2(c==0,c<<4,8) | (clipi(0,15,fine)&15)) with { c=fixedCoarse(crs); };
+fixedHz(range,crs,fine)=fixedBase(crs,fine) << clipi(0,7,range);
+// v5 intentionally reproduces the pinned ymfm substep interpretation. For the
+// TX81Z-facing voice, fixed mode must instead mean the documented audible Hz.
+fixedPhaseStep(range,crs,fine)=int(float(fixedHz(range,crs,fine))*1048576.0/ma.SR+0.5);
+phaseStep(bf,mode,ratioCoarse,fine,dt1,dt2,range,fixedCrs)=
+    select2(mode>0,v5.phaseStep(bf,mode,ratioCoarse,fine,dt1,dt2,range),fixedPhaseStep(range,fixedCrs,fine));

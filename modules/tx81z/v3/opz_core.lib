@@ -1,0 +1,21 @@
+// OPZ v3 routing checkpoint. Wave construction retained from qualified v2.
+// Routing follows ymfm's OPM/OPN 4-op algorithm table at
+// aaronsgiles/ymfm@81aec25ccbb98f4873a255f7551ac4dadac59b4a.
+// Feedback and exact OPZ level/envelope laws remain later work.
+import("stdfaust.lib");
+frac01(x)=x-floor(x); phasor(f)=(+(f/ma.SR)~frac01); sqsin(x)=x*abs(x);
+waveAt(p,n)=select2(int(n)%2,shaped,sqsin(shaped))*mask with { phase=frac01(p); base=sin(select2(n>=4,2*ma.PI,4*ma.PI)*phase); shaped=select2(n>=6,base,abs(base)); mask=(n<2)|(phase<0.5); };
+op(freq,pm,w)=waveAt(frac01(phasor(freq)+pm),w);
+
+// Explicit functions avoid asking Faust to expand all eight complete graphs
+// behind a runtime selector. The first v3 attempt exposed that compile-time
+// cost and is retained in CI history. Runtime algorithm switching is a later
+// host/graph design decision; these functions establish the actual DSP routes.
+alg0(f,r1,r2,r3,r4,l1,l2,l3,l4,w1,w2,w3,w4)=o4 with {o1=op(f*r1,0,w1)*l1;o2=op(f*r2,o1,w2)*l2;o3=op(f*r3,o2,w3)*l3;o4=op(f*r4,o3,w4)*l4;};
+alg1(f,r1,r2,r3,r4,l1,l2,l3,l4,w1,w2,w3,w4)=o4 with {o1=op(f*r1,0,w1)*l1;o2=op(f*r2,0,w2)*l2;o3=op(f*r3,o1+o2,w3)*l3;o4=op(f*r4,o3,w4)*l4;};
+alg2(f,r1,r2,r3,r4,l1,l2,l3,l4,w1,w2,w3,w4)=o4 with {o1=op(f*r1,0,w1)*l1;o2=op(f*r2,0,w2)*l2;o3=op(f*r3,o2,w3)*l3;o4=op(f*r4,o1+o3,w4)*l4;};
+alg3(f,r1,r2,r3,r4,l1,l2,l3,l4,w1,w2,w3,w4)=o4 with {o1=op(f*r1,0,w1)*l1;o2=op(f*r2,o1,w2)*l2;o3=op(f*r3,0,w3)*l3;o4=op(f*r4,o2+o3,w4)*l4;};
+alg4(f,r1,r2,r3,r4,l1,l2,l3,l4,w1,w2,w3,w4)=o2+o4 with {o1=op(f*r1,0,w1)*l1;o2=op(f*r2,o1,w2)*l2;o3=op(f*r3,0,w3)*l3;o4=op(f*r4,o3,w4)*l4;};
+alg5(f,r1,r2,r3,r4,l1,l2,l3,l4,w1,w2,w3,w4)=o2+o3+o4 with {o1=op(f*r1,0,w1)*l1;o2=op(f*r2,o1,w2)*l2;o3=op(f*r3,o1,w3)*l3;o4=op(f*r4,o1,w4)*l4;};
+alg6(f,r1,r2,r3,r4,l1,l2,l3,l4,w1,w2,w3,w4)=o2+o3+o4 with {o1=op(f*r1,0,w1)*l1;o2=op(f*r2,o1,w2)*l2;o3=op(f*r3,0,w3)*l3;o4=op(f*r4,0,w4)*l4;};
+alg7(f,r1,r2,r3,r4,l1,l2,l3,l4,w1,w2,w3,w4)=o1+o2+o3+o4 with {o1=op(f*r1,0,w1)*l1;o2=op(f*r2,0,w2)*l2;o3=op(f*r3,0,w3)*l3;o4=op(f*r4,0,w4)*l4;};
