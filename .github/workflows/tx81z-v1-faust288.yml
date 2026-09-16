@@ -1,4 +1,4 @@
-name: TX81Z waveform, routing and frequency qualification (Faust 2.88)
+name: TX81Z waveform, routing and native-law qualification (Faust 2.88)
 on:
   pull_request:
     paths: ['modules/tx81z/**', 'tools/modules/tx81z_*', 'tools/modules/ymfm_opz_*', 'tests/test_tx81z_*', '.github/workflows/tx81z-v1-faust288.yml']
@@ -59,7 +59,7 @@ jobs:
           mkdir -p build/tx81z/frequency
           g++ -std=c++17 -O2 -Ibuild/tx81z/ymfm/src tools/modules/ymfm_opz_frequency_probe.cpp build/tx81z/ymfm/src/ymfm_opz.cpp -o build/tx81z/frequency/probe
           build/tx81z/frequency/probe > build/tx81z/frequency/native.csv
-          /usr/bin/python3 tools/modules/tx81z_frequency_analysis.py --csv build/tx81z/frequency/native.csv --out build/tx81z/frequency/analysis | tee build/tx81z/logs/frequency.log
+          /usr/bin/python3 tools/modules/tx81z_frequency_analysis.py --csv build/tx81z/frequency/native.csv --out build/tx81z/frequency/analysis 2>&1 | tee build/tx81z/logs/frequency.log
       - name: Build pinned compiler
         run: |
           set -euo pipefail
@@ -85,12 +85,25 @@ jobs:
           from pathlib import Path
           r=json.loads(Path('build/tx81z/runtime-results/results.json').read_text()); assert r['status']=='completed' and r['oracle']['status']=='completed'; assert all(c['passed'] for c in r['checks']); assert len(r['comparisons'])==64
           PY
+      - name: Qualify OPZ native laws against the real core and deliver audio
+        run: |
+          set -euo pipefail
+          /usr/bin/python3 tools/modules/tx81z_laws_qualification.py --out build/tx81z/native-laws-results --faust build/tx81z/toolchain/build/bin/faust --libraries build/tx81z/toolchain/libraries --archive build/tx81z/faust.tar.gz --renderer .reviewed-lab/tools/modules/render.cpp --ymfm build/tx81z/ymfm 2>&1 | tee build/tx81z/logs/native-laws.log
+          /usr/bin/python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('build/tx81z/native-laws-results/results.json').read_text())
+          assert r['status']=='completed' and r['oracle']['status']=='completed'
+          assert r['checks'] and all(c['passed'] for c in r['checks'])
+          assert len(r['comparisons'])==149 and len(r['listening'])==6
+          PY
       - name: Retain actual sources, audio, failures and toolchain evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: tx81z-wave-${{ github.run_id }}
           path: |
+            build/tx81z/native-laws-results/
             build/tx81z/frequency/
             build/tx81z/results/
             build/tx81z/runtime-results/
