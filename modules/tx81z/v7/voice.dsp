@@ -4,7 +4,7 @@ declare description "TX81Z-facing fixed frequency plus measured firmware LFO map
 import("stdfaust.lib");
 opz=library("../v5/opz_core.lib");
 panel=library("../v6/panel_frequency.lib");
-lfo=library("lfo.lib");
+lfo=library("../v7/lfo.lib");
 
 gate=button("gate[curlop:input]");
 freq=hslider("freq[unit:Hz][scale:log][curlop:input]",220,20,4400,.01);
