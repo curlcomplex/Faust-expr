@@ -28,12 +28,13 @@ def sysex(v,a):
 class TX81ZPatchTests(unittest.TestCase):
     def test_asymmetric_edit_buffer_operator_order(self):
         v,a = voice()
-        # Documented VCED/ACED order4,3,2,1. Literal offsets prevent a
-        # self-consistent but wrong mapping from passing against its own map.
-        v[13:26] = bytes([30,21,12,8,6,43,2,4,1,5,77,31,3])
-        a[5:10] = bytes([0,4,9,6,3])
-        v[26:39] = bytes([29,20,11,7,5,42,1,3,0,4,66,13,2])
-        a[10:15] = bytes([1,3,8,5,2])
+        # Actual order4,2,3,1 from Edisyn and independently documented real
+        # patches, not the manual's incorrect middle-operator labels.
+        # Literal offsets prevent testing only the decoder's own constants.
+        v[26:39] = bytes([30,21,12,8,6,43,2,4,1,5,77,31,3])
+        a[10:15] = bytes([0,4,9,6,3])
+        v[13:26] = bytes([29,20,11,7,5,42,1,3,0,4,66,13,2])
+        a[5:10] = bytes([1,3,8,5,2])
         p = m.decode(bytes(v),bytes(a)); c,u = m.to_controls(p)
         self.assertEqual((c['op3AR'],c['op3TL'],c['op3LS'],c['op3EBS']),(30,22,43,4))
         self.assertEqual((c['op2AR'],c['op2TL'],c['op2LS'],c['op2EBS']),(29,33,42,3))
