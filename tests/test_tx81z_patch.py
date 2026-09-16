@@ -17,13 +17,13 @@ class TX81ZPatchTests(unittest.TestCase):
         self.assertEqual((c['algorithm'],c['feedback']),(8,6))
         self.assertEqual((c['lfoSpeed'],c['lfoWave'],c['pModSens'],c['aModSens']),(91,3,5,2))
         self.assertEqual((c['op1AR'],c['op1Mode'],c['op1Range'],c['op1Fine'],c['op1Wave'],c['op1FixedCRS']),(31,1,6,12,7,37))
-        # panel ratio coarse 37 is DT2 family 3, multiple slot 7; DET 4 is +1.
         self.assertEqual((c['op1Coarse'],c['op1DT2'],c['op1DT1']),(7,3,1))
-        self.assertEqual((c['op1TL'],c['op1KVS']),(11,6))
-        # panel ratio coarse 31 is DT2 family 0, multiple slot 10; centred DET -> zero.
+        self.assertEqual((c['op1TL'],c['op1KVS'],c['op1LS'],c['op1EBS']),(11,6,44,5))
         self.assertEqual((c['op2Coarse'],c['op2DT2'],c['op2DT1']),(10,0,0))
+        self.assertEqual((c['op2LS'],c['op2EBS']),(43,4))
         self.assertNotIn('op1EGShift',c); self.assertEqual(c['op2EGShift'],3)
-        self.assertEqual(u['op1'],{'level_scaling':44,'eg_bias':5})
+        self.assertNotIn('op1',u)
+        self.assertIn('eg_bias_controller',u['voice'])
 
     def test_all_ratio_coarse_values_are_bijective(self):
         self.assertEqual(len(m.RATIO_MAP),64)
