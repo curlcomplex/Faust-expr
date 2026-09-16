@@ -17,8 +17,8 @@ class TX81ZPatchTests(unittest.TestCase):
         self.assertEqual((c['algorithm'],c['feedback']),(8,6))
         self.assertEqual((c['lfoSpeed'],c['lfoWave'],c['pModSens'],c['aModSens']),(91,3,5,2))
         self.assertEqual((c['op1AR'],c['op1Mode'],c['op1Range'],c['op1Fine'],c['op1Wave'],c['op1FixedCRS']),(31,1,6,12,7,37))
-        # panel ratio coarse 37 is DT2 family 0, multiple slot 7; DET 4 is +1.
-        self.assertEqual((c['op1Coarse'],c['op1DT2'],c['op1DT1']),(7,0,1))
+        # panel ratio coarse 37 is DT2 family 3, multiple slot 7; DET 4 is +1.
+        self.assertEqual((c['op1Coarse'],c['op1DT2'],c['op1DT1']),(7,3,1))
         self.assertEqual((c['op1TL'],c['op1KVS']),(11,6))
         # panel ratio coarse 31 is DT2 family 0, multiple slot 10; centred DET -> zero.
         self.assertEqual((c['op2Coarse'],c['op2DT2'],c['op2DT1']),(10,0,0))
