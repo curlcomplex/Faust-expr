@@ -21,14 +21,14 @@ phase(speed,wave,g,sync)=next~_ with {
   next(prev)=select2(on&(sync>0),prev+inc-floor(prev+inc),0.0);
 };
 
-pmWave(p,w)=select2(w==0,saw,select2(w==1,square,select2(w==2,tri,sh))) with {
+pmWave(p,w)=select2(w==0,select2(w==1,select2(w==2,sh,tri),square),saw) with {
   saw=select2(p<0.5,2.0*p-2.0,2.0*p);
   square=select2(p<0.5,-1.0,1.0);
   tri=select2(p<0.25,select2(p<0.75,4.0*p,2.0-4.0*p),4.0*p-4.0);
   wrapped=(p<p');
   sh=ba.sAndH(wrapped,no.noise)*2.0;
 };
-amWave(p,w)=max(0,min(1,select2(w==0,1.0-p,select2(w==1,select2(p<0.5,0.0,1.0),select2(w==2,abs(pmWave(p,2)),(pmWave(p,3)+1.0)*0.5)))));
+amWave(p,w)=max(0,min(1,select2(w==0,select2(w==1,select2(w==2,(pmWave(p,3)+1.0)*0.5,abs(pmWave(p,2))),select2(p<0.5,0.0,1.0)),1.0-p)));
 
 noteAge(g)=next~_ with { on=(g>0)&(g'<=0); next(prev)=select2(on,prev+1,0); };
 delayGain(delay,g)=select2(delay<=0,shape,1.0) with {
