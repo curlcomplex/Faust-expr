@@ -10,7 +10,7 @@ bf=b.fromHz(freq); tick=b.egClock:(_,!); count=b.egClock:(!,_);
 egCarrier=b.envelope(gate,tick,count,bf,31,10,0,6,8,0,0);
 egMod=b.envelope(gate,tick,count,bf,31,18,8,12,6,0,0);
 pCarrier=b.phase(b.phaseStep(bf,0,1,0,0,0,0,0),gate);
-pMod=b.phase(b.phaseStep(bf,0,2,0,0,0,0,0,0),gate);
+pMod=b.phase(b.phaseStep(bf,0,2,0,0,0,0,0),gate);
 mod=b.op(pMod,egMod,int(90.0*(1.0-index)),wave);
 carrier=b.op(b.modulatePhase(pCarrier,mod),egCarrier,8,0);
 process=b.toAudio(carrier)*0.6;
