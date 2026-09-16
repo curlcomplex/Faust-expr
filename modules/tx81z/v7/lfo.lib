@@ -1,0 +1,58 @@
+// TX81Z-facing LFO mapping for the single-voice path.
+// VCED->YM2414 conversion tables are transcribed from measured TX81Z firmware
+// behavior documented by nornand (2020); oscillator arithmetic follows the
+// pinned ymfm OPZ model. This is instrument-facing policy, not a generic FM LFO.
+import("stdfaust.lib");
+
+clip99(x)=int(max(0,min(99,x)));
+table100(i,a)= (a,int(i)) : rdtable;
+lfsNormal(i)=table100(clip99(i),waveform{0,31,74,89,106,114,125,133,138,144,148,153,157,161,165,167,171,173,176,178,181,184,185,188,189,191,194,195,197,198,200,201,203,205,206,207,208,210,211,212,213,214,216,217,218,219,220,221,222,223,223,225,226,226,227,228,229,230,231,231,232,233,234,234,235,236,237,237,238,238,239,240,240,241,242,242,243,244,244,245,246,246,247,247,248,249,249,250,250,251,251,252,252,253,253,253,254,255,255,255});
+pmdReg(i)=table100(clip99(i),waveform{0,0,2,3,4,5,7,8,9,11,12,13,14,16,17,18,20,21,22,23,25,26,27,29,30,31,33,34,35,36,38,39,40,42,43,44,45,47,48,49,51,52,53,54,56,57,58,60,61,62,63,65,66,67,69,70,71,72,74,75,76,78,79,80,82,83,84,85,87,88,89,91,92,93,94,96,97,98,100,101,102,103,105,106,107,109,110,111,112,114,115,116,118,119,120,121,123,124,125,127});
+amdReg(i)=table100(clip99(i),waveform{0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,5,5,5,6,6,6,7,7,7,7,8,8,8,9,9,9,10,10,10,11,11,12,12,12,13,13,14,14,15,15,16,16,17,17,18,18,19,19,20,20,21,21,22,23,23,24,25,25,26,27,28,28,29,30,31,32,33,34,35,36,37,38,40,41,42,44,45,48,49,51,54,56,60,62,67,70,77,86,96,127});
+delayTicks(i)=table100(clip99(i),waveform{0,15,16,16,17,18,18,19,19,20,21,22,23,24,25,26,27,29,31,32,34,35,36,37,38,40,41,43,45,47,49,52,54,57,61,64,67,69,71,74,76,79,82,86,90,94,98,103,108,114,121,128,133,137,142,147,152,158,164,171,179,187,196,205,216,228,241,256,265,273,283,293,304,315,328,341,356,372,390,409,431,455,481,511,528,546,564,585,606,630,655,682,711,744,780,818,861,909,963,1022});
+
+// S/H uses a different linear firmware mapping; measured conversion is (660*n)>>8.
+lfs(speed,wave)=select2(int(wave)==3,lfsNormal(speed),(660*clip99(speed))>>8);
+rateHz(reg)=float((16+(int(reg)&15))*(1<<(int(reg)>>4)))*(55930.0/1073741824.0);
+
+phase(speed,wave,g,sync)=next~_ with {
+  inc=rateHz(lfs(speed,wave))/ma.SR;
+  on=(g>0)&(g'<=0);
+  next(prev)=select2(on&(sync>0),prev+inc-floor(prev+inc),0.0);
+};
+
+pmWave(p,w)=select2(w==0,saw,select2(w==1,square,select2(w==2,tri,sh))) with {
+  saw=select2(p<0.5,2.0*p-2.0,2.0*p);
+  square=select2(p<0.5,-1.0,1.0);
+  tri=select2(p<0.25,select2(p<0.75,4.0*p,2.0-4.0*p),4.0*p-4.0);
+  wrapped=(p<p');
+  sh=ba.sAndH(wrapped,no.noise)*2.0;
+};
+amWave(p,w)=max(0,min(1,select2(w==0,1.0-p,select2(w==1,select2(p<0.5,0.0,1.0),select2(w==2,abs(pmWave(p,2)),(pmWave(p,3)+1.0)*0.5)))));
+
+noteAge(g)=next~_ with { on=(g>0)&(g'<=0); next(prev)=select2(on,prev+1,0); };
+delayGain(delay,g)=select2(delay<=0,shape,1.0) with {
+  total=max(1.0,float(delayTicks(delay))*ma.SR/48.0);
+  x=min(1.0,float(noteAge(g))/total);
+  shape=max(0.0,min(1.0,2.0*x-1.0));
+};
+
+// Return signed key delta in native 1/64-semitone units.
+pmDelta(speed,delay,pmd,pms,wave,sync,g)=select2(int(pms)>0,0,delta) with {
+  p=phase(speed,wave,g,sync);
+  raw=int(pmWave(p,wave)*127.0);
+  depth=int(float(pmdReg(pmd))*delayGain(delay,g));
+  base=(raw*depth)>>7;
+  s=int(pms);
+  delta=select2(s<6,base<<(s-5),base>>(6-s));
+};
+
+// Return native attenuation offset (0..~508 at AMS3), applied only to AM-enabled operators.
+amOffset(speed,delay,amd,ams,wave,sync,g)=select2(int(ams)>0,0,offset) with {
+  p=phase(speed,wave,g,sync);
+  raw=int(amWave(p,wave)*255.0);
+  // Firmware ramps AMD on an A-like curve after the first half of delay.
+  gain=delayGain(delay,g); depth=int(float(amdReg(amd))*gain*gain);
+  base=(raw*depth)>>7;
+  offset=base<<(int(ams)-1);
+};
