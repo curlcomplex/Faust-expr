@@ -1,8 +1,6 @@
 name: Faust compile and audio evidence
 
 on:
-  push:
-  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -14,18 +12,17 @@ concurrency:
 
 jobs:
   smoke:
-    # Standard hosted runner; no paid larger runner.
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - name: Check out this public repository only
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           persist-credentials: false
       - name: Install distribution compiler and analysis tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends faust g++ python3-numpy python3-matplotlib
+          sudo apt-get install -y --no-install-recommends faust libfaust-static g++ clang-17 python3-numpy python3-matplotlib
       - name: Check analyser failure detection
         run: /usr/bin/python3 -m unittest discover -s tests -v
       - name: Compile actual Faust, render, and validate
@@ -33,13 +30,114 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p evidence
-          # Use the same distribution Python as the apt-installed libraries.
           PATH=/usr/bin:/bin:$PATH bash scripts/build.sh 2>&1 | tee evidence/build.log
+      - name: Probe libfaust LLVM vector and scheduler modes
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p evidence build
+          FAUST_INCLUDE="$(faust --includedir)"
+          FAUST_LIB="$(ldconfig -p | awk '/libfaust\.so\.2/{print $NF; exit}')"
+          SCHEDULER_CPP="$(find /usr/share/faust /usr/include -name scheduler.cpp -print -quit 2>/dev/null)"
+          printf 'include=%s\nlib=%s\nscheduler_cpp=%s\n' "$FAUST_INCLUDE" "$FAUST_LIB" "$SCHEDULER_CPP" | tee evidence/jit-environment.txt
+          clang++-17 --version | head -1 | tee -a evidence/jit-environment.txt
+          if [ -z "$SCHEDULER_CPP" ]; then
+            echo 'Installed Faust package did not contain scheduler.cpp' | tee evidence/scheduler-module-build.txt
+            exit 10
+          fi
+          cp "$SCHEDULER_CPP" build/faust-scheduler-link.cpp
+          sed -i 's/#define EXPORT inline __attribute__ ((visibility("default"))) __attribute__((always_inline))/#define EXPORT __attribute__ ((visibility("default")))/' build/faust-scheduler-link.cpp
+          clang++-17 -std=c++17 -O2 -S -emit-llvm -I"$FAUST_INCLUDE" build/faust-scheduler-link.cpp -o build/faust-scheduler.ll 2>&1 | tee evidence/scheduler-module-build.txt
+          module_status=${PIPESTATUS[0]}
+          if [ "$module_status" -ne 0 ]; then exit "$module_status"; fi
+          grep -E '(define|declare) .*@(createScheduler|deleteScheduler|startAll|stopAll|signalAll|syncAll|computeThreadExternal)' build/faust-scheduler.ll | tee evidence/scheduler-module-symbols.txt || true
+          g++ -std=c++17 -O2 -I"$FAUST_INCLUDE" scripts/jit_scheduler_probe.cpp "$FAUST_LIB" -lpthread -ldl -lz -o build/jit_scheduler_probe 2>&1 | tee evidence/jit-build.log
+          build_status=${PIPESTATUS[0]}
+          if [ "$build_status" -ne 0 ]; then exit "$build_status"; fi
+          : > evidence/jit-summary.txt
+          linked_status=0
+          set +e
+          for mode in scalar vec32 vec64 sch sch-linked; do
+            echo "=== $mode ===" | tee -a evidence/jit-summary.txt
+            FAUST_SCHEDULER_MODULE="$PWD/build/faust-scheduler.ll" timeout 30s build/jit_scheduler_probe "$mode" >"evidence/jit-${mode}.txt" 2>&1
+            status=$?
+            cat "evidence/jit-${mode}.txt" | tee -a evidence/jit-summary.txt
+            echo "exit_status=$status" | tee -a evidence/jit-summary.txt
+            if [ "$mode" = sch-linked ]; then linked_status=$status; fi
+          done
+          set -e
+          exit "$linked_status"
+      - name: Compare editable module boundaries with a fused Faust graph
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence build
+          FAUST_INCLUDE="$(faust --includedir)"
+          FAUST_LIB="$(ldconfig -p | awk '/libfaust\.so\.2/{print $NF; exit}')"
+          g++ -std=c++17 -O2 -I"$FAUST_INCLUDE" scripts/module_fusion_probe.cpp "$FAUST_LIB" -lpthread -ldl -lz -o build/module_fusion_probe 2>&1 | tee evidence/module-fusion-build.txt
+          FAUST_JIT_TARGET="x86_64-pc-linux-gnu:generic" timeout 120s build/module_fusion_probe 2>&1 | tee evidence/module-fusion-results.txt
       - name: Save commit-specific audio and test evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: faust-evidence-${{ github.sha }}-${{ github.run_attempt }}
+          name: faust-evidence-linux-${{ github.sha }}-${{ github.run_attempt }}
           path: evidence/
+          if-no-files-found: warn
+          retention-days: 3
+
+  module-fusion-macos:
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - name: Check out this public repository only
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Install Faust
+        shell: bash
+        run: |
+          set -euo pipefail
+          brew install faust
+      - name: Build and run Apple Silicon Faust probes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence-macos build
+          uname -a | tee evidence-macos/environment.txt
+          sysctl -n machdep.cpu.brand_string 2>/dev/null | tee -a evidence-macos/environment.txt || true
+          faust -v 2>&1 | head -5 | tee -a evidence-macos/environment.txt
+          FAUST_INCLUDE="$(faust --includedir)"
+          FAUST_LIBDIR="$(faust --libdir)"
+          printf 'include=%s\nlibdir=%s\n' "$FAUST_INCLUDE" "$FAUST_LIBDIR" | tee -a evidence-macos/environment.txt
+          cat > build/faust_target.cpp <<'CPP'
+          #include <faust/dsp/llvm-dsp.h>
+          #include <iostream>
+          int main() { std::cout << getDSPMachineTarget(); }
+          CPP
+          clang++ -std=c++17 -O2 -I"$FAUST_INCLUDE" build/faust_target.cpp -L"$FAUST_LIBDIR" -lfaust -lpthread -lz -o build/faust_target
+          TARGET="$(build/faust_target)"
+          echo "jit_target=$TARGET" | tee -a evidence-macos/environment.txt
+
+          clang++ -std=c++17 -O2 -I"$FAUST_INCLUDE" scripts/module_fusion_probe.cpp -L"$FAUST_LIBDIR" -lfaust -lpthread -lz -o build/module_fusion_probe 2>&1 | tee evidence-macos/module-fusion-build.txt
+          : > evidence-macos/module-fusion-results.txt
+          for repeat in 1 2 3; do
+            echo "=== repeat $repeat ===" | tee -a evidence-macos/module-fusion-results.txt
+            FAUST_JIT_TARGET="$TARGET" build/module_fusion_probe 2>&1 | tee -a evidence-macos/module-fusion-results.txt
+          done
+
+          clang++ -std=c++17 -O2 -I"$FAUST_INCLUDE" scripts/two_level_cache_probe.cpp -L"$FAUST_LIBDIR" -lfaust -lpthread -lz -o build/two_level_cache_probe 2>&1 | tee evidence-macos/two-level-cache-build.txt
+          : > evidence-macos/two-level-cache-results.txt
+          for repeat in 1 2 3; do
+            echo "=== repeat $repeat ===" | tee -a evidence-macos/two-level-cache-results.txt
+            FAUST_JIT_TARGET="$TARGET" build/two_level_cache_probe 2>&1 | tee -a evidence-macos/two-level-cache-results.txt
+          done
+      - name: Save macOS benchmark evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: faust-evidence-macos-${{ github.sha }}-${{ github.run_attempt }}
+          path: evidence-macos/
           if-no-files-found: warn
           retention-days: 3

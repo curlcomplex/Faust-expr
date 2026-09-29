@@ -1,0 +1,98 @@
+name: LLVM region boundary checkpoint
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/llvm_region_boundary_probe.cpp'
+      - '.github/workflows/llvm-region-boundary.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: llvm-region-boundary-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  region-boundary-macos:
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Install Faust
+        shell: bash
+        run: |
+          set -euo pipefail
+          brew install faust
+      - name: Build and run one-worker region contract probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build evidence-llvm-region-boundary
+          uname -a | tee evidence-llvm-region-boundary/environment.txt
+          sysctl -n machdep.cpu.brand_string 2>/dev/null | tee -a evidence-llvm-region-boundary/environment.txt || true
+          faust -v 2>&1 | head -5 | tee -a evidence-llvm-region-boundary/environment.txt
+          FAUST_INCLUDE="$(faust --includedir)"
+          FAUST_LIBDIR="$(faust --libdir)"
+          LLVM_PREFIX="$(brew --prefix llvm@22)"
+          CLANGXX="$LLVM_PREFIX/bin/clang++"
+          test -x "$CLANGXX"
+          "$CLANGXX" --version | head -1 | tee -a evidence-llvm-region-boundary/environment.txt
+          printf 'include=%s\nlibdir=%s\nclang=%s\n' "$FAUST_INCLUDE" "$FAUST_LIBDIR" "$CLANGXX" | tee -a evidence-llvm-region-boundary/environment.txt
+
+          "$CLANGXX" -std=c++17 -O2 -I"$FAUST_INCLUDE" scripts/llvm_region_boundary_probe.cpp \
+            -L"$FAUST_LIBDIR" -lfaust -lpthread -lz -o build/llvm_region_boundary_probe
+          build/llvm_region_boundary_probe 2>&1 | tee evidence-llvm-region-boundary/results.txt
+
+          python3 - <<'PY' | tee evidence-llvm-region-boundary/REPORT.md
+          from pathlib import Path
+          import re
+          text = Path('evidence-llvm-region-boundary/results.txt').read_text()
+          def metric(label):
+              m = re.search(rf'^{re.escape(label)} max_abs=([^ ]+) rms=([^ ]+) max_index=(\d+)$', text, re.M)
+              if not m:
+                  raise SystemExit(f'missing metric {label}')
+              return float(m.group(1)), float(m.group(2)), int(m.group(3))
+          labels = [
+              'whole_block_invariance', 'region_block_invariance',
+              'region_vs_whole_fixed', 'region_vs_whole_irregular',
+              'whole_fresh_bitcode_reload', 'region_fresh_bitcode_reload',
+              'reload_region_vs_whole',
+          ]
+          values = {label: metric(label) for label in labels}
+          if 'checkpoint_gate=PASS' not in text:
+              raise SystemExit('checkpoint did not pass')
+          lines = [
+              '# LLVM region boundary checkpoint', '',
+              'One calling thread executes region A, materializes an explicit one-sample delayed A-output edge with host carry state across compute blocks, then executes region B. The same signal construction is compiled independently as one whole LLVM JIT DSP for comparison.', '',
+              '| comparison | max abs | RMS | max-error frame |',
+              '|---|---:|---:|---:|',
+          ]
+          for label in labels:
+              a, r, i = values[label]
+              lines.append(f'| `{label}` | {a:.10e} | {r:.10e} | {i} |')
+          lines += [
+              '',
+              '**Gate:** PASS.', '',
+              'This establishes a bounded region-interface contract for this linear/stateful fixture: serial LLVM regions can preserve an explicit delayed inter-region edge across irregular block boundaries, and freshly reconstructed factories from cached bitcode reproduce the fresh-source result.', '',
+              'It does **not** extract or execute upstream `SuperNodeGraph` fused blocks, serialize a live DSP instance state across factory reload, test feedback cycles crossing a region boundary, test multiple workers, establish realtime safety, or qualify arbitrary nonlinear/stateful Faust programs. Those remain separate gates.',
+          ]
+          print('\n'.join(lines))
+          PY
+      - name: Publish report
+        if: always()
+        shell: bash
+        run: |
+          if [ -f evidence-llvm-region-boundary/REPORT.md ]; then cat evidence-llvm-region-boundary/REPORT.md >> "$GITHUB_STEP_SUMMARY"; fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: llvm-region-boundary-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence-llvm-region-boundary/
+          if-no-files-found: warn
+          retention-days: 14
