@@ -1,0 +1,84 @@
+// CYM-ID: dense shared-pole identification experiment.
+// No audio samples, sample playback, convolution kernel or time-envelope table.
+// IMPORTANT: fitted modal excitations at three reference anchors. This is NOT
+// the geometrically derived CYM-A/B physical model or proven unseen-hit realism.
+import("stdfaust.lib");
+declare name "CYM-ID Materials - property-informed experiment";
+declare description "Named elastic/thermal properties with explicitly unmeasured loss factors. Not validated replacement-material cymbal physics.";
+gate=button("gate");
+hit=gate>gate';
+clear=button("clear");
+velocity=hslider("velocity",0.7,0,1,0.001);
+position=hslider("position",0.82,0,1,0.001);
+// Only the two measured radial anchors are defined. This interpolation does not
+// assert the real mode shapes or the radius of the original recording's strikes.
+wb=min(1,max(0,(0.60-position)/0.40));
+wv=min(1,max(0,(velocity-0.15)/0.55));
+ws=(1-wb)*(1-wv)*velocity/0.15;
+wh=(1-wb)*wv*velocity/0.7;
+wbell=wb*velocity/0.45;
+// Honest spectral-domain morph controls, NOT claimed physical dimensions.
+frequency_scale=hslider("frequency_scale[scale:log]",1,0.125,8,0.001);
+loss_scale=hslider("loss_scale[scale:log]",1,0.25,8,0.001);
+
+cat_E_Pa(i)=(110000000000.0,78000000000.0,83000000000.0,120000000000.0,205800000000.0,69100000000.0,117210873981.0,110316116688.0,71700000000.0,64000000000.0,3300000000.0,3200000000.0):ba.selectn(12,i);
+cat_rho_kg_m3(i)=(8800.0,19325.0,10490.0,4510.0,7850.0,2700.0,8910.0,8530.0,2200.0,2230.0,1190.0,700.0):ba.selectn(12,i);
+cat_nu(i)=(0.34000000000000002,0.44,0.37,0.36099999999999999,0.29999999999999999,0.33000000000000002,0.328125,0.33333333333333326,0.17000000000000001,0.20000000000000001,0.34999999999999998,0.29999999999999999):ba.selectn(12,i);
+cat_cp_J_kgK(i)=(380.0,129.0,235.0,522.29999999999995,460.24000000000001,878.63999999999999,385.18560000000002,376.81200000000001,740.56799999999998,830.0,1470.0,1600.0):ba.selectn(12,i);
+cat_k_W_mK(i)=(50.0,329.0,429.0,11.4,62.759999999999998,205.01599999999999,391.14603451599999,121.15142662,1.3799999999999999,1.2,0.19,0.14999999999999999):ba.selectn(12,i);
+cat_alpha_per_K(i)=(1.7e-05,1.4e-05,1.8899999999999999e-05,8.4100000000000008e-06,1.2e-05,2.3e-05,1.6920000000000001e-05,1.9980000000000002e-05,5.7000000000000005e-07,3.2499999999999998e-06,8.0000000000000007e-05,5.0000000000000004e-06):ba.selectn(12,i);
+cat_eta(i)=(0.00035,0.00035,0.00035,0.00035,0.00035,0.00035,0.00035,0.00035,5.0000000000000002e-05,0.00020000000000000001,0.02,0.017999999999999999):ba.selectn(12,i);
+
+material_a=int(nentry("material_a[style:menu{'Original / bronze reference':0;'Gold (pure)':1;'Silver (pure)':2;'Titanium':3;'Steel (carbon)':4;'Aluminium':5;'Copper (C11000)':6;'Brass (C26000)':7;'Glass (fused silica)':8;'Glass (borosilicate)':9;'Acrylic (PMMA)':10;'Wood (effective)':11}]",0,0,11,1));
+material_b=int(nentry("material_b[style:menu{'Original / bronze reference':0;'Gold (pure)':1;'Silver (pure)':2;'Titanium':3;'Steel (carbon)':4;'Aluminium':5;'Copper (C11000)':6;'Brass (C26000)':7;'Glass (fused silica)':8;'Glass (borosilicate)':9;'Acrylic (PMMA)':10;'Wood (effective)':11}]",1,0,11,1));
+material_mix=hslider("material_mix",0,0,1,0.001);
+material_depth=hslider("material_depth",1,0,1,0.001);
+pitch_lock=checkbox("pitch_lock");
+intrinsic_loss_scale=hslider("intrinsic_loss_scale[scale:log]",1,0.1,10,0.001);
+thermal_thickness_mm=hslider("thermal_thickness_mm[unit:mm]",1.2,0.2,6,0.01);
+grip=hslider("grip",0,0,1,0.001);
+grip_strength=hslider("grip_strength",1,0.1,4,0.001);
+geoblend(fn)=fn(0)*exp((1-material_mix)*log(fn(material_a)/fn(0))
+                                    +material_mix*log(fn(material_b)/fn(0)));
+linblend(fn)=fn(material_a)+(fn(material_b)-fn(material_a))*material_mix;
+me=geoblend(cat_E_Pa); mrho=geoblend(cat_rho_kg_m3);
+mcp=geoblend(cat_cp_J_kgK); mk=geoblend(cat_k_W_mK);
+mnu=linblend(cat_nu); malpha=linblend(cat_alpha_per_K); meta=geoblend(cat_eta);
+refe=cat_E_Pa(0); refrho=cat_rho_kg_m3(0); refnu=cat_nu(0);
+refcp=cat_cp_J_kgK(0); refk=cat_k_W_mK(0); refalpha=cat_alpha_per_K(0); refeta=cat_eta(0);
+natural_ratio=sqrt((me/refe)*(refrho/mrho)*(1-refnu*refnu)/(1-mnu*mnu));
+material_ratio=exp(material_depth*log(natural_ratio));
+played_ratio=select2((pitch_lock+(original_material>0)+(material_depth==0))>0,material_ratio,1);
+original_material=((material_a==0)*(material_mix==0))+
+                  ((material_b==0)*(material_mix==1))+
+                  ((material_a==0)*(material_b==0));
+unchanged=(material_depth==0)+((original_material>0)*(intrinsic_loss_scale==1));
+// Zener single-relaxation approximation, used as a MODEL ingredient.
+// eta is a loss factor; sigma=pi*f*eta is an amplitude decay rate in 1/s.
+ted(f,e,rho,cp,k,alpha)=ma.PI*f*delta*z/(1+z*z) with {
+  tau=rho*cp*pow(thermal_thickness_mm*0.001,2)/(ma.PI*ma.PI*k);
+  delta=e*alpha*alpha*293.15/(rho*cp);
+  z=2*ma.PI*f*tau;
+};
+ref_loss(f)=ma.PI*f*refeta+ted(f,refe,refrho,refcp,refk,refalpha);
+new_loss(f)=ma.PI*f*meta*intrinsic_loss_scale+ted(f,me,mrho,mcp,mk,malpha);
+
+mode(f,d,hr,hi,br,bi,sr,si) = (step ~ (_, _)) : (_,!) with {
+  hz=f*frequency_scale*played_ratio;
+  // Anchor total empirical loss and retain at least 35% as unidentified residual.
+  // Never claim the residual/replaceable decomposition was measured.
+  rl=max(1e-12,ref_loss(f));
+  participation=min(0.65*d,rl)/rl;
+  md_calc=max(1e-6,d+material_depth*participation*(new_loss(f*material_ratio)-rl));
+  md=select2(unchanged,md_calc,d);
+  choke_loss=grip*grip*grip_strength*(25+45*sqrt(max(0,hz)/1000));
+  audible=min(1,max(0,(0.48*ma.SR-hz)/(0.04*ma.SR)));
+  // Rotation+damping has no autonomous energy gain, including retuning.
+  w=2*ma.PI*min(0.48*ma.SR,hz)/ma.SR;
+  decay=exp(0-(md*loss_scale+choke_loss+200*(1-audible))/ma.SR)*(1-clear);
+  a=cos(w)*decay; b=sin(w)*decay;
+  er=hit*audible*(wh*hr+wbell*br+ws*sr);
+  ei=hit*audible*(wh*hi+wbell*bi+ws*si);
+  step(re,im)=a*re-b*im+er,b*re+a*im+ei;
+};
+

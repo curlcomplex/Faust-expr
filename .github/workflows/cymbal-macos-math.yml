@@ -1,0 +1,56 @@
+name: Cymbal Apple Silicon phase audit
+on:
+  push:
+    branches: [cym-id-materials-01]
+    paths:
+      - 'experiments/cym-id-materials/native-host/mac-math-audit.cpp'
+      - '.github/workflows/cymbal-macos-math.yml'
+permissions:
+  contents: read
+concurrency:
+  group: cymbal-macos-math-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  mac-arm64:
+    runs-on: macos-15
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Record machine and compiler
+        run: |
+          set -euo pipefail
+          mkdir -p build/mac-audit
+          uname -a | tee build/mac-audit/platform.txt
+          sw_vers | tee -a build/mac-audit/platform.txt
+          sysctl hw.model hw.memsize hw.ncpu machdep.cpu.brand_string | tee -a build/mac-audit/platform.txt
+          xcrun clang++ --version | tee build/mac-audit/compiler.txt
+          test "$(uname -m)" = arm64
+      - name: Build current Core Audio host and check component availability
+        run: |
+          set -euo pipefail
+          xcrun clang++ -std=c++20 -O2 -Wall -Wextra -ffp-contract=off -mmacosx-version-min=12.0 \
+            experiments/cym-id-materials/native-host/audio_harness.cpp \
+            -framework AudioToolbox -framework CoreAudio -o build/mac-audit/audio_harness
+          build/mac-audit/audio_harness --selftest | tee build/mac-audit/host-selftest.json
+      - name: Build exactness and throughput audit
+        run: |
+          set -euo pipefail
+          xcrun clang++ -std=c++20 -O3 -Wall -Wextra -ffp-contract=off -mmacosx-version-min=12.0 \
+            experiments/cym-id-materials/native-host/mac-math-audit.cpp -framework Accelerate \
+            -o build/mac-audit/mac_math_audit
+      - name: Compare scalar paired and vector mathematics
+        run: |
+          set -euo pipefail
+          build/mac-audit/mac_math_audit | tee build/mac-audit/math-report.json
+          printf '%s\n' 'Actual arm64/macOS build and phase-math test. No complete checkpoint21 modal dataset is in this job. NOT a whole-cymbal audio/performance test, not a DAW deadline pass. Candidate remains unpromoted pending full-audio regression.' > build/mac-audit/SCOPE.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cymbal-macos-phase-${{ github.sha }}
+          path: |
+            build/mac-audit/*.json
+            build/mac-audit/*.txt
+          if-no-files-found: error
+          retention-days: 7

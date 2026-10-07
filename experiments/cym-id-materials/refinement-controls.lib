@@ -1,0 +1,32 @@
+// Extension 02: relative-thickness sensitivity and held viscoelastic load.
+// The mapping onto measured poles is an explicit hypothesis, not recovered shapes.
+relative_thickness=hslider("relative_thickness[scale:log]",1,0.25,4,0.001);
+thickness_pitch_lock=checkbox("thickness_pitch_lock[tooltip:Hold the 1kHz reference pole, not every resonance]");
+contact_material=int(nentry("contact_material[style:menu{'Finger-like':0;'Felt-like':1;'Leather-like':2;'Rubber-like':3;'Wood-like':4;'Bone-like':5}]",0,0,5,1));
+contact_pressure=hslider("contact_pressure",0,0,1,0.001);
+contact_area_scale=hslider("contact_area_scale[scale:log]",1,0.1,4,0.001);
+contact_strength=hslider("contact_strength[scale:log]",1,0.1,4,0.001);
+contact_pad_scale=hslider("contact_pad_scale[tooltip:Relative pad compliance length, not a measured millimetre thickness][scale:log]",1,0.25,4,0.001);
+bendtab(i)=(waveform{0.77128184255251253,0.84498984633393481,0.90530292051107708,0.87433641332373313,0.80970806971346221,0.83513631589878756,0.78910437998690486,0.74274090627724265,0.78900867778753325,0.86884746492479736,0.92414908033271226,0.93784261547387693,0.93022140431683431,0.93236207861046039,0.9453341659499398,0.94189127428734021,0.93650905560340514,0.94181190564649686,0.91766741246706363,0.85697150073341566,0.84449864268449415,0.83532991020444203,0.7418314198562358,0.73112631421674357,0.76407248297768515},int(i)):rdtable;
+bend_fraction(f)=bendtab(j)+(bendtab(j+1)-bendtab(j))*(p-j) with {
+ p=min(24,max(0,log(max(1,f)/32)/log(2)*24/9)); j=min(23,int(p));
+};
+thickness_ratio(f)=sqrt(1+bend_fraction(f)*(relative_thickness*relative_thickness-1));
+thickness_played(f)=thickness_ratio(f)/select2(thickness_pitch_lock,1,thickness_ratio(1000));
+pad_k0=(300000.0,100000.0,1500000.0,800000.0,20000000.0,40000000.0):ba.selectn(6,contact_material);
+pad_k1=(5000000.0,3000000.0,6000000.0,8000000.0,3000000.0,4000000.0):ba.selectn(6,contact_material);
+pad_tau=(0.00069999999999999999,0.00012,0.00020000000000000001,0.0001,7.9999999999999996e-06,3.9999999999999998e-06):ba.selectn(6,contact_material);
+pad_visc=(18.0,12.0,6.0,3.0,1.5,0.80000000000000004):ba.selectn(6,contact_material);
+// Diagonal weak-loading reduction of a passive standard-linear-solid impedance.
+// NOT a transient hand/contact solver. Effective area/mass participation is unknown.
+load=contact_pressure*contact_pressure*contact_area_scale*contact_strength/(relative_thickness*contact_pad_scale);
+pad_z(f)=2*ma.PI*f*pad_tau;
+pad_storage(f)=load*(pad_k0+pad_k1*pad_z(f)^2/(1+pad_z(f)^2));
+pad_decay(f)=load*(pad_visc+pad_k1*pad_tau/(2*(1+pad_z(f)^2)));
+pad_frequency(f)=sqrt(f*f+pad_storage(f)/(4*ma.PI*ma.PI));
+// Both paths are explicit at neutral settings, preserving the original.
+ted_thick(f,e,rho,cp,k,alpha)=ma.PI*f*delta*z/(1+z*z) with {
+ tau=rho*cp*pow(thermal_thickness_mm*0.001*relative_thickness,2)/(ma.PI*ma.PI*k);
+ delta=e*alpha*alpha*293.15/(rho*cp);z=2*ma.PI*f*tau;
+};
+new_loss_thick(f)=ma.PI*f*meta*intrinsic_loss_scale+ted_thick(f,me,mrho,mcp,mk,malpha);
