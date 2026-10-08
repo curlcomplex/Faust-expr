@@ -18,9 +18,35 @@ The sonic brief is a small set of authored instruments with reduced controls and
 
 ## Ownership
 
-Faust-expr owns portable kernels, authored mappings, definitions, tests, reference manifests and release identities. Consumers own UI, sequencing, project storage, audio devices, plugin/application packaging and electrical interfaces. A private runner-control repository may execute the tests without becoming another source of truth for the DSP.
+Faust-expr owns the portable kernels, authored mappings, definitions, tests,
+reference manifests and release identities maintained as laboratory modules
+here. Consumers own their target UI, sequencing, project storage, audio
+devices, application packaging and electrical interfaces.
 
-Future implementation should place a concrete module under `modules/<neutral-module-id>/` with its source, mapping/manifest, tests and compact evidence index. Shared code is extracted only when multiple real modules justify it. Large recordings and build outputs do not belong in ordinary source commits. This planning PR creates no empty engine scaffolding.
+A product may adopt a laboratory module into its designated canonical source
+repository. The handoff must identify the exact laboratory revision and retain
+lineage, control/contract history, licences and applicable qualification
+evidence. After that handoff, ongoing product DSP, mappings, module panels,
+assets, focused tests and release identities belong to that source home.
+Laboratory snapshots remain research and export provenance; they are not a
+second editable product source. There is no automatic reverse synchronization.
+Other laboratory experiments and shared research stay here unless separately
+adopted. A private runner-control repository executes checks without becoming
+an additional source authority.
+
+A laboratory export does not establish downstream sound acceptance, custom-GUI
+readiness, installed playback, saved-project recall or release selection. Early
+prototypes can use basic controls; product GUI and shared-widget work follows
+sound qualification under the receiving product's readiness process. Preserve
+existing panels and contracts during a relocation; adoption alone is not a
+redesign or a new qualification.
+
+For new laboratory work, place a concrete module under
+`modules/<neutral-module-id>/` with its source, mapping/manifest, tests and
+compact evidence index. Extract shared code only when multiple real modules
+justify it. Large recordings and build outputs do not belong in ordinary
+source commits. Public CI does not fetch private product sources or credentials.
+See [D1 and D7](DECISIONS.md) and [the adoption clarification issue](https://github.com/curlcomplex/Faust-expr/issues/133).
 
 ## Work map
 
