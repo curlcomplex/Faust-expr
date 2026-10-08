@@ -1,0 +1,40 @@
+name: Cymbal reference auditions
+
+on:
+  push:
+    branches: [cymbal-reference-shortlist]
+    paths:
+      - scripts/fetch_cymbal_references.py
+      - .github/workflows/cymbal-references.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cymbal-references-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  references:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Fetch ten public CC0 recordings and verify upstream hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/cymbal-references
+          git rev-parse HEAD > evidence/cymbal-references/collector-commit.txt
+          python3 scripts/fetch_cymbal_references.py 2>&1 | tee evidence/cymbal-references/fetch.log
+      - name: Preserve original audio and source provenance
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: cymbal-reference-candidates-${{ github.sha }}
+          path: evidence/cymbal-references/
+          retention-days: 3
+          if-no-files-found: error
