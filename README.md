@@ -27,6 +27,12 @@ The Python tests use explicitly synthetic fixtures to validate the analyser. The
 
 This repository contains only standalone laboratory files. It does not fetch, build, or publish any private host repository, its history, dependencies, settings, recordings or credentials. CI needs no API key and calls no AI model. Its GitHub token is read-only; it runs no deployment, release or automatic merge. Do not add a private checkout or private credentials to this public workflow.
 
+The [module ownership guide](modules/README.md#ownership) distinguishes
+laboratory sources from modules adopted into a downstream product's canonical
+source home. Adoption retains exact-revision provenance and existing contracts;
+it does not make laboratory snapshots a second editable product source or
+establish downstream GUI, recall or release acceptance.
+
 No open-source licence has been selected; choosing one is a separate project decision.
 
 ## References

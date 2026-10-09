@@ -4,7 +4,21 @@ Owner decision record, 8 September 2026. Programme authority: [#10](https://gith
 
 ## D1 — One canonical library, several consumers
 
-**Accepted:** module source, mappings, test scores and release identities belong in Faust-expr. CURLOP, Tracker and later products consume versioned definitions. A host adapter is permitted; an independently maintained copy of a machine is not.
+**Amended:** 9 October 2026, source ownership after downstream adoption ([#133 — Source ownership clarification](https://github.com/curlcomplex/Faust-expr/issues/133)).
+
+**Accepted:** Faust-expr is canonical for the module sources, mappings, test
+scores and release identities maintained as laboratory modules here. CURLOP,
+Tracker and later products may consume versioned definitions. A host adapter
+is permitted; parallel editable copies of the same product module are not.
+
+When a product adopts a module into its designated canonical source repository,
+that source home owns ongoing product DSP, mappings, module panels/assets,
+focused tests and release identities. Record the exact laboratory revision and
+preserve lineage, control/contract history, licences and applicable evidence at
+the handoff. Laboratory snapshots retain research/export provenance; they do
+not remain a competing product source or receive automatic reverse updates.
+This handoff does not move unrelated research, grant private-repository access
+or make public CI a product-source consumer.
 
 **Rationale:** sound corrections and new instruments should propagate deliberately across products without divergent implementations. One source does not mean one target binary, UI or compiled graph. Architecture-specific factories, generated code and tables are derived.
 
@@ -53,6 +67,13 @@ Owner decision record, 8 September 2026. Programme authority: [#10](https://gith
 **Accepted:** CURLOP may become the hands-on environment for source, macro mapping, preset audition and export. Versioned source/mapping packages must already be usable without that future environment.
 
 **Rationale:** the first kick should not wait for a plugin marketplace, GUI framework or content-distribution system. A diagnostic panel can expose internals without changing the released compact surface.
+
+**Clarified:** 9 October 2026. Source ownership follows D1 independently of the
+authoring UI. Basic or automatic controls suffice for early sound prototypes.
+Custom GUI and shared-widget work follows sound qualification in the receiving
+product's candidate process. Laboratory export evidence does not replace that
+product's listening, installed-host, saved-project recall or release gates;
+relocation preserves existing controls and panels.
 
 **Open:** exact authoring UI, package transport, mobile content-update mechanism, signing and commercial release policy. No executable mobile download or JIT permission is assumed.
 
